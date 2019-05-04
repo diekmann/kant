@@ -46,6 +46,8 @@ neuer_paragraph (Gesetz g) = let ps = S.map (\ (Paragraph i, _) -> i) g;
 
 -- Fuegt eine Rechtsnorm als neuen Paragraphen hinzu.
 hinzufuegen :: Ord a => Ord b => Rechtsnorm a b -> Gesetz Integer a b -> Gesetz Integer a b
+hinzufuegen rn (Gesetz g) | S.member rn rechtsnormen = Gesetz g -- Rechtsnorm existiert bereits
+    where rechtsnormen = S.map snd g
 hinzufuegen rn (Gesetz g) = Gesetz $ S.insert (neuer_paragraph (Gesetz g), rn) g
 
 

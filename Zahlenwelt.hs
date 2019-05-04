@@ -37,16 +37,18 @@ zahlengesetz_beispiel = Gesetz $ S.singleton ((Paragraph 42), (Rechtsnorm (Tatbe
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ (Zahlenwelt 9000 0) (Kant.Handlung (abbauen 5)) maxime_zahlenfortschritt case_law_ableiten leer
 
-make_case_law :: Kant.Handlung Zahlenwelt -> Zahlenwelt -> CaseLaw Zahlenwelt -> CaseLaw Zahlenwelt
-make_case_law h w g =
+-- max i iterations
+make_case_law :: Int -> Kant.Handlung Zahlenwelt -> Zahlenwelt -> CaseLaw Zahlenwelt -> CaseLaw Zahlenwelt
+make_case_law i _ _ g | i <= 0 = g
+make_case_law i h w g =
   if not (moeglich w h) then
     g
   else
   let (s,g') = Kant.kategorischer_imperativ w h maxime_zahlenfortschritt case_law_ableiten g in
   let w' = (if s == Erlaubnis then Kant.handeln w h else w) in
-  make_case_law h w' g'
+  make_case_law (i-1) h w' g'
 
-beispiel = make_case_law (Kant.Handlung (abbauen 5)) (Zahlenwelt 42 0) zahlengesetz_beispiel
+beispiel = make_case_law 100 (Kant.Handlung (abbauen (-1))) (Zahlenwelt 42 5) zahlengesetz_beispiel
 --putStrLn $ show_CaseLaw  beispiel
 
 
