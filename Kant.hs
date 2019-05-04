@@ -1,7 +1,6 @@
 module Kant where
 
-import qualified Data.Set as S --TODO remove
-import Gesetz
+import qualified Gesetz as G
 
 -- Beschreibt Handlungen als Änderung der Welt.
 newtype Handlung world = Handlung (world -> world)
@@ -33,11 +32,11 @@ kategorischer_imperativ ::
     world              -- Die Welt in ihrem aktuellen Zustand
     -> Handlung world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
     -> Maxime world    -- Persönliche Ethik?
-    -> (world -> world -> Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
-    -> Gesetz a b      -- Allgemeines Gesetz (für alle Menschen)
+    -> (world -> world -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
+    -> G.Gesetz a b      -- Allgemeines Gesetz (für alle Menschen)
     -- Ergebnis:
-    -> (Sollensanordnung, -- Sollen wir die Handlung ausführen?
-        Gesetz a b)       -- Soll das allgemeine Gesetz entsprechend angepasst werden?
+    -> (G.Sollensanordnung, -- Sollen wir die Handlung ausführen?
+        G.Gesetz a b)       -- Soll das allgemeine Gesetz entsprechend angepasst werden?
     --TODO: Wenn unsere Maximen perfekt und die Maximen aller Menschen konsisten sind, soll das Gesetz nur erweitert werden (append only)?
 kategorischer_imperativ welt handlung maxime gesetz_ableiten gesetz =
     -- Es fehlt: ich muss nach allgemeinem Gesetz handeln. Wenn das Gesetz meinen Fall nicht abdeckt, dann muss meine Maxime zum Gesetz erhoben werden.
@@ -46,12 +45,10 @@ kategorischer_imperativ welt handlung maxime gesetz_ableiten gesetz =
     if bewerten welt handlung then
         --TODO gesetz erweitern, für alle Welten?
         --Wenn (bewerten handlung) für alle Menschen True ist muss es ein Gebot werden?
-        (Erlaubnis, add (gesetz_ableiten welt (handeln welt handlung)) gesetz)
+        (G.Erlaubnis, add (gesetz_ableiten welt (handeln welt handlung)) gesetz)
     else
         --Nur ein Verbot wenn (bewerten handlung) für alle Menschen False ist.
-        (Verbot, gesetz)
-      where add rn (Gesetz g) = Gesetz $ S.insert (Paragraph "0", rn) g
+        (G.Verbot, gesetz)
+      where add rn g = G.hinzufuegen (G.Paragraph "0") rn g
 
-case_law_ableiten w1 w2 = Rechtsnorm (Tatbestand (w1, w2)) (Rechtsfolge Erlaubnis)
-
-beispiel_kategorischer_imperativ = kategorischer_imperativ 0 (Handlung (\n-> n+1)) maxime_mir_ist_alles_recht case_law_ableiten (Gesetz S.empty)
+beispiel_kategorischer_imperativ = kategorischer_imperativ 0 (Handlung (\n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
