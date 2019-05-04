@@ -59,8 +59,8 @@ data Sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
 type CaseLaw world = Gesetz Integer (world, world) Sollensanordnung
 
 -- uebertraegt einen Tatbestand woertlich als Erlaubnis ins Gesetz
-case_law_ableiten :: w -> w -> Rechtsnorm (w, w) Sollensanordnung
-case_law_ableiten vorher nachher = Rechtsnorm (Tatbestand (vorher, nachher)) (Rechtsfolge Erlaubnis)
+case_law_ableiten :: w -> w -> Sollensanordnung -> Rechtsnorm (w, w) Sollensanordnung
+case_law_ableiten vorher nachher erlaubt = Rechtsnorm (Tatbestand (vorher, nachher)) (Rechtsfolge erlaubt)
 
 show_CaseLaw :: Show w => CaseLaw w -> String
 show_CaseLaw (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g

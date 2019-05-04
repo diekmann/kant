@@ -32,7 +32,7 @@ kategorischer_imperativ ::
     world              -- Die Welt in ihrem aktuellen Zustand
     -> Handlung world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
     -> Maxime world    -- Persönliche Ethik?
-    -> (world -> world -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
+    -> (world -> world -> G.Sollensanordnung -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
     -> G.Gesetz Integer a b      -- Allgemeines Gesetz (für alle Menschen)
     -- Ergebnis:
     -> (G.Sollensanordnung, -- Sollen wir die Handlung ausführen?
@@ -42,13 +42,14 @@ kategorischer_imperativ welt handlung maxime gesetz_ableiten gesetz =
     -- Es fehlt: ich muss nach allgemeinem Gesetz handeln. Wenn das Gesetz meinen Fall nicht abdeckt, dann muss meine Maxime zum Gesetz erhoben werden.
     -- Es fehlt: Wollen. Was will will? Was WILL ich für ein allgemeines Gesetz? Es soll für ALLE Menschen fair und gerecht sein.
     let Maxime bewerten = maxime in
-    if bewerten welt handlung then
-        --TODO gesetz erweitern, für alle Welten?
-        --Wenn (bewerten handlung) für alle Menschen True ist muss es ein Gebot werden?
-        (G.Erlaubnis, add (gesetz_ableiten welt (handeln welt handlung)) gesetz)
-    else
-        --Nur ein Verbot wenn (bewerten handlung) für alle Menschen False ist.
-        (G.Verbot, gesetz)
+    let soll_handeln = (if bewerten welt handlung then
+          --Wenn (bewerten handlung) für alle Menschen True ist muss es ein Gebot werden?
+          G.Erlaubnis
+        else
+          --Nur ein Verbot wenn (bewerten handlung) für alle Menschen False ist.
+          G.Verbot) in
+    --TODO gesetz erweitern, für alle Welten?
+    (soll_handeln, add (gesetz_ableiten welt (handeln welt handlung) soll_handeln) gesetz)
       where add rn g = G.hinzufuegen rn g
 
 beispiel_kategorischer_imperativ = kategorischer_imperativ 0 (Handlung (\n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
