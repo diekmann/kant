@@ -33,10 +33,10 @@ kategorischer_imperativ ::
     -> Handlung world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
     -> Maxime world    -- Persönliche Ethik?
     -> (world -> world -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
-    -> G.Gesetz a b      -- Allgemeines Gesetz (für alle Menschen)
+    -> G.Gesetz Integer a b      -- Allgemeines Gesetz (für alle Menschen)
     -- Ergebnis:
     -> (G.Sollensanordnung, -- Sollen wir die Handlung ausführen?
-        G.Gesetz a b)       -- Soll das allgemeine Gesetz entsprechend angepasst werden?
+        G.Gesetz Integer a b)       -- Soll das allgemeine Gesetz entsprechend angepasst werden?
     --TODO: Wenn unsere Maximen perfekt und die Maximen aller Menschen konsisten sind, soll das Gesetz nur erweitert werden (append only)?
 kategorischer_imperativ welt handlung maxime gesetz_ableiten gesetz =
     -- Es fehlt: ich muss nach allgemeinem Gesetz handeln. Wenn das Gesetz meinen Fall nicht abdeckt, dann muss meine Maxime zum Gesetz erhoben werden.
@@ -49,6 +49,6 @@ kategorischer_imperativ welt handlung maxime gesetz_ableiten gesetz =
     else
         --Nur ein Verbot wenn (bewerten handlung) für alle Menschen False ist.
         (G.Verbot, gesetz)
-      where add rn g = G.hinzufuegen (G.Paragraph "0") rn g
+      where add rn g = G.hinzufuegen rn g
 
 beispiel_kategorischer_imperativ = kategorischer_imperativ 0 (Handlung (\n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
