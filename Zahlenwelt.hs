@@ -6,8 +6,10 @@ import qualified Kant
 import qualified Data.Set as S
 import qualified Data.Map as M
 
+import Debug.Trace
+
 data Person = Alice | Bob | Carl
-    deriving (Eq, Ord, Show, Enum)
+    deriving (Eq, Ord, Show, Enum, Bounded)
 
 -- Wenn die welt nur eine Zahl ist, ...
 -- Resourcen sind endlich.
@@ -24,23 +26,23 @@ abbauen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend-i) (M.adju
 
 -- Eine Handlung ist nur physikalisch moeglich, solange es noch Resourcen gibt.
 moeglich :: Person -> Zahlenwelt -> Handlung Person Zahlenwelt -> Bool
-moeglich person (Zahlenwelt verbleibend besitz) h =
-  let (Zahlenwelt v w) = handeln person (Zahlenwelt verbleibend besitz) h in
-  v >= 0 --TODO use verbleibend
+moeglich person welt h = (verbleibend nach_handlung) >= 0
+    where nach_handlung = handeln person welt h 
 
 -- Mehr ist mehr gut.
 fortschritt :: Zahlenwelt -> Zahlenwelt -> Bool
-fortschritt (Zahlenwelt _ w1) (Zahlenwelt _ w2) = (sum w2) > (sum w1)
-    where sum = M.foldl' (+) 0
+-- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die moeglichkeit haben!!
+fortschritt (Zahlenwelt _ vorher) (Zahlenwelt _ nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
+    where gesamtbesitz = M.foldl' (+) 0
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
-maxime_zahlenfortschritt = Kant.Maxime $ \w (Handlung h) -> fortschritt w (h Alice w) --TODO hardcoded Alice!!!
+maxime_zahlenfortschritt = Kant.Maxime $ \person welt h -> trace ("maximaler fortschritt " ++ show welt ++ show person) $ fortschritt welt (handeln person welt h)
 
 zahlengesetz_beispiel :: CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
     (Paragraph 42),
-    (Rechtsnorm (Tatbestand (Zahlenwelt { verbleibend = 0, besitz = M.singleton Alice 0 },
-                             Zahlenwelt { verbleibend = 0, besitz = M.singleton Alice 1}))
+    (Rechtsnorm (Tatbestand (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 },
+                             Zahlenwelt { verbleibend = 90000, besitz = M.singleton Alice 1}))
                 (Rechtsfolge Verbot)))
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
@@ -50,6 +52,7 @@ beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
 make_case_law :: Int -> Handlung Person Zahlenwelt -> Zahlenwelt -> CaseLaw Zahlenwelt -> CaseLaw Zahlenwelt
 make_case_law i _ _ g | i <= 0 = g
 make_case_law i h w g =
+  --TODO: alles fuer Alice hardcoded
   if not (moeglich Alice w h) then
     g
   else

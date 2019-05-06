@@ -6,10 +6,18 @@ import qualified Handlung as H
 
 -- Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 -- Passt nicht so ganz auf die Definition von Maxime?
-newtype Maxime person world = Maxime (world -> H.Handlung person world -> Bool)
+-- TODO: ich sollte Maxime als axiom betrachten.
+newtype Maxime person world = Maxime (person -> world -> H.Handlung person world -> Bool)
 --TODO: Maxime
 
-maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
+maxime_mir_ist_alles_recht = Maxime (\_ _ _ -> True)
+
+
+teste_maxime :: Enum person => Bounded person => world -> H.Handlung person world -> Maxime person world -> Bool
+teste_maxime welt handlung (Maxime m) = all (\p -> m p welt handlung) all_persons 
+    where all_persons = [minBound..maxBound]
+
+
 
 --TODO: Name passt nicht ganz
 --verallgemeinern :: Maxime world -> S.Set (Rechtsnorm a b)
@@ -21,6 +29,7 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 -- TODO unterstütze viele Maximen, wobei manche nicht zutreffen können?
 kategorischer_imperativ ::
     Ord a => Ord b =>
+    Enum person => Bounded person =>
     person                      -- handelnde Person
     -> world                    -- Die Welt in ihrem aktuellen Zustand
     -> H.Handlung person world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
@@ -34,15 +43,15 @@ kategorischer_imperativ ::
 kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz =
     -- Es fehlt: ich muss nach allgemeinem Gesetz handeln. Wenn das Gesetz meinen Fall nicht abdeckt, dann muss meine Maxime zum Gesetz erhoben werden.
     -- Es fehlt: Wollen. Was will will? Was WILL ich für ein allgemeines Gesetz? Es soll für ALLE Menschen fair und gerecht sein.
-    let Maxime bewerten = maxime in
-    let soll_handeln = (if bewerten welt handlung then
+    let soll_handeln = (if teste_maxime welt handlung maxime then
           --Wenn (bewerten handlung) für alle Menschen True ist muss es ein Gebot werden?
           G.Erlaubnis
         else
           --Nur ein Verbot wenn (bewerten handlung) für alle Menschen False ist.
           G.Verbot) in
     --TODO gesetz erweitern, für alle Welten?
+    --TODO gesetz muss fuer alle gelten!
     (soll_handeln, add (gesetz_ableiten welt (H.handeln ich welt handlung) soll_handeln) gesetz)
       where add rn g = G.hinzufuegen rn g
 
-beispiel_kategorischer_imperativ = kategorischer_imperativ "ich" 0 (H.Handlung (\_ n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
+beispiel_kategorischer_imperativ = kategorischer_imperativ 'I' 0 (H.Handlung (\_ n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
