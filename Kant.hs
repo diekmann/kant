@@ -1,20 +1,12 @@
 module Kant where
 
 import qualified Gesetz as G
+import qualified Handlung as H
 
--- Beschreibt Handlungen als Änderung der Welt.
-newtype Handlung world = Handlung (world -> world)
-
-handeln :: world -> Handlung world -> world
-handeln welt (Handlung h) = h welt
-
--- Beispiel, für eine Welt die nur aus einer Zahl besteht.
--- Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
-beispiel_handlung = Handlung $ \n -> if n < 9000 then n+1 else n
 
 -- Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 -- Passt nicht so ganz auf die Definition von Maxime?
-newtype Maxime world = Maxime (world -> Handlung world -> Bool)
+newtype Maxime world = Maxime (world -> H.Handlung world -> Bool)
 --TODO: Maxime
 
 maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
@@ -30,7 +22,7 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 kategorischer_imperativ ::
     Ord a => Ord b =>
     world              -- Die Welt in ihrem aktuellen Zustand
-    -> Handlung world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
+    -> H.Handlung world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
     -> Maxime world    -- Persönliche Ethik?
     -> (world -> world -> G.Sollensanordnung -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
     -> G.Gesetz Integer a b      -- Allgemeines Gesetz (für alle Menschen)
@@ -49,7 +41,7 @@ kategorischer_imperativ welt handlung maxime gesetz_ableiten gesetz =
           --Nur ein Verbot wenn (bewerten handlung) für alle Menschen False ist.
           G.Verbot) in
     --TODO gesetz erweitern, für alle Welten?
-    (soll_handeln, add (gesetz_ableiten welt (handeln welt handlung) soll_handeln) gesetz)
+    (soll_handeln, add (gesetz_ableiten welt (H.handeln welt handlung) soll_handeln) gesetz)
       where add rn g = G.hinzufuegen rn g
 
-beispiel_kategorischer_imperativ = kategorischer_imperativ 0 (Handlung (\n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
+beispiel_kategorischer_imperativ = kategorischer_imperativ 0 (H.Handlung (\n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
