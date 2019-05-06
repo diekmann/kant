@@ -1,12 +1,11 @@
 module Handlung where
 
-
 -- Beschreibt Handlungen als Änderung der Welt.
-newtype Handlung world = Handlung (world -> world)
+newtype Handlung person world = Handlung (person -> world -> world)
 
-handeln :: world -> Handlung world -> world
-handeln welt (Handlung h) = h welt
+handeln :: person -> world -> Handlung person world -> world
+handeln handelnde_person welt (Handlung h) = h handelnde_person welt
 
 -- Beispiel, für eine Welt die nur aus einer Zahl besteht.
 -- Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
-beispiel_handlung = Handlung $ \n -> if n < 9000 then n+1 else n
+beispiel_handlung = Handlung $ \p n -> if n < 9000 then n+1 else n
