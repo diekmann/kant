@@ -24,6 +24,13 @@ instance Show Zahlenwelt where
 abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
 abbauen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend-i) (M.adjust (+i) p besitz)
 
+stehlen :: Integer -> Person -> Person -> Zahlenwelt -> Zahlenwelt
+stehlen _ opfer _ welt | M.notMember opfer (besitz welt) = welt -- Wenn das Opfer nichts hat kann auch nichts gestohlen werden.
+stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
+    where neuer_besitz = case M.lookup opfer besitz of
+                           Nothing -> besitz
+                           Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer besitz)
+
 -- Eine Handlung ist nur physikalisch moeglich, solange es noch Resourcen gibt.
 moeglich :: Person -> Zahlenwelt -> Handlung Person Zahlenwelt -> Bool
 moeglich person welt h = (verbleibend nach_handlung) >= 0
@@ -67,7 +74,12 @@ make_case_law i h w g =
   let w' = (if s == Erlaubnis then handeln Alice w h else w) in
   make_case_law (i-1) h w' g'
 
-beispiel = make_case_law 100 (Handlung (abbauen 10)) (Zahlenwelt { verbleibend = 42, besitz = M.singleton Alice 5 }) zahlengesetz_beispiel
+initialwelt = Zahlenwelt {
+                verbleibend = 42,
+                besitz = M.fromList [(Alice, 5), (Bob, 10)]
+              }
+
+beispiel = make_case_law 100 (Handlung (stehlen 5 Bob)) initialwelt zahlengesetz_beispiel
 --putStrLn $ show_CaseLaw  beispiel
 
 
