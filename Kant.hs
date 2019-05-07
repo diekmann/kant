@@ -14,9 +14,8 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ _ -> True)
 
 
 teste_maxime :: Enum person => Bounded person => world -> H.Handlung person world -> Maxime person world -> Bool
-teste_maxime welt handlung (Maxime m) = all (\p -> m p welt handlung) all_persons 
+teste_maxime welt handlung (Maxime maxime) = all (\person -> maxime person welt handlung) all_persons 
     where all_persons = [minBound..maxBound]
-
 
 
 --TODO: Name passt nicht ganz

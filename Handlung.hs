@@ -1,6 +1,6 @@
 module Handlung where
 
--- Beschreibt Handlungen als Änderung der Welt.
+-- Beschreibt Handlungen für eine handelnde Person als Änderung der Welt.
 newtype Handlung person world = Handlung (person -> world -> world)
 
 handeln :: person -> world -> Handlung person world -> world

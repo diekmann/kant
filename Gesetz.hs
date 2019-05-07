@@ -60,14 +60,14 @@ data Sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
 -- Paragraphen sind einfach Integer
 type CaseLaw world = Gesetz Integer (world, world) Sollensanordnung
 
--- uebertraegt einen Tatbestand woertlich als Erlaubnis ins Gesetz
-case_law_ableiten :: w -> w -> Sollensanordnung -> Rechtsnorm (w, w) Sollensanordnung
-case_law_ableiten vorher nachher erlaubt = Rechtsnorm (Tatbestand (vorher, nachher)) (Rechtsfolge erlaubt)
-
 show_CaseLaw :: Show w => CaseLaw w -> String
 show_CaseLaw (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
   where
     show_paragraph (Paragraph p, rechtsnorm) = "§" ++ show p ++ ": " ++ show_rechtsnorm rechtsnorm
     show_rechtsnorm (Rechtsnorm (Tatbestand (a,b)) (Rechtsfolge f)) = "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++
                                                                        show b ++ " aendern wollen, dann " ++ show f
+
+-- uebertraegt einen Tatbestand woertlich ins Gesetz
+case_law_ableiten :: w -> w -> Sollensanordnung -> Rechtsnorm (w, w) Sollensanordnung
+case_law_ableiten vorher nachher erlaubt = Rechtsnorm (Tatbestand (vorher, nachher)) (Rechtsfolge erlaubt)
 
