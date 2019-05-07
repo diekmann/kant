@@ -30,13 +30,20 @@ moeglich person welt h = (verbleibend nach_handlung) >= 0
     where nach_handlung = handeln person welt h 
 
 -- Mehr ist mehr gut.
-fortschritt :: Zahlenwelt -> Zahlenwelt -> Bool
+globaler_fortschritt :: Zahlenwelt -> Zahlenwelt -> Bool
 -- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die moeglichkeit haben!!
-fortschritt (Zahlenwelt _ vorher) (Zahlenwelt _ nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
+globaler_fortschritt (Zahlenwelt _ vorher) (Zahlenwelt _ nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
     where gesamtbesitz = M.foldl' (+) 0
+-- Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werden und die Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).
+
+
+individueller_fortschritt :: Person -> Zahlenwelt -> Zahlenwelt -> Bool
+individueller_fortschritt p vorher nachher = (meins nachher) >= (meins vorher)
+    where meins welt = M.findWithDefault 0 p (besitz welt)
+
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
-maxime_zahlenfortschritt = Kant.Maxime $ \person welt h -> trace ("maximaler fortschritt " ++ show welt ++ show person) $ fortschritt welt (handeln person welt h)
+maxime_zahlenfortschritt = Kant.Maxime $ \person welt h -> individueller_fortschritt person welt (handeln person welt h)
 
 zahlengesetz_beispiel :: CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
