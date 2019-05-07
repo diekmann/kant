@@ -7,14 +7,16 @@ import qualified Handlung as H
 -- Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 -- Passt nicht so ganz auf die Definition von Maxime?
 -- TODO: ich sollte Maxime als axiom betrachten.
-newtype Maxime person world = Maxime (person -> world -> H.Handlung person world -> Bool)
+newtype Maxime person world = Maxime (H.Handlung world -> Bool)
 --TODO: Maxime
 
-maxime_mir_ist_alles_recht = Maxime (\_ _ _ -> True)
+maxime_mir_ist_alles_recht = Maxime (\_ -> True)
 
 
-teste_maxime :: Enum person => Bounded person => world -> H.Handlung person world -> Maxime person world -> Bool
-teste_maxime welt handlung (Maxime maxime) = all (\person -> maxime person welt handlung) all_persons 
+-- Wir testen: was wenn jeder so handeln wuerde.
+-- TODO: was wenn jeder diese maxime haette? Betroffene Person. Bsp: stehlen und bestohlen werden.
+teste_maxime :: Enum person => Bounded person => world -> H.HandlungF person world -> Maxime person world -> Bool
+teste_maxime welt handlung (Maxime maxime) = all (\person -> maxime (H.handeln person welt handlung)) all_persons 
     where all_persons = [minBound..maxBound]
 
 
@@ -24,16 +26,21 @@ teste_maxime welt handlung (Maxime maxime) = all (\person -> maxime person welt 
 
 --type gesetz_ableiten = world -> world -> Rechtsnorm a b
 
+
+-- uebertraegt einen Tatbestand woertlich ins Gesetz
+case_law_ableiten :: H.Handlung world -> G.Sollensanordnung -> G.Rechtsnorm (world, world) G.Sollensanordnung
+case_law_ableiten (H.Handlung vorher nachher) erlaubt = G.Rechtsnorm (G.Tatbestand (vorher, nachher)) (G.Rechtsfolge erlaubt)
+
 -- Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst, dass sie ein allgemeines Gesetz werde.
 -- TODO unterstütze viele Maximen, wobei manche nicht zutreffen können?
 kategorischer_imperativ ::
     Ord a => Ord b =>
     Enum person => Bounded person =>
-    person                      -- handelnde Person
-    -> world                    -- Die Welt in ihrem aktuellen Zustand
-    -> H.Handlung person world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
+    person                       -- handelnde Person
+    -> world                     -- Die Welt in ihrem aktuellen Zustand
+    -> H.HandlungF person world  -- Eine mögliche Handlung, über die wir entscheiden wollen ob wir sie ausführen sollten.
     -> Maxime person world  -- Persönliche Ethik?
-    -> (world -> world -> G.Sollensanordnung -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
+    -> (H.Handlung world -> G.Sollensanordnung -> G.Rechtsnorm a b) -- allgemeines Gesetz ableiten. TODO: so wird das nicht allgemein.
     -> G.Gesetz Integer a b      -- Allgemeines Gesetz (für alle Menschen)
     -- Ergebnis:
     -> (G.Sollensanordnung, -- Sollen wir die Handlung ausführen?
@@ -50,7 +57,7 @@ kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz =
           G.Verbot) in
     --TODO gesetz erweitern, für alle Welten?
     --TODO gesetz muss fuer alle gelten!
-    (soll_handeln, add (gesetz_ableiten welt (H.handeln ich welt handlung) soll_handeln) gesetz)
+    (soll_handeln, add (gesetz_ableiten (H.handeln ich welt handlung) soll_handeln) gesetz)
       where add rn g = G.hinzufuegen rn g
 
-beispiel_kategorischer_imperativ = kategorischer_imperativ 'I' 0 (H.Handlung (\_ n-> n+1)) maxime_mir_ist_alles_recht G.case_law_ableiten G.leer
+beispiel_kategorischer_imperativ = kategorischer_imperativ 'I' 0 (H.HandlungF (\_ n-> n+1)) maxime_mir_ist_alles_recht case_law_ableiten G.leer

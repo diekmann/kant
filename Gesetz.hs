@@ -67,7 +67,4 @@ show_CaseLaw (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
     show_rechtsnorm (Rechtsnorm (Tatbestand (a,b)) (Rechtsfolge f)) = "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++
                                                                        show b ++ " aendern wollen, dann " ++ show f
 
--- uebertraegt einen Tatbestand woertlich ins Gesetz
-case_law_ableiten :: w -> w -> Sollensanordnung -> Rechtsnorm (w, w) Sollensanordnung
-case_law_ableiten vorher nachher erlaubt = Rechtsnorm (Tatbestand (vorher, nachher)) (Rechtsfolge erlaubt)
 

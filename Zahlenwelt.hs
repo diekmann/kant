@@ -32,46 +32,47 @@ stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
                            Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer besitz)
 
 -- Eine Handlung ist nur physikalisch moeglich, solange es noch Resourcen gibt.
-moeglich :: Person -> Zahlenwelt -> Handlung Person Zahlenwelt -> Bool
+moeglich :: Person -> Zahlenwelt -> HandlungF Person Zahlenwelt -> Bool
 moeglich person welt h = (verbleibend nach_handlung) >= 0
-    where nach_handlung = handeln person welt h 
+    where nach_handlung = nachher $ handeln person welt h 
 
 -- Mehr ist mehr gut.
-globaler_fortschritt :: Zahlenwelt -> Zahlenwelt -> Bool
+globaler_fortschritt :: Handlung Zahlenwelt -> Bool
 -- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die moeglichkeit haben!!
-globaler_fortschritt (Zahlenwelt _ vorher) (Zahlenwelt _ nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
-    where gesamtbesitz = M.foldl' (+) 0
+globaler_fortschritt (Handlung vorher nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
+    where gesamtbesitz w = M.foldl' (+) 0 (besitz w)
 -- Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werden und die Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).
 
 
-individueller_fortschritt :: Person -> Zahlenwelt -> Zahlenwelt -> Bool
-individueller_fortschritt p vorher nachher = (meins nachher) >= (meins vorher)
+individueller_fortschritt :: Person -> Handlung Zahlenwelt -> Bool
+individueller_fortschritt p (Handlung vorher nachher) = (meins nachher) >= (meins vorher)
     where meins welt = M.findWithDefault 0 p (besitz welt)
 
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
-maxime_zahlenfortschritt = Kant.Maxime $ \person welt h -> individueller_fortschritt person welt (handeln person welt h)
+-- TODO: hard-coded alice
+maxime_zahlenfortschritt = Kant.Maxime (individueller_fortschritt Alice)
 
 zahlengesetz_beispiel :: CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
     (Paragraph 42),
     (Rechtsnorm (Tatbestand (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 },
-                             Zahlenwelt { verbleibend = 90000, besitz = M.singleton Alice 1}))
+                             Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 1}))
                 (Rechtsfolge Verbot)))
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
-    (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (Handlung (abbauen 5)) maxime_zahlenfortschritt case_law_ableiten leer
+    (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (HandlungF (abbauen 5)) maxime_zahlenfortschritt Kant.case_law_ableiten leer
 
 -- max i iterations
-make_case_law :: Int -> Handlung Person Zahlenwelt -> Zahlenwelt -> CaseLaw Zahlenwelt -> CaseLaw Zahlenwelt
+make_case_law :: Int -> HandlungF Person Zahlenwelt -> Zahlenwelt -> CaseLaw Zahlenwelt -> CaseLaw Zahlenwelt
 make_case_law i _ _ g | i <= 0 = g
 make_case_law i h w g =
   --TODO: alles fuer Alice hardcoded
   if not (moeglich Alice w h) then
     g
   else
-  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt case_law_ableiten g in
-  let w' = (if s == Erlaubnis then handeln Alice w h else w) in
+  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt Kant.case_law_ableiten g in
+  let w' = (if s == Erlaubnis then nachher (handeln Alice w h) else w) in
   make_case_law (i-1) h w' g'
 
 initialwelt = Zahlenwelt {
@@ -79,7 +80,8 @@ initialwelt = Zahlenwelt {
                 besitz = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
-beispiel = make_case_law 100 (Handlung (stehlen 5 Bob)) initialwelt zahlengesetz_beispiel
+beispiel1 = make_case_law 10 (HandlungF (abbauen 5)) initialwelt zahlengesetz_beispiel
+beispiel2 = make_case_law 10 (HandlungF (stehlen 5 Bob)) initialwelt zahlengesetz_beispiel
 --putStrLn $ show_CaseLaw  beispiel
 
 
