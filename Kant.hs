@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Kant where
 
 import qualified Gesetz as G
@@ -16,11 +18,17 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 
 -- Wir testen: was wenn jeder so handeln wuerde.
 -- TODO: was wenn jeder diese maxime haette? Betroffene Person. Bsp: stehlen und bestohlen werden.
-teste_maxime :: Enum person => Bounded person => world -> H.HandlungF person world -> Maxime person world -> Bool
-teste_maxime welt handlung (Maxime maxime) = all id [ maxime betroffene_person (H.handeln handelnde_person welt handlung)
-                                                     | handelnde_person <- all_persons,
-                                                       betroffene_person <- all_persons ] 
-    where all_persons = [minBound..maxBound]
+teste_maxime :: forall person world. Enum person => Bounded person => world -> H.HandlungF person world -> Maxime person world -> Bool
+teste_maxime welt handlung (Maxime maxime) = all was_wenn_jeder_so_handelt_aus_sicht_von bevoelkerung
+    where
+      bevoelkerung :: [person]
+      bevoelkerung = [minBound..maxBound]
+
+      wenn_jeder_so_handelt :: [H.Handlung world]
+      wenn_jeder_so_handelt = [H.handeln handelnde_person welt handlung | handelnde_person <- bevoelkerung]
+
+      was_wenn_jeder_so_handelt_aus_sicht_von :: person -> Bool
+      was_wenn_jeder_so_handelt_aus_sicht_von betroffene_person = all (maxime betroffene_person) wenn_jeder_so_handelt
 
 
 --TODO: Name passt nicht ganz
