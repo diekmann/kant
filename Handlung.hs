@@ -4,6 +4,9 @@ module Handlung where
 -- Beschreibt vergangene Handlung.
 data Handlung world = Handlung {vorher::world, nachher::world}
 
+instance Show world => Show (Handlung world) where
+    show (Handlung vorher nachher) = "(Handlung vorher:"++show vorher++" nachher:"++show nachher++")"
+
 -- Was ist das? Abstrakte Handlung? Plan zu handeln?
 newtype HandlungF person world = HandlungF (person -> world -> world)
 
