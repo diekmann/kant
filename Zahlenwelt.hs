@@ -74,21 +74,21 @@ make_case_law :: Int -> HandlungF Person Zahlenwelt -> Zahlenwelt -> CaseLaw Zah
 make_case_law i _ _ g | i <= 0 = g
 make_case_law i h w g =
   --TODO: alles fuer Alice hardcoded
-  if not (moeglich Alice w h) then
-    g
-  else
   let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt Kant.case_law_ableiten g in
-  let w' = (if s == Erlaubnis then nachher (handeln Alice w h) else w) in
-  make_case_law (i-1) h w' g'
+  let w' = (if s == Erlaubnis && (moeglich Alice w h) then nachher (handeln Alice w h) else w) in
+  if w == w' then
+    g'
+  else
+    make_case_law (i-1) h w' g'
 
 initialwelt = Zahlenwelt {
                 verbleibend = 42,
                 besitz = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
-beispiel1 = make_case_law 10 (HandlungF (abbauen 5)) initialwelt zahlengesetz_beispiel
-beispiel2 = make_case_law 10 (HandlungF (stehlen 5 Bob)) initialwelt zahlengesetz_beispiel
-beispiel3 = make_case_law 10 (HandlungF (stehlen 2 Alice)) initialwelt zahlengesetz_beispiel
+beispiel1 = make_case_law 10 (HandlungF (abbauen 5)) initialwelt leer
+beispiel2 = make_case_law 10 (HandlungF (stehlen 5 Bob)) initialwelt leer
+beispiel3 = make_case_law 10 (HandlungF (stehlen 2 Alice)) initialwelt leer
 --putStrLn $ show_CaseLaw  beispiel
 
 

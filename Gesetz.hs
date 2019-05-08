@@ -40,6 +40,7 @@ beispiel_gesetz = Gesetz $ S.fromList [
   ]
 
 neuer_paragraph :: Gesetz Integer a b -> Paragraph Integer
+neuer_paragraph (Gesetz g) | (S.null g) = Paragraph 1
 neuer_paragraph (Gesetz g) = let ps = S.map (\ (Paragraph i, _) -> i) g;
                                  max = S.findMax ps in
                              Paragraph (max+1)
