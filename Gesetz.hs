@@ -67,4 +67,3 @@ show_CaseLaw (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
     show_rechtsnorm (Rechtsnorm (Tatbestand (a,b)) (Rechtsfolge f)) = "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++
                                                                        show b ++ " aendern wollen, dann " ++ show f
 
-

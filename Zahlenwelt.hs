@@ -37,6 +37,7 @@ moeglich person welt h = (verbleibend nach_handlung) >= 0
     where nach_handlung = nachher $ handeln person welt h 
 
 -- Mehr ist mehr gut.
+-- Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
 globaler_fortschritt :: Handlung Zahlenwelt -> Bool
 -- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die moeglichkeit haben!!
 globaler_fortschritt (Handlung vorher nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
@@ -50,8 +51,8 @@ individueller_fortschritt p (Handlung vorher nachher) = (meins nachher) >= (mein
 
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
--- TODO: hard-coded alice
-maxime_zahlenfortschritt = Kant.Maxime (individueller_fortschritt Alice)
+-- TODO: hard-coded alice. Eine Maxime braucht ein Aus-Sicht-Von!
+maxime_zahlenfortschritt = Kant.Maxime (\ich -> individueller_fortschritt ich)
 
 zahlengesetz_beispiel :: CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
@@ -82,6 +83,7 @@ initialwelt = Zahlenwelt {
 
 beispiel1 = make_case_law 10 (HandlungF (abbauen 5)) initialwelt zahlengesetz_beispiel
 beispiel2 = make_case_law 10 (HandlungF (stehlen 5 Bob)) initialwelt zahlengesetz_beispiel
+beispiel3 = make_case_law 10 (HandlungF (stehlen 2 Alice)) initialwelt zahlengesetz_beispiel
 --putStrLn $ show_CaseLaw  beispiel
 
 

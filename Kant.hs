@@ -3,20 +3,23 @@ module Kant where
 import qualified Gesetz as G
 import qualified Handlung as H
 
-
 -- Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 -- Passt nicht so ganz auf die Definition von Maxime?
 -- TODO: ich sollte Maxime als axiom betrachten.
-newtype Maxime person world = Maxime (H.Handlung world -> Bool)
+-- TODO: in einer maxime darf keine konkrete Person hardcoded sein.
+newtype Maxime person world = Maxime (person -> H.Handlung world -> Bool)
 --TODO: Maxime
 
-maxime_mir_ist_alles_recht = Maxime (\_ -> True)
+maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 
+-- Verboten: Maxime (\ich _ -> if ich == "konkrete Person" then ...)
 
 -- Wir testen: was wenn jeder so handeln wuerde.
 -- TODO: was wenn jeder diese maxime haette? Betroffene Person. Bsp: stehlen und bestohlen werden.
 teste_maxime :: Enum person => Bounded person => world -> H.HandlungF person world -> Maxime person world -> Bool
-teste_maxime welt handlung (Maxime maxime) = all (\person -> maxime (H.handeln person welt handlung)) all_persons 
+teste_maxime welt handlung (Maxime maxime) = all id [ maxime betroffene_person (H.handeln handelnde_person welt handlung)
+                                                     | handelnde_person <- all_persons,
+                                                       betroffene_person <- all_persons ] 
     where all_persons = [minBound..maxBound]
 
 
