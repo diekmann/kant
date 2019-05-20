@@ -21,6 +21,11 @@ data Zahlenwelt = Zahlenwelt { verbleibend :: Integer, -- verbleibendResourcen
 instance Show Zahlenwelt where
     show (Zahlenwelt resourcen welt) = "verbleibendeResourcen:"++show resourcen++";welt:"++show welt
 
+-- kann ich aenderung beschreiben?
+-- diff handlung?
+--diff :: Zahlenwelt -> Zahlenwelt -> ???
+--diff vorher nachher = 
+
 abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
 abbauen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend-i) (M.adjust (+i) p besitz)
 
