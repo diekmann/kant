@@ -2,7 +2,7 @@ module Zahlenwelt where
 
 import Gesetz
 import Handlung
-import Aenderung
+import qualified Aenderung
 import qualified Kant
 import qualified Data.Set as S
 import qualified Data.Map as M
@@ -75,12 +75,19 @@ zahlengesetz_beispiel = Gesetz $ S.singleton (
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
     (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (HandlungF (abbauen 5)) maxime_zahlenfortschritt Kant.case_law_ableiten leer
 
+case_law_relativ_ableiten :: Handlung Zahlenwelt -> Sollensanordnung -> Rechtsnorm [Aenderung.Aenderung Person Integer] Sollensanordnung
+case_law_relativ_ableiten (Handlung vorher nachher) erlaubt = Rechtsnorm (Tatbestand (diff_zahlenwelt vorher nachher)) (Rechtsfolge erlaubt)
+    where diff_zahlenwelt a b = Aenderung.diff_num_map (besitz a) (besitz b) --TODO wer braucht schon Natur?
+
+-- Fuer zahlenwelt
+type CaseLawRelativ = Gesetz Integer [Aenderung.Aenderung Person Integer] Sollensanordnung
+
 -- max i iterations
-make_case_law :: Int -> HandlungF Person Zahlenwelt -> Zahlenwelt -> CaseLaw Zahlenwelt -> CaseLaw Zahlenwelt
+make_case_law :: Int -> HandlungF Person Zahlenwelt -> Zahlenwelt -> CaseLawRelativ -> CaseLawRelativ
 make_case_law i _ _ g | i <= 0 = g
 make_case_law i h w g =
   --TODO: alles fuer Alice hardcoded
-  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt Kant.case_law_ableiten g in
+  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt case_law_relativ_ableiten g in
   let w' = (if s == Erlaubnis && (moeglich Alice w h) then nachher (handeln Alice w h) else w) in
   if w == w' then
     g'
@@ -96,6 +103,7 @@ beispiel1 = make_case_law 10 (HandlungF (abbauen 5)) initialwelt leer
 beispiel2 = make_case_law 10 (HandlungF (stehlen 5 Bob)) initialwelt leer
 beispiel3 = make_case_law 10 (HandlungF (stehlen 2 Alice)) initialwelt leer
 --putStrLn $ show_CaseLaw  beispiel
+
 
 
 

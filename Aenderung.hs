@@ -12,6 +12,7 @@ import Data.Maybe (mapMaybe)
 -- person kann sein: natürliche Person, juristische Person, ein Tier, die Umwelt an sich, ....
 
 data Aenderung person etwas = Verliert person etwas | Gewinnt person etwas
+    deriving (Ord, Eq)
 -- brauche noch Vorbedingung fuer einen Diff von Handlungen?
 
 instance (Show person, Show etwas) => Show (Aenderung person etwas) where
