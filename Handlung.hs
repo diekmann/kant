@@ -31,19 +31,21 @@ beispiel_handlungf = HandlungF $ \p n -> if n < 9000 then n+1 else n
 
 -- person kann sein: natürliche Person, juristische Person, ein Tier, die Umwelt an sich, ....
 
-data Aenderung person etwas = Geben person person etwas | Nehmen person person etwas
+data Aenderung person etwas = Verliert person etwas | Gewinnt person etwas
 -- brauche noch Vorbedingung fuer einen Diff von Handlungen?
 
---TODO world, person, etwas relaten!!!! MultiParamTypeClasses?
-class Diff world person etwas where
-    diff :: world -> world -> [Aenderung person etwas]
+instance (Show person, Show etwas) => Show (Aenderung person etwas) where
+    show (Verliert p e) = show p ++ " verliert " ++ show e
+    show (Gewinnt p e) = show p ++ " gewinnt " ++ show e
 
---TODO person should be generic?
-instance Diff Integer () Integer where
-    diff i1 i2
-        | i1 == i2 = []
-        | i1 > i2 = [Geben () () (i1 - i2)]
-        | i1 < i2 = [Nehmen () () (i2 - i1)]
+--TODO world, person, etwas relaten!!!! MultiParamTypeClasses?
+data Auswirkung world person etwas = Auswirkung (world -> world -> [Aenderung person etwas])
+
+num_diff :: (Ord etwas, Num etwas) => person -> etwas -> etwas -> [Aenderung person etwas]
+num_diff p i1 i2
+    | i1 == i2 = []
+    | i1 > i2 = [Verliert p (i1 - i2)]
+    | i1 < i2 = [Gewinnt  p (i2 - i1)]
 
 --TODO test
 
