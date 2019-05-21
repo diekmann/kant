@@ -2,6 +2,7 @@ module Zahlenwelt where
 
 import Gesetz
 import Handlung
+import Aenderung
 import qualified Kant
 import qualified Data.Set as S
 import qualified Data.Map as M
