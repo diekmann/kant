@@ -65,12 +65,12 @@ tests = [
         )
     ]
 
+prop_positive :: Integer -> Integer -> Bool
 prop_positive i1 i2 = case diff_num "X" i1 i2 of
                         Just a -> (number a) > 0
                         Nothing -> i1 == i2
                       where number (Gewinnt _ n) = n
                             number (Verliert _ n) = n
 
-props = [
-    prop_positive
-    ]
+prop_max_aenderungen :: M.Map String Integer -> M.Map String Integer -> Bool
+prop_max_aenderungen m1 m2 = length (diff_num_map m1 m2) <= length (M.keys m1) + length (M.keys m2)

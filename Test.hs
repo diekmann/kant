@@ -11,8 +11,9 @@ tests = TestList $ Aenderung.tests ++
             )
         ]
 
-props = Aenderung.props
+qcArgs = stdArgs{maxSuccess = 1000}
 
 main = do
     runTestTT tests
-    mapM (quickCheckWith (stdArgs{maxSuccess = 1000})) props
+    quickCheckWith qcArgs Aenderung.prop_positive
+    quickCheck Aenderung.prop_max_aenderungen
