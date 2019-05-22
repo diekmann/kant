@@ -5,6 +5,8 @@ import qualified Data.Map as M
 import Data.List (nub)
 import Data.Maybe (mapMaybe)
 
+import Test.HUnit (Test(..), assertEqual)
+
 -- diffing worlds.
 -- Im Unterschied zu Data.Generic.Diff will ich keinen editscript der die Gleichheit betont,
 -- ich suche nur die Unterschiede und will den Ausgangszustand wegabstrahieren.
@@ -36,4 +38,23 @@ diff_num_map vorher nachher = mapMaybe (\p -> diff_num p (lookup p vorher) (look
 -- diff_num_map (M.fromList [("Alice", 3)]) (M.fromList [("Bob", 8)])
 
 --TODO test
+
+tests = [
+    TestCase (assertEqual "eq"
+        Nothing
+        (diff_num "X"  4 4)
+        ),
+    TestCase (assertEqual "geben"
+        (Just (Verliert "X" 3))
+        (diff_num "X"  4 1)
+        ),
+    TestCase (assertEqual "nehmen"
+        (Just (Gewinnt "X" 6))
+        (diff_num "X"  4 10)
+        ),
+    TestCase (assertEqual "negativ"
+        (Just (Verliert "X" 8))
+        (diff_num "X"  4 (-4))
+        )
+    ]
 

@@ -75,6 +75,9 @@ zahlengesetz_beispiel = Gesetz $ S.singleton (
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
     (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (HandlungF (abbauen 5)) maxime_zahlenfortschritt Kant.case_law_ableiten leer
 
+
+--TODO beispie sowohl fuer case_law_ableiten als auch case_law_relativ_ableiten
+
 case_law_relativ_ableiten :: Handlung Zahlenwelt -> Sollensanordnung -> Rechtsnorm [Aenderung.Aenderung Person Integer] Sollensanordnung
 case_law_relativ_ableiten (Handlung vorher nachher) erlaubt = Rechtsnorm (Tatbestand (diff_zahlenwelt vorher nachher)) (Rechtsfolge erlaubt)
     where diff_zahlenwelt a b = Aenderung.diff_num_map (besitz a) (besitz b) --TODO wer braucht schon Natur?
