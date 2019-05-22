@@ -15,4 +15,4 @@ props = Aenderung.props
 
 main = do
     runTestTT tests
-    mapM quickCheck props
+    mapM (quickCheckWith (stdArgs{maxSuccess = 1000})) props
