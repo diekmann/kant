@@ -35,26 +35,33 @@ diff_num_map vorher nachher = mapMaybe (\p -> diff_num p (lookup p vorher) (look
     where personen = nub $ (M.keys vorher) ++ (M.keys nachher) --TODO nub is O(n^2), use sets
           lookup = M.findWithDefault 0
 
--- diff_num_map (M.fromList [("Alice", 3)]) (M.fromList [("Bob", 8)])
-
---TODO test
+-- Tests and properties
 
 tests = [
     TestCase (assertEqual "eq"
         Nothing
-        (diff_num "X"  4 4)
+        (diff_num "X" 4 4)
         ),
     TestCase (assertEqual "geben"
         (Just (Verliert "X" 3))
-        (diff_num "X"  4 1)
+        (diff_num "X" 4 1)
         ),
     TestCase (assertEqual "nehmen"
         (Just (Gewinnt "X" 6))
-        (diff_num "X"  4 10)
+        (diff_num "X" 4 10)
         ),
     TestCase (assertEqual "negativ"
         (Just (Verliert "X" 8))
-        (diff_num "X"  4 (-4))
+        (diff_num "X" 4 (-4))
+        )
+    ] ++ [
+    TestCase (assertEqual "map"
+        [Verliert "Alice" 3, Gewinnt "Bob" 8]
+        (diff_num_map (M.fromList [("Alice", 3)]) (M.fromList [("Bob", 8)]))
+        ),
+    TestCase (assertEqual "map"
+        [Gewinnt "Alice" 5]
+        (diff_num_map (M.fromList [("Bob", 42), ("Alice", 3)]) (M.fromList [("Alice", 8), ("Bob", 42)]))
         )
     ]
 
