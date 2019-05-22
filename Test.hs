@@ -1,4 +1,5 @@
 import Test.HUnit
+import Test.QuickCheck
 import qualified Aenderung
 import qualified Gesetz
 
@@ -10,4 +11,8 @@ tests = TestList $ Aenderung.tests ++
             )
         ]
 
-main = runTestTT tests
+props = Aenderung.props
+
+main = do
+    runTestTT tests
+    mapM quickCheck props
