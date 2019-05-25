@@ -22,11 +22,6 @@ data Zahlenwelt = Zahlenwelt { verbleibend :: Integer, -- verbleibendResourcen
 instance Show Zahlenwelt where
     show (Zahlenwelt resourcen welt) = "verbleibendeResourcen:"++show resourcen++";welt:"++show welt
 
--- kann ich aenderung beschreiben?
--- diff handlung?
---diff :: Zahlenwelt -> Zahlenwelt -> ???
---diff vorher nachher = 
-
 abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
 abbauen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend-i) (M.adjust (+i) p besitz)
 
@@ -78,9 +73,11 @@ beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
 
 --TODO beispie sowohl fuer case_law_ableiten als auch case_law_relativ_ableiten
 
+delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
+delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher) --TODO wer braucht schon Natur und verbleibende Resourcen?
+
 case_law_relativ_ableiten :: Handlung Zahlenwelt -> Sollensanordnung -> Rechtsnorm [Aenderung.Aenderung Person Integer] Sollensanordnung
-case_law_relativ_ableiten (Handlung vorher nachher) erlaubt = Rechtsnorm (Tatbestand (diff_zahlenwelt vorher nachher)) (Rechtsfolge erlaubt)
-    where diff_zahlenwelt a b = Aenderung.diff_num_map (besitz a) (besitz b) --TODO wer braucht schon Natur?
+case_law_relativ_ableiten (Handlung vorher nachher) erlaubt = Rechtsnorm (Tatbestand (delta_zahlenwelt vorher nachher)) (Rechtsfolge erlaubt)
 
 -- Fuer zahlenwelt
 type CaseLawRelativ = Gesetz Integer [Aenderung.Aenderung Person Integer] Sollensanordnung
