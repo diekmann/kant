@@ -2,6 +2,8 @@ module Gesetz where
 
 import qualified Data.Set as S
 
+import Test.HUnit (Test(..), assertEqual)
+
 newtype Tatbestand a = Tatbestand a
   deriving (Eq, Ord, Show)
 newtype Rechtsfolge a = Rechtsfolge a
@@ -67,4 +69,36 @@ show_CaseLaw (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
     show_paragraph (Paragraph p, rechtsnorm) = "§" ++ show p ++ ": " ++ show_rechtsnorm rechtsnorm
     show_rechtsnorm (Rechtsnorm (Tatbestand (a,b)) (Rechtsfolge f)) = "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++
                                                                        show b ++ " aendern wollen, dann " ++ show f
+-- Tests
 
+tests = [
+    TestCase (assertEqual "leer"
+        (Paragraph 1)
+        (neuer_paragraph leer)
+        ),
+    TestCase (assertEqual "zwei"
+        (Paragraph 2)
+        (neuer_paragraph (Gesetz (S.singleton (Paragraph 1, rn))))
+        ),
+    TestCase (assertEqual "vier"
+        (Paragraph 4)
+        (neuer_paragraph (Gesetz (S.fromList [(Paragraph 1, rn), (Paragraph 3, rn)])))
+        ),
+    TestCase (assertEqual "vier ungeordnet"
+        (Paragraph 4)
+        (neuer_paragraph (Gesetz (S.fromList [(Paragraph 3, rn), (Paragraph 1, rn)])))
+        ),
+    TestCase (assertEqual "hinzufuegen leer"
+        (Gesetz (S.singleton (Paragraph 1, rn)))
+        (hinzufuegen rn leer)
+        ),
+    TestCase (assertEqual "hinzufuegen id"
+        (Gesetz (S.singleton (Paragraph 1, rn)))
+        (hinzufuegen rn (hinzufuegen rn leer))
+        ),
+    TestCase (assertEqual "zwei hinzufuegen"
+        (Gesetz (S.fromList [(Paragraph 1, rn), (Paragraph 2, Rechtsnorm (Tatbestand "tb") (Rechtsfolge "andere Folge"))]))
+        (hinzufuegen (Rechtsnorm (Tatbestand "tb") (Rechtsfolge "andere Folge")) (hinzufuegen rn leer))
+        )
+    ]
+    where rn = Rechtsnorm (Tatbestand "tb") (Rechtsfolge "rf")
