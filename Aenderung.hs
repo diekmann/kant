@@ -11,17 +11,16 @@ import Test.HUnit (Test(..), assertEqual)
 -- Im Unterschied zu Data.Generic.Diff will ich keinen editscript der die Gleichheit betont,
 -- ich suche nur die Unterschiede und will den Ausgangszustand wegabstrahieren.
 
--- person kann sein: natürliche Person, juristische Person, ein Tier, die Umwelt an sich, ....
+-- Person kann sein: natürliche Person, juristische Person, ein Tier, die Umwelt an sich, ....
 
 data Aenderung person etwas = Verliert person etwas | Gewinnt person etwas
     deriving (Ord, Eq)
--- brauche noch Vorbedingung fuer einen Diff von Handlungen?
+-- brauche noch Vorbedingung fuer ein Delta von Handlungen?
 
 instance (Show person, Show etwas) => Show (Aenderung person etwas) where
     show (Verliert p e) = show p ++ " verliert " ++ show e
     show (Gewinnt p e) = show p ++ " gewinnt " ++ show e
 
---TODO world, person, etwas relaten!!!! MultiParamTypeClasses?
 data Auswirkung world person etwas = Auswirkung (world -> world -> [Aenderung person etwas])
 
 

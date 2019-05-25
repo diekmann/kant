@@ -76,7 +76,7 @@ beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
 delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
 delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher) --TODO wer braucht schon Natur und verbleibende Resourcen?
 
-case_law_relativ_ableiten :: Handlung Zahlenwelt -> Sollensanordnung -> Rechtsnorm [Aenderung.Aenderung Person Integer] Sollensanordnung
+case_law_relativ_ableiten :: Kant.AllgemeinesGesetzAbleiten Zahlenwelt [Aenderung.Aenderung Person Integer] Sollensanordnung
 case_law_relativ_ableiten (Handlung vorher nachher) erlaubt = Rechtsnorm (Tatbestand (delta_zahlenwelt vorher nachher)) (Rechtsfolge erlaubt)
 
 -- Fuer zahlenwelt
@@ -103,7 +103,5 @@ beispiel1 = make_case_law 10 (HandlungF (abbauen 5)) initialwelt leer
 beispiel2 = make_case_law 10 (HandlungF (stehlen 5 Bob)) initialwelt leer
 beispiel3 = make_case_law 10 (HandlungF (stehlen 2 Alice)) initialwelt leer
 --putStrLn $ show_CaseLaw  beispiel
-
-
 
 
