@@ -53,8 +53,8 @@ kategorischer_imperativ ::
     -> AllgemeinesGesetzAbleiten world a b
     -> G.Gesetz Integer a b      -- Allgemeines Gesetz (für alle Menschen)
     -- Ergebnis:
-    -> (G.Sollensanordnung, -- Sollen wir die Handlung ausführen?
-        G.Gesetz Integer a b)       -- Soll das allgemeine Gesetz entsprechend angepasst werden?
+    -> (G.Sollensanordnung,    -- Sollen wir die Handlung ausführen?
+        G.Gesetz Integer a b)  -- Soll das allgemeine Gesetz entsprechend angepasst werden?
     --TODO: Wenn unsere Maximen perfekt und die Maximen aller Menschen konsisten sind, soll das Gesetz nur erweitert werden (append only)?
 kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz =
     -- Es fehlt: ich muss nach allgemeinem Gesetz handeln. Wenn das Gesetz meinen Fall nicht abdeckt, dann muss meine Maxime zum Gesetz erhoben werden.
