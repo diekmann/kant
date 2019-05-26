@@ -76,25 +76,33 @@ case_law_relativ_ableiten (H.Handlung vorher nachher) erlaubt = Rechtsnorm (Tatb
 type CaseLawRelativ = Gesetz Integer [Aenderung.Aenderung Person Integer] Sollensanordnung
 
 -- max i iterations
-make_case_law :: Int -> H.HandlungF Person Zahlenwelt -> Zahlenwelt -> CaseLawRelativ -> CaseLawRelativ
-make_case_law i _ _ g | i <= 0 = g
-make_case_law i h w g =
+make_case_law :: (Ord a, Ord b) => Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
+                 -> Int                            -- maximale Anzahl Iterationen (Simulationen)
+                 -> H.HandlungF Person Zahlenwelt  -- Beabsichtigte Handlung
+                 -> Zahlenwelt                     -- Initialwelt
+                 -> Gesetz Integer a b             -- Initialgesetz
+                 -> Gesetz Integer a b
+make_case_law _ i _ _ g | i <= 0 = g
+make_case_law ableiten i h w g =
   --TODO: alles fuer Alice hardcoded
-  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt case_law_relativ_ableiten g in
+  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt ableiten g in
   let w' = (if s == Erlaubnis && (moeglich Alice w h) then H.nachher (H.handeln Alice w h) else w) in
   if w == w' then
     g'
   else
-    make_case_law (i-1) h w' g'
+    make_case_law ableiten (i-1) h w' g'
 
 initialwelt = Zahlenwelt {
                 verbleibend = 42,
                 besitz = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
-beispiel1 = make_case_law 10 (H.HandlungF (abbauen 5)) initialwelt leer
-beispiel2 = make_case_law 10 (H.HandlungF (stehlen 5 Bob)) initialwelt leer
-beispiel3 = make_case_law 10 (H.HandlungF (stehlen 2 Alice)) initialwelt leer
+beispiel1 :: CaseLaw Zahlenwelt
+beispiel1 = make_case_law Kant.case_law_ableiten 10 (H.HandlungF (abbauen 5)) initialwelt leer
+beispiel1' :: CaseLawRelativ
+beispiel1' = make_case_law case_law_relativ_ableiten 10 (H.HandlungF (abbauen 5)) initialwelt leer
+beispiel2 = make_case_law case_law_relativ_ableiten 10 (H.HandlungF (stehlen 5 Bob)) initialwelt leer
+beispiel3 = make_case_law case_law_relativ_ableiten 10 (H.HandlungF (stehlen 2 Alice)) initialwelt leer
 --putStrLn $ show_CaseLaw  beispiel
 
 
