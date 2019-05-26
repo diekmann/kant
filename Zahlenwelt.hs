@@ -7,8 +7,6 @@ import qualified Kant
 import qualified Data.Set as S
 import qualified Data.Map as M
 
-import Debug.Trace
-
 data Person = Alice | Bob | Carl
     deriving (Eq, Ord, Show, Enum, Bounded)
 
@@ -50,15 +48,10 @@ individueller_fortschritt :: Person -> H.Handlung Zahlenwelt -> Bool
 individueller_fortschritt p (H.Handlung vorher nachher) = (meins nachher) >= (meins vorher)
     where meins welt = M.findWithDefault 0 p (besitz welt)
 
-debug_maxime :: (Person -> H.Handlung Zahlenwelt -> Bool) -> (Person -> H.Handlung Zahlenwelt -> Bool)
---debug_maxime f = \ich welt -> trace ("maxime aus sicht von " ++ show ich ++ " für " ++ show welt) $ f ich welt
-debug_maxime f ich welt = do_trace ("aus sicht von " ++ show ich ++ " für " ++ show welt) $ f ich welt
-    where ergebnis = f ich welt
-          do_trace str = if not ergebnis then trace ("verletzte maxime "++str) else id
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
 -- TODO: hard-coded alice. Eine Maxime braucht ein Aus-Sicht-Von!
-maxime_zahlenfortschritt = Kant.Maxime $ debug_maxime (\ich -> individueller_fortschritt ich)
+maxime_zahlenfortschritt = Kant.Maxime $ Kant.debug_maxime (\ich -> individueller_fortschritt ich)
 
 zahlengesetz_beispiel :: CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (

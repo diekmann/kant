@@ -5,12 +5,20 @@ module Kant where
 import qualified Gesetz as G
 import qualified Handlung as H
 
+import qualified Debug.Trace (trace)
+
 -- Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 -- Passt nicht so ganz auf die Definition von Maxime?
 -- TODO: ich sollte Maxime als axiom betrachten.
 -- TODO: in einer Maxime darf keine konkrete Person hardcoded sein.
 newtype Maxime person world = Maxime (person -> H.Handlung world -> Bool)
---TODO: Maxime
+
+
+-- debug_maxime gibt Details aus wenn die Maxime verletzt wurde.
+debug_maxime :: (Show person, Show world) => (person -> H.Handlung world -> Bool) -> (person -> H.Handlung world -> Bool)
+debug_maxime f ich welt = do_trace ("aus Sicht von " ++ show ich ++ " für " ++ show welt) $ ergebnis
+    where ergebnis = f ich welt
+          do_trace str = if not ergebnis then Debug.Trace.trace ("\nverletzte maxime "++str) else id
 
 maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 
