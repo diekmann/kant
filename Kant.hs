@@ -44,11 +44,6 @@ teste_maxime welt handlung (Maxime maxime) = all was_wenn_jeder_so_handelt_aus_s
 -- wird es schwer ein allgemeines Gesetz abzuleiten.
 type AllgemeinesGesetzAbleiten world a b = H.Handlung world -> G.Sollensanordnung -> G.Rechtsnorm a b
 
--- uebertraegt einen Tatbestand woertlich ins Gesetz.
--- Nicht sehr allgemein.
-case_law_ableiten :: AllgemeinesGesetzAbleiten world (world, world) G.Sollensanordnung
-case_law_ableiten (H.Handlung vorher nachher) erlaubt = G.Rechtsnorm (G.Tatbestand (vorher, nachher)) (G.Rechtsfolge erlaubt)
-
 -- Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst, dass sie ein allgemeines Gesetz werde.
 -- TODO unterstütze viele Maximen, wobei manche nicht zutreffen können?
 kategorischer_imperativ ::
@@ -78,4 +73,4 @@ kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz =
     (soll_handeln, add (gesetz_ableiten (H.handeln ich welt handlung) soll_handeln) gesetz)
       where add rn g = G.hinzufuegen rn g
 
-beispiel_kategorischer_imperativ = kategorischer_imperativ 'I' 0 (H.HandlungF (\_ n-> n+1)) maxime_mir_ist_alles_recht case_law_ableiten G.leer
+beispiel_kategorischer_imperativ = kategorischer_imperativ 'I' 0 (H.HandlungF (\_ n-> n+1)) maxime_mir_ist_alles_recht (\_ _ -> G.Rechtsnorm (G.Tatbestand "tb") (G.Rechtsfolge "yolo")) G.leer

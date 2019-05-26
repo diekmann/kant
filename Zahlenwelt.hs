@@ -4,6 +4,7 @@ import Gesetz
 import qualified Handlung as H
 import qualified Aenderung
 import qualified Kant
+import qualified Gesetze
 import qualified Data.Set as S
 import qualified Data.Map as M
 
@@ -53,7 +54,7 @@ individueller_fortschritt p (H.Handlung vorher nachher) = (meins nachher) >= (me
 -- TODO: hard-coded alice. Eine Maxime braucht ein Aus-Sicht-Von!
 maxime_zahlenfortschritt = Kant.Maxime $ Kant.debug_maxime (\ich -> individueller_fortschritt ich)
 
-zahlengesetz_beispiel :: CaseLaw Zahlenwelt
+zahlengesetz_beispiel :: Gesetze.CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
     (Paragraph 42),
     (Rechtsnorm (Tatbestand (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 },
@@ -61,7 +62,8 @@ zahlengesetz_beispiel = Gesetz $ S.singleton (
                 (Rechtsfolge Verbot)))
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
-    (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (H.HandlungF (abbauen 5)) maxime_zahlenfortschritt Kant.case_law_ableiten leer
+    (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (H.HandlungF (abbauen 5)) maxime_zahlenfortschritt
+    Gesetze.case_law_ableiten leer
 
 
 --TODO beispie sowohl fuer case_law_ableiten als auch case_law_relativ_ableiten
@@ -69,11 +71,6 @@ beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
 delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
 delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher) --TODO wer braucht schon Natur und verbleibende Resourcen?
 
-case_law_relativ_ableiten :: Kant.AllgemeinesGesetzAbleiten Zahlenwelt [Aenderung.Aenderung Person Integer] Sollensanordnung
-case_law_relativ_ableiten (H.Handlung vorher nachher) erlaubt = Rechtsnorm (Tatbestand (delta_zahlenwelt vorher nachher)) (Rechtsfolge erlaubt)
-
--- Fuer zahlenwelt
-type CaseLawRelativ = Gesetz Integer [Aenderung.Aenderung Person Integer] Sollensanordnung
 
 -- max i iterations
 make_case_law :: (Ord a, Ord b) => Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
@@ -97,12 +94,12 @@ initialwelt = Zahlenwelt {
                 besitz = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
-beispiel1 :: CaseLaw Zahlenwelt
-beispiel1 = make_case_law Kant.case_law_ableiten 10 (H.HandlungF (abbauen 5)) initialwelt leer
-beispiel1' :: CaseLawRelativ
-beispiel1' = make_case_law case_law_relativ_ableiten 10 (H.HandlungF (abbauen 5)) initialwelt leer
-beispiel2 = make_case_law case_law_relativ_ableiten 10 (H.HandlungF (stehlen 5 Bob)) initialwelt leer
-beispiel3 = make_case_law case_law_relativ_ableiten 10 (H.HandlungF (stehlen 2 Alice)) initialwelt leer
+beispiel1 :: Gesetze.CaseLaw Zahlenwelt
+beispiel1 = make_case_law Gesetze.case_law_ableiten 10 (H.HandlungF (abbauen 5)) initialwelt leer
+beispiel1' :: Gesetze.CaseLawRelativ Person Integer
+beispiel1' = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (abbauen 5)) initialwelt leer
+beispiel2 = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (stehlen 5 Bob)) initialwelt leer
+beispiel3 = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (stehlen 2 Alice)) initialwelt leer
 --putStrLn $ show_CaseLaw  beispiel
 
 

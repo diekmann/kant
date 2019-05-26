@@ -59,16 +59,6 @@ data Sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
   deriving (Eq, Ord, Show, Enum)
 
 
--- Gesetz beschreibt: (wenn vorher, wenn nachher) dann Erlaubt/Verboten, wobei vorher/nachher die Welt beschreiben.
--- Paragraphen sind einfach Integer
-type CaseLaw world = Gesetz Integer (world, world) Sollensanordnung
-
-show_CaseLaw :: Show w => CaseLaw w -> String
-show_CaseLaw (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
-  where
-    show_paragraph (Paragraph p, rechtsnorm) = "§" ++ show p ++ ": " ++ show_rechtsnorm rechtsnorm
-    show_rechtsnorm (Rechtsnorm (Tatbestand (a,b)) (Rechtsfolge f)) = "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++
-                                                                       show b ++ " aendern wollen, dann " ++ show f
 -- Tests
 
 tests = [
