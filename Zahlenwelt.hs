@@ -31,7 +31,7 @@ stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
                            Nothing -> besitz
                            Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer besitz)
 
--- Eine Handlung ist nur physikalisch moeglich, solange es noch Resourcen gibt.
+-- Eine Handlung ist nur physikalisch möglich, solange es noch Resourcen gibt.
 moeglich :: Person -> Zahlenwelt -> H.HandlungF Person Zahlenwelt -> Bool
 moeglich person welt h = (verbleibend nach_handlung) >= 0
     where nach_handlung = H.nachher $ H.handeln person welt h

@@ -26,7 +26,10 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 
 -- Wir testen: was wenn jeder so handeln würde?
 -- TODO: was wenn jeder diese maxime hätte? Betroffene Person. Bsp: stehlen und bestohlen werden.
-teste_maxime :: forall person world. Enum person => Bounded person => world -> H.HandlungF person world -> Maxime person world -> Bool
+teste_maxime ::
+    forall person world.
+    Enum person => Bounded person =>
+    world -> H.HandlungF person world -> Maxime person world -> Bool
 teste_maxime welt handlung (Maxime maxime) = all was_wenn_jeder_so_handelt_aus_sicht_von bevoelkerung
     where
       bevoelkerung :: [person]

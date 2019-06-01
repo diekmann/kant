@@ -15,7 +15,10 @@ type CaseLaw world = G.Gesetz Integer (world, world) G.Sollensanordnung
 -- uebertraegt einen Tatbestand woertlich ins Gesetz.
 -- Nicht sehr allgemein.
 case_law_ableiten :: Kant.AllgemeinesGesetzAbleiten world (world, world) G.Sollensanordnung
-case_law_ableiten (H.Handlung vorher nachher) erlaubt = G.Rechtsnorm (G.Tatbestand (vorher, nachher)) (G.Rechtsfolge erlaubt)
+case_law_ableiten (H.Handlung vorher nachher) sollensanordnung =
+    G.Rechtsnorm
+        (G.Tatbestand (vorher, nachher))
+        (G.Rechtsfolge sollensanordnung)
 
 show_CaseLaw :: Show w => CaseLaw w -> String
 show_CaseLaw (G.Gesetz g) = Set.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
