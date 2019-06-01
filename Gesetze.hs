@@ -24,8 +24,9 @@ show_CaseLaw :: Show w => CaseLaw w -> String
 show_CaseLaw (G.Gesetz g) = Set.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
   where
     show_paragraph (G.Paragraph p, rechtsnorm) = "§" ++ show p ++ ": " ++ show_rechtsnorm rechtsnorm
-    show_rechtsnorm (G.Rechtsnorm (G.Tatbestand (a,b)) (G.Rechtsfolge f)) = "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++
-                                                                       show b ++ " aendern wollen, dann " ++ show f
+    show_rechtsnorm (G.Rechtsnorm (G.Tatbestand (a,b)) (G.Rechtsfolge f)) =
+        "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++ show b ++
+        " aendern wollen, dann " ++ show f
 
 -- Case Law etwas besser --
 

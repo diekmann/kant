@@ -100,6 +100,6 @@ beispiel1' :: Gesetze.CaseLawRelativ Person Integer
 beispiel1' = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (abbauen 5)) initialwelt leer
 beispiel2 = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (stehlen 5 Bob)) initialwelt leer
 beispiel3 = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (stehlen 2 Alice)) initialwelt leer
---putStrLn $ show_CaseLaw  beispiel
+--putStrLn $ Gesetze.show_CaseLaw  beispiel
 
 

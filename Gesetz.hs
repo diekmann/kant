@@ -13,10 +13,19 @@ data Rechtsnorm a b = Rechtsnorm (Tatbestand a) (Rechtsfolge b)
   deriving (Eq, Ord, Show)
 
 newtype Paragraph p = Paragraph p
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
 newtype Gesetz p a b = Gesetz (S.Set (Paragraph p, Rechtsnorm a b))
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show p => Show (Paragraph p) where
+    show (Paragraph p) = "§" ++ show p
+
+instance (Show p, Show a, Show b) => Show (Gesetz p a b) where
+    show (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
+      where
+        show_paragraph (p, rechtsnorm) = show p ++ ": " ++ show_rechtsnorm rechtsnorm
+        show_rechtsnorm (Rechtsnorm t f) = "Wenn " ++ show t ++ ", dann " ++ show f
 
 leer :: Gesetz p a b
 leer = Gesetz S.empty
@@ -87,8 +96,8 @@ tests = [
         (hinzufuegen rn (hinzufuegen rn leer))
         ),
     TestCase (assertEqual "zwei hinzufuegen"
-        (Gesetz (S.fromList [(Paragraph 1, rn), (Paragraph 2, Rechtsnorm (Tatbestand "tb") (Rechtsfolge "andere Folge"))]))
-        (hinzufuegen (Rechtsnorm (Tatbestand "tb") (Rechtsfolge "andere Folge")) (hinzufuegen rn leer))
+        (Gesetz (S.fromList [(Paragraph 1, rn), (Paragraph 2, Rechtsnorm (Tatbestand "tb") (Rechtsfolge Verbot))]))
+        (hinzufuegen (Rechtsnorm (Tatbestand "tb") (Rechtsfolge Verbot)) (hinzufuegen rn leer))
         )
     ]
-    where rn = Rechtsnorm (Tatbestand "tb") (Rechtsfolge "rf")
+    where rn = Rechtsnorm (Tatbestand "tb") (Rechtsfolge Erlaubnis)
