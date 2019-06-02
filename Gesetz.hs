@@ -6,6 +6,7 @@ import Test.HUnit (Test(..), assertEqual)
 
 newtype Tatbestand a = Tatbestand a
   deriving (Eq, Ord, Show)
+
 newtype Rechtsfolge a = Rechtsfolge a
   deriving (Eq, Ord, Show)
 
@@ -25,8 +26,7 @@ newtype Gesetz p a b = Gesetz (S.Set (Paragraph p, Rechtsnorm a b))
 
 instance (Show p, Show a, Show b) => Show (Gesetz p a b) where
   show (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
-    where
-      show_paragraph (p, rechtsnorm) = show p ++ ": " ++ show rechtsnorm
+    where show_paragraph (p, rechtsnorm) = show p ++ ": " ++ show rechtsnorm
 
 leer :: Gesetz p a b
 leer = Gesetz S.empty

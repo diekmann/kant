@@ -23,7 +23,7 @@ case_law_ableiten (H.Handlung vorher nachher) sollensanordnung =
 show_CaseLaw :: Show w => CaseLaw w -> String
 show_CaseLaw (G.Gesetz g) = Set.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
   where
-    show_paragraph (G.Paragraph p, rechtsnorm) = "§" ++ show p ++ ": " ++ show_rechtsnorm rechtsnorm
+    show_paragraph (p, rechtsnorm) = show p ++ ": " ++ show_rechtsnorm rechtsnorm
     show_rechtsnorm (G.Rechtsnorm (G.Tatbestand (a,b)) (G.Rechtsfolge f)) =
         "Wenn die welt " ++ show a ++ " ist und wir die welt nach " ++ show b ++
         " aendern wollen, dann " ++ show f

@@ -91,13 +91,20 @@ initialwelt = Zahlenwelt {
                 besitz = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
-beispiel1 :: Gesetze.CaseLaw Zahlenwelt
-beispiel1 = make_case_law Gesetze.case_law_ableiten 10 (H.HandlungF (abbauen 5)) initialwelt leer
-beispiel1' :: Gesetze.CaseLawRelativ Person Integer
-beispiel1' = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (abbauen 5)) initialwelt leer
+beispiel_CaseLaw :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
+beispiel_CaseLaw h = make_case_law Gesetze.case_law_ableiten 10 h initialwelt leer
 
-beispiel2 = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (stehlen 5 Bob)) initialwelt leer
-beispiel3 = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 (H.HandlungF (stehlen 2 Alice)) initialwelt leer
---putStrLn $ Gesetze.show_CaseLaw  beispiel
+beispiel_CaseLawRelativ :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
+beispiel_CaseLawRelativ h = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 h initialwelt leer
+
+beispiel1 = beispiel_CaseLaw (H.HandlungF (abbauen 5))
+beispiel1' = beispiel_CaseLawRelativ (H.HandlungF (abbauen 5))
+--putStrLn $ Gesetze.show_CaseLaw  beispiel1
+
+beispiel2 = beispiel_CaseLaw (H.HandlungF (stehlen 5 Bob))
+beispiel2' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 5 Bob))
+
+beispiel3 = beispiel_CaseLaw (H.HandlungF (stehlen 2 Alice))
+beispiel3' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 2 Alice))
 
 
