@@ -16,10 +16,7 @@ data Person = Alice | Bob | Carl
 data Zahlenwelt = Zahlenwelt { verbleibend :: Integer, -- verbleibendResourcen
                                besitz :: M.Map Person Integer -- Besitz jeder Person
                              }
-  deriving (Eq, Ord)
-
-instance Show Zahlenwelt where
-    show (Zahlenwelt resourcen welt) = "verbleibendeResourcen:"++show resourcen++";welt:"++show welt
+  deriving (Eq, Ord, Show)
 
 abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
 abbauen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend-i) (M.adjust (+i) p besitz)
