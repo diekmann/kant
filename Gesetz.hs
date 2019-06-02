@@ -10,22 +10,23 @@ newtype Rechtsfolge a = Rechtsfolge a
   deriving (Eq, Ord, Show)
 
 data Rechtsnorm a b = Rechtsnorm (Tatbestand a) (Rechtsfolge b)
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+instance (Show a, Show b) => Show (Rechtsnorm a b) where
+  show (Rechtsnorm tb folge) = "Wenn " ++ show tb ++ ", dann " ++ show folge
 
 newtype Paragraph p = Paragraph p
   deriving (Eq, Ord)
+instance Show p => Show (Paragraph p) where
+  show (Paragraph p) = "§" ++ show p
+
 
 newtype Gesetz p a b = Gesetz (S.Set (Paragraph p, Rechtsnorm a b))
   deriving (Eq, Ord)
 
-instance Show p => Show (Paragraph p) where
-    show (Paragraph p) = "§" ++ show p
-
 instance (Show p, Show a, Show b) => Show (Gesetz p a b) where
-    show (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
-      where
-        show_paragraph (p, rechtsnorm) = show p ++ ": " ++ show_rechtsnorm rechtsnorm
-        show_rechtsnorm (Rechtsnorm t f) = "Wenn " ++ show t ++ ", dann " ++ show f
+  show (Gesetz g) = S.foldl (\s p-> s ++ show_paragraph p ++ "\n") "" g
+    where
+      show_paragraph (p, rechtsnorm) = show p ++ ": " ++ show rechtsnorm
 
 leer :: Gesetz p a b
 leer = Gesetz S.empty
