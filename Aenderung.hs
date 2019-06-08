@@ -1,4 +1,3 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
 module Aenderung where
 
 import qualified Data.Map as M
@@ -12,7 +11,6 @@ import Test.HUnit (Test(..), assertEqual)
 -- ich suche nur die Unterschiede und will den Ausgangszustand wegabstrahieren.
 
 -- Person kann sein: natürliche Person, juristische Person, ein Tier, die Umwelt an sich, ....
-
 data Aenderung person etwas = Verliert person etwas | Gewinnt person etwas
     deriving (Ord, Eq)
 -- brauche noch Vorbedingung fuer ein Delta von Handlungen?
@@ -40,7 +38,8 @@ delta_num p i1 i2
     | i1 < i2 = Just $ Gewinnt  p (i2 - i1)
 
 delta_num_map :: Ord person => (Ord etwas, Num etwas) => Delta (M.Map person etwas) person etwas
-delta_num_map vorher nachher = mapMaybe (\p -> delta_num p (lookup p vorher) (lookup p nachher)) personen
+delta_num_map vorher nachher =
+  mapMaybe (\p -> delta_num p (lookup p vorher) (lookup p nachher)) personen
     where personen = nub $ (M.keys vorher) ++ (M.keys nachher) --TODO nub is O(n^2), use sets
           lookup = M.findWithDefault 0
 

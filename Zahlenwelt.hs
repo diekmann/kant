@@ -22,7 +22,8 @@ abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
 abbauen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend-i) (M.adjust (+i) p besitz)
 
 stehlen :: Integer -> Person -> Person -> Zahlenwelt -> Zahlenwelt
-stehlen _ opfer _ welt | M.notMember opfer (besitz welt) = welt -- Wenn das Opfer nichts hat kann auch nichts gestohlen werden.
+stehlen _ opfer _ welt | M.notMember opfer (besitz welt) =
+    welt -- Wenn das Opfer nichts hat kann auch nichts gestohlen werden.
 stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
     where neuer_besitz = case M.lookup opfer besitz of
                            Nothing -> besitz
@@ -36,7 +37,7 @@ moeglich person welt h = (verbleibend nach_handlung) >= 0
 -- Mehr ist mehr gut.
 -- Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
 globaler_fortschritt :: H.Handlung Zahlenwelt -> Bool
--- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die moeglichkeit haben!!
+-- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die möglichkeit haben!!
 globaler_fortschritt (H.Handlung vorher nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
     where gesamtbesitz w = M.foldl' (+) 0 (besitz w)
 -- Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werden und die Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).
@@ -48,8 +49,8 @@ individueller_fortschritt p (H.Handlung vorher nachher) = (meins nachher) >= (me
 
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
--- TODO: hard-coded alice. Eine Maxime braucht ein Aus-Sicht-Von!
 maxime_zahlenfortschritt = Kant.Maxime $ Kant.debug_maxime (\ich -> individueller_fortschritt ich)
+-- Interessant: hard-coded Alice anstelle von 'ich'.
 
 zahlengesetz_beispiel :: Gesetze.CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
@@ -59,14 +60,16 @@ zahlengesetz_beispiel = Gesetz $ S.singleton (
                 (Rechtsfolge Verbot)))
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
-    (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 }) (H.HandlungF (abbauen 5)) maxime_zahlenfortschritt
-    Gesetze.case_law_ableiten leer
+    (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 })
+    (H.HandlungF (abbauen 5))
+    maxime_zahlenfortschritt
+    Gesetze.case_law_ableiten
+    leer
 
-
---TODO beispie sowohl fuer case_law_ableiten als auch case_law_relativ_ableiten
 
 delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
-delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher) --TODO wer braucht schon Natur und verbleibende Resourcen?
+delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher)
+  --TODO wer braucht schon Natur und verbleibende Resourcen?
 
 
 -- max i iterations
@@ -78,7 +81,7 @@ make_case_law :: (Ord a, Ord b) => Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
                  -> Gesetz Integer a b
 make_case_law _ i _ _ g | i <= 0 = g
 make_case_law ableiten i h w g =
-  --TODO: alles fuer Alice hardcoded
+  --TODO: alles für Alice hardcoded
   let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt ableiten g in
   let w' = (if s == Erlaubnis && (moeglich Alice w h) then H.nachher (H.handeln Alice w h) else w) in
   if w == w' then

@@ -98,4 +98,13 @@ kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz =
     G.hinzufuegen (gesetz_ableiten (H.handeln ich welt handlung) soll_handeln) gesetz
   )
 
-beispiel_kategorischer_imperativ = kategorischer_imperativ 'I' 0 (H.HandlungF (\_ n-> n+1)) maxime_mir_ist_alles_recht (\_ _ -> G.Rechtsnorm (G.Tatbestand "tb") (G.Rechtsfolge "yolo")) G.leer
+
+beispiel_kategorischer_imperativ =
+  kategorischer_imperativ
+    ()  -- ich  (ein Bounded type der nicht so groß ist)
+    0   -- Welt
+    (H.HandlungF (\_ n-> n+1)) -- die Welt inkrementieren
+    maxime_mir_ist_alles_recht
+    (\_ _ -> G.Rechtsnorm (G.Tatbestand "tb") (G.Rechtsfolge "yolo")) -- AllgemeinesGesetzAbleiten
+    G.leer
+

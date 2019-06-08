@@ -5,11 +5,13 @@ module Handlung where
 --
 -- Handlungen können Leute betreffen.
 -- Handlungen können aus Sicht Anderer wahrgenommen werden.
--- Ich brauche nur Welt vorher und Welt nachher. so kann ich handelnde Person und beobachtende Person trennen
+-- Ich brauche nur Welt vorher und Welt nachher.
+-- So kann ich handelnde Person und beobachtende Person trennen.
 data Handlung world = Handlung {vorher::world, nachher::world}
 
 instance Show world => Show (Handlung world) where
-    show (Handlung vorher nachher) = "(Handlung vorher:"++show vorher++" nachher:"++show nachher++")"
+  show (Handlung vorher nachher) =
+    "(Handlung vorher:" ++ show vorher ++ " nachher:" ++ show nachher ++ ")"
 
 -- Handlung als Funktion gewrapped.
 -- Was ist das? Abstrakte Handlung? Plan zu handeln? Absicht?
