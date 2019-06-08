@@ -82,7 +82,8 @@ simulate :: (Ord a, Ord b) =>
   -> Zahlenwelt                     -- Initialwelt
   -> Gesetz Integer a b             -- Initialgesetz
   -> Gesetz Integer a b
-simulate _ _ _ iteration _ _ gesetz | iteration <= 0 = gesetz
+simulate _      _      _        i _ _    g | i <= 0 = g -- iteration vorbei
+simulate person _      _        i h welt g | not (moeglich person welt h) = g
 simulate person maxime ableiten i h welt g =
   let (sollensanordnung, g') = Kant.kategorischer_imperativ person welt h maxime ableiten g in
   let w' = (if sollensanordnung == Erlaubnis && (moeglich person welt h)
@@ -105,7 +106,7 @@ beispiel_CaseLaw :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
 beispiel_CaseLaw h = simulate Alice maxime_zahlenfortschritt Gesetze.case_law_ableiten 10 h initialwelt leer
 
 beispiel_CaseLawRelativ :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
-beispiel_CaseLawRelativ h = simulate Alice maxime_zahlenfortschritt (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 h initialwelt leer
+beispiel_CaseLawRelativ h = simulate Alice maxime_zahlenfortschritt (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 20 h initialwelt leer
 
 beispiel1 = beispiel_CaseLaw (H.HandlungF (abbauen 5))
 beispiel1' = beispiel_CaseLawRelativ (H.HandlungF (abbauen 5))
