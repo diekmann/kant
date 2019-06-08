@@ -12,4 +12,5 @@ main = do
     runTestTT tests
     quickCheckWith qcArgs Aenderung.prop_positive
     quickCheck Aenderung.prop_max_aenderungen
+    -- TODO: Debug.Trace schreibt auf STDERR.
     quickCheck DebugMaximeTest.prop_debug_maxime_id_executable

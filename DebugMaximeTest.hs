@@ -23,8 +23,16 @@ prop_debug_maxime_id maxime person world =
     f_debug person world == f_orig person world
 
 -- YOLO: irgendwas, damit quickcheck das ausführen kann.
-prop_debug_maxime_id_executable :: String -> H.Handlung Integer -> Bool
-prop_debug_maxime_id_executable = prop_debug_maxime_id Kant.maxime_mir_ist_alles_recht
+prop_debug_maxime_id_executable :: Kant.Maxime String Integer -> String -> H.Handlung Integer -> Bool
+prop_debug_maxime_id_executable = prop_debug_maxime_id
+
+instance Arbitrary (Kant.Maxime String Integer) where
+  arbitrary = do
+    ergebnis <- arbitrary
+    return $ Kant.Maxime (\_ _ -> ergebnis)
+
+instance Show (Kant.Maxime String Integer) where
+  show _ = "Dummy show Kant.Maxime String Integer for quickcheck"
 
 instance Arbitrary (H.Handlung Integer) where
   arbitrary = do
