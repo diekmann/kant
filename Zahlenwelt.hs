@@ -73,22 +73,28 @@ delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besit
   --TODO wer braucht schon Natur und verbleibende Resourcen?
 
 
--- max i iterations
-make_case_law :: (Ord a, Ord b) => Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
-                 -> Int                            -- maximale Anzahl Iterationen (Simulationen)
-                 -> H.HandlungF Person Zahlenwelt  -- Beabsichtigte Handlung
-                 -> Zahlenwelt                     -- Initialwelt
-                 -> Gesetz Integer a b             -- Initialgesetz
-                 -> Gesetz Integer a b
-make_case_law _ i _ _ g | i <= 0 = g
-make_case_law ableiten i h w g =
-  --TODO: alles für Alice hardcoded
-  let (s,g') = Kant.kategorischer_imperativ Alice w h maxime_zahlenfortschritt ableiten g in
-  let w' = (if s == Erlaubnis && (moeglich Alice w h) then H.nachher (H.handeln Alice w h) else w) in
-  if w == w' then
+simulate :: (Ord a, Ord b) =>
+  Person
+  -> Kant.Maxime Person Zahlenwelt
+  -> Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
+  -> Int                            -- maximale Anzahl Iterationen (Simulationen)
+  -> H.HandlungF Person Zahlenwelt  -- Beabsichtigte Handlung
+  -> Zahlenwelt                     -- Initialwelt
+  -> Gesetz Integer a b             -- Initialgesetz
+  -> Gesetz Integer a b
+simulate _ _ _ iteration _ _ gesetz | iteration <= 0 = gesetz
+simulate person maxime ableiten i h welt g =
+  let (sollensanordnung, g') = Kant.kategorischer_imperativ person welt h maxime ableiten g in
+  let w' = (if sollensanordnung == Erlaubnis && (moeglich person welt h)
+            then
+              H.nachher (H.handeln person welt h)
+            else
+              welt
+           ) in
+  if welt == w' then
     g'
   else
-    make_case_law ableiten (i-1) h w' g'
+    simulate person maxime ableiten (i-1) h w' g'
 
 initialwelt = Zahlenwelt {
                 verbleibend = 42,
@@ -96,10 +102,10 @@ initialwelt = Zahlenwelt {
               }
 
 beispiel_CaseLaw :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
-beispiel_CaseLaw h = make_case_law Gesetze.case_law_ableiten 10 h initialwelt leer
+beispiel_CaseLaw h = simulate Alice maxime_zahlenfortschritt Gesetze.case_law_ableiten 10 h initialwelt leer
 
 beispiel_CaseLawRelativ :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
-beispiel_CaseLawRelativ h = make_case_law (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 h initialwelt leer
+beispiel_CaseLawRelativ h = simulate Alice maxime_zahlenfortschritt (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 10 h initialwelt leer
 
 beispiel1 = beispiel_CaseLaw (H.HandlungF (abbauen 5))
 beispiel1' = beispiel_CaseLawRelativ (H.HandlungF (abbauen 5))
