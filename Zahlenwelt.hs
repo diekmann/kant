@@ -50,7 +50,7 @@ individueller_fortschritt p (H.Handlung vorher nachher) = (meins nachher) >= (me
 
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
-maxime_zahlenfortschritt = Kant.Maxime $ Debug.debug_maxime (\ich -> individueller_fortschritt ich)
+maxime_zahlenfortschritt = Debug.debug_maxime $ Kant.Maxime (\ich -> individueller_fortschritt ich)
 -- Interessant: hard-coded Alice anstelle von 'ich'.
 
 zahlengesetz_beispiel :: Gesetze.CaseLaw Zahlenwelt
