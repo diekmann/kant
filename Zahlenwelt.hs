@@ -5,17 +5,18 @@ import qualified Handlung as H
 import qualified Aenderung
 import qualified Kant
 import qualified Gesetze
+import qualified DebugMaxime as Debug
 import qualified Data.Set as S
 import qualified Data.Map as M
 
 data Person = Alice | Bob | Carl
     deriving (Eq, Ord, Show, Enum, Bounded)
 
--- Wenn die welt nur eine Zahl ist, ...
--- Resourcen sind endlich.
-data Zahlenwelt = Zahlenwelt { verbleibend :: Integer, -- verbleibendResourcen
-                               besitz :: M.Map Person Integer -- Besitz jeder Person
-                             }
+-- Wenn die Welt sich durch eine Zahl darstellen lässt, ...
+data Zahlenwelt = Zahlenwelt {
+        verbleibend :: Integer, -- Ressourcen sind endlich. Verbleibende Ressourcen in der Welt.
+        besitz :: M.Map Person Integer -- Besitz jeder Person.
+      }
   deriving (Eq, Ord, Show)
 
 abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
@@ -49,7 +50,7 @@ individueller_fortschritt p (H.Handlung vorher nachher) = (meins nachher) >= (me
 
 
 -- TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.
-maxime_zahlenfortschritt = Kant.Maxime $ Kant.debug_maxime (\ich -> individueller_fortschritt ich)
+maxime_zahlenfortschritt = Kant.Maxime $ Debug.debug_maxime (\ich -> individueller_fortschritt ich)
 -- Interessant: hard-coded Alice anstelle von 'ich'.
 
 zahlengesetz_beispiel :: Gesetze.CaseLaw Zahlenwelt
