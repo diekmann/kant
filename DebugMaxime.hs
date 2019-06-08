@@ -1,5 +1,6 @@
 module DebugMaxime where
 
+import qualified Kant
 import qualified Handlung as H
 import qualified Debug.Trace (trace)
 
@@ -12,3 +13,8 @@ debug_maxime f ich welt =
           do_trace str = if not ergebnis
                          then Debug.Trace.trace ("\nverletzte maxime "++str)
                          else id
+
+debug_maxime2 :: (Show person, Show world) =>
+  Kant.Maxime person world -> Kant.Maxime person world
+debug_maxime2 (Kant.Maxime f) = Kant.Maxime (debug_maxime f)
+
