@@ -13,7 +13,7 @@ import Test.HUnit (Test(..), assertEqual)
 -- Person kann sein: natürliche Person, juristische Person, ein Tier, die Umwelt an sich, ....
 data Aenderung person etwas = Verliert person etwas | Gewinnt person etwas
     deriving (Ord, Eq)
--- brauche noch Vorbedingung fuer ein Delta von Handlungen?
+-- brauche noch Vorbedingung fuer ein Delta von Actionen?
 
 instance (Show person, Show etwas) => Show (Aenderung person etwas) where
     show (Verliert p e) = show p ++ " verliert " ++ show e
@@ -38,9 +38,9 @@ delta_num p i1 i2
     | i1 < i2 = Just $ Gewinnt  p (i2 - i1)
 
 delta_num_map :: Ord person => (Ord etwas, Num etwas) => Delta (M.Map person etwas) person etwas
-delta_num_map vorher nachher =
-  mapMaybe (\p -> delta_num p (lookup p vorher) (lookup p nachher)) personen
-    where personen = nub $ (M.keys vorher) ++ (M.keys nachher) --TODO nub is O(n^2), use sets
+delta_num_map before after =
+  mapMaybe (\p -> delta_num p (lookup p before) (lookup p after)) personen
+    where personen = nub $ (M.keys before) ++ (M.keys after) --TODO nub is O(n^2), use sets
           lookup = M.findWithDefault 0
 
 -- Tests and properties

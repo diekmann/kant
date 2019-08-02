@@ -2,7 +2,7 @@
 module DebugMaximeTest where
 
 import qualified Kant
-import qualified Handlung as H
+import qualified Action as H
 import qualified DebugMaxime as Debug
 
 import Test.QuickCheck.Arbitrary
@@ -14,7 +14,7 @@ import Test.QuickCheck.Arbitrary
 prop_debug_maxime_id :: (Arbitrary person, Show person, Arbitrary world, Show world) =>
   Kant.Maxime person world
   -> person
-  -> H.Handlung world
+  -> A.Action world
   -> Bool
 prop_debug_maxime_id maxime person world =
     let Kant.Maxime f_orig = maxime
@@ -23,7 +23,7 @@ prop_debug_maxime_id maxime person world =
     f_debug person world == f_orig person world
 
 -- YOLO: irgendwas, damit quickcheck das ausführen kann.
-prop_debug_maxime_id_executable :: Kant.Maxime String Integer -> String -> H.Handlung Integer -> Bool
+prop_debug_maxime_id_executable :: Kant.Maxime String Integer -> String -> A.Action Integer -> Bool
 prop_debug_maxime_id_executable = prop_debug_maxime_id
 
 instance Arbitrary (Kant.Maxime String Integer) where
@@ -34,8 +34,8 @@ instance Arbitrary (Kant.Maxime String Integer) where
 instance Show (Kant.Maxime String Integer) where
   show _ = "Dummy show Kant.Maxime String Integer for quickcheck"
 
-instance Arbitrary (H.Handlung Integer) where
+instance Arbitrary (A.Action Integer) where
   arbitrary = do
     v <- arbitrary
     n <- arbitrary
-    return (H.Handlung v n)
+    return (A.Action v n)

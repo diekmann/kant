@@ -1,24 +1,24 @@
 module Gesetze where
 
 import qualified Gesetz as G
-import qualified Handlung as H
+import qualified Action as A
 import qualified Aenderung
 import qualified Kant
 import qualified Data.Set as Set
 
 -- Case Law
 
--- Gesetz beschreibt: (wenn vorher, wenn nachher) dann Erlaubt/Verboten,
---                    wobei vorher/nachher die Welt beschreiben.
+-- Gesetz beschreibt: (wenn before, wenn after) dann Erlaubt/Verboten,
+--                    wobei before/after die Welt beschreiben.
 -- Paragraphen sind einfache Integer
 type CaseLaw world = G.Gesetz Integer (world, world) G.Sollensanordnung
 
 -- Übertraegt einen Tatbestand wörtlich ins Gesetz.
 -- Nicht sehr allgemein.
 case_law_ableiten :: Kant.AllgemeinesGesetzAbleiten world (world, world) G.Sollensanordnung
-case_law_ableiten (H.Handlung vorher nachher) sollensanordnung =
+case_law_ableiten (A.Action before after) sollensanordnung =
     G.Rechtsnorm
-        (G.Tatbestand (vorher, nachher))
+        (G.Tatbestand (before, after))
         (G.Rechtsfolge sollensanordnung)
 
 show_CaseLaw :: Show w => CaseLaw w -> String
@@ -37,6 +37,6 @@ type CaseLawRelativ person etwas = G.Gesetz Integer [Aenderung.Aenderung person 
 case_law_relativ_ableiten
   :: (world -> world -> [Aenderung.Aenderung person etwas])
      -> Kant.AllgemeinesGesetzAbleiten world [Aenderung.Aenderung person etwas] G.Sollensanordnung
-case_law_relativ_ableiten delta (H.Handlung vorher nachher) erlaubt =
-  G.Rechtsnorm (G.Tatbestand (delta vorher nachher)) (G.Rechtsfolge erlaubt)
+case_law_relativ_ableiten delta (A.Action before after) erlaubt =
+  G.Rechtsnorm (G.Tatbestand (delta before after)) (G.Rechtsfolge erlaubt)
 

@@ -1,7 +1,7 @@
 module DebugMaxime (debug_maxime) where
 
 import qualified Kant
-import qualified Handlung as H
+import qualified Action as A
 import qualified Debug.Trace (trace)
 
 -- debug_maxime gibt Details aus wenn die Maxime verletzt wurde.
@@ -12,7 +12,7 @@ debug_maxime (Kant.Maxime f) = Kant.Maxime (debug_maxime_f f)
 
 -- debug_maxime_f wrapped die Funktion in einer Maxime.
 debug_maxime_f :: (Show person, Show world) =>
-  (person -> H.Handlung world -> Bool) -> (person -> H.Handlung world -> Bool)
+  (person -> A.Action world -> Bool) -> (person -> A.Action world -> Bool)
 debug_maxime_f f ich welt =
   do_trace ("aus Sicht von " ++ show ich ++ " für " ++ show welt) $ ergebnis
     where ergebnis = f ich welt

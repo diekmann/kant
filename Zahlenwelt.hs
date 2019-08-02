@@ -1,7 +1,7 @@
 module Zahlenwelt where
 
 import Gesetz
-import qualified Handlung as H
+import qualified Action as A
 import qualified Aenderung
 import qualified Kant
 import qualified Gesetze
@@ -30,22 +30,22 @@ stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
                            Nothing -> besitz
                            Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer besitz)
 
--- Eine Handlung ist nur physikalisch möglich, solange es noch Resourcen gibt.
-moeglich :: Person -> Zahlenwelt -> H.HandlungF Person Zahlenwelt -> Bool
+-- Eine Action ist nur physikalisch möglich, solange es noch Resourcen gibt.
+moeglich :: Person -> Zahlenwelt -> A.ActionF Person Zahlenwelt -> Bool
 moeglich person welt h = (verbleibend nach_handlung) >= 0
-    where nach_handlung = H.nachher $ H.handeln person welt h
+    where nach_handlung = A.after $ A.act person welt h
 
 -- Mehr ist mehr gut.
 -- Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
-globaler_fortschritt :: H.Handlung Zahlenwelt -> Bool
--- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die möglichkeit haben!!
-globaler_fortschritt (H.Handlung vorher nachher) = (gesamtbesitz nachher) >= (gesamtbesitz vorher) -- kein strenger Fortschritt, eher kein Rueckschritt
+globaler_fortschritt :: A.Action Zahlenwelt -> Bool
+-- Groesser (>) anstelle (>=) ist hier echt spannend! Es sagt, dass wir nicht act duerfen, wenn andere nicht die möglichkeit haben!!
+globaler_fortschritt (A.Action before after) = (gesamtbesitz after) >= (gesamtbesitz before) -- kein strenger Fortschritt, eher kein Rueckschritt
     where gesamtbesitz w = M.foldl' (+) 0 (besitz w)
 -- Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werden und die Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).
 
 
-individueller_fortschritt :: Person -> H.Handlung Zahlenwelt -> Bool
-individueller_fortschritt p (H.Handlung vorher nachher) = (meins nachher) >= (meins vorher)
+individueller_fortschritt :: Person -> A.Action Zahlenwelt -> Bool
+individueller_fortschritt p (A.Action before after) = (meins after) >= (meins before)
     where meins welt = M.findWithDefault 0 p (besitz welt)
 
 
@@ -62,14 +62,14 @@ zahlengesetz_beispiel = Gesetz $ S.singleton (
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
     (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 })
-    (H.HandlungF (abbauen 5))
+    (A.ActionF (abbauen 5))
     maxime_zahlenfortschritt
     Gesetze.case_law_ableiten
     leer
 
 
 delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
-delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher)
+delta_zahlenwelt before after = Aenderung.delta_num_map (besitz before) (besitz after)
   --TODO wer braucht schon Natur und verbleibende Resourcen?
 
 
@@ -78,7 +78,7 @@ simulate :: (Ord a, Ord b) =>
   -> Kant.Maxime Person Zahlenwelt
   -> Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
   -> Int                            -- maximale Anzahl Iterationen (Simulationen)
-  -> H.HandlungF Person Zahlenwelt  -- Beabsichtigte Handlung
+  -> A.ActionF Person Zahlenwelt  -- Beabsichtigte Action
   -> Zahlenwelt                     -- Initialwelt
   -> Gesetz Integer a b             -- Initialgesetz
   -> Gesetz Integer a b
@@ -88,7 +88,7 @@ simulate person maxime ableiten i h welt g =
   let (sollensanordnung, g') = Kant.kategorischer_imperativ person welt h maxime ableiten g in
   let w' = (if sollensanordnung == Erlaubnis && (moeglich person welt h)
             then
-              H.nachher (H.handeln person welt h)
+              A.after (A.act person welt h)
             else
               welt
            ) in
@@ -102,20 +102,20 @@ initialwelt = Zahlenwelt {
                 besitz = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
-beispiel_CaseLaw :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
+beispiel_CaseLaw :: A.ActionF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
 beispiel_CaseLaw h = simulate Alice maxime_zahlenfortschritt Gesetze.case_law_ableiten 10 h initialwelt leer
 
-beispiel_CaseLawRelativ :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
+beispiel_CaseLawRelativ :: A.ActionF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
 beispiel_CaseLawRelativ h = simulate Alice maxime_zahlenfortschritt (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 20 h initialwelt leer
 
-beispiel1 = beispiel_CaseLaw (H.HandlungF (abbauen 5))
-beispiel1' = beispiel_CaseLawRelativ (H.HandlungF (abbauen 5))
+beispiel1 = beispiel_CaseLaw (A.ActionF (abbauen 5))
+beispiel1' = beispiel_CaseLawRelativ (A.ActionF (abbauen 5))
 --putStrLn $ Gesetze.show_CaseLaw  beispiel1
 
-beispiel2 = beispiel_CaseLaw (H.HandlungF (stehlen 5 Bob))
-beispiel2' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 5 Bob))
+beispiel2 = beispiel_CaseLaw (A.ActionF (stehlen 5 Bob))
+beispiel2' = beispiel_CaseLawRelativ (A.ActionF (stehlen 5 Bob))
 
-beispiel3 = beispiel_CaseLaw (H.HandlungF (stehlen 2 Alice))
-beispiel3' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 2 Alice))
+beispiel3 = beispiel_CaseLaw (A.ActionF (stehlen 2 Alice))
+beispiel3' = beispiel_CaseLawRelativ (A.ActionF (stehlen 2 Alice))
 
 

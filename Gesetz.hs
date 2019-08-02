@@ -64,7 +64,7 @@ hinzufuegen rn (Gesetz g) | S.member rn rechtsnormen = Gesetz g -- Rechtsnorm ex
 hinzufuegen rn (Gesetz g) = Gesetz $ S.insert (neuer_paragraph (Gesetz g), rn) g
 
 
--- ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss.
+-- ob eine Action ausgeführt werden muss, darf, kann, nicht muss.
 data Sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
   deriving (Eq, Ord, Show, Enum)
 
