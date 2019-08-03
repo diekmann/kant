@@ -55,21 +55,6 @@ maxime_zahlenfortschritt = Debug.debug_maxime $ Kant.Maxime (\me -> individual_p
 -- Interesting: hard-code Alice instead of 'me'.
 
 
-zahlengesetz_beispiel :: Gesetze.CaseLaw Zahlenwelt
-zahlengesetz_beispiel = Gesetz $ S.singleton (
-    (Paragraph 42),
-    (Rechtsnorm (Tatbestand (Zahlenwelt { remaining = 9000, property = M.singleton Alice 0 },
-                             Zahlenwelt { remaining = 9000, property = M.singleton Alice 1}))
-                (Rechtsfolge Verbot)))
-
-beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
-    (Zahlenwelt { remaining = 9000, property = M.singleton Alice 0 })
-    (A.ActionF (abbauen 5))
-    maxime_zahlenfortschritt
-    Gesetze.case_law_ableiten
-    leer
-
-
 delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
 delta_zahlenwelt before after = Aenderung.delta_num_map (property before) (property after)
   --yolo: who needs nature and consider remaining resources?

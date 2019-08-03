@@ -18,7 +18,6 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 -- Verboten: Maxime (\ich _ -> if ich == "konkrete Person" then ...)
 
 
-
 -- We test:
 --   * What if everyone would act like this?
 --   * What if everyone would judge by that maxime?
