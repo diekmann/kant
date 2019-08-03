@@ -10,6 +10,7 @@ import qualified Action as A
 newtype Maxime person world = Maxime (person -> A.Action world -> Bool)
 --                                    I (me) -> Impact         -> good/bad
 
+
 -- Beispiel
 maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 
@@ -17,62 +18,53 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 -- Verboten: Maxime (\ich _ -> if ich == "konkrete Person" then ...)
 
 
+
 -- We test:
 --   * What if everyone would act like this?
---   * Was if everyone would judge by that maxime?
+--   * What if everyone would judge by that maxime?
 --     Example: robbing - potentially good for the thief
 --                        but the thief would not like to be the victim.
 -- Essentially: cross-product       Population x Population
 --              where each person   acts       x is affected
 teste_maxime :: forall person world. (Enum person, Bounded person) =>
-  world                       -- Welt in ihrem aktuellen Zustand
-  -> A.ActionF person world -- Zu untersuchende Action
+  world                       -- World in its current state
+  -> A.ActionF person world   -- Action we judge
   -> Maxime person world
   -> Bool
-teste_maxime welt handlung (Maxime maxime) =
-  all was_wenn_jeder_so_handelt_aus_sicht_von bevoelkerung
+teste_maxime world action (Maxime maxime) =
+  all being_affected population
     where
-      bevoelkerung :: [person]
-      bevoelkerung = [minBound..maxBound]
+      population :: [person]
+      population = [minBound..maxBound]
 
-      wenn_jeder_so_handelt :: [A.Action world]
-      wenn_jeder_so_handelt = [A.act acting_person welt handlung
-                               | acting_person <- bevoelkerung]
+      everyone_acts :: [A.Action world]
+      everyone_acts = [A.act acting_person world action | acting_person <- population]
 
-      was_wenn_jeder_so_handelt_aus_sicht_von :: person -> Bool
-      was_wenn_jeder_so_handelt_aus_sicht_von betroffene_person =
-        all (maxime betroffene_person) wenn_jeder_so_handelt
+      being_affected :: person -> Bool
+      being_affected affected_person = all (maxime affected_person) everyone_acts
 
 
--- Versuch ein allgemeines Gesetz abzuleiten:
--- TODO: Nur aus einer von außen betrachteten Action
---       und einer Entscheidung ob diese Action ausgeführt werden soll
---       wird es schwer ein allgemeines Gesetz abzuleiten.
+-- Deriving a universal law.
 type AllgemeinesGesetzAbleiten world a b =
   A.Action world -> G.Sollensanordnung -> G.Rechtsnorm a b
 
 -- Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
 -- dass sie ein allgemeines Gesetz werde.
--- TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?
 kategorischer_imperativ ::
   Ord a => Ord b =>
   Enum person => Bounded person =>
-  person                       -- actde Person
-  -> world                     -- Die Welt in ihrem aktuellen Zustand
-  -> A.ActionF person world  -- Eine mögliche Action,
-                               -- über die wir entscheiden wollen ob wir sie ausführen sollten.
-  -> Maxime person world       -- Persönliche Ethik?
-  -> AllgemeinesGesetzAbleiten world a b -- (wenn man keinen Plan hat wie man sowas implementiert,
-                                         --  einfach als Eingabe annehmen)
-  -> G.Gesetz Integer a b      -- Allgemeines Gesetz (für alle Menschen)
-  -- Ergebnis:
-  -> (G.Sollensanordnung,    -- Sollen wir die Action ausführen?
-      G.Gesetz Integer a b)  -- Soll das allgemeine Gesetz entsprechend angepasst werden?
-  --TODO: Wenn unsere Maximen perfekt und die Maximen aller Menschen konsisten sind,
-  --      soll das Gesetz nur erweitert werden.
+  person                       -- acting Person
+  -> world                     -- current state of the world
+  -> A.ActionF person world    -- action we examine
+  -> Maxime person world       -- personal ethics
+  -> AllgemeinesGesetzAbleiten world a b
+  -> G.Gesetz Integer a b
+  -- Result
+  -> (G.Sollensanordnung,    -- Are we allowed to act?
+      G.Gesetz Integer a b)  -- Updated law.
 kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz =
-  -- Es fehlt: "Wollen"
-  -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
+  -- TODO: missing "will"
+  -- TODO: only Erlaubnis/Verbot support.
   let should_act = if teste_maxime welt handlung maxime
                      then
                        G.Erlaubnis

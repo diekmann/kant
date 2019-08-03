@@ -78,7 +78,7 @@ simulate :: (Ord a, Ord b) =>
   -> Kant.Maxime Person Zahlenwelt
   -> Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
   -> Int                            -- maximale Anzahl Iterationen (Simulationen)
-  -> A.ActionF Person Zahlenwelt  -- Beabsichtigte Action
+  -> A.ActionF Person Zahlenwelt    -- Beabsichtigte Action
   -> Zahlenwelt                     -- Initialwelt
   -> Gesetz Integer a b             -- Initialgesetz
   -> Gesetz Integer a b
