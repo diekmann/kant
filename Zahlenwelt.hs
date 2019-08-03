@@ -12,20 +12,19 @@ import qualified Data.Map as M
 data Person = Alice | Bob | Carl
     deriving (Eq, Ord, Show, Enum, Bounded)
 
--- Wenn die Welt sich durch eine Zahl darstellen lässt, ...
 data Zahlenwelt = Zahlenwelt {
         remaining :: Integer,            -- Resources are finite.
         property :: M.Map Person Integer -- Estate of each person.
       }
   deriving (Eq, Ord, Show)
 
-abbauen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
-abbauen i p (Zahlenwelt remaining property) = Zahlenwelt (remaining-i) (M.adjust (+i) p property)
+mining :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
+mining i p (Zahlenwelt remaining property) = Zahlenwelt (remaining-i) (M.adjust (+i) p property)
 
-stehlen :: Integer -> Person -> Person -> Zahlenwelt -> Zahlenwelt
-stehlen _ opfer _ welt | M.notMember opfer (property welt) =
+stealing :: Integer -> Person -> Person -> Zahlenwelt -> Zahlenwelt
+stealing _ opfer _ welt | M.notMember opfer (property welt) =
     welt -- Wenn das Opfer nichts hat kann auch nichts gestohlen werden.
-stehlen i opfer dieb (Zahlenwelt r property) = Zahlenwelt r neuer_property
+stealing i opfer dieb (Zahlenwelt r property) = Zahlenwelt r neuer_property
     where neuer_property = case M.lookup opfer property of
                            Nothing -> property
                            Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer property)
@@ -89,6 +88,7 @@ initialwelt = Zahlenwelt {
                 property = M.fromList [(Alice, 5), (Bob, 10)]
               }
 
+-- !!
 -- Now we hard-code Alice as acting person in our examples (the maxim remains generic)
  
 beispiel_CaseLaw :: A.ActionF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
@@ -97,13 +97,13 @@ beispiel_CaseLaw h = simulate Alice maxime_zahlenfortschritt Gesetze.case_law_ab
 beispiel_CaseLawRelativ :: A.ActionF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
 beispiel_CaseLawRelativ h = simulate Alice maxime_zahlenfortschritt (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 20 h initialwelt leer
 
-beispiel1 = beispiel_CaseLaw (A.ActionF (abbauen 5))
-beispiel1' = beispiel_CaseLawRelativ (A.ActionF (abbauen 5))
+beispiel1 = beispiel_CaseLaw (A.ActionF (mining 5))
+beispiel1' = beispiel_CaseLawRelativ (A.ActionF (mining 5))
 
-beispiel2 = beispiel_CaseLaw (A.ActionF (stehlen 5 Bob))
-beispiel2' = beispiel_CaseLawRelativ (A.ActionF (stehlen 5 Bob))
+beispiel2 = beispiel_CaseLaw (A.ActionF (stealing 5 Bob))
+beispiel2' = beispiel_CaseLawRelativ (A.ActionF (stealing 5 Bob))
 
-beispiel3 = beispiel_CaseLaw (A.ActionF (stehlen 2 Alice))
-beispiel3' = beispiel_CaseLawRelativ (A.ActionF (stehlen 2 Alice))
+beispiel3 = beispiel_CaseLaw (A.ActionF (stealing 2 Alice))
+beispiel3' = beispiel_CaseLawRelativ (A.ActionF (stealing 2 Alice))
 
 
