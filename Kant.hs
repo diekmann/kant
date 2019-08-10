@@ -25,7 +25,7 @@ maxime_mir_ist_alles_recht = Maxime (\_ _ -> True)
 --           wobei jeder einmal als handelnde Person auftritt
 --           und einmal als betroffene Person (durch Auswertung der Maxime).
 teste_maxime :: forall person world. (Enum person, Bounded person) =>
-  world                       -- Welt in ihrem aktuellen Zustand
+  world                       -- Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!
   -> H.HandlungF person world -- Zu untersuchende Handlung
   -> Maxime person world
   -> Bool

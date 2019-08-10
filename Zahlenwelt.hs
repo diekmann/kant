@@ -6,6 +6,7 @@ import qualified Aenderung
 import qualified Kant
 import qualified Gesetze
 import qualified DebugMaxime as Debug
+import qualified Simulation
 import qualified Data.Set as S
 import qualified Data.Map as M
 
@@ -31,9 +32,8 @@ stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
                            Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer besitz)
 
 -- Eine Handlung ist nur physikalisch möglich, solange es noch Resourcen gibt.
-moeglich :: Person -> Zahlenwelt -> H.HandlungF Person Zahlenwelt -> Bool
-moeglich person welt h = (verbleibend nach_handlung) >= 0
-    where nach_handlung = H.nachher $ H.handeln person welt h
+moeglich :: H.Handlung Zahlenwelt -> Bool
+moeglich (H.Handlung vorher nachher) = (verbleibend nachher) >= 0
 
 -- Mehr ist mehr gut.
 -- Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
@@ -72,30 +72,16 @@ delta_zahlenwelt :: Aenderung.Delta Zahlenwelt Person Integer
 delta_zahlenwelt vorher nachher = Aenderung.delta_num_map (besitz vorher) (besitz nachher)
   --TODO wer braucht schon Natur und verbleibende Resourcen?
 
+so = Simulation.Optionen {
+    Simulation.person = Alice,
 
-simulate :: (Ord a, Ord b) =>
-  Person
-  -> Kant.Maxime Person Zahlenwelt
-  -> Kant.AllgemeinesGesetzAbleiten Zahlenwelt a b
-  -> Int                            -- maximale Anzahl Iterationen (Simulationen)
-  -> H.HandlungF Person Zahlenwelt  -- Beabsichtigte Handlung
-  -> Zahlenwelt                     -- Initialwelt
-  -> Gesetz Integer a b             -- Initialgesetz
-  -> Gesetz Integer a b
-simulate _      _      _        i _ _    g | i <= 0 = g -- iteration vorbei
-simulate person _      _        i h welt g | not (moeglich person welt h) = g
-simulate person maxime ableiten i h welt g =
-  let (sollensanordnung, g') = Kant.kategorischer_imperativ person welt h maxime ableiten g in
-  let w' = (if sollensanordnung == Erlaubnis && (moeglich person welt h)
-            then
-              H.nachher (H.handeln person welt h)
-            else
-              welt
-           ) in
-  if welt == w' then
-    g'
-  else
-    simulate person maxime ableiten (i-1) h w' g'
+    Simulation.moeglich = moeglich,
+
+    Simulation.maxime = maxime_zahlenfortschritt,
+    Simulation.allgemeines_gesetz_ableiten = Gesetze.case_law_ableiten 
+}
+
+so_besser = so { Simulation.allgemeines_gesetz_ableiten = Gesetze.case_law_relativ_ableiten delta_zahlenwelt }
 
 initialwelt = Zahlenwelt {
                 verbleibend = 42,
@@ -103,10 +89,10 @@ initialwelt = Zahlenwelt {
               }
 
 beispiel_CaseLaw :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLaw Zahlenwelt
-beispiel_CaseLaw h = simulate Alice maxime_zahlenfortschritt Gesetze.case_law_ableiten 10 h initialwelt leer
+beispiel_CaseLaw h = Simulation.simulateOne so 20 h initialwelt leer
 
 beispiel_CaseLawRelativ :: H.HandlungF Person Zahlenwelt -> Gesetze.CaseLawRelativ Person Integer
-beispiel_CaseLawRelativ h = simulate Alice maxime_zahlenfortschritt (Gesetze.case_law_relativ_ableiten delta_zahlenwelt) 20 h initialwelt leer
+beispiel_CaseLawRelativ h = Simulation.simulateOne so_besser 20 h initialwelt leer
 
 beispiel1 = beispiel_CaseLaw (H.HandlungF (abbauen 5))
 beispiel1' = beispiel_CaseLawRelativ (H.HandlungF (abbauen 5))
