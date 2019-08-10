@@ -76,7 +76,7 @@ tests = [
 -- Die Zahlen bei Gewinnt oder Verliert sind immer positiv.
 prop_positive :: Integer -> Integer -> Bool
 prop_positive i1 i2 = case delta_num "X" i1 i2 of
-                        Just a -> (number a) > 0
+                        Just a -> number a > 0
                         Nothing -> i1 == i2
                       where number (Gewinnt _ n) = n
                             number (Verliert _ n) = n

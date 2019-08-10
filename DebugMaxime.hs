@@ -14,7 +14,7 @@ debug_maxime (Kant.Maxime f) = Kant.Maxime (debug_maxime_f f)
 debug_maxime_f :: (Show person, Show world) =>
   (person -> H.Handlung world -> Bool) -> (person -> H.Handlung world -> Bool)
 debug_maxime_f f ich welt =
-  do_trace ("aus Sicht von " ++ show ich ++ " für " ++ show welt) $ ergebnis
+  do_trace ("aus Sicht von " ++ show ich ++ " für " ++ show welt) ergebnis
     where ergebnis = f ich welt
           do_trace str = if not ergebnis
                          then Debug.Trace.trace ("\nverletzte maxime "++str)

@@ -69,10 +69,10 @@ maxime_zahlenfortschritt = Debug.debug_maxime $ Kant.Maxime (\ich -> individuell
 
 zahlengesetz_beispiel :: Gesetze.CaseLaw Zahlenwelt
 zahlengesetz_beispiel = Gesetz $ S.singleton (
-    (Paragraph 42),
-    (Rechtsnorm (Tatbestand (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 },
+    Paragraph 42,
+    Rechtsnorm (Tatbestand (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 },
                              Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 1}))
-                (Rechtsfolge Verbot)))
+                (Rechtsfolge Verbot))
 
 beispiel_kategorischer_imperativ = Kant.kategorischer_imperativ Alice
     (Zahlenwelt { verbleibend = 9000, besitz = M.singleton Alice 0 })
