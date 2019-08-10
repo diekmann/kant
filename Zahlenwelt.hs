@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+--TODO move Arbitrary and FlexibleInstances into smaller module
+
 module Zahlenwelt where
 
 import Gesetz
@@ -9,6 +12,10 @@ import qualified DebugMaxime as Debug
 import qualified Simulation
 import qualified Data.Set as S
 import qualified Data.Map as M
+
+import Test.QuickCheck
+
+
 
 data Person = Alice | Bob | Carl
     deriving (Eq, Ord, Show, Enum, Bounded)
@@ -104,4 +111,14 @@ beispiel2' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 5 Bob))
 beispiel3 = beispiel_CaseLaw (H.HandlungF (stehlen 2 Alice))
 beispiel3' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 2 Alice))
 
+instance Arbitrary Person where
+    arbitrary = elements [minBound..maxBound]
 
+instance Arbitrary (H.HandlungF Person Zahlenwelt) where
+  arbitrary = do
+    i <- arbitrary
+    opfer <- arbitrary
+    f <- elements [abbauen i, stehlen i opfer]
+    return (H.HandlungF f)
+
+beispiel4 = Simulation.gesetzbuch_inferieren so_besser initialwelt
