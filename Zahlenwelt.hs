@@ -38,6 +38,13 @@ stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
                            Nothing -> besitz
                            Just _ ->  M.insertWith (+) dieb i (M.adjust (\x -> x-i) opfer besitz)
 
+wegwerfen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
+wegwerfen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt verbleibend (M.adjust (\x -> x-i) p besitz)
+
+recyclen :: Integer -> Person -> Zahlenwelt -> Zahlenwelt
+recyclen i p (Zahlenwelt verbleibend besitz) = Zahlenwelt (verbleibend+i) (M.adjust (\x -> x-i) p besitz)
+
+
 -- Eine Handlung ist nur physikalisch möglich, solange es noch Resourcen gibt.
 moeglich :: H.Handlung Zahlenwelt -> Bool
 moeglich (H.Handlung vorher nachher) = (verbleibend nachher) >= 0
@@ -111,6 +118,9 @@ beispiel2' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 5 Bob))
 beispiel3 = beispiel_CaseLaw (H.HandlungF (stehlen 2 Alice))
 beispiel3' = beispiel_CaseLawRelativ (H.HandlungF (stehlen 2 Alice))
 
+beispiel4 = beispiel_CaseLaw (H.HandlungF (abbauen 0))
+beispiel4' = beispiel_CaseLawRelativ (H.HandlungF (abbauen 0))
+
 instance Arbitrary Person where
     arbitrary = elements [minBound..maxBound]
 
@@ -118,7 +128,8 @@ instance Arbitrary (H.HandlungF Person Zahlenwelt) where
   arbitrary = do
     i <- arbitrary
     opfer <- arbitrary
-    f <- elements [abbauen i, stehlen i opfer]
+    f <- elements [abbauen i, stehlen i opfer, wegwerfen i, recyclen i]
     return (H.HandlungF f)
 
-beispiel4 = Simulation.gesetzbuch_inferieren so_besser initialwelt
+beispiel_sim1 = Simulation.gesetzbuch_inferieren so initialwelt
+beispiel_sim1' = Simulation.gesetzbuch_inferieren so_besser initialwelt
