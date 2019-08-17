@@ -39,6 +39,20 @@ simulateHandlungF so h welt g =
            ) in
   (w', g')
 
+-- Funktion begrenzt oft anwenden bis sich die Welt nicht mehr ändert.
+converge :: (Eq world) =>
+  (world -> gesetz -> (world, gesetz)) -- Funktion
+  -> Int                               -- maximale Anzahl Iterationen (Simulationen)
+  -> world                             -- Initialwelt.
+  -> gesetz
+  -> (world, gesetz)
+converge _ i w g | i <= 0 = (w, g)
+converge f i w g =
+  let (w', g') = f w g in
+  if w == w' then
+    (w, g')
+  else
+    converge f (i-1) w' g'
 
 -- simulate one HandlungF
 simulateOne :: (Ord a, Ord b) => (Enum person, Bounded person) => (Eq world) =>
@@ -48,13 +62,7 @@ simulateOne :: (Ord a, Ord b) => (Enum person, Bounded person) => (Eq world) =>
   -> world                          -- Initialwelt.
   -> G.Gesetz Integer a b             -- Initialgesetz
   -> G.Gesetz Integer a b
-simulateOne _  i _ _    g | i <= 0 = g -- iteration vorbei
-simulateOne so i h welt g =
-  let (w', g') = simulateHandlungF so h welt g in
-  if welt == w' then
-    g'
-  else
-    simulateOne so (i-1) h w' g'
+simulateOne so i h w g = snd $ converge (simulateHandlungF so h) i w g
 
 
 gesetzbuch_generator :: (Ord a, Ord b) => (Enum person, Bounded person) => (Eq world) =>
