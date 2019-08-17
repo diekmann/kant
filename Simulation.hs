@@ -60,11 +60,15 @@ simulateOne so i h welt g =
 gesetzbuch_generator :: (Ord a, Ord b) => (Enum person, Bounded person) => (Eq world) =>
   (Arbitrary (H.HandlungF person world)) =>
   Optionen person world a b
+  -> Int
   -> world
+  -> G.Gesetz Integer a b
   -> Gen (G.Gesetz Integer a b)
 -- TODO: liste mit Historie was passiert ist und zu welchem Gesetz fuehrte.
-gesetzbuch_generator so welt = do
+gesetzbuch_generator _  i _    g | i <= 0 = return g
+gesetzbuch_generator so i welt g = do
     h <- arbitrary
-    return $ simulateOne so 20 h welt G.leer
+    let (w', g') = simulateHandlungF so h welt g
+    gesetzbuch_generator so (i-1) w' g'
 
-gesetzbuch_inferieren so welt = generate $ gesetzbuch_generator so welt
+gesetzbuch_inferieren so welt = generate $ gesetzbuch_generator so 10 welt G.leer
