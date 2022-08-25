@@ -1,3 +1,4 @@
+(*Experiment: Steuergesetzgebung*)
 theory Steuern
 imports Main HOL.Real
 begin
@@ -140,7 +141,8 @@ definition einkommenssteuer :: "'a Person \<Rightarrow> nat" where
 lemma \<open>einkommenssteuer (Person 10 ()) = 0\<close> by eval
 lemma \<open>einkommenssteuer (Person 10000 ()) = 0\<close> by eval
 lemma \<open>einkommenssteuer (Person 14000 ()) = floor ((14000-10347)*0.14)\<close> by eval
-value \<open>einkommenssteuer (Person 20000 ()) = floor ((14926-10347)*0.14 + (20000-14926)*0.2397)\<close>
+lemma \<open>einkommenssteuer (Person 20000 ()) =
+        floor ((14926-10347)*0.14 + (20000-14926)*0.2397)\<close> by eval
 value \<open>einkommenssteuer (Person 40000 ())\<close>
 value \<open>einkommenssteuer (Person 60000 ())\<close>
 
