@@ -28,6 +28,7 @@ begin
     by standard (transfer; simp; fail)+
 end
 
+
 text\<open>A \<^term>\<open>Abs_percentage 0.1\<close> would give a "Abstraction violation" in a value command.
 So here is some magic to make code work.\<close>
 definition percentage :: "real \<Rightarrow> percentage" where
@@ -38,18 +39,18 @@ lemma percentage_code [code abstract]:
   unfolding percentage_def
   by (simp add: Abs_percentage_inverse one_percentage.rep_eq zero_percentage.rep_eq)
 
-value "percentage 0.1"
-value "real_of_percentage (percentage 0.1) * (20::real)"
-value "(20::real) * real_of_percentage (percentage 0.1)"
-value "(real_of_percentage (a::percentage)) * (20::nat)"
+value[code] "percentage 0.1" (*no longer an error*)
+lemma "real_of_percentage (percentage 0.1) * (25::real) = 2.5" by eval
+lemma "(25::real) * real_of_percentage (percentage 0.1) = 2.5" by eval
 
 text\<open>And now we get rid of explicit calls to \<^const>\<open>real_of_percentage\<close>\<close>
 declare [[coercion "real_of_percentage :: percentage \<Rightarrow> real"]]
 
-value "(percentage 0.1) * (20::real)"
-value "(20::real) * (percentage 0.1)"
-value "(percentage 0.1) * (20::nat)"
-value "(20::nat) * (percentage 0.1)"
+lemma "(percentage 0.1) * (25::real) = 2.5" by eval
+lemma "(25::real) * (percentage 0.1) = 2.5" by eval
+lemma "(percentage 0.1) * (25::nat) = 2.5" by eval
+lemma "(25::nat) * (percentage 0.1) = 2.5" by eval
+
 
 lemma percentage_range:
   fixes p :: percentage
