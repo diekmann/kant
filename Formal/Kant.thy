@@ -53,8 +53,7 @@ lemma teste_maxime_unfold:
   "teste_maxime welt handlung (Maxime m) =
         (\<forall>p\<in>bevoelkerung. \<forall>x\<in>bevoelkerung. m p (handeln x welt handlung))"
   by(simp add: teste_maxime_def wenn_jeder_so_handelt_def)
-lemma teste_maxime_crossproduct_unfold: (*WARNING: rhs not fully simp'ed!*)
-  "teste_maxime welt handlung (Maxime m) =
+lemma "teste_maxime welt handlung (Maxime m) =
         (\<forall>(p,x)\<in>bevoelkerung\<times>bevoelkerung. m p (handeln x welt handlung))"
   unfolding teste_maxime_unfold by simp
 
@@ -68,7 +67,7 @@ definition teste_maxime_exhaust where
 lemma teste_maxime_exhaust: "set b = (UNIV::'person set) \<Longrightarrow>
         teste_maxime welt handlung maxime = teste_maxime_exhaust b welt handlung maxime"
   apply(case_tac maxime, rename_tac m, simp)
-  unfolding teste_maxime_crossproduct_unfold teste_maxime_exhaust_def bevoelkerung_def
+  unfolding teste_maxime_unfold teste_maxime_exhaust_def bevoelkerung_def
   apply(simp)
   by(simp add: list_all_iff)
 
