@@ -1,6 +1,6 @@
 (*Experiment: Steuergesetzgebung*)
 theory Steuern
-imports Main HOL.Real
+imports Main HOL.Real Percentage
 begin
 
 datatype 'a Person = Person (einkommen: nat) 'a
@@ -22,64 +22,55 @@ begin
   (*TODO: mehr einkommen \<Rightarrow> hoeherer Steuersatz*)
 end
 
-(*can I have a type for this?*)
-definition wfPercent :: "real \<Rightarrow> bool" where
-  "wfPercent p \<equiv> 0 \<le> p \<and> p \<le> 1"
-
-fun zonensteuer :: "(nat \<times> real) list \<Rightarrow> real \<Rightarrow> nat \<Rightarrow> real" where
+fun zonensteuer :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
    "zonensteuer ((zone, prozent)#zonen) spitzensteuer e =
         ((min zone e) * prozent) + (zonensteuer zonen spitzensteuer (e - zone))"
 |  "zonensteuer [] spitzensteuer e = e*spitzensteuer"
 
 lemma zonensteuermono: "e1 \<le> e2
-  \<Longrightarrow> wfPercent spitzensteuer
-  \<Longrightarrow> (\<forall>p \<in> set (map snd zs). wfPercent p)
   \<Longrightarrow> zonensteuer zs spitzensteuer e1 \<le> zonensteuer zs spitzensteuer e2"
   apply(induction zs arbitrary: e1 e2)
-   apply(simp add: wfPercent_def mult_right_mono)
-  apply(simp)
-  apply(simp add: wfPercent_def)
+   apply(simp add: mult_right_mono percentage_range; fail)
   apply(rename_tac z zs e1 e2, case_tac z, rename_tac zone prozent)
   apply(simp)
   apply(rule Groups.add_mono_thms_linordered_semiring(1), rule conjI)
    defer
    apply(simp; fail)
-  by (simp add: mult_right_mono)
-  
-  
+  by(simp add: mult_right_mono percentage_range)
 
-definition steuerzonen2022 :: "(nat \<times> real) list" where
+
+definition steuerzonen2022 :: "(nat \<times> percentage) list" where
   "steuerzonen2022 \<equiv> [
-                       (10347, 0),
-                       (4579, 0.14),
-                       (43670, 0.2397),
-                       (219229, 0.42)
+                       (10347, percentage 0),
+                       (4579, percentage 0.14),
+                       (43670, percentage 0.2397),
+                       (219229, percentage 0.42)
                       ]"
 
-fun steuerzonenAbs :: "(nat \<times> real) list \<Rightarrow> (nat \<times> real) list" where
+fun steuerzonenAbs :: "(nat \<times> percentage ) list \<Rightarrow> (nat \<times> percentage ) list" where
    "steuerzonenAbs [] = []"
  |  "steuerzonenAbs ((zone, prozent)#zonen) = 
       (zone,prozent)#(map (\<lambda>(z,p). (zone+z, p)) (steuerzonenAbs zonen))"
 
-definition steuerbuckets2022 :: "(nat \<times> real) list" where
+definition steuerbuckets2022 :: "(nat \<times> percentage) list" where
   "steuerbuckets2022 \<equiv> [
-                       (10347, 0),
-                       (14926, 0.14),
-                       (58596, 0.2397),
-                       (277825, 0.42)
+                       (10347, percentage 0),
+                       (14926, percentage 0.14),
+                       (58596, percentage 0.2397),
+                       (277825, percentage 0.42)
                       ]"
                        (*(\<infinity>, 0.45)*)
 
 lemma steuerbuckets2022: "steuerbuckets2022 = steuerzonenAbs steuerzonen2022"
   by(simp add: steuerbuckets2022_def steuerzonen2022_def)
 
-fun wfSteuerbuckets :: "(nat \<times> real) list \<Rightarrow> bool" where
+fun wfSteuerbuckets :: "(nat \<times> percentage) list \<Rightarrow> bool" where
   "wfSteuerbuckets [] = True"
 | "wfSteuerbuckets [bs] = True"
 | "wfSteuerbuckets ((b1, p1)#(b2, p2)#bs) \<longleftrightarrow> b1 \<le> b2 \<and> wfSteuerbuckets ((b2,p2)#bs)"
 
 (*TODO; get rid of the map, just have spans! and derive those separators as a view ..*)
-fun bucketsteuerAbs :: "(nat \<times> real) list \<Rightarrow> real \<Rightarrow> nat \<Rightarrow> real" where
+fun bucketsteuerAbs :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
    "bucketsteuerAbs ((bis, prozent)#mehr) spitzensteuer e =
         ((min bis e) * prozent)
         + (bucketsteuerAbs (map (\<lambda>(s,p). (s-bis,p)) mehr) spitzensteuer (e - bis))"
@@ -136,7 +127,8 @@ lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
   by linarith
 
 definition einkommenssteuer :: "'a Person \<Rightarrow> nat" where
-  "einkommenssteuer p \<equiv> floor (bucketsteuerAbs steuerbuckets2022 0.45 (einkommen p))"
+  "einkommenssteuer p \<equiv>
+    floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) (einkommen p))"
 
 lemma \<open>einkommenssteuer (Person 10 ()) = 0\<close> by eval
 lemma \<open>einkommenssteuer (Person 10000 ()) = 0\<close> by eval
@@ -147,14 +139,13 @@ value \<open>einkommenssteuer (Person 40000 ())\<close>
 value \<open>einkommenssteuer (Person 60000 ())\<close>
 
 lemma einkommenssteuer:
-  "einkommenssteuer p = floor (zonensteuer steuerzonen2022 0.45 (einkommen p))"
+  "einkommenssteuer p = floor (zonensteuer steuerzonen2022 (percentage 0.45) (einkommen p))"
   apply(simp add: einkommenssteuer_def)
   apply(simp add: steuerbuckets2022)
   apply(subst bucketsteuerAbs_zonensteuer)
    apply(simp add: steuerzonen2022_def; fail)
   apply(simp)
   done
-
 
 interpretation steuersystem
   where steuer = einkommenssteuer
@@ -164,13 +155,9 @@ proof
     apply(simp add: einkommenssteuer)
     apply(rule floorD)
     apply(rule zonensteuermono)
-      apply(simp)
-     apply(simp add: wfPercent_def)
-    apply(simp add: steuerzonen2022_def wfPercent_def)
-    done
+    by(simp)
 qed
-    
-    
-    
+
+
 end
   
