@@ -58,6 +58,8 @@ lemma teste_maxime_crossproduct_unfold: (*WARNING: rhs not fully simp'ed!*)
         (\<forall>(p,x)\<in>bevoelkerung\<times>bevoelkerung. m p (handeln x welt handlung))"
   unfolding teste_maxime_unfold by simp
 
+text\<open>Versuch eine executable version zu bauen.
+Wir muessen die bevoelkerung enumerieren.\<close>
 definition teste_maxime_exhaust where
   "teste_maxime_exhaust bevoelk welt handlung maxime \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
@@ -69,31 +71,24 @@ lemma teste_maxime_exhaust: "set b = (UNIV::'person set) \<Longrightarrow>
   unfolding teste_maxime_crossproduct_unfold teste_maxime_exhaust_def bevoelkerung_def
   apply(simp)
   by(simp add: list_all_iff)
-  
-  
 
-datatype example_very_finite_population = Alice | Bob
-(*lemma UNIV_example_very_finite_world [code_unfold]:
-  "UNIV = {AliceHappy, AliceSad, BobHappy, BobSad}"
-  by(auto intro:example_very_finite_world.exhaust UNIV_eq_I)
-lemma coset_example_very_finite_world [code_unfold]:
-  "List.coset [] = {AliceHappy, AliceSad, BobHappy, BobSad}"
-  using UNIV_example_very_finite_world by simp*)
+  
+text\<open>Beispiel\<close>
+datatype example_very_finite_population = Alice | Bob | Carol | Eve
+
 lemma bevoelkerung_example_very_finite_population [code_unfold]:
-  "bevoelkerung = {Alice, Bob}"
+  "bevoelkerung = {Alice, Bob, Carol, Eve}"
   unfolding bevoelkerung_def
   by(auto intro:example_very_finite_population.exhaust UNIV_eq_I)
 
-declare UNIV_coset[code del]
-declare bevoelkerung_def[code del]
-code_thms teste_maxime
+lemma [code_unfold]: "teste_maxime welt handlung maxime =
+        teste_maxime_exhaust [Alice, Bob, Carol, Eve] welt handlung maxime"
+  apply(rule teste_maxime_exhaust)
+  by(simp add: bevoelkerung_example_very_finite_population[simplified bevoelkerung_def])
 
-(*does not replace bevoekerung with the set for this type*)
-value[nbe] \<open>teste_maxime
-            (42::nat)
-            (HandlungF (\<lambda>(person::example_very_finite_population) welt. welt + 1))
-            (Maxime (\<lambda>_ _. True))\<close>
-value \<open>teste_maxime_exhaust [Alice, Bob]
+declare teste_maxime_def[code del] \<comment>\<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
+
+value \<open>teste_maxime
             (42::nat)
             (HandlungF (\<lambda>(person::example_very_finite_population) welt. welt + 1))
             (Maxime (\<lambda>_ _. True))\<close>
