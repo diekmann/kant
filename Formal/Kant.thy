@@ -1,5 +1,5 @@
 theory Kant
-imports Handlung
+imports Handlung Gesetz
 begin
 
 text\<open>
@@ -10,11 +10,11 @@ TODO: ich sollte Maxime als axiom betrachten.
 (*TODO: wenn ich Steuersysteme als Maxime encoden will muss ich welten vergleichen.
   Es ist eh ein TODO unten, dass ich alle welten testen muss.
   Um ausfuehrbaren code zu haben sollte eventuell hier noch eine vergleichswelt eingefuehrt werden?*)
-datatype ('person, 'world) Maxime = Maxime "'person \<Rightarrow> 'world Handlung \<Rightarrow> bool"
+datatype ('person, 'world) maxime = Maxime "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
                                  (*          ich    -> Auswirkung      -> gut/böse  *)
 
 text\<open>Beispiel\<close>
-definition maxime_mir_ist_alles_recht :: "('person, 'world) Maxime" where
+definition maxime_mir_ist_alles_recht :: "('person, 'world) maxime" where
   "maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)"
 
 (*
@@ -33,12 +33,12 @@ Faktisch: Kreuzprodukt Bevölkerung \<times> Bevölkerung,
 \<close>
 definition bevoelkerung :: "'person set" where "bevoelkerung \<equiv> UNIV"
 definition wenn_jeder_so_handelt
-    :: "'world \<Rightarrow> ('person, 'world) HandlungF \<Rightarrow> ('world Handlung) set"
+    :: "'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('world handlung) set"
   where
     "wenn_jeder_so_handelt welt handlung \<equiv>
       (\<lambda>handelnde_person. handeln handelnde_person welt handlung) ` bevoelkerung"
 fun was_wenn_jeder_so_handelt_aus_sicht_von
-    :: "'world \<Rightarrow> ('person, 'world) HandlungF \<Rightarrow> ('person, 'world) Maxime \<Rightarrow> 'person \<Rightarrow> bool"
+    :: "'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> bool"
   where
     "was_wenn_jeder_so_handelt_aus_sicht_von welt handlung (Maxime m) betroffene_person =
         (\<forall> h \<in> wenn_jeder_so_handelt welt handlung. m betroffene_person h)"
@@ -48,7 +48,7 @@ fun was_wenn_jeder_so_handelt_aus_sicht_von
   Zu untersuchende Handlung
 *)
 definition teste_maxime ::
-  "'world \<Rightarrow> ('person, 'world) HandlungF \<Rightarrow> ('person, 'world) Maxime \<Rightarrow> bool" where
+  "'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool" where
 "teste_maxime welt handlung maxime \<equiv>
   \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlung maxime p"
 
@@ -113,4 +113,14 @@ lemma \<open>\<not> teste_maxime
             (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
             (Maxime (\<lambda>person handlung. (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
+
+
+
+text\<open>Versuch ein allgemeines Gesetz abzuleiten:
+TODO: Nur aus einer von außen betrachteten Handlung
+      und einer Entscheidung ob diese Handlung ausgeführt werden soll
+      wird es schwer ein allgemeines Gesetz abzuleiten.
+\<close>
+type_synonym ('world, 'a, 'b) allgemeines_gesetz_ableiten =
+  "'world handlung \<Rightarrow> sollensanordnung \<Rightarrow> ('a, 'b) rechtsnorm"
 end

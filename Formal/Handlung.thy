@@ -11,7 +11,7 @@ Handlungen können aus Sicht Anderer wahrgenommen werden.
 Ich brauche nur Welt vorher und Welt nachher.
 So kann ich handelnde Person und beobachtende Person trennen.
 \<close>
-datatype 'world Handlung = Handlung (vorher: 'world) (nachher: 'world)
+datatype 'world handlung = Handlung (vorher: 'world) (nachher: 'world)
 
 text \<open>
 Handlung als Funktion gewrapped.
@@ -19,12 +19,12 @@ Was ist das? Abstrakte Handlung? Plan zu handeln? Absicht?
 Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
 Die Absicht die sich in einer Funktion verstecken kann ist schwer zu erkennen.
 \<close>
-datatype ('person, 'world) HandlungF = HandlungF "'person \<Rightarrow> 'world \<Rightarrow> 'world"
+datatype ('person, 'world) handlungF = HandlungF "'person \<Rightarrow> 'world \<Rightarrow> 'world"
 
-text \<open>Eine \<^typ>\<open>('person, 'world) HandlungF\<close> kann nicht geprinted werden!\<close>
+text \<open>Eine \<^typ>\<open>('person, 'world) handlungF\<close> kann nicht geprinted werden!\<close>
 
 
-fun handeln :: "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) HandlungF \<Rightarrow> 'world Handlung" where
+fun handeln :: "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'world handlung" where
 "handeln handelnde_person welt (HandlungF h) = Handlung welt (h handelnde_person welt)"
 
 text\<open>
