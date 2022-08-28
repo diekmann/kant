@@ -7,6 +7,9 @@ Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 Passt nicht so ganz auf die Definition von Maxime?
 TODO: ich sollte Maxime als axiom betrachten.
 \<close>
+(*TODO: wenn ich Steuersysteme als Maxime encoden will muss ich welten vergleichen.
+  Es ist eh ein TODO unten, dass ich alle welten testen muss.
+  Um ausfuehrbaren code zu haben sollte eventuell hier noch eine vergleichswelt eingefuehrt werden?*)
 datatype ('person, 'world) Maxime = Maxime "'person \<Rightarrow> 'world Handlung \<Rightarrow> bool"
                                  (*          ich    -> Auswirkung      -> gut/böse  *)
 
