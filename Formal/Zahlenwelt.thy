@@ -4,6 +4,9 @@ begin
 
 datatype person = Alice | Bob | Carol | Eve
 
+lemma UNIV_person: "UNIV = {Alice, Bob, Carol, Eve}"
+  by(auto intro:person.exhaust UNIV_eq_I)
+
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype zahlenwelt = Zahlenwelt
         nat \<comment>\<open>verbleibend: Ressourcen sind endlich. Verbleibende Ressourcen in der Welt.\<close>
@@ -11,7 +14,7 @@ datatype zahlenwelt = Zahlenwelt
 
 (*Cool, this definition is WRONG if 2 folks have the same besitz -_- *)
 fun gesamtbesitz :: "zahlenwelt \<Rightarrow> int" where
-  "gesamtbesitz (Zahlenwelt _ besitz) = \<Sum> {b. \<exists>p. (besitz p) = Some b}"
+  "gesamtbesitz (Zahlenwelt _ besitz) = sum_list (List.map_filter besitz [Alice, Bob, Carol, Eve])"
 
 (*TODO: is there a library function for this?*)
 fun the_default :: "'a option \<Rightarrow> 'a \<Rightarrow> 'a" where
@@ -24,60 +27,11 @@ code_thms gesamtbesitz
 (*iterate over person only*)
 lemma XXX: "{b. \<exists>p. (besitz p) = Some b} = {b. Some b \<in> range besitz}"
   by (metis rangeE range_eqI)
-
-lemma "range besitz = besitz ` UNIV" by simp
-
-term List.map_filter
-value \<open>[x . P x , x \<leftarrow> y]\<close>
-value "List.map_filter x xs"
-
 lemma map_filter_id: "S = set s \<Longrightarrow> {b. Some b \<in> S} = set (List.map_filter id s)"
   apply(simp add: map_filter_def)
   apply(simp add: image_def)
   apply(rule Collect_cong)
   by auto
-
-  thm Collect_cong
-  value "List.map_filter id [Some (1::nat), None, Some 4]"
-
-thm Collect_code enum_UNIV
-term Collect
-lemma "{b. \<exists>p. (besitz p) = Some b} = Collect (\<lambda> b. \<exists> p. besitz p = Some b)"
-  by simp
-lemma "{b. \<exists>p. (besitz p) = Some b} = 
-        set (map (the \<circ> besitz) (filter (\<lambda>p. case (besitz p) of Some _ \<Rightarrow> True | _ \<Rightarrow> False) [Alice, Bob, Carol, Eve]))"
-  apply(simp)
-  oops
-
-lemma [code_unfold]:
-  "gesamtbesitz (Zahlenwelt verbleibend besitz) =
-    foldl (\<lambda>acc p. acc + (the_default (besitz p) 0)) 0 [Alice, Bob, Carol, Eve]"
-proof -
-  thm Collect_code enum_UNIV
-  have "{b. \<exists>p. (besitz p) = Some b} = Collect (\<lambda> b. \<exists> p. besitz p = Some b)"
-    by simp
-
-  thm map_filter_id[where s="[Some Alice, Some Bob, Some Carol, Some Eve]"]
-
-  have "UNIV = {Alice, Bob, Carol, Eve}" by(auto intro:person.exhaust UNIV_eq_I)
-  then have range_besitz:
-    "range besitz = set [besitz Alice, besitz Bob, besitz Carol, besitz Eve]"
-    by (metis (no_types, lifting) empty_set image_empty image_insert list.simps(15))
-    
-    
-
-  show ?thesis
-    apply(simp)
-    apply(simp add: XXX)
-    apply(subst map_filter_id[OF range_besitz])
-    apply(simp add: List.map_filter_simps)
-    apply(case_tac "besitz Alice", case_tac[!] "besitz Bob",
-           case_tac[!] "besitz Carol", case_tac[!] "besitz Eve")
-                   apply(simp_all add: List.map_filter_simps)
-    quickcheck
-    
-  sorry (*TODO!!!!!!!!!!!!!!!!!!!!*)
-qed
 
 value "gesamtbesitz (Zahlenwelt 42 [Alice \<mapsto> 4, Carol \<mapsto> 8])"
 
