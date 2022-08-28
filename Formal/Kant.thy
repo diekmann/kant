@@ -76,6 +76,7 @@ lemma teste_maxime_exhaust: "set b = (UNIV::'person set) \<Longrightarrow>
 
   
 text\<open>Beispiel\<close>
+(*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
 datatype example_very_finite_population = Alice | Bob | Carol | Eve
 
 lemma bevoelkerung_example_very_finite_population [code_unfold]:
