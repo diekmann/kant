@@ -11,7 +11,7 @@ Paragraphen sind einfache \<^typ>\<open>nat\<close>\<close>
 type_synonym 'world case_law = "(nat, ('world \<times> 'world), sollensanordnung) gesetz"
 
 text\<open>
-Übertraegt einen Tatbestand wörtlich ins Gesetz.
+Überträgt einen Tatbestand wörtlich ins Gesetz.
 Nicht sehr allgemein.\<close>
 definition case_law_ableiten
     :: "('world, ('world \<times> 'world), sollensanordnung) allgemeines_gesetz_ableiten"
