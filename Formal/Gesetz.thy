@@ -65,4 +65,21 @@ lemma \<open>max_paragraph {Paragraph 1, Paragraph 7, Paragraph 2} = 7\<close> b
 fun neuer_paragraph :: "(nat, 'a, 'b) gesetz \<Rightarrow> nat prg" where
  "neuer_paragraph (Gesetz G) = Paragraph ((max_paragraph (fst ` G)) + 1)"
 
+text\<open>Fügt eine Rechtsnorm als neuen Paragraphen hinzu.\<close>
+fun hinzufuegen :: "('a,'b) rechtsnorm \<Rightarrow> (nat,'a,'b) gesetz \<Rightarrow> (nat,'a,'b) gesetz" where
+  "hinzufuegen rn (Gesetz G) =
+    (if rn \<in> (snd ` G) then Gesetz G else Gesetz (insert (neuer_paragraph (Gesetz G), rn) G))"
+
+
+text\<open>ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss.\<close>
+datatype sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
+
+
+lemma \<open>hinzufuegen
+        (Rechtsnorm (Tatbestand ''tb2'') (Rechtsfolge Verbot))
+        (Gesetz {(Paragraph 1, (Rechtsnorm (Tatbestand ''tb1'') (Rechtsfolge Erlaubnis)))}) =
+ Gesetz
+  {(Paragraph 2, Rechtsnorm (Tatbestand ''tb2'') (Rechtsfolge Verbot)),
+   (Paragraph 1, Rechtsnorm (Tatbestand ''tb1'') (Rechtsfolge Erlaubnis))}\<close> by eval
+
 end
