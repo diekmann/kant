@@ -44,6 +44,10 @@ fun converge
           else
             converge f its w' g')"
 
+text\<open>Example: Count 32..42\<close>
+lemma \<open>converge (\<lambda>w g. (w+1, w#g)) 10 (32::int) ([]) =
+        (42, [41, 40, 39, 38, 37, 36, 35, 34, 33, 32])\<close> by eval
+
 text\<open>simulate one \<^typ>\<open>('person, 'world) handlungF\<close> a few times\<close>
 definition simulateOne
     :: "('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
@@ -54,10 +58,18 @@ definition simulateOne
       let (welt, gesetz) = converge (simulate_handlungF simconsts h) i w g in
             gesetz"
 
-text\<open>Example: Count 22..42\<close> (*FAIL!*)
-value \<open>simulateOne
+text\<open>Example: Count 32..42\<close> (*FAIL!*)
+value[nbe] \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-        20 (HandlungF (\<lambda>p n. Suc n))
+        10 (HandlungF (\<lambda>p n. Suc n))
         22
         (Gesetz {})\<close>
+
+lemma \<open>simulateOne
+        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
+        10 (HandlungF (\<lambda>p n. Suc n))
+        22
+        (Gesetz {}) = X\<close>
+  apply(simp add: simulateOne_def)
+  thm simulate_handlungF.simps
 end
