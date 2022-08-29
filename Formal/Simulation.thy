@@ -27,11 +27,20 @@ fun simulate_handlungF
     )"
 
 (*FAIL*)
-value \<open>simulate_handlungF
+value[nbe] \<open>simulate_handlungF
        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
        (HandlungF (\<lambda>p w. w+1))
        (32::int)
        (Gesetz {})\<close>
+(** lemma works. Maybe the code equation for teste_maxime which does bevoelkerung unfolding? **)
+lemma \<open>simulate_handlungF
+       (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
+       (HandlungF (\<lambda>p w. w+1))
+       (32::int)
+       (Gesetz {}) = 
+    (33,
+     Gesetz {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
+  by(simp add: kategorischer_imperativ_def teste_maxime_def max_paragraph_def)
 
 text\<open>Funktion begrenzt oft anwenden bis sich die Welt nicht mehr ändert.
 Parameter
