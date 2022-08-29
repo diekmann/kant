@@ -89,7 +89,22 @@ lemma example_teste_maxime_exhaust [code_unfold]: "teste_maxime welt handlung ma
   apply(rule teste_maxime_exhaust)
   by(simp add: bevoelkerung_example_very_finite_population[simplified bevoelkerung_def])
 
+(*TODO: kann ich das generalisieren?*)
+lemma XXX1 [code_unfold]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
+  apply(simp add: fun_eq_iff)
+  apply(rule allI)+
+  apply(rule teste_maxime_exhaust)
+  using enum_UNIV by simp
+lemma XXX2 [code_unfold]: "teste_maxime = teste_maxime_exhaust [()]"
+  apply(simp add: fun_eq_iff)
+  apply(rule allI)+
+  apply(rule teste_maxime_exhaust)
+  by auto
+
 declare teste_maxime_def[code del] \<comment>\<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
+(*this causes
+  fun teste_maxime _ _ _ = raise Fail "Kant.teste_maxime";
+when we don't use teste_maxime_exhaust*)
 
 text\<open>Beispiel: Die Mir-ist-alles-Recht Maxime ist erfüllt.\<close>
 lemma \<open>teste_maxime

@@ -26,12 +26,28 @@ fun simulate_handlungF
       (w', g')
     )"
 
-(*FAIL*)
-value[nbe] \<open>simulate_handlungF
+export_code simulate_handlungF in SML
+definition "foo = simulate_handlungF
+       (SimConsts () (Maxime (\<lambda>(p::unit) _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
+       (HandlungF (\<lambda>p w. w+1))
+       (32::int)
+       (Gesetz {})"
+lemma XXX1 [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
+  apply(simp add: fun_eq_iff)
+  apply(rule allI)+
+  apply(rule teste_maxime_exhaust)
+  using enum_UNIV by simp
+
+code_thms foo
+export_code foo in SML
+lemma \<open>simulate_handlungF
        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
        (HandlungF (\<lambda>p w. w+1))
        (32::int)
-       (Gesetz {})\<close>
+       (Gesetz {})= 
+    (33,
+     Gesetz {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
+  by eval
 (** lemma works. Maybe the code equation for teste_maxime which does bevoelkerung unfolding? **)
 lemma \<open>simulate_handlungF
        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
