@@ -53,4 +53,11 @@ definition simulateOne
     "simulateOne simconsts i h w g \<equiv>
       let (welt, gesetz) = converge (simulate_handlungF simconsts h) i w g in
             gesetz"
+
+text\<open>Example: Count 22..42\<close> (*FAIL!*)
+value \<open>simulateOne
+        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
+        20 (HandlungF (\<lambda>p n. Suc n))
+        22
+        (Gesetz {})\<close>
 end
