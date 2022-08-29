@@ -67,7 +67,7 @@ definition teste_maxime_exhaust where
     (case maxime of (Maxime m) \<Rightarrow> 
       list_all (\<lambda>(p,x). m p (handeln x welt handlung)) (List.product bevoelk bevoelk))"
 
-lemma teste_maxime_exhaust: "set b = (UNIV::'person set) \<Longrightarrow>
+lemma teste_maxime_exhaust_univ: "set b = (UNIV::'person set) \<Longrightarrow>
         teste_maxime welt handlung maxime = teste_maxime_exhaust b welt handlung maxime"
   apply(case_tac maxime, rename_tac m, simp)
   unfolding teste_maxime_unfold teste_maxime_exhaust_def bevoelkerung_def
@@ -86,25 +86,25 @@ lemma bevoelkerung_example_very_finite_population [code_unfold]:
 
 lemma example_teste_maxime_exhaust [code_unfold]: "teste_maxime welt handlung maxime =
         teste_maxime_exhaust [Alice, Bob, Carol, Eve] welt handlung maxime"
-  apply(rule teste_maxime_exhaust)
+  apply(rule teste_maxime_exhaust_univ)
   by(simp add: bevoelkerung_example_very_finite_population[simplified bevoelkerung_def])
 
-(*TODO: kann ich das generalisieren?*)
-lemma XXX1 [code_unfold]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
+(*TODO: for reasons I do not understand,
+  example_teste_maxime_exhaust needs [code_unfold]
+  but
+  teste_maxime_exhaust needs [coteste_maxime_exhaustde]
+  ? ? ?*)
+lemma teste_maxime_exhaust [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
   apply(simp add: fun_eq_iff)
   apply(rule allI)+
-  apply(rule teste_maxime_exhaust)
+  apply(rule teste_maxime_exhaust_univ)
   using enum_UNIV by simp
-lemma XXX2 [code_unfold]: "teste_maxime = teste_maxime_exhaust [()]"
-  apply(simp add: fun_eq_iff)
-  apply(rule allI)+
-  apply(rule teste_maxime_exhaust)
-  by auto
 
 declare teste_maxime_def[code del] \<comment>\<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
 (*this causes
   fun teste_maxime _ _ _ = raise Fail "Kant.teste_maxime";
-when we don't use teste_maxime_exhaust*)
+when we don't use teste_maxime_exhaust.
+So when code fails with "Kant.teste_maxime", make sure the 'person implements enum.*)
 
 text\<open>Beispiel: Die Mir-ist-alles-Recht Maxime ist erfüllt.\<close>
 lemma \<open>teste_maxime

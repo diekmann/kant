@@ -26,20 +26,6 @@ fun simulate_handlungF
       (w', g')
     )"
 
-export_code simulate_handlungF in SML
-definition "foo = simulate_handlungF
-       (SimConsts () (Maxime (\<lambda>(p::unit) _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-       (HandlungF (\<lambda>p w. w+1))
-       (32::int)
-       (Gesetz {})"
-lemma XXX1 [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
-  apply(simp add: fun_eq_iff)
-  apply(rule allI)+
-  apply(rule teste_maxime_exhaust)
-  using enum_UNIV by simp
-
-code_thms foo
-export_code foo in SML
 lemma \<open>simulate_handlungF
        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
        (HandlungF (\<lambda>p w. w+1))
@@ -48,15 +34,6 @@ lemma \<open>simulate_handlungF
     (33,
      Gesetz {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
   by eval
-(** lemma works. Maybe the code equation for teste_maxime which does bevoelkerung unfolding? **)
-lemma \<open>simulate_handlungF
-       (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-       (HandlungF (\<lambda>p w. w+1))
-       (32::int)
-       (Gesetz {}) = 
-    (33,
-     Gesetz {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
-  by(simp add: kategorischer_imperativ_def teste_maxime_def max_paragraph_def)
 
 text\<open>Funktion begrenzt oft anwenden bis sich die Welt nicht mehr ändert.
 Parameter
@@ -91,18 +68,23 @@ definition simulateOne
       let (welt, gesetz) = converge (simulate_handlungF simconsts h) i w g in
             gesetz"
 
-text\<open>Example: Count 32..42\<close> (*FAIL!*)
-value[nbe] \<open>simulateOne
-        (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-        10 (HandlungF (\<lambda>p n. Suc n))
-        32
-        (Gesetz {})\<close>
-
+text\<open>Example: Count 32..42\<close>
 lemma \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
         10 (HandlungF (\<lambda>p n. Suc n))
         32
-        (Gesetz {}) = X\<close>
-  apply(simp add: simulateOne_def)
-  thm simulate_handlungF.simps
+        (Gesetz {}) =
+  Gesetz
+  {(Paragraph 10, Rechtsnorm (Tatbestand (Handlung 41 42)) (Rechtsfolge ''count'')),
+   (Paragraph 9, Rechtsnorm (Tatbestand (Handlung 40 41)) (Rechtsfolge ''count'')),
+   (Paragraph 8, Rechtsnorm (Tatbestand (Handlung 39 40)) (Rechtsfolge ''count'')),
+   (Paragraph 7, Rechtsnorm (Tatbestand (Handlung 38 39)) (Rechtsfolge ''count'')),
+   (Paragraph 6, Rechtsnorm (Tatbestand (Handlung 37 38)) (Rechtsfolge ''count'')),
+   (Paragraph 5, Rechtsnorm (Tatbestand (Handlung 36 37)) (Rechtsfolge ''count'')),
+   (Paragraph 4, Rechtsnorm (Tatbestand (Handlung 35 36)) (Rechtsfolge ''count'')),
+   (Paragraph 3, Rechtsnorm (Tatbestand (Handlung 34 35)) (Rechtsfolge ''count'')),
+   (Paragraph 2, Rechtsnorm (Tatbestand (Handlung 33 34)) (Rechtsfolge ''count'')),
+   (Paragraph 1, Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))}\<close>
+  by eval
+
 end
