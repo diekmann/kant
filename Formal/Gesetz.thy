@@ -1,5 +1,5 @@
 theory Gesetz
-imports Main
+imports Main ExecutableSetHelper
 begin
 
 datatype 'a tatbestand = Tatbestand 'a
@@ -48,16 +48,15 @@ value \<open>Gesetz {
 definition max_paragraph :: "nat prg set \<Rightarrow> nat" where
   [code del]: "max_paragraph ps \<equiv> if card ps = 0 then 0 else Max {p. (Paragraph p)\<in>ps}"
 
-lemma prg_set_deconstruct: "{p. Paragraph p \<in> ps} = (case_prg (\<lambda>p. p) ` ps)"
-  apply(simp)
-  apply(simp add: vimage_def[symmetric])
-  apply(subst bij_vimage_eq_inv_image)
+lemma prg_set_deconstruct: "{p. Paragraph p \<in> ps} = (\<lambda>x. case x of Paragraph p \<Rightarrow> p) ` ps"
+  apply(rule set_of_constructor)
    apply(simp add: bij_def)
    apply (meson injI prg.exhaust prg.inject surj_def)
-  by (metis prg.case prg.exhaust surj_def surj_iff_all)
+  by (metis prg.case prg.exhaust surj_def surj_f_inv_f)
+
 lemma [code_unfold]:
   "max_paragraph ps = (if card ps = 0 then 0 else Max ((\<lambda>pa. case pa of Paragraph p \<Rightarrow> p) ` ps))"
-  by(simp add:max_paragraph_def prg_set_deconstruct)
+  by(simp add: max_paragraph_def prg_set_deconstruct)
   
 lemma \<open>max_paragraph {} = 0\<close> by eval
 lemma \<open>max_paragraph {Paragraph 1, Paragraph 7, Paragraph 2} = 7\<close> by eval
