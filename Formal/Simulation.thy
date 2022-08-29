@@ -26,6 +26,13 @@ fun simulate_handlungF
       (w', g')
     )"
 
+(*FAIL*)
+value \<open>simulate_handlungF
+       (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
+       (HandlungF (\<lambda>p w. w+1))
+       (32::int)
+       (Gesetz {})\<close>
+
 text\<open>Funktion begrenzt oft anwenden bis sich die Welt nicht mehr ändert.
 Parameter
  \<^item> Funktion
@@ -44,7 +51,8 @@ fun converge
           else
             converge f its w' g')"
 
-text\<open>Example: Count 32..42\<close>
+text\<open>Example: Count 32..42,
+      where \<^term>\<open>32::int\<close> is the initial world and we do \<^term>\<open>10::nat\<close> iterations.\<close>
 lemma \<open>converge (\<lambda>w g. (w+1, w#g)) 10 (32::int) ([]) =
         (42, [41, 40, 39, 38, 37, 36, 35, 34, 33, 32])\<close> by eval
 
@@ -62,13 +70,13 @@ text\<open>Example: Count 32..42\<close> (*FAIL!*)
 value[nbe] \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
         10 (HandlungF (\<lambda>p n. Suc n))
-        22
+        32
         (Gesetz {})\<close>
 
 lemma \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
         10 (HandlungF (\<lambda>p n. Suc n))
-        22
+        32
         (Gesetz {}) = X\<close>
   apply(simp add: simulateOne_def)
   thm simulate_handlungF.simps
