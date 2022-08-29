@@ -1,11 +1,23 @@
 theory Zahlenwelt
-imports Simulation
+imports Simulation Gesetze
 begin
 
 datatype person = Alice | Bob | Carol | Eve
 
 lemma UNIV_person: "UNIV = {Alice, Bob, Carol, Eve}"
   by(auto intro:person.exhaust UNIV_eq_I)
+
+instantiation person :: enum
+begin
+  definition "enum_person \<equiv> [Alice, Bob, Carol, Eve]"
+  definition "enum_all_person P \<longleftrightarrow> P Alice \<and> P Bob \<and> P Carol \<and> P Eve"
+  definition "enum_ex_person P \<longleftrightarrow> P Alice \<or> P Bob \<or> P Carol \<or> P Eve"
+
+instance proof
+  qed (simp_all only: enum_person_def enum_all_person_def enum_ex_person_def UNIV_person, simp_all)
+end
+
+
 
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype zahlenwelt = Zahlenwelt
@@ -42,4 +54,22 @@ text\<open>Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werde
 Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).\<close>
 
 
+fun meins :: "person \<Rightarrow> zahlenwelt \<Rightarrow> int" where
+  "meins p (Zahlenwelt verbleibend besitz) = the_default (besitz p) 0"
+
+fun individueller_fortschritt :: "person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool" where
+  "individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p nach) \<ge> (meins p vor)"
+
+(*TODO: Eigentlich wollen wir Fortschritt in ALLEN möglichen Welten.*)
+
+definition maxime_zahlenfortschritt :: "(person, zahlenwelt) maxime" where
+  "maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)"
+(*Interessant: hard-coded Alice anstelle von 'ich'.*)
+
+definition "sc \<equiv> SimConsts Alice maxime_zahlenfortschritt case_law_ableiten"
+definition "initialwelt \<equiv> Zahlenwelt 42 [Alice \<mapsto> 5, Bob \<mapsto> 10]"
+
+definition "beispiel_case_law h \<equiv> simulateOne sc 20 h initialwelt (Gesetz {})"
+
+value \<open>beispiel_case_law (HandlungF (abbauen 5))\<close>
 end
