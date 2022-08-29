@@ -92,7 +92,7 @@ lemma example_teste_maxime_exhaust [code_unfold]: "teste_maxime welt handlung ma
 (*TODO: for reasons I do not understand,
   example_teste_maxime_exhaust needs [code_unfold]
   but
-  teste_maxime_exhaust needs [coteste_maxime_exhaustde]
+  teste_maxime_exhaust needs [code]
   ? ? ?*)
 lemma teste_maxime_exhaust [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
   apply(simp add: fun_eq_iff)
