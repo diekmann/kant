@@ -1,5 +1,5 @@
 theory Kant
-imports Handlung Gesetz
+imports Handlung Gesetz BeispielPerson
 begin
 
 text\<open>
@@ -74,33 +74,23 @@ lemma teste_maxime_exhaust_univ: "set b = (UNIV::'person set) \<Longrightarrow>
   apply(simp)
   by(simp add: list_all_iff)
 
+subsection \<open>Making it executable\<close>
+  (*TODO: for reasons I do not understand,
+    teste_maxime_exhaust [Alice, Bob, Carol, Eve] (not enum) needs [code_unfold]
+    but
+    teste_maxime_exhaust (enum) needs [code]
+    ? ? ?*)
+  lemma teste_maxime_exhaust [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
+    apply(simp add: fun_eq_iff)
+    apply(rule allI)+
+    apply(rule teste_maxime_exhaust_univ)
+    using enum_UNIV by simp
   
-text\<open>Beispiel\<close>
+  declare teste_maxime_def[code del] \<comment>\<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
+  
+subsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
-datatype example_very_finite_population = Alice | Bob | Carol | Eve
 
-lemma bevoelkerung_example_very_finite_population [code_unfold]:
-  "bevoelkerung = {Alice, Bob, Carol, Eve}"
-  unfolding bevoelkerung_def
-  by(auto intro:example_very_finite_population.exhaust UNIV_eq_I)
-
-lemma example_teste_maxime_exhaust [code_unfold]: "teste_maxime welt handlung maxime =
-        teste_maxime_exhaust [Alice, Bob, Carol, Eve] welt handlung maxime"
-  apply(rule teste_maxime_exhaust_univ)
-  by(simp add: bevoelkerung_example_very_finite_population[simplified bevoelkerung_def])
-
-(*TODO: for reasons I do not understand,
-  example_teste_maxime_exhaust needs [code_unfold]
-  but
-  teste_maxime_exhaust needs [code]
-  ? ? ?*)
-lemma teste_maxime_exhaust [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
-  apply(simp add: fun_eq_iff)
-  apply(rule allI)+
-  apply(rule teste_maxime_exhaust_univ)
-  using enum_UNIV by simp
-
-declare teste_maxime_def[code del] \<comment>\<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
 (*this causes
   fun teste_maxime _ _ _ = raise Fail "Kant.teste_maxime";
 when we don't use teste_maxime_exhaust.
@@ -109,7 +99,7 @@ So when code fails with "Kant.teste_maxime", make sure the 'person implements en
 text\<open>Beispiel: Die Mir-ist-alles-Recht Maxime ist erfüllt.\<close>
 lemma \<open>teste_maxime
             (42::nat)
-            (HandlungF (\<lambda>(person::example_very_finite_population) welt. welt + 1))
+            (HandlungF (\<lambda>(person::person) welt. welt + 1))
             (Maxime (\<lambda>_ _. True))\<close> by eval
 
 text\<open>Beispiel:
