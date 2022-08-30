@@ -9,7 +9,13 @@ TODO: ich sollte Maxime als axiom betrachten.
 \<close>
 (*TODO: wenn ich Steuersysteme als Maxime encoden will muss ich welten vergleichen.
   Es ist eh ein TODO unten, dass ich alle welten testen muss.
-  Um ausfuehrbaren code zu haben sollte eventuell hier noch eine vergleichswelt eingefuehrt werden?*)
+  Um ausfuehrbaren code zu haben sollte eventuell hier noch eine vergleichswelt eingefuehrt werden?
+  Oder eine vergleichsperson? Oder kann ich Vergelichspersonsn in die aktuelle maxime encoded,
+  z.B. jeder der mehr hat als ich muss mehr steuern zahlen
+   (und jeder der weniger hat zahlt weniger steuern?)
+   \<forall>p\<in>{p \<in> dom (einkommen::person \<Rightarrow> int option). einkommen p \<ge> ich}
+    wenn person::enum dann sollte auch `dom einkommen`:: enum
+*)
 datatype ('person, 'world) maxime = Maxime "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
                                  (*          ich    -> Auswirkung      -> gut/böse  *)
 

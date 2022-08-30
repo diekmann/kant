@@ -22,4 +22,7 @@ instance proof
   qed (simp_all only: enum_person_def enum_all_person_def enum_ex_person_def UNIV_person, simp_all)
 end
 
+text\<open>Also makes maps partially executable.\<close>
+lemma \<open>dom [Alice \<mapsto> (3::nat), Carol \<mapsto> 6] = {Alice, Carol}\<close> by eval
+
 end
