@@ -45,11 +45,50 @@ definition show_map :: "('a::enum \<rightharpoonup> 'b) \<Rightarrow> ('a \<time
 
 lemma \<open>show_map [True \<mapsto> (8::int), False \<mapsto> 12] = [(False, 12), (True, 8)]\<close> by eval
 
-lemma "map_of (show_map m) = m"
-  apply(simp add: show_map_def map_of_def)
-  apply(induction enum_class.enum)
-   apply(simp)
-  oops (*TODO*)
+
+lemma show_map_induction_helper:
+  "distinct xs \<Longrightarrow> dom m \<subseteq> set xs \<Longrightarrow> map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs) = m"
+proof(induction xs arbitrary: m)
+  case Nil
+  then show ?case by(simp add: map_filter_def)
+next
+  case (Cons x xs)
+  then show ?case
+  proof(cases "\<exists>y. m x = Some y")
+    case True
+    from True obtain y where "m x = Some y" by blast
+    let ?m'="m(x:=None)"
+    have m: "m = ?m'(x \<mapsto> y)" using \<open>m x = Some y\<close> by auto
+    have "dom ?m' \<subseteq> set xs" using Cons.prems by auto
+    with Cons.IH[of ?m'] have IH':
+      "map_of (List.map_filter (\<lambda>p. map_option (Pair p) (?m' p)) xs) = ?m'"
+      using Cons.prems(1) by fastforce
+    show ?thesis
+      apply(subst m)
+      by (smt (z3) Cons.prems(1)
+            \<open>m x = Some y\<close> IH' distinct.simps(2)
+            domIff dom_fun_upd filter_cong insertE
+            m map_eq_conv map_filter_def map_filter_simps(1)
+            map_le_def map_of.simps(2) mem_Collect_eq o_apply
+            option.case(2) option.map(2) prod.sel(1) prod.sel(2)
+            set_filter upd_None_map_le)
+  next
+    case False
+    with Cons show ?thesis
+      apply(simp add: map_filter_def)
+      apply (meson domIff subset_insert)
+      done
+  qed
+qed
+
+
+lemma map_of_show_map:
+  fixes m::"'a::enum \<Rightarrow> 'b option"
+  shows "map_of (show_map m) = m"
+  apply(simp add: show_map_def)
+  apply(rule show_map_induction_helper)
+  using enum_distinct apply simp
+  by(simp add: UNIV_enum[symmetric])
 
 
 definition show_fun :: "('a::enum \<Rightarrow> 'b) \<Rightarrow> ('a \<times> 'b) list" where
