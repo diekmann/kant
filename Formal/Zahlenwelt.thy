@@ -27,9 +27,9 @@ Mehr ist mehr gut.
 Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
 
 
-Groesser (>) anstelle (\<ge>) ist hier echt spannend!
-Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die möglichkeit haben!!
-Das \<ge> ist kein strenger Fortschritt, eher kein Rueckschritt.
+Größer (>) anstelle (>=) ist hier echt spannend!
+Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die Möglichkeit haben!!
+Das >= ist kein strenger Fortschritt, eher kein Rückschritt.
 \<close>
 fun globaler_fortschritt :: "zahlenwelt handlung \<Rightarrow> bool" where
   "globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz nach) \<ge> (gesamtbesitz vor)"

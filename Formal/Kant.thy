@@ -33,7 +33,7 @@ text\<open>
 Wir testen:
   \<^item> Was wenn jeder so handeln würde?
   \<^item> Was wenn jeder diese maxime hätte? Bsp: stehlen und bestohlen werden.
-Faktisch: Kreuzprodukt Bevölkerung \<times> Bevölkerung,
+Faktisch: Kreuzprodukt Bevölkerung x Bevölkerung,
           wobei jeder einmal als handelnde Person auftritt
           und einmal als betroffene Person (durch Auswertung der Maxime).
 \<close>

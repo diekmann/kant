@@ -1,0 +1,11 @@
+session Kant = HOL +
+  options [document = pdf, document_output = "output"]
+theories [document = false]
+    ExecutableSetHelper
+  theories
+    Gesetz
+    Kant
+    BeispielSteuern
+    Zahlenwelt
+  document_files
+    "root.tex"
