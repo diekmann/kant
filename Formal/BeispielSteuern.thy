@@ -60,7 +60,7 @@ value \<open>beispiel_case_law
 
   
 text\<open>Jeder muss steuern zahlen: funktioniert\<close> (*TODO: ich muss die maps printen!*)
-(*TODO: wieso hoert das eigentlich mit einem Verbot auf?*)
+(*TODO: wieso hoert das eigentlich mit einem Verbot auf? A: weil steuerlast the_default 0 macht!*)
 value \<open>beispiel_case_law
   (HandlungF (\<lambda>ich welt. Steuerwelt (
         (map_map (\<lambda>e. e - 1) (get_einkommen welt))
