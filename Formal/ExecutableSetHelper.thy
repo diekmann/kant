@@ -52,5 +52,8 @@ lemma "map_of (show_map m) = m"
   oops (*TODO*)
 
 
+definition show_fun :: "('a::enum \<Rightarrow> 'b) \<Rightarrow> ('a \<times> 'b) list" where
+  "show_fun f \<equiv> map (\<lambda>p. (p, f p)) (enum_class.enum)"
+
 
 end

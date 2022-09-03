@@ -4,28 +4,26 @@ begin
 
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype steuerwelt = Steuerwelt
-        (*TODO: was ist der unterschied zwischen 
-            Alice \<rightarrow> None
-            Alice \<rightarrow> 0
-          Warum nicht `person \<Rightarrow> int` und einfach immer 0 annehmen wenn nicht anders definiert?*)
-        (get_einkommen: "person \<rightharpoonup> int") \<comment>\<open>einkommen: einkommen jeder Person.\<close>
+        (get_einkommen: "person \<Rightarrow> int") \<comment>\<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
 
 fun steuerlast :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
-  "steuerlast p (Handlung vor nach) =
-    (the_default ((get_einkommen vor) p) 0) - (the_default ((get_einkommen nach) p) 0)"
+  "steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)"
 
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt [Alice \<mapsto> 8]) (Steuerwelt [Alice \<mapsto> 5])) = 3\<close> by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt [Alice \<mapsto> 8]) (Steuerwelt [Alice \<mapsto> 0])) = 8\<close> by eval
-lemma \<open>steuerlast Bob   (Handlung (Steuerwelt [Alice \<mapsto> 8]) (Steuerwelt [Alice \<mapsto> 5])) = 0\<close> by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt [Alice \<mapsto> -3]) (Steuerwelt [Alice \<mapsto> -4])) = 1\<close> by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt [Alice \<mapsto> 1]) (Steuerwelt [Alice \<mapsto> -1])) = 2\<close> by eval
+text\<open>Default: kein Einkommen. Um Beispiele einfacher zu schreiben.\<close>
+definition KE :: "person \<Rightarrow> int" where
+  "KE \<equiv> \<lambda>p. 0"
+
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=8))) (Steuerwelt (KE(Alice:=5)))) = 3\<close> by eval
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=8))) (Steuerwelt (KE(Alice:=0)))) = 8\<close> by eval
+lemma \<open>steuerlast Bob   (Handlung (Steuerwelt (KE(Alice:=8))) (Steuerwelt (KE(Alice:=5)))) = 0\<close> by eval
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=-3))) (Steuerwelt (KE(Alice:=-4)))) = 1\<close> by eval
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=1))) (Steuerwelt (KE(Alice:=-1)))) = 2\<close> by eval
 
 fun mehrverdiener :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> person set" where
-  "mehrverdiener ich (Handlung vor nach) =
-    {p. the_default ((get_einkommen vor) p) 0 \<ge> the_default ((get_einkommen vor) ich) 0}"
+  "mehrverdiener ich (Handlung vor nach) = {p. (get_einkommen vor) p \<ge> (get_einkommen vor) ich}"
 
 lemma \<open>mehrverdiener Alice
-        (Handlung (Steuerwelt [Alice \<mapsto> 8, Bob \<mapsto> 12, Eve \<mapsto> 7]) (Steuerwelt [Alice \<mapsto> 5]))
+        (Handlung (Steuerwelt (KE(Alice:=8, Bob:=12, Eve:=7))) (Steuerwelt (KE(Alice:=5))))
        = {Alice, Bob}\<close> by eval
 
 (*TODO: maxime sollte sein, dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
@@ -40,8 +38,8 @@ definition maxime_steuern :: "(person, steuerwelt) maxime" where
 definition "sc \<equiv> SimConsts
                     Alice
                     maxime_steuern
-                    (\<lambda>h. case_law_ableiten (map_handlung (\<lambda>w. show_map (get_einkommen w)) h))" (*printable handlung*)
-definition "initialwelt \<equiv> Steuerwelt [Alice \<mapsto> 8, Bob \<mapsto> 3, Eve \<mapsto> 5]"
+                    (\<lambda>h. case_law_ableiten (map_handlung (\<lambda>w. show_fun (get_einkommen w)) h))" (*printable handlung*)
+definition "initialwelt \<equiv> Steuerwelt (KE(Alice:=8, Bob:=3, Eve:= 5))"
 
 definition "beispiel_case_law h \<equiv> simulateOne sc 20 h initialwelt (Gesetz {})"
 
@@ -51,18 +49,13 @@ value \<open>beispiel_case_law (HandlungF (\<lambda>ich welt. welt))\<close>
 text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber? Achjaaaaaa, jeder muss ja steuer zahlen, ....\<close>
 value \<open>beispiel_case_law
   (HandlungF (\<lambda>ich welt. Steuerwelt (
-                (get_einkommen welt)(ich \<mapsto> (the_default ((get_einkommen welt) ich) 0) - 1)
-    )))\<close>
-value \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-                (get_einkommen welt)(ich := map_option (\<lambda>e. e - 1) ((get_einkommen welt) ich))
+                (get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1)
     )))\<close>
 
   
-text\<open>Jeder muss steuern zahlen: funktioniert\<close> (*TODO: ich muss die maps printen!*)
-(*TODO: wieso hoert das eigentlich mit einem Verbot auf? A: weil steuerlast the_default 0 macht!*)
+text\<open>Jeder muss steuern zahlen: funktioniert, ist aber doof\<close>
 value \<open>beispiel_case_law
   (HandlungF (\<lambda>ich welt. Steuerwelt (
-        (map_map (\<lambda>e. e - 1) (get_einkommen welt))
+        ((\<lambda>e. e - 1) \<circ> (get_einkommen welt))
     )))\<close>
 end
