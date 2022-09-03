@@ -35,36 +35,6 @@ definition maxime_steuern :: "(person, steuerwelt) maxime" where
            \<forall>p\<in>mehrverdiener ich handlung. steuerlast ich handlung \<le> steuerlast p handlung)"
 
 
-term map_option
-term map_comp
-
-
-text\<open>Isabelle does not allow printing functions, but it allows printing lists\<close>
-definition show_map :: "('a::enum \<rightharpoonup> 'b) \<Rightarrow> ('a \<times> 'b) list" where
-  "show_map m \<equiv> List.map_filter (\<lambda>p. map_option (\<lambda>i. (p, i)) (m p)) (enum_class.enum)"
-
-lemma \<open>show_map [Alice \<mapsto> (8::int), Bob \<mapsto> 12, Eve \<mapsto> 7] = [(Alice, 8), (Bob, 12), (Eve, 7)]\<close> by eval
-
-lemma "map_of (show_map m) = m"
-  apply(simp add: show_map_def map_of_def)
-  apply(induction enum_class.enum)
-   apply(simp)
-  oops (*TODO*)
-
-(*TODO: why isnt this a library function?*)
-definition map_map :: "('a \<Rightarrow> 'b) \<Rightarrow> ('k \<rightharpoonup> 'a) \<Rightarrow> ('k \<rightharpoonup> 'b)" where
-  "map_map f m k \<equiv> case m k of None \<Rightarrow> None | Some a \<Rightarrow> Some (f a)"
-
-lemma map_map: "map_map f m = map_comp (\<lambda>a. Some (f a)) m"
-  by(simp add: fun_eq_iff map_map_def map_comp_def)
-
-(*does this help printing?*)
-lemma map_map_map_if_propagate[simp add]:
-  "map_map f (\<lambda>k. if P k then Some y else X k) = (\<lambda>k. if P k then Some (f y) else map_map f X k)"
-  apply(simp add: fun_eq_iff, intro allI conjI)
-   apply(simp add: map_map_def)+
-  done
-
 
 
 definition "sc \<equiv> SimConsts
