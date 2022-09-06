@@ -1,6 +1,8 @@
 theory Gesetz
-imports Main ExecutableSetHelper
+imports Main ExecutableHelper
 begin
+
+section\<open>Gesetz\<close>
 
 datatype 'a tatbestand = Tatbestand 'a
  

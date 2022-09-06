@@ -2,6 +2,8 @@ theory Gesetze
 imports Gesetz Kant
 begin
 
+section\<open>Gesetze\<close>
+
 subsection\<open>Case Law\<close>
 
 text\<open>

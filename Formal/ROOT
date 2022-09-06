@@ -1,7 +1,7 @@
 session Kant = HOL +
   options [document = pdf, document_output = "output"]
 theories [document = false]
-    ExecutableSetHelper
+    ExecutableHelper
   theories
     Gesetz
     Kant

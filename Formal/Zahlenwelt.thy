@@ -2,6 +2,7 @@ theory Zahlenwelt
 imports Simulation Gesetze BeispielPerson
 begin
 
+section\<open>Beispiel: Zahlenwelt\<close>
 
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype zahlenwelt = Zahlenwelt

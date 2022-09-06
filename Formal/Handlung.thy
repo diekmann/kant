@@ -2,6 +2,8 @@ theory Handlung
 imports Main
 begin
 
+section\<open>Handlung\<close>
+
 text\<open>
 Beschreibt Handlungen als Änderung der Welt. Unabhängig von der handelnden Person.
 Beschreibt vergangene Handlung.

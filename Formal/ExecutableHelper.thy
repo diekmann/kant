@@ -1,6 +1,9 @@
-theory ExecutableSetHelper
+theory ExecutableHelper
 imports Main
 begin
+
+section\<open>Executable Helper\<close>
+text\<open>This is a helper library (and should be excluded from the theory document).\<close>
 
 (*TODO: is there a library function for this?*)
 fun the_default :: "'a option \<Rightarrow> 'a \<Rightarrow> 'a" where
