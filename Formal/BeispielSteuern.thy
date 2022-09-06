@@ -39,9 +39,9 @@ definition maxime_steuern :: "(person, steuerwelt) maxime" where
 
 
 definition "sc \<equiv> SimConsts
-                    Alice
-                    maxime_steuern
-                    (\<lambda>h. case_law_ableiten (map_handlung (\<lambda>w. show_fun (get_einkommen w)) h))" (*printable handlung*)
+    Alice
+    maxime_steuern
+    (\<lambda>h. case_law_ableiten_absolut (map_handlung (\<lambda>w. show_fun (get_einkommen w)) h))" (*printable handlung*)
 definition "initialwelt \<equiv> Steuerwelt (KE(Alice:=8, Bob:=3, Eve:= 5))"
 
 definition "beispiel_case_law h \<equiv> simulateOne sc 20 h initialwelt (Gesetz {})"
