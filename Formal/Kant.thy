@@ -119,14 +119,16 @@ In einer Welt in der keiner etwas hat, erfuellt die Handlung jemanden 3 zu geben
 lemma \<open>teste_maxime
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
-            (Maxime (\<lambda>person handlung. (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
+            (Maxime (\<lambda>person handlung.
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
 text\<open>Wenn nun \<^const>\<open>Bob\<close> allerdings bereits 4 hat, würde die obige Handlung ein Verlust
 für ihn bedeuten und die Maxime ist nicht erfüllt.\<close>
 lemma \<open>\<not> teste_maxime
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
-            (Maxime (\<lambda>person handlung. (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
+            (Maxime (\<lambda>person handlung.
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
 
 

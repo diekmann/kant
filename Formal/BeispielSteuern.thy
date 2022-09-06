@@ -49,7 +49,8 @@ definition "beispiel_case_law h \<equiv> simulateOne sc 20 h initialwelt (Gesetz
 text\<open>Keiner zahlt steuern: funktioniert\<close>
 value \<open>beispiel_case_law (HandlungF (\<lambda>ich welt. welt))\<close>
 
-text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber? Achjaaaaaa, jeder muss ja steuer zahlen, ....\<close>
+text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber?
+Achjaaaaaa, jeder muss ja steuer zahlen, ....\<close>
 value \<open>beispiel_case_law
   (HandlungF (\<lambda>ich welt. Steuerwelt (
                 (get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1)

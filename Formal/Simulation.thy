@@ -29,12 +29,16 @@ fun simulate_handlungF
     )"
 
 lemma \<open>simulate_handlungF
-       (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
+       (SimConsts
+          ()
+          (Maxime (\<lambda>_ _. True))
+          (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
        (HandlungF (\<lambda>p w. w+1))
        (32::int)
        (Gesetz {})= 
-    (33,
-     Gesetz {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
+  (33,
+   Gesetz
+    {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
   by eval
 
 text\<open>Funktion begrenzt oft anwenden bis sich die Welt nicht mehr ändert.

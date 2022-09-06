@@ -26,7 +26,8 @@ definition case_law_ableiten_absolut
 text\<open>Case Law etwas besser, wir zeigen nur die Änderung.\<close>
 fun case_law_ableiten_relativ
     :: "('world \<Rightarrow> 'world \<Rightarrow> (('person, 'etwas) aenderung) list)
-        \<Rightarrow> ('world, (('person, 'etwas) aenderung) list, sollensanordnung) allgemeines_gesetz_ableiten"
+        \<Rightarrow> ('world, (('person, 'etwas) aenderung) list, sollensanordnung)
+              allgemeines_gesetz_ableiten"
   where
     "case_law_ableiten_relativ delta (Handlung vor nach) erlaubt =
       Rechtsnorm (Tatbestand (delta vor nach)) (Rechtsfolge erlaubt)"
