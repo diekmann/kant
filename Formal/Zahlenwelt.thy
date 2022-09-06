@@ -51,7 +51,12 @@ definition maxime_zahlenfortschritt :: "(person, zahlenwelt) maxime" where
   "maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)"
 (*Interessant: hard-coded Alice anstelle von 'ich'.*)
 
-definition "sc \<equiv> SimConsts Alice maxime_zahlenfortschritt case_law_ableiten"
+definition "sc \<equiv> SimConsts
+    Alice
+    maxime_zahlenfortschritt
+    (\<lambda>h. case_law_ableiten (map_handlung
+          (\<lambda>w. case w of Zahlenwelt verbleibend besitz \<Rightarrow> (verbleibend, show_map besitz))
+            h))" (*make printable*)
 definition "initialwelt \<equiv> Zahlenwelt 42 [Alice \<mapsto> 5, Bob \<mapsto> 10]"
 
 definition "beispiel_case_law h \<equiv> simulateOne sc 20 h initialwelt (Gesetz {})"
