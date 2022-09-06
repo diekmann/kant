@@ -2,6 +2,10 @@ theory ExecutableHelper
 imports Main
 begin
 
+(*is this helpful?*)
+term sorted_list_of_set
+
+
 section\<open>Executable Helper\<close>
 text\<open>This is a helper library (and should be excluded from the theory document).\<close>
 

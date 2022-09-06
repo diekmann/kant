@@ -25,4 +25,8 @@ end
 text\<open>Also makes maps partially executable.\<close>
 lemma \<open>dom [Alice \<mapsto> (3::nat), Carol \<mapsto> 6] = {Alice, Carol}\<close> by eval
 
+(*TODO: use https://www.isa-afp.org/entries/Generic_Deriving.html to get a linorder?
+value "sorted_list_of_set {Alice, Carol}"
+*)
+
 end
