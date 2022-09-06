@@ -2,6 +2,9 @@ theory Kant
 imports Handlung Gesetz BeispielPerson
 begin
 
+section\<open>Kant\<close>
+text\<open>Meine persönliche, etwas utilitaristische, Interpretation.\<close>
+
 text\<open>
 Beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 Passt nicht so ganz auf die Definition von Maxime?
