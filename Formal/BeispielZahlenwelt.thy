@@ -1,4 +1,4 @@
-theory Zahlenwelt
+theory BeispielZahlenwelt
 imports Simulation Gesetze BeispielPerson
 begin
 
@@ -58,9 +58,8 @@ fun delta_zahlenwelt :: "(zahlenwelt, person, int) delta" where
 definition "sc \<equiv> SimConsts
     Alice
     maxime_zahlenfortschritt
-    (\<lambda>h. case_law_ableiten_absolut (map_handlung
-          (\<lambda>w. case w of Zahlenwelt verbleibend besitz \<Rightarrow> (verbleibend, show_map besitz))
-            h))" (*make printable*)
+    (printable_case_law_ableiten_absolut
+      (\<lambda>w. case w of Zahlenwelt verbleibend besitz \<Rightarrow> (verbleibend, show_map besitz)))"
 definition "sc' \<equiv> SimConsts
     Alice
     maxime_zahlenfortschritt

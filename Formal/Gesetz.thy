@@ -30,7 +30,8 @@ text\<open>From \<^url>\<open>https://de.wikipedia.org/wiki/Rechtsfolge\<close>\
 value \<open>Gesetz {
   (Paragraph ''823 BGB'',
    Rechtsnorm
-     (Tatbestand ''Wer vorsaetzlich oder fahrlaessig das Leben, den Koerper, die Gesundheit, (...), das Eigentum oder (...) eines anderen widerrechtlich verletzt,'')
+     (Tatbestand ''Wer vorsaetzlich oder fahrlaessig das Leben, den Koerper, die Gesundheit, (...),
+                   das Eigentum oder (...) eines anderen widerrechtlich verletzt,'')
      (Rechtsfolge ''ist dem anderen zum Ersatz des daraus entstehenden Schadens verpflichtet.'')
   ),
   (Paragraph ''985 BGB'',

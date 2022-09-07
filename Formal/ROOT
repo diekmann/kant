@@ -5,7 +5,7 @@ theories [document = false]
   theories
     Gesetz
     Kant
+    BeispielZahlenwelt
     BeispielSteuern
-    Zahlenwelt
   document_files
     "root.tex"

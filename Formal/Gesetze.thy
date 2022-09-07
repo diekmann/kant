@@ -23,6 +23,14 @@ definition case_law_ableiten_absolut
             (Tatbestand (vorher handlung, nachher handlung))
             (Rechtsfolge sollensanordnung)"
 
+definition printable_case_law_ableiten_absolut
+  :: "('world \<Rightarrow>'printable_world) \<Rightarrow>
+     ('world, ('printable_world \<times> 'printable_world), sollensanordnung) allgemeines_gesetz_ableiten"
+  where
+  "printable_case_law_ableiten_absolut print_world h \<equiv>
+      case_law_ableiten_absolut (map_handlung print_world h)"
+  
+
 text\<open>Case Law etwas besser, wir zeigen nur die Änderung.\<close>
 fun case_law_ableiten_relativ
     :: "('world \<Rightarrow> 'world \<Rightarrow> (('person, 'etwas) aenderung) list)
