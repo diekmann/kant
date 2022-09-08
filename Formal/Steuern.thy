@@ -1,21 +1,25 @@
-(*Experiment: Steuergesetzgebung*)
 theory Steuern
 imports Main HOL.Real Percentage
 begin
 
-datatype 'a Person = Person (einkommen: nat) 'a
+section\<open>Experiment: Steuergesetzgebung\<close>
 
-value "einkommen (Person 4 ())"
+text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerrechts.
+Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Teil des 
+österreichischen Steuersystem gebaut mit deutschen Konstanten.\<close>
+
+datatype Person = Person (einkommen: nat)
+
+value "einkommen (Person 4)"
 
 locale steuersystem =
-  fixes steuer :: "'a Person \<Rightarrow> nat"
+  fixes steuer :: "Person \<Rightarrow> nat"
   
-  assumes monotonie: "einkommen (a::'a Person) \<ge> einkommen (b::'a Person)
-                      \<Longrightarrow> steuer a \<ge> steuer b"
+  assumes monotonie: "einkommen a \<ge> einkommen b \<Longrightarrow> steuer a \<ge> steuer b"
 begin
-  definition brutto :: "'a Person \<Rightarrow> nat" where
+  definition brutto :: "Person \<Rightarrow> nat" where
     "brutto p \<equiv> einkommen p"
-  definition netto :: "'a Person \<Rightarrow> nat" where
+  definition netto :: "Person \<Rightarrow> nat" where
     "netto p \<equiv> (brutto p) - (steuer p)"
 
   (*TODO: mehr einkommen \<ge> mehr netto*)
@@ -126,17 +130,17 @@ lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
   apply(simp add: floor_def)
   by linarith
 
-definition einkommenssteuer :: "'a Person \<Rightarrow> nat" where
+definition einkommenssteuer :: "Person \<Rightarrow> nat" where
   "einkommenssteuer p \<equiv>
     floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) (einkommen p))"
 
-lemma \<open>einkommenssteuer (Person 10 ()) = 0\<close> by eval
-lemma \<open>einkommenssteuer (Person 10000 ()) = 0\<close> by eval
-lemma \<open>einkommenssteuer (Person 14000 ()) = floor ((14000-10347)*0.14)\<close> by eval
-lemma \<open>einkommenssteuer (Person 20000 ()) =
+lemma \<open>einkommenssteuer (Person 10) = 0\<close> by eval
+lemma \<open>einkommenssteuer (Person 10000) = 0\<close> by eval
+lemma \<open>einkommenssteuer (Person 14000) = floor ((14000-10347)*0.14)\<close> by eval
+lemma \<open>einkommenssteuer (Person 20000) =
         floor ((14926-10347)*0.14 + (20000-14926)*0.2397)\<close> by eval
-value \<open>einkommenssteuer (Person 40000 ())\<close>
-value \<open>einkommenssteuer (Person 60000 ())\<close>
+value \<open>einkommenssteuer (Person 40000)\<close>
+value \<open>einkommenssteuer (Person 60000)\<close>
 
 lemma einkommenssteuer:
   "einkommenssteuer p = floor (zonensteuer steuerzonen2022 (percentage 0.45) (einkommen p))"
@@ -150,7 +154,7 @@ lemma einkommenssteuer:
 interpretation steuersystem
   where steuer = einkommenssteuer
 proof
-  fix a :: "'a Person" and b :: "'a Person"
+  fix a :: Person and b :: Person
   show "einkommen a \<le> einkommen b \<Longrightarrow> einkommenssteuer a \<le> einkommenssteuer b"
     apply(simp add: einkommenssteuer)
     apply(rule floorD)
@@ -160,4 +164,3 @@ qed
 
 
 end
-  
