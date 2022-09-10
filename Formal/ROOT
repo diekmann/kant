@@ -1,5 +1,6 @@
 session Kant = HOL +
-  options [document = pdf, document_output = "output"]
+  (*add document = pdf to build the pdf*)
+  options [browser_info, document_output = "output"]
 theories [document = false]
     ExecutableHelper
   theories
