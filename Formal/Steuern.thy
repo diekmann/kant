@@ -275,6 +275,14 @@ proof
     apply(rule floorD)
     apply(rule zonensteuermono)
     by(simp)
+next
+  fix einkommen_a and einkommen_b
+  show "einkommen_b \<le> einkommen_a \<Longrightarrow>
+       steuer_defs.netto einkommenssteuer einkommen_b
+       \<le> steuer_defs.netto einkommenssteuer einkommen_a"
+    apply(simp add: einkommenssteuer steuer_defs.netto_def floor_def)
+    apply(drule zonensteuer_leistung_lohnt_sich)
+    meh
 qed
 
 
