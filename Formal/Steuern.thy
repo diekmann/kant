@@ -100,17 +100,6 @@ next
       \<le> real e2 - real e2 * real_of_percentage prozent"
     by (metis diff_ge_0_iff_ge mult.right_neutral mult_right_mono
               of_nat_le_iff percentage_range right_diff_distrib')
-  with Cons.prems have
-    "real e1 - min (real zone) (real e1) * real_of_percentage prozent
-      \<le> real e2 - min (real zone) (real e2) * real_of_percentage prozent"
-    apply(cases "zone \<le> e1")
-     apply(simp; fail)
-    apply(simp)
-    apply(cases "zone \<le> e2")
-     apply(simp)
-     apply (smt (verit) mult_right_mono of_nat_mono real_of_percentage_range(1))
-    apply(simp)
-    done
   have
     "real e1 -
     (min (real zone) (real e1) * real_of_percentage prozent +
