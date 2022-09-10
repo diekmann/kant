@@ -59,6 +59,15 @@ lemma zonensteuer_pos: "zonensteuer ls p e \<ge> 0"
    apply(simp add: percentage_range)
   by (metis zero_le zonensteuer_zero zonensteuermono)
 
+text\<open>Steuer kann nicht höher sein als das Einkommen.\<close>
+lemma zonensteuer_limit: "zonensteuer ls spitzensteuer einkommen \<le> einkommen"
+  apply(induction ls arbitrary: einkommen)
+   apply(simp)
+   apply (simp add: real_of_percentage_mult; fail)
+  apply(rename_tac z zs einkommen, case_tac z, rename_tac zone prozent)
+  apply(simp)
+  by (smt (verit, ccfv_SIG) diff_is_0_eq nle_le of_nat_diff
+      real_of_percentage_mult(1) zonensteuer_zero)
 
 lemma zonensteuer_leistung_lohnt_sich: "e1 \<le> e2
   \<Longrightarrow> e1 - zonensteuer zs spitzensteuer e1 \<le> e2 - zonensteuer zs spitzensteuer e2"
@@ -104,15 +113,13 @@ next
       proof(cases "e2 \<le> zone")
         case True
         then show ?thesis
-          apply(simp add: e1)
-          apply(simp add: \<open>e1 \<le> zone\<close>)
-          using e1e2diff by (simp; fail)
+          apply(simp add: e1 \<open>e1 \<le> zone\<close>)
+          using e1e2diff by (simp)
       next
         case False
         from False have "zone < e2" by simp
         from this obtain mehr where mehr: "e2 = zone + mehr"
           using less_imp_add_positive by blast
-        thm Cons.prems False \<open>e1 \<le> zone\<close> 
         
         have e1zonediff:
          "real e1 - real e1 * real_of_percentage prozent
@@ -121,10 +128,8 @@ next
               mult.right_neutral mult_right_mono nle_le percentage_range
               right_diff_distrib')
 
-        (*TODO: this should be a general lemma!*)
-        have zonensteuer_limit:
-          "zonensteuer zs spitzensteuer mehr \<le> mehr"
-          using IH True mehr zonensteuer_zero by force
+        have zonensteuer_limit: "zonensteuer zs spitzensteuer mehr \<le> mehr"
+          using zonensteuer_limit by simp
   
         from False show ?thesis
           apply(simp add: e1)

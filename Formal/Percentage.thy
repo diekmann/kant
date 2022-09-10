@@ -62,4 +62,10 @@ lemma real_of_percentage_range:
   "real_of_percentage p \<le> 1"
   by(simp add: percentage_range)+
 
+lemma real_of_percentage_mult:
+  "real a * real_of_percentage p \<le> a"
+  "real_of_percentage p * real a \<le> a"
+  by (simp add: mult.commute mult_left_le percentage_range)+
+
+
 end
