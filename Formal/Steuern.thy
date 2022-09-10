@@ -8,8 +8,6 @@ text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerr
 Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Teil des 
 österreichischen Steuersystem gebaut mit deutschen Konstanten.\<close>
 
-(*
-*)
 
 locale steuer_defs =
   fixes steuer :: "nat \<Rightarrow> nat" \<comment>\<open>Einkommen -> Steuer\<close>
@@ -61,15 +59,6 @@ lemma zonensteuer_pos: "zonensteuer ls p e \<ge> 0"
    apply(simp add: percentage_range)
   by (metis zero_le zonensteuer_zero zonensteuermono)
 
-
-lemma fixes e1::nat
-  shows "e1 \<le> e2 \<Longrightarrow> e1 - a \<le> e2 - c \<Longrightarrow> e1 - b \<le> e2 - d \<Longrightarrow>
-  e1 - (a + b) \<le> e2 - (c + d)"
-  quickcheck
-  oops
-
-lemma fixes e1::real
-  shows "(e1 + mehr) - (a+b) = (e1 - (a+b)) + (mehr)" by simp
 
 lemma zonensteuer_leistung_lohnt_sich: "e1 \<le> e2
   \<Longrightarrow> e1 - zonensteuer zs spitzensteuer e1 \<le> e2 - zonensteuer zs spitzensteuer e2"
@@ -242,6 +231,13 @@ lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
   apply(simp add: floor_def)
   by linarith
 
+lemma floor_minusD:
+  fixes a :: nat and a' :: real
+  shows  "a \<le> b \<Longrightarrow> a - a' \<le> b - b' \<Longrightarrow> a - floor a' \<le> b - floor b'"
+  apply(simp add: floor_def)
+  by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
+        nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
+
 definition einkommenssteuer :: "nat \<Rightarrow> nat" where
   "einkommenssteuer einkommen \<equiv>
     floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) einkommen)"
@@ -280,9 +276,10 @@ next
   show "einkommen_b \<le> einkommen_a \<Longrightarrow>
        steuer_defs.netto einkommenssteuer einkommen_b
        \<le> steuer_defs.netto einkommenssteuer einkommen_a"
-    apply(simp add: einkommenssteuer steuer_defs.netto_def floor_def)
-    apply(drule zonensteuer_leistung_lohnt_sich)
-    meh
+    apply(simp add: einkommenssteuer steuer_defs.netto_def)
+    thm floor_minusD
+    apply(rule floor_minusD, simp)
+    using zonensteuer_leistung_lohnt_sich by simp
 qed
 
 
