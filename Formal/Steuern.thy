@@ -8,17 +8,27 @@ text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerr
 Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Teil des 
 österreichischen Steuersystem gebaut mit deutschen Konstanten.\<close>
 
+(*
+*)
 
-locale steuersystem =
+locale steuer_defs =
   fixes steuer :: "nat \<Rightarrow> nat" \<comment>\<open>Einkommen -> Steuer\<close>
-  
-  assumes wer_hat_der_gibt:
-    "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuer einkommen_a \<ge> steuer einkommen_b"
 begin
+  definition brutto :: "nat \<Rightarrow> nat" where
+    "brutto einkommen \<equiv> einkommen"
   definition netto :: "nat \<Rightarrow> nat" where
     "netto einkommen \<equiv> einkommen - (steuer einkommen)"
 
-  (*TODO: mehr einkommen \<ge> mehr netto*)
+  (*definition steuersatz*)
+end
+
+locale steuersystem = steuer_defs +
+  assumes wer_hat_der_gibt:
+    "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuer einkommen_a \<ge> steuer einkommen_b"
+  and leistung_lohnt_sich:
+    "einkommen_a \<ge> einkommen_b \<Longrightarrow> netto einkommen_a \<ge> netto einkommen_b"
+begin
+
   (*TODO: mehr einkommen \<Rightarrow> hoeherer Steuersatz*)
 end
 
@@ -50,6 +60,111 @@ lemma zonensteuer_pos: "zonensteuer ls p e \<ge> 0"
   apply(induction ls)
    apply(simp add: percentage_range)
   by (metis zero_le zonensteuer_zero zonensteuermono)
+
+
+lemma fixes e1::nat
+  shows "e1 \<le> e2 \<Longrightarrow> e1 - a \<le> e2 - c \<Longrightarrow> e1 - b \<le> e2 - d \<Longrightarrow>
+  e1 - (a + b) \<le> e2 - (c + d)"
+  quickcheck
+  oops
+
+lemma fixes e1::real
+  shows "(e1 + mehr) - (a+b) = (e1 - (a+b)) + (mehr)" by simp
+
+lemma zonensteuer_leistung_lohnt_sich: "e1 \<le> e2
+  \<Longrightarrow> e1 - zonensteuer zs spitzensteuer e1 \<le> e2 - zonensteuer zs spitzensteuer e2"
+proof(induction zs arbitrary: e1 e2)
+  case Nil
+  then show ?case
+   apply(simp)
+   using real_of_percentage_range by(metis
+      diff_ge_0_iff_ge mult.right_neutral mult_right_mono
+      of_nat_le_iff right_diff_distrib') 
+next
+  case (Cons z zs)
+  obtain zone prozent where z: "z = (zone, prozent)" by(cases z)
+  have "e1 - zone \<le> e2 - zone" using Cons.prems diff_le_mono by blast
+  from Cons.IH[OF this] have IH:
+    "real (e1 - zone) - zonensteuer zs spitzensteuer (e1 - zone)
+      \<le> real (e2 - zone) - zonensteuer zs spitzensteuer (e2 - zone)" . (*THIS?*)
+  hence IH':
+    "real e1 - zonensteuer zs spitzensteuer (e1 - zone)
+      \<le> real e2 - zonensteuer zs spitzensteuer (e2 - zone)"
+    using Cons.prems by linarith
+  from Cons.prems have
+    "min (real zone) (real e1) * real_of_percentage prozent
+      \<le> min (real zone) (real e2) * real_of_percentage prozent"
+    using real_of_percentage_range[of prozent] by(simp add: mult_mono')
+  from Cons.prems have e1e2diff:
+    "real e1 - real e1 * real_of_percentage prozent
+      \<le> real e2 - real e2 * real_of_percentage prozent"
+    by (metis diff_ge_0_iff_ge mult.right_neutral mult_right_mono
+              of_nat_le_iff percentage_range right_diff_distrib')
+  with Cons.prems have
+    "real e1 - min (real zone) (real e1) * real_of_percentage prozent
+      \<le> real e2 - min (real zone) (real e2) * real_of_percentage prozent"
+    apply(cases "zone \<le> e1")
+     apply(simp; fail)
+    apply(simp)
+    apply(cases "zone \<le> e2")
+     apply(simp)
+     apply (smt (verit) mult_right_mono of_nat_mono real_of_percentage_range(1))
+    apply(simp)
+    done
+  have
+    "real e1 -
+    (min (real zone) (real e1) * real_of_percentage prozent +
+     zonensteuer zs spitzensteuer (e1 - zone))
+    \<le> real e2 -
+       (min (real zone) (real e2) * real_of_percentage prozent +
+        zonensteuer zs spitzensteuer (e2 - zone))"
+    proof(cases "e1 \<le> zone")
+      case True
+      assume \<open>e1 \<le> zone\<close>
+      have e1: "min (real zone) (real e1) = real e1" using True by simp
+      show ?thesis
+      proof(cases "e2 \<le> zone")
+        case True
+        then show ?thesis
+          apply(simp add: e1)
+          apply(simp add: \<open>e1 \<le> zone\<close>)
+          using e1e2diff by (simp; fail)
+      next
+        case False
+        from False have "zone < e2" by simp
+        from this obtain mehr where mehr: "e2 = zone + mehr"
+          using less_imp_add_positive by blast
+        thm Cons.prems False \<open>e1 \<le> zone\<close> 
+        
+        have e1zonediff:
+         "real e1 - real e1 * real_of_percentage prozent
+           \<le> real zone - real zone * real_of_percentage prozent"
+          by (metis (no_types, opaque_lifting) diff_ge_0_iff_ge e1 min.bounded_iff
+              mult.right_neutral mult_right_mono nle_le percentage_range
+              right_diff_distrib')
+
+        (*TODO: this should be a general lemma!*)
+        have zonensteuer_limit:
+          "zonensteuer zs spitzensteuer mehr \<le> mehr"
+          using IH True mehr zonensteuer_zero by force
+  
+        from False show ?thesis
+          apply(simp add: e1)
+          apply(simp add: \<open>e1 \<le> zone\<close>)
+          apply(simp add: mehr)
+          apply(simp add: zonensteuer_zero)
+          using e1zonediff zonensteuer_limit by linarith
+        qed
+    next
+      case False
+      have e1: "min (real zone) (real e1) = real zone" using False by auto
+      have e2: "min (real zone) (real e2) = real zone" using False Cons.prems by auto
+      from IH' e1 e2 show ?thesis by (simp)
+    qed
+  thus ?case
+    by(simp add: z)
+qed
+
 
 definition steuerzonen2022 :: "(nat \<times> percentage) list" where
   "steuerzonen2022 \<equiv> [

@@ -57,4 +57,9 @@ lemma percentage_range:
   shows "0 \<le> p \<and> p \<le> 1"
   using real_of_percentage by auto
 
+lemma real_of_percentage_range:
+  "0 \<le> real_of_percentage p"
+  "real_of_percentage p \<le> 1"
+  by(simp add: percentage_range)+
+
 end
