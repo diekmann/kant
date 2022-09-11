@@ -10,7 +10,7 @@ Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Te
 
 
 locale steuer_defs =
-  fixes steuer :: "nat \<Rightarrow> nat" \<comment>\<open>Einkommen -> Steuer\<close>
+  fixes steuer :: "nat \<Rightarrow> nat" \<comment> \<open>Einkommen -> Steuer\<close>
 begin
   definition brutto :: "nat \<Rightarrow> nat" where
     "brutto einkommen \<equiv> einkommen"
@@ -85,7 +85,7 @@ next
   from Cons.IH[OF this] have IH:
     "real (e1 - zone) - zonensteuer zs spitzensteuer (e1 - zone)
       \<le> real (e2 - zone) - zonensteuer zs spitzensteuer (e2 - zone)" . (*THIS?*)
-  hence IH':
+  then have IH':
     "real e1 - zonensteuer zs spitzensteuer (e1 - zone)
       \<le> real e2 - zonensteuer zs spitzensteuer (e2 - zone)"
     using Cons.prems by linarith
@@ -144,7 +144,7 @@ next
       have e2: "min (real zone) (real e2) = real zone" using False Cons.prems by auto
       from IH' e1 e2 show ?thesis by (simp)
     qed
-  thus ?case
+  then show ?case
     by(simp add: z)
 qed
 

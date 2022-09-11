@@ -7,7 +7,7 @@ section\<open>Beispiel: Steuern\<close>
 
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype steuerwelt = Steuerwelt
-        (get_einkommen: "person \<Rightarrow> int") \<comment>\<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
+        (get_einkommen: "person \<Rightarrow> int") \<comment> \<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
 
 fun steuerlast :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
   "steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)"

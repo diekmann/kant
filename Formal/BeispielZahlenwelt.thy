@@ -6,8 +6,8 @@ section\<open>Beispiel: Zahlenwelt\<close>
 
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype zahlenwelt = Zahlenwelt
-        nat \<comment>\<open>verbleibend: Ressourcen sind endlich. Verbleibende Ressourcen in der Welt.\<close>
-        "person \<Rightarrow> int option" \<comment>\<open>besitz: Besitz jeder Person.\<close>
+        nat \<comment> \<open>verbleibend: Ressourcen sind endlich. Verbleibende Ressourcen in der Welt.\<close>
+        "person \<Rightarrow> int option" \<comment> \<open>besitz: Besitz jeder Person.\<close>
 
 fun gesamtbesitz :: "zahlenwelt \<Rightarrow> int" where
   "gesamtbesitz (Zahlenwelt _ besitz) = sum_list (List.map_filter besitz [Alice, Bob, Carol, Eve])"
