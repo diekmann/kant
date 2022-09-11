@@ -176,7 +176,8 @@ lemma "steuersystem steuersystem_impl \<Longrightarrow>
 
 lemma "a \<le> x \<Longrightarrow> int x - int (x - a) = a" by simp
 
-text\<open>Danke ihr nats.\<close>
+(*TODO*)
+text\<open>Danke ihr nats. Macht also keinen Sinn das als Annahme in die Maxime zu packen....\<close>
 lemma steuern_kleiner_einkommen_nat:
       "steuerlast ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))
          \<le> brutto ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))"
