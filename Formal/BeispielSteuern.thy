@@ -12,6 +12,12 @@ datatype steuerwelt = Steuerwelt
 fun steuerlast :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
   "steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)"
 
+fun brutto :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
+  "brutto p (Handlung vor nach) = (get_einkommen vor) p"
+fun netto :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
+  "netto p (Handlung vor nach) = (get_einkommen nach) p"
+
+
 text\<open>Default: kein Einkommen. Um Beispiele einfacher zu schreiben.\<close>
 definition KE :: "person \<Rightarrow> int" where
   "KE \<equiv> \<lambda>p. 0"
@@ -38,8 +44,12 @@ lemma \<open>mehrverdiener Alice
 definition maxime_steuern :: "(person, steuerwelt) maxime" where
   "maxime_steuern \<equiv> Maxime 
       (\<lambda>ich handlung.
-           \<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung)"
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)
+          \<and> (\<forall>p\<in>mehrverdiener ich handlung.
+                netto ich handlung \<le> netto p handlung)
+          )"
+  (*do we also need: \<and> steuerlast ich handlung \<le> brutto ich handlung*)
 
 
 fun delta_steuerwelt :: "(steuerwelt, person, int) delta" where
@@ -147,17 +157,78 @@ lemma \<open>simulateOne
 text\<open>Die Anforderungen fuer ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
 lemma "steuersystem steuersystem_impl \<Longrightarrow>
         (\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern)"
-  (*apply(rule iffI)*)
    apply(simp add: maxime_steuern_def teste_maxime_unfold)
    apply(simp add: jeder_zahlt_def bevoelkerung_def)
-   apply(intro allI impI)
-  apply(rename_tac welt p1 p2)
-  thm steuersystem.wer_hat_der_gibt
+   apply(intro allI impI conjI)
+   apply(rename_tac welt p1 p2)
+   thm steuersystem.wer_hat_der_gibt
    apply(drule_tac
         einkommen_b="nat (get_einkommen welt p1)" and
         einkommen_a="nat (get_einkommen welt p2)" in steuersystem.wer_hat_der_gibt)
     apply(simp; fail)
    apply(simp; fail)
+  apply(rename_tac welt p1 p2)
+  apply(drule_tac
+        einkommen_b="nat (get_einkommen welt p1)" and
+        einkommen_a="nat (get_einkommen welt p2)" in steuersystem.leistung_lohnt_sich)
+   apply(simp; fail)
+  by (simp add: steuer_defs.netto_def)
+
+lemma "a \<le> x \<Longrightarrow> int x - int (x - a) = a" by simp
+
+text\<open>Danke ihr nats.\<close>
+lemma steuern_kleiner_einkommen_nat:
+      "steuerlast ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))
+         \<le> brutto ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))"
+  apply(simp del: steuerlast.simps)
+  apply(subst steuerlast.simps)
+  apply(simp add: jeder_zahlt_def)
   done
+
+lemma "(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
+        \<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern
+        \<Longrightarrow> steuersystem steuersystem_impl"
+proof
+  fix einkommen_b einkommen_a :: nat
+  assume m: "\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern"
+     and a: "einkommen_b \<le> einkommen_a"
+     and bezahlbar: "\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen"
+  from m have m':
+    "get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
+       get_einkommen welt pA -
+             int (nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA)))
+             \<le> get_einkommen welt pB -
+                int (nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB)))"
+    for welt :: steuerwelt and pA pB :: person
+    by(simp add: maxime_steuern_def teste_maxime_unfold jeder_zahlt_def bevoelkerung_def)
+  from m'[where welt="Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)"
+                and pA=Bob and pB=Alice] a
+  have almost:
+    "int einkommen_b - int (einkommen_b - steuersystem_impl einkommen_b)
+      \<le> int einkommen_a - int (einkommen_a - steuersystem_impl einkommen_a)"
+    by simp
+  from bezahlbar have "steuersystem_impl einkommen_b \<le> einkommen_b" by simp
+  from this almost show "steuersystem_impl einkommen_b \<le> steuersystem_impl einkommen_a"
+    by simp
+next
+  fix einkommen_b einkommen_a :: nat
+  assume m: "\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern"
+     and a: "einkommen_b \<le> einkommen_a"
+  from m have m':
+    "get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
+       nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA))
+       \<le> nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB))"
+    for welt :: steuerwelt and pA pB :: person
+    by(simp add: maxime_steuern_def teste_maxime_unfold jeder_zahlt_def bevoelkerung_def)
+  from m'[where welt="Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)"
+                and pA=Bob and pB=Alice] a
+  have "einkommen_b - steuersystem_impl einkommen_b \<le> einkommen_a - steuersystem_impl einkommen_a"
+    by simp
+  from this show
+    "steuer_defs.netto steuersystem_impl einkommen_b
+      \<le> steuer_defs.netto steuersystem_impl einkommen_a"
+    by(simp add: steuer_defs.netto_def)
+qed
+    
 
 end

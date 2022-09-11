@@ -287,5 +287,4 @@ next
     using zonensteuer_leistung_lohnt_sich by simp
 qed
 
-
 end
