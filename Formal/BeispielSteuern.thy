@@ -38,7 +38,8 @@ lemma \<open>mehrverdiener Alice
 definition maxime_steuern :: "(person, steuerwelt) maxime" where
   "maxime_steuern \<equiv> Maxime 
       (\<lambda>ich handlung.
-           \<forall>p\<in>mehrverdiener ich handlung. steuerlast ich handlung \<le> steuerlast p handlung)"
+           \<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)"
 
 
 
@@ -66,10 +67,9 @@ lemma \<open>beispiel_case_law' (HandlungF (\<lambda>ich welt. welt)) =
 
 text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber?
 Achjaaaaaa, jeder muss ja Steuer zahlen, ....\<close>
-lemma \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-                (get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1)
-    ))) =
+definition "ich_zahle_1_steuer ich welt \<equiv>
+  Steuerwelt ((get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1))"
+lemma \<open>beispiel_case_law (HandlungF ich_zahle_1_steuer) =
   Gesetz
   {(Paragraph 1,
     Rechtsnorm
@@ -77,18 +77,18 @@ lemma \<open>beispiel_case_law
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 3), (Carol, 0), (Eve, 5)]))
      (Rechtsfolge Verbot))}\<close> by eval
-lemma \<open>beispiel_case_law'
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-                (get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1)
-    ))) =
-  Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand [Verliert Alice 1]) (Rechtsfolge Verbot))}\<close> by eval
+lemma \<open>beispiel_case_law' (HandlungF ich_zahle_1_steuer) =
+  Gesetz
+  {(Paragraph 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
+                            (Rechtsfolge Verbot))}\<close> by eval
   
 text\<open>Jeder muss steuern zahlen:
   funktioniert, ist aber doof, denn am Ende sind alle im Minus.
 
 Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
-lemma \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))) =
+definition "jeder_zahle_1_steuer ich welt \<equiv>
+  Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt))"
+lemma \<open>beispiel_case_law (HandlungF jeder_zahle_1_steuer) =
 Gesetz
   {(Paragraph 3,
     Rechtsnorm
@@ -108,21 +108,20 @@ Gesetz
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)]))
      (Rechtsfolge Erlaubnis))}\<close> by eval
-lemma \<open>beispiel_case_law'
-  (HandlungF (\<lambda>ich welt. Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))) =
+lemma \<open>beispiel_case_law' (HandlungF jeder_zahle_1_steuer) =
   Gesetz
   {(Paragraph 1,
-    Rechtsnorm (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
+    Rechtsnorm
+     (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
 text\<open>Jetzt kommt die Steuern.thy ins Spiel.\<close>
 (*wow ist das langsam!*)
 
 text\<open>Bei dem geringen Einkommen zahlt keiner Steuern.\<close>
-lemma \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-        ((\<lambda>e. e - einkommenssteuer e) \<circ> nat \<circ> (get_einkommen welt))
-    ))) = 
+definition "jeder_zahlt_einkommenssteuer ich welt \<equiv>
+  Steuerwelt ((\<lambda>e. e - einkommenssteuer e) \<circ> nat \<circ> (get_einkommen welt))"
+lemma \<open>beispiel_case_law (HandlungF jeder_zahlt_einkommenssteuer ) = 
   Gesetz
   {(Paragraph 1,
     Rechtsnorm
@@ -133,9 +132,7 @@ lemma \<open>beispiel_case_law
 
 lemma \<open>simulateOne
   sc' 1
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-        ((\<lambda>e. e - einkommenssteuer e) \<circ> nat \<circ> (get_einkommen welt))
-    )))
+  (HandlungF jeder_zahlt_einkommenssteuer)
   (Steuerwelt (KE(Alice:=10000, Bob:=14000, Eve:= 20000)))
   (Gesetz {})
   =
