@@ -1,5 +1,5 @@
 theory Aenderung
-imports Main ExecutableHelper BeispielPerson
+imports Main ExecutableHelper BeispielPerson Handlung
 begin
 
 section\<open>Aenderungen in Welten\<close>
@@ -32,34 +32,38 @@ Man könnte eine class Delta world einführen, mit einer delta-Funtion
 Diese Klasse würde dann Welten mit Personen und Etwas in Relation setzen.
 Dafür bräuchte es MultiParamTypeClasses. Eine simple Funktion ist da einfacher.\<close>
 type_synonym ('world, 'person, 'etwas) delta =
-    "'world \<Rightarrow> 'world \<Rightarrow> (('person, 'etwas) aenderung) list"
+    "'world handlung \<Rightarrow> (('person, 'etwas) aenderung) list"
 
-definition delta_num_map
+fun delta_num_map
   :: "(('person::enum \<rightharpoonup> ('etwas::{zero,minus,ord})), 'person, 'etwas) delta"
   where
-  "delta_num_map vorher nachher =
+  "delta_num_map (Handlung vor nach) =
       List.map_filter
-        (\<lambda>p. case (the_default (vorher p) 0, the_default (nachher p) 0)
+        (\<lambda>p. case (the_default (vor p) 0, the_default (nach p) 0)
                of (a,b) \<Rightarrow> delta_num p a b)
         (Enum.enum::'person list)"
 
-lemma\<open>delta_num_map [Alice \<mapsto> 5::int, Bob \<mapsto> 10, Eve \<mapsto> 1] [Alice \<mapsto> 3, Bob \<mapsto> 13, Carol \<mapsto> 2]
+lemma\<open>delta_num_map
+  (Handlung [Alice \<mapsto> 5::int, Bob \<mapsto> 10, Eve \<mapsto> 1]
+            [Alice \<mapsto> 3, Bob \<mapsto> 13, Carol \<mapsto> 2])
   = [Verliert Alice 2, Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]\<close> by eval
 
 
-definition delta_num_fun
+fun delta_num_fun
   :: "(('person::enum \<Rightarrow> ('etwas::{minus,ord})), 'person, 'etwas) delta"
   where
-  "delta_num_fun vorher nachher =
-      List.map_filter (\<lambda>p. delta_num p (vorher p) (nachher p)) Enum.enum"
+  "delta_num_fun (Handlung vor nach) =
+      List.map_filter (\<lambda>p. delta_num p (vor p) (nach p)) Enum.enum"
 
 lemma \<open>delta_num_fun
+    (Handlung
         ((\<lambda>p. 0::int)(Alice:=8, Bob:=12, Eve:=7))
-        ((\<lambda>p. 0::int)(Alice:=3, Bob:=15, Eve:=0))
+        ((\<lambda>p. 0::int)(Alice:=3, Bob:=15, Eve:=0)))
   = [Verliert Alice 5, Gewinnt Bob 3, Verliert Eve 7]\<close> by eval
 
-lemma delta_num_map: "delta_num_map m1 m2 =
-        delta_num_fun ((\<lambda>p. the_default (m1 p) 0)) ((\<lambda>p. the_default (m2 p) 0))"
-  by(simp add: delta_num_map_def delta_num_fun_def)
+lemma delta_num_map: "delta_num_map (Handlung m1 m2) =
+        delta_num_fun (Handlung (\<lambda>p. the_default (m1 p) 0) (\<lambda>p. the_default (m2 p) 0))"
+  by(simp)
+
 
 end

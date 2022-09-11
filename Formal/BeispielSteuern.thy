@@ -42,9 +42,11 @@ definition maxime_steuern :: "(person, steuerwelt) maxime" where
                 steuerlast ich handlung \<le> steuerlast p handlung)"
 
 
+(*kann ich delta als class implementieren?*)
 
 fun delta_steuerwelt :: "(steuerwelt, person, int) delta" where
-  "delta_steuerwelt vor nach = Aenderung.delta_num_fun (get_einkommen vor) (get_einkommen nach)"
+  "delta_steuerwelt (Handlung vor nach) =
+      Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))"
 
 definition "sc \<equiv> SimConsts
     Alice

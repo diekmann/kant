@@ -52,8 +52,8 @@ definition maxime_zahlenfortschritt :: "(person, zahlenwelt) maxime" where
 (*Interessant: hard-coded Alice anstelle von 'ich'.*)
 
 fun delta_zahlenwelt :: "(zahlenwelt, person, int) delta" where
-  "delta_zahlenwelt (Zahlenwelt _ vor_besitz) (Zahlenwelt _ nach_besitz) =
-      Aenderung.delta_num_map vor_besitz nach_besitz"
+  "delta_zahlenwelt (Handlung (Zahlenwelt _ vor_besitz) (Zahlenwelt _ nach_besitz)) =
+      Aenderung.delta_num_map (Handlung vor_besitz nach_besitz)"
 
 definition "sc \<equiv> SimConsts
     Alice
