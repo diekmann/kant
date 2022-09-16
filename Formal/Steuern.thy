@@ -2,6 +2,22 @@ theory Steuern
 imports Main HOL.Real Percentage
 begin
 
+text\<open>Helper\<close>
+definition floor :: "real \<Rightarrow> nat" where
+  "floor x \<equiv> nat \<lfloor>x\<rfloor>"
+
+lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
+  apply(simp add: floor_def)
+  by linarith
+
+lemma floor_minusD:
+  fixes a :: nat and a' :: real
+  shows  "a \<le> b \<Longrightarrow> a - a' \<le> b - b' \<Longrightarrow> a - floor a' \<le> b - floor b'"
+  apply(simp add: floor_def)
+  by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
+        nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
+
+
 section\<open>Experiment: Steuergesetzgebung\<close>
 
 text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerrechts.
@@ -31,6 +47,16 @@ lemma "beispiel_25prozent_steuer 100 = 25"
       "steuer_defs.brutto 100 = 100"
       "steuer_defs.netto beispiel_25prozent_steuer 100 = 75"
       "steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25"
+  by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
+            steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
+
+
+(*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+wegen dem Abrunden gilt die progression nicht!!
+*)
+lemma "steuer_defs.steuersatz beispiel_25prozent_steuer 103 =  percentage (25 / 103)"
+      "percentage (25 / 103) \<le> percentage 0.25"
+      "(103::nat) > 100"
   by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
             steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
 
@@ -169,6 +195,25 @@ next
     by(simp add: z)
 qed
 
+value "(floor (real 2 * (1/2)) / real 2, floor (real 3 * (1/2)) / real 3)"
+
+lemma "e1 \<le> e2 \<Longrightarrow>
+    x \<ge> 0 \<Longrightarrow>
+    floor (real e1 * x) / real e1
+    \<le> floor (real e2 * x) / real e2"
+  quickcheck
+term steuer_defs.steuersatz
+lemma "e1 \<le> e2 \<Longrightarrow>
+  steuer_defs.steuersatz (\<lambda>e. floor (zonensteuer zs spitzensteuer e)) e1
+    \<le> steuer_defs.steuersatz (\<lambda>e. floor (zonensteuer zs spitzensteuer e)) e2"
+  thm percentage_code
+  apply(simp add: floor_def steuer_defs.steuersatz_def)
+  apply(induction zs)
+   apply(simp add: percentage_code)
+   apply(intro conjI impI)
+     apply(simp_all add: real_of_percentage_range)
+  apply (smt (verit, best) floor_of_nat le_divide_eq_1 nonzero_mult_div_cancel_left of_int_floor_le of_int_of_nat_eq of_nat_0_le_iff of_nat_mono real_of_percentage_mult(1))
+  apply (smt (verit, best) divide_eq_0_iff divide_nonneg_nonneg divide_nonpos_nonneg floor_mono mult_mono of_int_le_iff of_nat_0_le_iff of_nat_le_iff real_of_percentage_range(1))
 
 definition steuerzonen2022 :: "(nat \<times> percentage) list" where
   "steuerzonen2022 \<equiv> [
@@ -248,21 +293,6 @@ lemma bucketsteuerAbs_zonensteuer:
   apply(drule wfSteuerbucketsConsD)
   using wfSteuerbucketsMapD by simp
   
-
-
-definition floor :: "real \<Rightarrow> nat" where
-  "floor x \<equiv> nat \<lfloor>x\<rfloor>"
-
-lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
-  apply(simp add: floor_def)
-  by linarith
-
-lemma floor_minusD:
-  fixes a :: nat and a' :: real
-  shows  "a \<le> b \<Longrightarrow> a - a' \<le> b - b' \<Longrightarrow> a - floor a' \<le> b - floor b'"
-  apply(simp add: floor_def)
-  by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
-        nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
 
 definition einkommenssteuer :: "nat \<Rightarrow> nat" where
   "einkommenssteuer einkommen \<equiv>
