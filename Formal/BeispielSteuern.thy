@@ -229,6 +229,7 @@ next
     "steuer_defs.netto steuersystem_impl einkommen_b
       \<le> steuer_defs.netto steuersystem_impl einkommen_a"
     by(simp add: steuer_defs.netto_def)
+(*Da fehlt was, ...*)
 qed
     
 
