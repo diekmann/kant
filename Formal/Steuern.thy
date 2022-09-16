@@ -139,13 +139,11 @@ next
     "e1 - zonensteuer zs spitzensteuer (e1 - zone)
       \<le> e2 - zonensteuer zs spitzensteuer (e2 - zone)"
     using Cons.prems by linarith
-  from Cons.prems have "min zone e1 * prozent \<le> min zone e2 * prozent"
-    using real_of_percentage_range[of prozent] by(simp add: mult_mono')
   from Cons.prems percentage_nat_diff_mult_right_mono have e1e2diff:
     "e1 - e1 * prozent \<le> e2 - e2 * prozent" by simp
   have
     "e1 - (min zone e1 * prozent + zonensteuer zs spitzensteuer (e1 - zone))
-      \<le> e2 - (min zone e2 * real_of_percentage prozent + zonensteuer zs spitzensteuer (e2 - zone))"
+      \<le> e2 - (min zone e2 * prozent + zonensteuer zs spitzensteuer (e2 - zone))"
     proof(cases "e1 \<le> zone")
       case True
       assume \<open>e1 \<le> zone\<close>

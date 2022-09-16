@@ -62,40 +62,66 @@ lemma real_of_percentage_range:
   "real_of_percentage p \<le> 1"
   by(simp add: percentage_range)+
 
+(*will cause simplifier looping*)
+lemma percentage_min_max_simps:
+    "real_of_percentage p = min 1 p"
+    "real_of_percentage p = max 0 p"
+  by (simp add: percentage_range)+
+
 lemma real_of_percentage_mult:
   "real a * real_of_percentage p \<le> a"
   "real_of_percentage p * real a \<le> a"
   by (simp add: mult.commute mult_left_le percentage_range)+
 
-lemma percentage_mult_right_mono: fixes p::percentage
-      shows "a \<le> b \<Longrightarrow> a * p \<le>  b * p"
+lemma percentage_percentage_mult_right:
+  fixes a p ::percentage
+  shows "a * p \<le> a"
+  by (simp add: mult_right_le_one_le real_of_percentage_range times_percentage.rep_eq)
+lemma percentage_percentage_mult_left:
+  fixes a p ::percentage
+  shows "p * a \<le> a"
+  by (simp add: mult.commute percentage_percentage_mult_right mult_right_le_one_le percentage_range times_percentage.rep_eq)
+lemma percentage_real_pos_mult_right:
+  fixes p::percentage and a :: real
+  shows "a \<ge> 0 \<Longrightarrow> a * (real_of_percentage p) \<le> a"
+  by (simp add: mult_left_le percentage_range)
+lemma percentage_real_pos_mult_left:
+  fixes p::percentage and a :: real
+  shows "a \<ge> 0 \<Longrightarrow> (real_of_percentage p) * a \<le> a"
+  by (simp add: mult_left_le_one_le percentage_range)
+
+lemma percentage_mult_right_mono:
+  fixes a b p ::percentage
+  shows "a \<le> b \<Longrightarrow> a * p \<le> b * p"
 proof -
   show "a \<le> b \<Longrightarrow> ?thesis"
     by (simp add: mult_right_mono real_of_percentage_range(1) times_percentage.rep_eq)
 qed
 
-lemma percentage_nat_diff_mult_right_mono: fixes p::percentage
-        and a b :: nat
-      shows "a \<le> b \<Longrightarrow> a - a * p \<le> b - b * p"
+lemma percentage_real_mult_right_mono:
+  fixes p ::percentage and a b :: real
+  shows "a \<le> b \<Longrightarrow> a * p \<le> b * p"
 proof -
-  (*Why and how does this work?*)
-  have XXX: "a \<le> b \<Longrightarrow> min (real b) a = a" by simp
-  from percentage_mult_right_mono show "a \<le> b \<Longrightarrow> ?thesis"
-    by (metis diff_ge_0_iff_ge mult.right_neutral mult_right_mono
-        of_nat_le_iff percentage_range right_diff_distrib')
-
+  show "a \<le> b \<Longrightarrow> ?thesis"
+    by (simp add: mult_right_mono real_of_percentage_range(1) times_percentage.rep_eq)
 qed
 
-(*      assume \<open>e1 \<le> zone\<close>
-      have e1: "min (real zone) e1 = e1" using True by simp
-      have e1zonediff:
-       "e1 - e1 * prozent \<le> zone - zone * prozent"
-        by (metis (no_types, opaque_lifting) diff_ge_0_iff_ge e1 min.bounded_iff
-            mult.right_neutral mult_right_mono nle_le percentage_range
-            right_diff_distrib')*)
+lemma percentage_real_diff_mult_right_mono:
+  fixes p::percentage and a b :: real
+  shows "a \<le> b \<Longrightarrow> a - a * (real_of_percentage p) \<le> b - b * (real_of_percentage p)"
+proof -
+  assume a: "a \<le> b"
+  have "0 \<le> b - a" by (simp add: a)
+  hence "(b - a) * real_of_percentage p \<le> b - a"
+    by (simp add: percentage_real_pos_mult_right)
+  with a show ?thesis
+    by (simp add: a left_diff_distrib')
+qed
 
-(* assume \<open>e1 \<le> zone\<close>
-      have e1: "min (real zone) e1 = e1" using True by simp
-      have e1zonediff:
-       "e1 - e1 * prozent \<le> zone - zone * prozent"*)
+lemma percentage_nat_diff_mult_right_mono: (*warning: coertion*)
+  fixes p::percentage
+    and a b :: nat
+  shows "a \<le> b \<Longrightarrow> a - a * p \<le> b - b * p"
+  by (simp add: percentage_real_diff_mult_right_mono)
+
 end
