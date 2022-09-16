@@ -186,7 +186,9 @@ lemma steuern_kleiner_einkommen_nat:
   apply(simp add: jeder_zahlt_def)
   done
 
+(*Braucht ein paar Annahmen.*)
 lemma "(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
+       (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
         \<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern
         \<Longrightarrow> steuersystem steuersystem_impl"
 proof
@@ -229,7 +231,11 @@ next
     "steuer_defs.netto steuersystem_impl einkommen_b
       \<le> steuer_defs.netto steuersystem_impl einkommen_a"
     by(simp add: steuer_defs.netto_def)
-(*Da fehlt was, ...*)
+next
+  fix einkommen
+  show "\<forall>einkommen\<le>9888. steuersystem_impl einkommen = 0
+        \<Longrightarrow> einkommen \<le> 9888 \<Longrightarrow> steuersystem_impl einkommen = 0"
+    by simp
 qed
     
 
