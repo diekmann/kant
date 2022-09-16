@@ -16,18 +16,39 @@ begin
     "brutto einkommen \<equiv> einkommen"
   definition netto :: "nat \<Rightarrow> nat" where
     "netto einkommen \<equiv> einkommen - (steuer einkommen)"
+  definition steuersatz :: "nat \<Rightarrow> percentage" where
+    "steuersatz einkommen \<equiv> percentage ((steuer einkommen) / einkommen)"
 
   (*definition steuersatz*)
 end
+
+
+text\<open>Beispiel\<close>
+definition beispiel_25prozent_steuer :: "nat \<Rightarrow> nat" where
+  "beispiel_25prozent_steuer e \<equiv> nat \<lfloor>real e * (percentage 0.25)\<rfloor>"
+
+lemma "beispiel_25prozent_steuer 100 = 25"
+      "steuer_defs.brutto 100 = 100"
+      "steuer_defs.netto beispiel_25prozent_steuer 100 = 75"
+      "steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25"
+  by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
+            steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
+
 
 locale steuersystem = steuer_defs +
   assumes wer_hat_der_gibt:
     "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuer einkommen_a \<ge> steuer einkommen_b"
   and leistung_lohnt_sich:
     "einkommen_a \<ge> einkommen_b \<Longrightarrow> netto einkommen_a \<ge> netto einkommen_b"
+  \<comment> \<open>Ein Existenzminimum wird nicht versteuert.
+      Zahl Deutschland 2022, vermutlich sogar die falsche Zahl.\<close>
+  and existenzminimum:
+    "einkommen \<le> 9888 \<Longrightarrow> steuer einkommen = 0"
+  \<comment> \<open>"Steuerprogression bedeutet das Ansteigen des Steuersatzes in Abhängigkeit vom zu
+       versteuernden Einkommen oder Vermögen." \<^url>\<open>https://de.wikipedia.org/wiki/Steuerprogression\<close>\<close>
+  and progression: "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuersatz einkommen_a \<ge> steuersatz einkommen_b"
 begin
 
-  (*TODO: mehr einkommen \<Rightarrow> hoeherer Steuersatz*)
 end
 
 fun zonensteuer :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
@@ -266,6 +287,7 @@ lemma einkommenssteuer:
   apply(simp)
   done
 
+(*TODO: geht das ohne immer steuer_defs zu schreiben?*)
 interpretation steuersystem
   where steuer = einkommenssteuer
 proof
@@ -285,6 +307,16 @@ next
     thm floor_minusD
     apply(rule floor_minusD, simp)
     using zonensteuer_leistung_lohnt_sich by simp
+next
+  fix einkommen
+  show "einkommen \<le> 9888 \<Longrightarrow> einkommenssteuer einkommen = 0"
+    by(simp add: einkommenssteuer floor_def steuerzonen2022_def percentage_code)
+next
+  fix einkommen_a and einkommen_b
+  show "einkommen_a \<ge> einkommen_b \<Longrightarrow>
+    steuer_defs.steuersatz einkommenssteuer einkommen_a \<ge> steuer_defs.steuersatz einkommenssteuer einkommen_b"
+    apply(simp add: steuer_defs.steuersatz_def einkommenssteuer)
+    (*TODO*)
 qed
 
 end
