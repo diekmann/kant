@@ -5,7 +5,7 @@ begin
 section\<open>Simulation\<close>
 
 datatype ('person, 'world, 'a, 'b) simulation_constants  = SimConsts
-    'person \<comment>\<open>handelnde Person\<close>
+    'person \<comment> \<open>handelnde Person\<close>
     (*moeglich :: H.Handlung world -> Bool, -- brauch ich das oder geht das mit typen?*)
     "('person, 'world) maxime"
     "('world, 'a, 'b) allgemeines_gesetz_ableiten"

@@ -2,6 +2,22 @@ theory Steuern
 imports Main HOL.Real Percentage
 begin
 
+text\<open>Helper\<close>
+definition floor :: "real \<Rightarrow> nat" where
+  "floor x \<equiv> nat \<lfloor>x\<rfloor>"
+
+lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
+  apply(simp add: floor_def)
+  by linarith
+
+lemma floor_minusD:
+  fixes a :: nat and a' :: real
+  shows  "a \<le> b \<Longrightarrow> a - a' \<le> b - b' \<Longrightarrow> a - floor a' \<le> b - floor b'"
+  apply(simp add: floor_def)
+  by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
+        nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
+
+
 section\<open>Experiment: Steuergesetzgebung\<close>
 
 text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerrechts.
@@ -10,24 +26,58 @@ Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Te
 
 
 locale steuer_defs =
-  fixes steuer :: "nat \<Rightarrow> nat" \<comment>\<open>Einkommen -> Steuer\<close>
+  fixes steuer :: "nat \<Rightarrow> nat" \<comment> \<open>Einkommen -> Steuer\<close>
 begin
   definition brutto :: "nat \<Rightarrow> nat" where
     "brutto einkommen \<equiv> einkommen"
   definition netto :: "nat \<Rightarrow> nat" where
     "netto einkommen \<equiv> einkommen - (steuer einkommen)"
-
-  (*definition steuersatz*)
+  definition steuersatz :: "nat \<Rightarrow> percentage" where
+    "steuersatz einkommen \<equiv> percentage ((steuer einkommen) / einkommen)"
 end
+
+
+text\<open>Beispiel\<close>
+definition beispiel_25prozent_steuer :: "nat \<Rightarrow> nat" where
+  "beispiel_25prozent_steuer e \<equiv> nat \<lfloor>real e * (percentage 0.25)\<rfloor>"
+
+lemma "beispiel_25prozent_steuer 100 = 25"
+      "steuer_defs.brutto 100 = 100"
+      "steuer_defs.netto beispiel_25prozent_steuer 100 = 75"
+      "steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25"
+  by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
+            steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
+
+
+(*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+wegen dem Abrunden gilt die progression nicht!!
+*)
+lemma "steuer_defs.steuersatz beispiel_25prozent_steuer 103 =  percentage (25 / 103)"
+      "percentage (25 / 103) \<le> percentage 0.25"
+      "(103::nat) > 100"
+  by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
+            steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
+
 
 locale steuersystem = steuer_defs +
   assumes wer_hat_der_gibt:
     "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuer einkommen_a \<ge> steuer einkommen_b"
+
   and leistung_lohnt_sich:
     "einkommen_a \<ge> einkommen_b \<Longrightarrow> netto einkommen_a \<ge> netto einkommen_b"
+
+  \<comment> \<open>Ein Existenzminimum wird nicht versteuert.
+      Zahl Deutschland 2022, vermutlich sogar die falsche Zahl.\<close>
+  and existenzminimum:
+    "einkommen \<le> 9888 \<Longrightarrow> steuer einkommen = 0"
+
+(*
+  \<comment> \<open>"Steuerprogression bedeutet das Ansteigen des Steuersatzes in Abhängigkeit vom zu
+       versteuernden Einkommen oder Vermögen." \<^url>\<open>https://de.wikipedia.org/wiki/Steuerprogression\<close>\<close>
+  and progression: "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuersatz einkommen_a \<ge> steuersatz einkommen_b"
+*)
 begin
 
-  (*TODO: mehr einkommen \<Rightarrow> hoeherer Steuersatz*)
 end
 
 fun zonensteuer :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
@@ -83,32 +133,23 @@ next
   obtain zone prozent where z: "z = (zone, prozent)" by(cases z)
   have "e1 - zone \<le> e2 - zone" using Cons.prems diff_le_mono by blast
   from Cons.IH[OF this] have IH:
-    "real (e1 - zone) - zonensteuer zs spitzensteuer (e1 - zone)
-      \<le> real (e2 - zone) - zonensteuer zs spitzensteuer (e2 - zone)" . (*THIS?*)
-  hence IH':
-    "real e1 - zonensteuer zs spitzensteuer (e1 - zone)
-      \<le> real e2 - zonensteuer zs spitzensteuer (e2 - zone)"
+    " (e1 - zone) - zonensteuer zs spitzensteuer (e1 - zone)
+      \<le> (e2 - zone) - zonensteuer zs spitzensteuer (e2 - zone)" .
+  then have IH':
+    "e1 - zonensteuer zs spitzensteuer (e1 - zone)
+      \<le> e2 - zonensteuer zs spitzensteuer (e2 - zone)"
     using Cons.prems by linarith
-  from Cons.prems have
-    "min (real zone) (real e1) * real_of_percentage prozent
-      \<le> min (real zone) (real e2) * real_of_percentage prozent"
-    using real_of_percentage_range[of prozent] by(simp add: mult_mono')
-  from Cons.prems have e1e2diff:
-    "real e1 - real e1 * real_of_percentage prozent
-      \<le> real e2 - real e2 * real_of_percentage prozent"
-    by (metis diff_ge_0_iff_ge mult.right_neutral mult_right_mono
-              of_nat_le_iff percentage_range right_diff_distrib')
+  from Cons.prems percentage_nat_diff_mult_right_mono have e1e2diff:
+    "e1 - e1 * prozent \<le> e2 - e2 * prozent" by simp
   have
-    "real e1 -
-    (min (real zone) (real e1) * real_of_percentage prozent +
-     zonensteuer zs spitzensteuer (e1 - zone))
-    \<le> real e2 -
-       (min (real zone) (real e2) * real_of_percentage prozent +
-        zonensteuer zs spitzensteuer (e2 - zone))"
+    "e1 - (min zone e1 * prozent + zonensteuer zs spitzensteuer (e1 - zone))
+      \<le> e2 - (min zone e2 * prozent + zonensteuer zs spitzensteuer (e2 - zone))"
     proof(cases "e1 \<le> zone")
       case True
       assume \<open>e1 \<le> zone\<close>
-      have e1: "min (real zone) (real e1) = real e1" using True by simp
+      have e1: "min (real zone) e1 = e1" using \<open>e1 \<le> zone\<close> by simp
+      from percentage_nat_diff_mult_right_mono have e1zonediff:
+       "e1 - e1 * prozent \<le> zone - zone * prozent" using True by auto
       show ?thesis
       proof(cases "e2 \<le> zone")
         case True
@@ -120,17 +161,8 @@ next
         from False have "zone < e2" by simp
         from this obtain mehr where mehr: "e2 = zone + mehr"
           using less_imp_add_positive by blast
-        
-        have e1zonediff:
-         "real e1 - real e1 * real_of_percentage prozent
-           \<le> real zone - real zone * real_of_percentage prozent"
-          by (metis (no_types, opaque_lifting) diff_ge_0_iff_ge e1 min.bounded_iff
-              mult.right_neutral mult_right_mono nle_le percentage_range
-              right_diff_distrib')
-
         have zonensteuer_limit: "zonensteuer zs spitzensteuer mehr \<le> mehr"
           using zonensteuer_limit by simp
-  
         from False show ?thesis
           apply(simp add: e1)
           apply(simp add: \<open>e1 \<le> zone\<close>)
@@ -140,14 +172,27 @@ next
         qed
     next
       case False
-      have e1: "min (real zone) (real e1) = real zone" using False by auto
-      have e2: "min (real zone) (real e2) = real zone" using False Cons.prems by auto
+      have e1: "min zone e1 = zone" using False by auto
+      have e2: "min zone e2 = zone" using False Cons.prems by auto
       from IH' e1 e2 show ?thesis by (simp)
     qed
-  thus ?case
+  then show ?case
     by(simp add: z)
 qed
 
+(*
+lemma "e1 \<le> e2 \<Longrightarrow>
+  steuer_defs.steuersatz (\<lambda>e. floor (zonensteuer zs spitzensteuer e)) e1
+    \<le> steuer_defs.steuersatz (\<lambda>e. floor (zonensteuer zs spitzensteuer e)) e2"
+  thm percentage_code
+  apply(simp add: floor_def steuer_defs.steuersatz_def)
+  apply(induction zs)
+   apply(simp add: percentage_code)
+   apply(intro conjI impI)
+     apply(simp_all add: real_of_percentage_range)
+  apply (smt (verit, best) floor_of_nat le_divide_eq_1 nonzero_mult_div_cancel_left of_int_floor_le of_int_of_nat_eq of_nat_0_le_iff of_nat_mono real_of_percentage_mult(1))
+  apply (smt (verit, best) divide_eq_0_iff divide_nonneg_nonneg divide_nonpos_nonneg floor_mono mult_mono of_int_le_iff of_nat_0_le_iff of_nat_le_iff real_of_percentage_range(1))
+*)
 
 definition steuerzonen2022 :: "(nat \<times> percentage) list" where
   "steuerzonen2022 \<equiv> [
@@ -228,21 +273,6 @@ lemma bucketsteuerAbs_zonensteuer:
   using wfSteuerbucketsMapD by simp
   
 
-
-definition floor :: "real \<Rightarrow> nat" where
-  "floor x \<equiv> nat \<lfloor>x\<rfloor>"
-
-lemma floorD: "a \<le> b \<Longrightarrow> floor a \<le> floor b"
-  apply(simp add: floor_def)
-  by linarith
-
-lemma floor_minusD:
-  fixes a :: nat and a' :: real
-  shows  "a \<le> b \<Longrightarrow> a - a' \<le> b - b' \<Longrightarrow> a - floor a' \<le> b - floor b'"
-  apply(simp add: floor_def)
-  by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
-        nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
-
 definition einkommenssteuer :: "nat \<Rightarrow> nat" where
   "einkommenssteuer einkommen \<equiv>
     floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) einkommen)"
@@ -266,6 +296,7 @@ lemma einkommenssteuer:
   apply(simp)
   done
 
+(*TODO: geht das ohne immer steuer_defs zu schreiben?*)
 interpretation steuersystem
   where steuer = einkommenssteuer
 proof
@@ -285,7 +316,17 @@ next
     thm floor_minusD
     apply(rule floor_minusD, simp)
     using zonensteuer_leistung_lohnt_sich by simp
+next
+  fix einkommen
+  show "einkommen \<le> 9888 \<Longrightarrow> einkommenssteuer einkommen = 0"
+    by(simp add: einkommenssteuer floor_def steuerzonen2022_def percentage_code)
+(*next
+  fix einkommen_a and einkommen_b
+  show "einkommen_a \<ge> einkommen_b \<Longrightarrow>
+    steuer_defs.steuersatz einkommenssteuer einkommen_a \<ge> steuer_defs.steuersatz einkommenssteuer einkommen_b"
+    apply(simp add: steuer_defs.steuersatz_def einkommenssteuer)
+    (*TODO*)
+*)
 qed
-
 
 end

@@ -62,10 +62,66 @@ lemma real_of_percentage_range:
   "real_of_percentage p \<le> 1"
   by(simp add: percentage_range)+
 
+(*will cause simplifier looping*)
+lemma percentage_min_max_simps:
+    "real_of_percentage p = min 1 p"
+    "real_of_percentage p = max 0 p"
+  by (simp add: percentage_range)+
+
 lemma real_of_percentage_mult:
   "real a * real_of_percentage p \<le> a"
   "real_of_percentage p * real a \<le> a"
   by (simp add: mult.commute mult_left_le percentage_range)+
 
+lemma percentage_percentage_mult_right:
+  fixes a p ::percentage
+  shows "a * p \<le> a"
+  by (simp add: mult_right_le_one_le real_of_percentage_range times_percentage.rep_eq)
+lemma percentage_percentage_mult_left:
+  fixes a p ::percentage
+  shows "p * a \<le> a"
+  by (simp add: mult.commute percentage_percentage_mult_right mult_right_le_one_le percentage_range times_percentage.rep_eq)
+lemma percentage_real_pos_mult_right:
+  fixes p::percentage and a :: real
+  shows "a \<ge> 0 \<Longrightarrow> a * (real_of_percentage p) \<le> a"
+  by (simp add: mult_left_le percentage_range)
+lemma percentage_real_pos_mult_left:
+  fixes p::percentage and a :: real
+  shows "a \<ge> 0 \<Longrightarrow> (real_of_percentage p) * a \<le> a"
+  by (simp add: mult_left_le_one_le percentage_range)
+
+lemma percentage_mult_right_mono:
+  fixes a b p ::percentage
+  shows "a \<le> b \<Longrightarrow> a * p \<le> b * p"
+proof -
+  show "a \<le> b \<Longrightarrow> ?thesis"
+    by (simp add: mult_right_mono real_of_percentage_range(1) times_percentage.rep_eq)
+qed
+
+lemma percentage_real_mult_right_mono:
+  fixes p ::percentage and a b :: real
+  shows "a \<le> b \<Longrightarrow> a * p \<le> b * p"
+proof -
+  show "a \<le> b \<Longrightarrow> ?thesis"
+    by (simp add: mult_right_mono real_of_percentage_range(1) times_percentage.rep_eq)
+qed
+
+lemma percentage_real_diff_mult_right_mono:
+  fixes p::percentage and a b :: real
+  shows "a \<le> b \<Longrightarrow> a - a * (real_of_percentage p) \<le> b - b * (real_of_percentage p)"
+proof -
+  assume a: "a \<le> b"
+  have "0 \<le> b - a" by (simp add: a)
+  hence "(b - a) * real_of_percentage p \<le> b - a"
+    by (simp add: percentage_real_pos_mult_right)
+  with a show ?thesis
+    by (simp add: a left_diff_distrib')
+qed
+
+lemma percentage_nat_diff_mult_right_mono: (*warning: coertion*)
+  fixes p::percentage
+    and a b :: nat
+  shows "a \<le> b \<Longrightarrow> a - a * p \<le> b - b * p"
+  by (simp add: percentage_real_diff_mult_right_mono)
 
 end

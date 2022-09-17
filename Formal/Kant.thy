@@ -95,7 +95,7 @@ subsection \<open>Making it executable\<close>
     apply(rule teste_maxime_exhaust_univ)
     using enum_UNIV by simp
   
-  declare teste_maxime_def[code del] \<comment>\<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
+  declare teste_maxime_def[code del] \<comment> \<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
   
 subsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)

@@ -7,10 +7,16 @@ section\<open>Beispiel: Steuern\<close>
 
 text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
 datatype steuerwelt = Steuerwelt
-        (get_einkommen: "person \<Rightarrow> int") \<comment>\<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
+        (get_einkommen: "person \<Rightarrow> int") \<comment> \<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
 
 fun steuerlast :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
   "steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)"
+
+fun brutto :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
+  "brutto p (Handlung vor nach) = (get_einkommen vor) p"
+fun netto :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
+  "netto p (Handlung vor nach) = (get_einkommen nach) p"
+
 
 text\<open>Default: kein Einkommen. Um Beispiele einfacher zu schreiben.\<close>
 definition KE :: "person \<Rightarrow> int" where
@@ -34,16 +40,21 @@ lemma \<open>mehrverdiener Alice
         (Handlung (Steuerwelt (KE(Alice:=8, Bob:=12, Eve:=7))) (Steuerwelt (KE(Alice:=5))))
        = {Alice, Bob}\<close> by eval
 
-(*TODO: maxime sollte sein, dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
+(*TODO: eine andere test maxime sollte sein, dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
 definition maxime_steuern :: "(person, steuerwelt) maxime" where
   "maxime_steuern \<equiv> Maxime 
       (\<lambda>ich handlung.
-           \<forall>p\<in>mehrverdiener ich handlung. steuerlast ich handlung \<le> steuerlast p handlung)"
-
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)
+          \<and> (\<forall>p\<in>mehrverdiener ich handlung.
+                netto ich handlung \<le> netto p handlung)
+          )"
+  (*do we also need: \<and> steuerlast ich handlung \<le> brutto ich handlung*)
 
 
 fun delta_steuerwelt :: "(steuerwelt, person, int) delta" where
-  "delta_steuerwelt vor nach = Aenderung.delta_num_fun (get_einkommen vor) (get_einkommen nach)"
+  "delta_steuerwelt (Handlung vor nach) =
+      Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))"
 
 definition "sc \<equiv> SimConsts
     Alice
@@ -66,10 +77,9 @@ lemma \<open>beispiel_case_law' (HandlungF (\<lambda>ich welt. welt)) =
 
 text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber?
 Achjaaaaaa, jeder muss ja Steuer zahlen, ....\<close>
-lemma \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-                (get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1)
-    ))) =
+definition "ich_zahle_1_steuer ich welt \<equiv>
+  Steuerwelt ((get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1))"
+lemma \<open>beispiel_case_law (HandlungF ich_zahle_1_steuer) =
   Gesetz
   {(Paragraph 1,
     Rechtsnorm
@@ -77,18 +87,18 @@ lemma \<open>beispiel_case_law
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 3), (Carol, 0), (Eve, 5)]))
      (Rechtsfolge Verbot))}\<close> by eval
-lemma \<open>beispiel_case_law'
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-                (get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1)
-    ))) =
-  Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand [Verliert Alice 1]) (Rechtsfolge Verbot))}\<close> by eval
+lemma \<open>beispiel_case_law' (HandlungF ich_zahle_1_steuer) =
+  Gesetz
+  {(Paragraph 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
+                            (Rechtsfolge Verbot))}\<close> by eval
   
 text\<open>Jeder muss steuern zahlen:
   funktioniert, ist aber doof, denn am Ende sind alle im Minus.
 
 Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
-lemma \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))) =
+definition "jeder_zahle_1_steuer ich welt \<equiv>
+  Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt))"
+lemma \<open>beispiel_case_law (HandlungF jeder_zahle_1_steuer) =
 Gesetz
   {(Paragraph 3,
     Rechtsnorm
@@ -108,21 +118,22 @@ Gesetz
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)]))
      (Rechtsfolge Erlaubnis))}\<close> by eval
-lemma \<open>beispiel_case_law'
-  (HandlungF (\<lambda>ich welt. Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))) =
+lemma \<open>beispiel_case_law' (HandlungF jeder_zahle_1_steuer) =
   Gesetz
   {(Paragraph 1,
-    Rechtsnorm (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
+    Rechtsnorm
+     (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
 text\<open>Jetzt kommt die Steuern.thy ins Spiel.\<close>
 (*wow ist das langsam!*)
 
 text\<open>Bei dem geringen Einkommen zahlt keiner Steuern.\<close>
-lemma \<open>beispiel_case_law
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-        ((\<lambda>e. e - einkommenssteuer e) \<circ> nat \<circ> (get_einkommen welt))
-    ))) = 
+definition "jeder_zahlt steuerberechnung ich welt \<equiv>
+  Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> nat \<circ> (get_einkommen welt))"
+
+definition "jeder_zahlt_einkommenssteuer \<equiv> jeder_zahlt einkommenssteuer"
+lemma \<open>beispiel_case_law (HandlungF jeder_zahlt_einkommenssteuer ) = 
   Gesetz
   {(Paragraph 1,
     Rechtsnorm
@@ -133,9 +144,7 @@ lemma \<open>beispiel_case_law
 
 lemma \<open>simulateOne
   sc' 1
-  (HandlungF (\<lambda>ich welt. Steuerwelt (
-        ((\<lambda>e. e - einkommenssteuer e) \<circ> nat \<circ> (get_einkommen welt))
-    )))
+  (HandlungF jeder_zahlt_einkommenssteuer)
   (Steuerwelt (KE(Alice:=10000, Bob:=14000, Eve:= 20000)))
   (Gesetz {})
   =
@@ -143,4 +152,91 @@ lemma \<open>simulateOne
   {(Paragraph 1,
     Rechtsnorm (Tatbestand [Verliert Bob 511, Verliert Eve 1857])
      (Rechtsfolge Erlaubnis))}\<close> by eval
+
+(*TODO: eigentlich sollte das folgende gelten in beide richtungen:*)
+text\<open>Die Anforderungen fuer ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
+lemma "steuersystem steuersystem_impl \<Longrightarrow>
+        (\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern)"
+   apply(simp add: maxime_steuern_def teste_maxime_unfold)
+   apply(simp add: jeder_zahlt_def bevoelkerung_def)
+   apply(intro allI impI conjI)
+   apply(rename_tac welt p1 p2)
+   thm steuersystem.wer_hat_der_gibt
+   apply(drule_tac
+        einkommen_b="nat (get_einkommen welt p1)" and
+        einkommen_a="nat (get_einkommen welt p2)" in steuersystem.wer_hat_der_gibt)
+    apply(simp; fail)
+   apply(simp; fail)
+  apply(rename_tac welt p1 p2)
+  apply(drule_tac
+        einkommen_b="nat (get_einkommen welt p1)" and
+        einkommen_a="nat (get_einkommen welt p2)" in steuersystem.leistung_lohnt_sich)
+   apply(simp; fail)
+  by (simp add: steuer_defs.netto_def)
+
+lemma "a \<le> x \<Longrightarrow> int x - int (x - a) = a" by simp
+
+(*TODO*)
+text\<open>Danke ihr nats. Macht also keinen Sinn das als Annahme in die Maxime zu packen....\<close>
+lemma steuern_kleiner_einkommen_nat:
+      "steuerlast ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))
+         \<le> brutto ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))"
+  apply(simp del: steuerlast.simps)
+  apply(subst steuerlast.simps)
+  apply(simp add: jeder_zahlt_def)
+  done
+
+(*Braucht ein paar Annahmen.*)
+lemma "(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
+       (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
+        \<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern
+        \<Longrightarrow> steuersystem steuersystem_impl"
+proof
+  fix einkommen_b einkommen_a :: nat
+  assume m: "\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern"
+     and a: "einkommen_b \<le> einkommen_a"
+     and bezahlbar: "\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen"
+  from m have m':
+    "get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
+       get_einkommen welt pA -
+             int (nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA)))
+             \<le> get_einkommen welt pB -
+                int (nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB)))"
+    for welt :: steuerwelt and pA pB :: person
+    by(simp add: maxime_steuern_def teste_maxime_unfold jeder_zahlt_def bevoelkerung_def)
+  from m'[where welt="Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)"
+                and pA=Bob and pB=Alice] a
+  have almost:
+    "int einkommen_b - int (einkommen_b - steuersystem_impl einkommen_b)
+      \<le> int einkommen_a - int (einkommen_a - steuersystem_impl einkommen_a)"
+    by simp
+  from bezahlbar have "steuersystem_impl einkommen_b \<le> einkommen_b" by simp
+  from this almost show "steuersystem_impl einkommen_b \<le> steuersystem_impl einkommen_a"
+    by simp
+next
+  fix einkommen_b einkommen_a :: nat
+  assume m: "\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern"
+     and a: "einkommen_b \<le> einkommen_a"
+  from m have m':
+    "get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
+       nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA))
+       \<le> nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB))"
+    for welt :: steuerwelt and pA pB :: person
+    by(simp add: maxime_steuern_def teste_maxime_unfold jeder_zahlt_def bevoelkerung_def)
+  from m'[where welt="Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)"
+                and pA=Bob and pB=Alice] a
+  have "einkommen_b - steuersystem_impl einkommen_b \<le> einkommen_a - steuersystem_impl einkommen_a"
+    by simp
+  from this show
+    "steuer_defs.netto steuersystem_impl einkommen_b
+      \<le> steuer_defs.netto steuersystem_impl einkommen_a"
+    by(simp add: steuer_defs.netto_def)
+next
+  fix einkommen
+  show "\<forall>einkommen\<le>9888. steuersystem_impl einkommen = 0
+        \<Longrightarrow> einkommen \<le> 9888 \<Longrightarrow> steuersystem_impl einkommen = 0"
+    by simp
+qed
+    
+
 end
