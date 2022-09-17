@@ -4,15 +4,15 @@ begin
 
 section\<open>Gesetz\<close>
 
-datatype 'a tatbestand = Tatbestand 'a
+datatype 'a tatbestand = Tatbestand \<open>'a\<close>
  
-datatype 'a rechtsfolge = Rechtsfolge 'a
+datatype 'a rechtsfolge = Rechtsfolge \<open>'a\<close>
 
-datatype ('a, 'b) rechtsnorm = Rechtsnorm "'a tatbestand" "'b rechtsfolge"
+datatype ('a, 'b) rechtsnorm = Rechtsnorm \<open>'a tatbestand\<close> \<open>'b rechtsfolge\<close>
 
-datatype 'p prg = Paragraph 'p
+datatype 'p prg = Paragraph \<open>'p\<close>
 
-datatype ('p, 'a, 'b) gesetz = Gesetz "('p prg \<times> ('a, 'b) rechtsnorm) set"
+datatype ('p, 'a, 'b) gesetz = Gesetz \<open>('p prg \<times> ('a, 'b) rechtsnorm) set\<close>
 
 (*
 instance (Show a, Show b) => Show (Rechtsnorm a b) where
@@ -48,29 +48,29 @@ value \<open>Gesetz {
 
 
 
-definition max_paragraph :: "nat prg set \<Rightarrow> nat" where
-  [code del]: "max_paragraph ps \<equiv> if card ps = 0 then 0 else Max {p. (Paragraph p)\<in>ps}"
+definition max_paragraph :: \<open>nat prg set \<Rightarrow> nat\<close> where
+  [code del]: \<open>max_paragraph ps \<equiv> if card ps = 0 then 0 else Max {p. (Paragraph p)\<in>ps}\<close>
 
-lemma prg_set_deconstruct: "{p. Paragraph p \<in> ps} = (\<lambda>x. case x of Paragraph p \<Rightarrow> p) ` ps"
+lemma prg_set_deconstruct: \<open>{p. Paragraph p \<in> ps} = (\<lambda>x. case x of Paragraph p \<Rightarrow> p) ` ps\<close>
   apply(rule set_of_constructor)
    apply(simp add: bij_def)
    apply (meson injI prg.exhaust prg.inject surj_def)
   by (metis prg.case prg.exhaust surj_def surj_f_inv_f)
 
 lemma [code_unfold]:
-  "max_paragraph ps = (if card ps = 0 then 0 else Max ((\<lambda>pa. case pa of Paragraph p \<Rightarrow> p) ` ps))"
+  \<open>max_paragraph ps = (if card ps = 0 then 0 else Max ((\<lambda>pa. case pa of Paragraph p \<Rightarrow> p) ` ps))\<close>
   by(simp add: max_paragraph_def prg_set_deconstruct)
   
 lemma \<open>max_paragraph {} = 0\<close> by eval
 lemma \<open>max_paragraph {Paragraph 1, Paragraph 7, Paragraph 2} = 7\<close> by eval
 
-fun neuer_paragraph :: "(nat, 'a, 'b) gesetz \<Rightarrow> nat prg" where
- "neuer_paragraph (Gesetz G) = Paragraph ((max_paragraph (fst ` G)) + 1)"
+fun neuer_paragraph :: \<open>(nat, 'a, 'b) gesetz \<Rightarrow> nat prg\<close> where
+ \<open>neuer_paragraph (Gesetz G) = Paragraph ((max_paragraph (fst ` G)) + 1)\<close>
 
 text\<open>Fügt eine Rechtsnorm als neuen Paragraphen hinzu.\<close>
-fun hinzufuegen :: "('a,'b) rechtsnorm \<Rightarrow> (nat,'a,'b) gesetz \<Rightarrow> (nat,'a,'b) gesetz" where
-  "hinzufuegen rn (Gesetz G) =
-    (if rn \<in> (snd ` G) then Gesetz G else Gesetz (insert (neuer_paragraph (Gesetz G), rn) G))"
+fun hinzufuegen :: \<open>('a,'b) rechtsnorm \<Rightarrow> (nat,'a,'b) gesetz \<Rightarrow> (nat,'a,'b) gesetz\<close> where
+  \<open>hinzufuegen rn (Gesetz G) =
+    (if rn \<in> (snd ` G) then Gesetz G else Gesetz (insert (neuer_paragraph (Gesetz G), rn) G))\<close>
 
 
 text\<open>ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss.\<close>

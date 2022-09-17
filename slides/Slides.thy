@@ -7,7 +7,7 @@ section\<open>Stuff 2\<close>
 text\<open>Foo
   \<^item> bar
   \<^item> baz
-  \<^item> The @{thm teste_maxime_unfold}
+  \<^item> The @{thm[display] teste_maxime_unfold[no_vars]}
 \<close>
 
 end

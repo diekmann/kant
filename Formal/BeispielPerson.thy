@@ -9,14 +9,14 @@ Wir müssen \<^class>\<open>enum\<close> implementieren, damit wür über alle p
 
 datatype person = Alice | Bob | Carol | Eve
 
-lemma UNIV_person: "UNIV = {Alice, Bob, Carol, Eve}"
+lemma UNIV_person: \<open>UNIV = {Alice, Bob, Carol, Eve}\<close>
   by(auto intro:person.exhaust UNIV_eq_I)
 
-instantiation person :: enum
+instantiation person :: \<open>enum\<close>
 begin
-  definition "enum_person \<equiv> [Alice, Bob, Carol, Eve]"
-  definition "enum_all_person P \<longleftrightarrow> P Alice \<and> P Bob \<and> P Carol \<and> P Eve"
-  definition "enum_ex_person P \<longleftrightarrow> P Alice \<or> P Bob \<or> P Carol \<or> P Eve"
+  definition \<open>enum_person \<equiv> [Alice, Bob, Carol, Eve]\<close>
+  definition \<open>enum_all_person P \<longleftrightarrow> P Alice \<and> P Bob \<and> P Carol \<and> P Eve\<close>
+  definition \<open>enum_ex_person P \<longleftrightarrow> P Alice \<or> P Bob \<or> P Carol \<or> P Eve\<close>
 
 instance proof
   qed (simp_all only: enum_person_def enum_all_person_def enum_ex_person_def UNIV_person, simp_all)

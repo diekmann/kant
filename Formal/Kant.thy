@@ -19,12 +19,12 @@ TODO: ich sollte Maxime als axiom betrachten.
    \<forall>p\<in>{p \<in> dom (einkommen::person \<Rightarrow> int option). einkommen p \<ge> ich}
     wenn person::enum dann sollte auch `dom einkommen`:: enum
 *)
-datatype ('person, 'world) maxime = Maxime "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
+datatype ('person, 'world) maxime = Maxime \<open>'person \<Rightarrow> 'world handlung \<Rightarrow> bool\<close>
                                  (*          ich    -> Auswirkung      -> gut/böse  *)
 
 text\<open>Beispiel\<close>
-definition maxime_mir_ist_alles_recht :: "('person, 'world) maxime" where
-  "maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)"
+definition maxime_mir_ist_alles_recht :: \<open>('person, 'world) maxime\<close> where
+  \<open>maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)\<close>
 
 (*
 TODO: in einer Maxime darf keine konkrete Person hardcoded sein.
@@ -40,45 +40,45 @@ Faktisch: Kreuzprodukt Bevölkerung x Bevölkerung,
           wobei jeder einmal als handelnde Person auftritt
           und einmal als betroffene Person (durch Auswertung der Maxime).
 \<close>
-definition bevoelkerung :: "'person set" where "bevoelkerung \<equiv> UNIV"
+definition bevoelkerung :: \<open>'person set\<close> where \<open>bevoelkerung \<equiv> UNIV\<close>
 definition wenn_jeder_so_handelt
-    :: "'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('world handlung) set"
+    :: \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('world handlung) set\<close>
   where
-    "wenn_jeder_so_handelt welt handlung \<equiv>
-      (\<lambda>handelnde_person. handeln handelnde_person welt handlung) ` bevoelkerung"
+    \<open>wenn_jeder_so_handelt welt handlung \<equiv>
+      (\<lambda>handelnde_person. handeln handelnde_person welt handlung) ` bevoelkerung\<close>
 fun was_wenn_jeder_so_handelt_aus_sicht_von
-    :: "'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> bool"
+    :: \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
-    "was_wenn_jeder_so_handelt_aus_sicht_von welt handlung (Maxime m) betroffene_person =
-        (\<forall> h \<in> wenn_jeder_so_handelt welt handlung. m betroffene_person h)"
+    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt handlung (Maxime m) betroffene_person =
+        (\<forall> h \<in> wenn_jeder_so_handelt welt handlung. m betroffene_person h)\<close>
 (*forall person world. (Enum person, Bounded person)*)
 (*
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
   Zu untersuchende Handlung
 *)
 definition teste_maxime ::
-  "'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool" where
-"teste_maxime welt handlung maxime \<equiv>
-  \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlung maxime p"
+  \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
+\<open>teste_maxime welt handlung maxime \<equiv>
+  \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlung maxime p\<close>
 
 lemma teste_maxime_unfold:
-  "teste_maxime welt handlung (Maxime m) =
-        (\<forall>p\<in>bevoelkerung. \<forall>x\<in>bevoelkerung. m p (handeln x welt handlung))"
+  \<open>teste_maxime welt handlung (Maxime m) =
+        (\<forall>p\<in>bevoelkerung. \<forall>x\<in>bevoelkerung. m p (handeln x welt handlung))\<close>
   by(simp add: teste_maxime_def wenn_jeder_so_handelt_def)
-lemma "teste_maxime welt handlung (Maxime m) =
-        (\<forall>(p,x)\<in>bevoelkerung\<times>bevoelkerung. m p (handeln x welt handlung))"
+lemma \<open>teste_maxime welt handlung (Maxime m) =
+        (\<forall>(p,x)\<in>bevoelkerung\<times>bevoelkerung. m p (handeln x welt handlung))\<close>
   unfolding teste_maxime_unfold by simp
 
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
 definition teste_maxime_exhaust where
-  "teste_maxime_exhaust bevoelk welt handlung maxime \<equiv>
+  \<open>teste_maxime_exhaust bevoelk welt handlung maxime \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
-      list_all (\<lambda>(p,x). m p (handeln x welt handlung)) (List.product bevoelk bevoelk))"
+      list_all (\<lambda>(p,x). m p (handeln x welt handlung)) (List.product bevoelk bevoelk))\<close>
 
-lemma teste_maxime_exhaust_univ: "set b = (UNIV::'person set) \<Longrightarrow>
-        teste_maxime welt handlung maxime = teste_maxime_exhaust b welt handlung maxime"
-  apply(case_tac maxime, rename_tac m, simp)
+lemma teste_maxime_exhaust_univ: \<open>set b = (UNIV::'person set) \<Longrightarrow>
+        teste_maxime welt handlung maxime = teste_maxime_exhaust b welt handlung maxime\<close>
+  apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
   unfolding teste_maxime_unfold teste_maxime_exhaust_def bevoelkerung_def
   apply(simp)
   by(simp add: list_all_iff)
@@ -89,7 +89,7 @@ subsection \<open>Making it executable\<close>
     but
     teste_maxime_exhaust (enum) needs [code]
     ? ? ?*)
-  lemma teste_maxime_exhaust [code]: "teste_maxime = teste_maxime_exhaust enum_class.enum"
+  lemma teste_maxime_exhaust [code]: \<open>teste_maxime = teste_maxime_exhaust enum_class.enum\<close>
     apply(simp add: fun_eq_iff)
     apply(rule allI)+
     apply(rule teste_maxime_exhaust_univ)
@@ -139,7 +139,7 @@ TODO: Nur aus einer von außen betrachteten Handlung
       wird es schwer ein allgemeines Gesetz abzuleiten.
 \<close>
 type_synonym ('world, 'a, 'b) allgemeines_gesetz_ableiten =
-  "'world handlung \<Rightarrow> sollensanordnung \<Rightarrow> ('a, 'b) rechtsnorm"
+  \<open>'world handlung \<Rightarrow> sollensanordnung \<Rightarrow> ('a, 'b) rechtsnorm\<close>
 
 
 text\<open>
@@ -164,10 +164,10 @@ text\<open>Parameter
    \<^typ>\<open>(nat, 'a, 'b) gesetz\<close>: Soll das allgemeine Gesetz entsprechend angepasst werden?
 \<close>
 definition kategorischer_imperativ ::
-  "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow>
+  \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow>
   ('person, 'world) maxime \<Rightarrow> ('world, 'a, 'b) allgemeines_gesetz_ableiten \<Rightarrow>
   (nat, 'a, 'b) gesetz
-  \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)" where
+  \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close> where
   (*TODO: Wenn unsere Maximen perfekt und die Maximen aller Menschen konsisten sind,
         soll das Gesetz nur erweitert werden.*)
 (*
@@ -177,7 +177,7 @@ definition kategorischer_imperativ ::
   -- Es fehlt: "Wollen"
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 *)
-"kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz \<equiv>
+\<open>kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz \<equiv>
   let soll_handeln = if teste_maxime welt handlung maxime
                      then
                        Erlaubnis
@@ -187,7 +187,7 @@ definition kategorischer_imperativ ::
       soll_handeln,
       hinzufuegen (gesetz_ableiten (handeln ich welt handlung) soll_handeln) gesetz
     )
-  "
+  \<close>
 
 
 end
