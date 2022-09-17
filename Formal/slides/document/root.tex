@@ -1,0 +1,76 @@
+% from https://makarius.sketis.net/repos/Virtual-Haifa2022
+\makeatletter
+
+\documentclass[a4paper,landscape]{foils}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{isabelle,isabellesym}
+\usepackage{amssymb}
+\usepackage[svgnames]{xcolor}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{ifthen}
+\usepackage{proof}
+\usepackage{geometry}
+\usepackage{pdfsetup}
+
+\hyphenation{Isabelle}
+
+\frenchspacing
+\raggedbottom
+
+\isadroptag{theory}
+
+\urlstyle{sf}
+\isabellestyle{literal}
+\MyLogo{}
+
+\newcommand{\titlestyle}{\color{DarkGreen}}
+\newcommand{\hilitecolor}{\color{Blue}}
+\newcommand{\hilite}[1]{{\hilitecolor#1}}
+\newcommand{\red}[1]{{\color{Red}#1}}
+\newcommand{\green}[1]{{\color{DarkGreen}#1}}
+
+\newcommand{\isactrlvec}[1]{\emph{$\overline{#1}$}}
+
+\newcommand{\smaller}{\def\isastyle{\small\it}\small}
+\newcommand{\Smaller}{\def\isastyle{\footnotesize\it}\footnotesize}
+
+\renewcommand{\isadigit}[1]{\isamath{#1}}
+
+\newcommand{\isasymvartheta}{\isamath{\,\theta}}
+
+\renewcommand{\isamarkupchapter}[1]{\newpage\thispagestyle{empty}\MyLogo{\let\\=\relax #1}\vspace*{0.4\textheight}\begin{center}\LARGE\bf\color{DarkGreen} #1\end{center}}
+\renewcommand{\isamarkupsection}[1]{\foilhead{\color{DarkGreen}#1}}
+\renewcommand\isamarkupparagraph{\@startsection{paragraph}{4}%
+{0pt}{\bigskipamount}{0.5ex \@plus .1ex}{\normalsize\bf\color{DarkBlue}}}
+\newcommand{\plainstyle}{\normalsize\sf\color{black}}
+\renewcommand{\isastyletext}{\normalsize\sf}
+\renewcommand{\isastyletxt}{\sf}
+\renewcommand{\isastylecmt}{\sf}
+
+\parindent 0pt\parskip 0.5ex
+
+\renewcommand\@listIa{\leftmargin\leftmargini
+\topsep 0\p@ \@plus 0.5\p@ \@minus 1\p@
+\parsep 2\p@ \@plus 1\p@ \@minus 1\p@
+\itemsep 2\p@ \@plus 1\p@ \@minus 0.5\p@}
+
+\makeatother
+
+
+\begin{document}
+
+\title{\titlestyle Stuff}
+\author{Cornelius Diekmann}
+\date{\today{}}
+\maketitle
+
+\vfill
+\begin{center}
+  \includegraphics[width=0.25\textwidth]{isabelle_logo}
+\end{center}
+
+\input{session}
+
+\end{document}
