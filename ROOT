@@ -10,7 +10,7 @@ session Slides in slides = HOL +
     "../Formal/Gesetz"
     "../Formal/Handlung"
     "../Formal/Kant"
-  theories
+  theories [show_question_marks = false]
     Slides
   document_files
     "root.tex"
