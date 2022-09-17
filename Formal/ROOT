@@ -12,7 +12,7 @@ session Kant = HOL +
     "root.tex"
 
 
-session Slides in slides = Kant +
+session Slides in slides = Kant + (*or include via `sessions` command?*)
   (*pass document=pdf via iabelle build command line *)
   options [document_output = "output", document_echo, document_logo = "_"]
   theories
