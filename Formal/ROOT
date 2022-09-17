@@ -1,5 +1,5 @@
 session Kant = HOL +
-  (*add document = pdf to build the pdf*)
+  (*pass document=pdf via iabelle build command line *)
   options [document_output = "output"]
   theories [document = false]
     ExecutableHelper
@@ -8,14 +8,5 @@ session Kant = HOL +
     Kant
     BeispielZahlenwelt
     BeispielSteuern
-  document_files
-    "root.tex"
-
-
-session Slides in slides = Kant +
-  (*TODO: need document=pdf but make browserinfo does not like this *)
-  options [document_output = "output", document_echo, document_logo = "_"]
-  theories
-    Slides
   document_files
     "root.tex"
