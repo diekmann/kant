@@ -1,12 +1,21 @@
 session Kant = HOL +
   (*add document = pdf to build the pdf*)
-  options [browser_info, document_output = "output"]
-theories [document = false]
+  options [document_output = "output"]
+  theories [document = false]
     ExecutableHelper
   theories
     Gesetz
     Kant
     BeispielZahlenwelt
     BeispielSteuern
+  document_files
+    "root.tex"
+
+
+session Slides in slides = Kant +
+  (*TODO: need document=pdf but make browserinfo does not like this *)
+  options [document_output = "output", document_echo, document_logo = "_"]
+  theories
+    Slides
   document_files
     "root.tex"
