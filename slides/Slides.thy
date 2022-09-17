@@ -1,5 +1,5 @@
 theory Slides
-  imports Main Kant.Kant (*wie lade ich das mit dem heap image im editor?*)
+  imports Main "../Formal/Kant" (*wie lade ich das mit dem heap image im editor?*)
 begin
 
 chapter\<open>Stuff\<close>
