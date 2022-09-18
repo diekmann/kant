@@ -1,6 +1,6 @@
 session Kant = HOL +
   (*pass document=pdf via iabelle build command line *)
-  options [document_output = "output"]
+  options [document_output="output", document_variants="outline=/proof,/ML"]
   theories [document = false]
     ExecutableHelper
   theories
