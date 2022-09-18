@@ -3,15 +3,19 @@ imports Main
 begin
 
 section\<open>Beispiel Person\<close>
-text\<open>Eine Beispielbevölkerung.
-Wir müssen \<^class>\<open>enum\<close> implementieren, damit wür über alle persosn iterieren können.
-\<close>
+text\<open>Eine Beispielbevölkerung.\<close>
 
 datatype person = Alice | Bob | Carol | Eve
 
+text\<open>Unsere Bevölkerung ist sehr endlich:\<close>
 lemma UNIV_person: \<open>UNIV = {Alice, Bob, Carol, Eve}\<close>
   by(auto intro:person.exhaust UNIV_eq_I)
 
+(*<*)
+text\<open>
+Technisch müssen wir \<^class>\<open>enum\<close> implementieren, damit wir über alle Personen iterieren können.
+Ansonsten würden nur Beweise funktionieren, aber keine ausführbaren Beispiele.
+\<close>
 instantiation person :: \<open>enum\<close>
 begin
   definition \<open>enum_person \<equiv> [Alice, Bob, Carol, Eve]\<close>
@@ -28,5 +32,6 @@ lemma \<open>dom [Alice \<mapsto> (3::nat), Carol \<mapsto> 6] = {Alice, Carol}\
 (*TODO: use https://www.isa-afp.org/entries/Generic_Deriving.html to get a linorder?
 value "sorted_list_of_set {Alice, Carol}"
 *)
+(*>*)
 
 end

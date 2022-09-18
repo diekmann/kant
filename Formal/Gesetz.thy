@@ -3,6 +3,7 @@ imports Main ExecutableHelper
 begin
 
 section\<open>Gesetz\<close>
+text\<open>Definiert einen Datentyp um Gesetzestext zu modellieren.\<close>
 
 datatype 'a tatbestand = Tatbestand \<open>'a\<close>
  
@@ -26,7 +27,7 @@ instance (Show p, Show a, Show b) => Show (Gesetz p a b) where
 
 *)
 
-text\<open>From \<^url>\<open>https://de.wikipedia.org/wiki/Rechtsfolge\<close>\<close>
+text\<open>Beispiel, von \<^url>\<open>https://de.wikipedia.org/wiki/Rechtsfolge\<close>:\<close>
 value \<open>Gesetz {
   (Paragraph ''823 BGB'',
    Rechtsnorm
@@ -47,7 +48,7 @@ value \<open>Gesetz {
   }\<close>
 
 
-
+(*<*)
 definition max_paragraph :: \<open>nat prg set \<Rightarrow> nat\<close> where
   [code del]: \<open>max_paragraph ps \<equiv> if card ps = 0 then 0 else Max {p. (Paragraph p)\<in>ps}\<close>
 
@@ -63,20 +64,22 @@ lemma [code_unfold]:
   
 lemma \<open>max_paragraph {} = 0\<close> by eval
 lemma \<open>max_paragraph {Paragraph 1, Paragraph 7, Paragraph 2} = 7\<close> by eval
+(*>*)
 
 fun neuer_paragraph :: \<open>(nat, 'a, 'b) gesetz \<Rightarrow> nat prg\<close> where
  \<open>neuer_paragraph (Gesetz G) = Paragraph ((max_paragraph (fst ` G)) + 1)\<close>
 
-text\<open>Fügt eine Rechtsnorm als neuen Paragraphen hinzu.\<close>
+text\<open>Fügt eine Rechtsnorm als neuen Paragraphen hinzu:\<close>
 fun hinzufuegen :: \<open>('a,'b) rechtsnorm \<Rightarrow> (nat,'a,'b) gesetz \<Rightarrow> (nat,'a,'b) gesetz\<close> where
   \<open>hinzufuegen rn (Gesetz G) =
     (if rn \<in> (snd ` G) then Gesetz G else Gesetz (insert (neuer_paragraph (Gesetz G), rn) G))\<close>
 
 
-text\<open>ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss.\<close>
+text\<open>Moelliert ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss:\<close>
 datatype sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
 
 
+text\<open>Beispiel:\<close>
 lemma \<open>hinzufuegen
         (Rechtsnorm (Tatbestand ''tb2'') (Rechtsfolge Verbot))
         (Gesetz {(Paragraph 1, (Rechtsnorm (Tatbestand ''tb1'') (Rechtsfolge Erlaubnis)))}) =
