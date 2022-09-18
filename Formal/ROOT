@@ -4,6 +4,7 @@ session Kant = HOL +
   theories [document = false]
     ExecutableHelper
   theories
+    Disclaimer
     Gesetz
     Kant
     BeispielZahlenwelt
