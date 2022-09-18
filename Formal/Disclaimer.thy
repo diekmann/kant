@@ -11,6 +11,7 @@ Ich habe
 
 Und in dieser Session werden ich all das zusammenwerfen.
 
+\<^bigskip>
   Cheers!
 \<close>
 
