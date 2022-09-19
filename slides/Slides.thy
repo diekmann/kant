@@ -2,6 +2,14 @@ theory Slides
   imports Main "../Formal/Kant" "../Formal/Steuern"
 begin
 
+section\<open>Wie ein Gesetz entsteht\<close>
+(*https://www.bpb.de/themen/politisches-system/24-deutschland/40463/wie-ein-gesetz-entsteht/*)
+text_raw\<open>
+  \begin{center}
+    \includegraphics[height=0.8\textheight]{bpbgesetz}
+  \end{center}
+\<close>
+
 (*chapter\<open>Stuff\<close>*)
 section\<open>Stuff 2\<close>
 text\<open>Foo

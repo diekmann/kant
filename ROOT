@@ -14,7 +14,8 @@ session Slides in slides = HOL +
     "../Formal/Kant"
     "../Formal/Steuern"
   theories [show_question_marks = false]
-    Disclaimer
+    "../Formal/Disclaimer"
     Slides
   document_files
     "root.tex"
+    "bpbgesetz.pdf"

@@ -10,4 +10,5 @@ session Kant = HOL +
     BeispielZahlenwelt
     BeispielSteuern
   document_files
+    "420px-Kant.png"
     "root.tex"
