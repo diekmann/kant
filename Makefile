@@ -1,4 +1,4 @@
-ISABELLE = /home/corny/Downloads/Isabelle2021-1/bin/isabelle
+ISABELLE = /home/corny/Downloads/Isabelle2022-RC2/bin/isabelle
 
 
 pdf:

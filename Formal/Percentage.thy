@@ -2,6 +2,8 @@ theory Percentage
   imports HOL.Real
 begin
 
+section\<open>Implementation Detail: Percentage Type\<close>
+
 (*thx pruvisto!*)
 typedef percentage = "{0..(1::real)}"
   morphisms real_of_percentage Abs_percentage

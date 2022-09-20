@@ -3,7 +3,8 @@ session Kant = HOL +
   options [document_output="output", document_build = "pdflatex", document_variants="outline=-proof,-ML"]
   theories [document = false]
     ExecutableHelper
-  theories
+    Percentage
+  theories [show_question_marks = false]
     Disclaimer
     Gesetz
     Kant
