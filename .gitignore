@@ -1,2 +1,5 @@
 *.thy~
 ROOT~
+Formal/output/
+slides/output/
+
