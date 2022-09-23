@@ -117,4 +117,19 @@ lemma \<open>simulateOne
    (Paragraph 1, Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))}\<close>
   by eval
 
+
+text\<open>Eine Iteration der Simulation liefert genau einen Paragraphen im Gesetz:\<close>
+lemma \<open>\<exists>tb rf. 
+  simulateOne
+    (SimConsts person maxime gesetz_ableiten)
+    1 handlungF
+    initialwelt
+    (Gesetz {})
+  = Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>
+  apply(simp add: simulateOne_def kategorischer_imperativ_def)
+  apply(case_tac maxime, simp)
+  apply(simp add: teste_maxime_unfold max_paragraph_def)
+  apply(intro conjI impI)
+  by(metis rechtsfolge.exhaust rechtsnorm.exhaust tatbestand.exhaust)+
+  
 end
