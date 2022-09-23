@@ -74,7 +74,7 @@ wobei jeder einmal als handelnde Person auftritt und einmal als betroffene Perso
 \<close>
 lemma teste_maxime_unfold:
   \<open>teste_maxime welt handlung (Maxime m) =
-        (\<forall>p\<in>bevoelkerung. \<forall>x\<in>bevoelkerung. m p (handeln x welt handlung))\<close>
+        (\<forall>p1\<in>bevoelkerung. \<forall>p2\<in>bevoelkerung. m p1 (handeln p2 welt handlung))\<close>
   by(simp add: teste_maxime_def wenn_jeder_so_handelt_def)
 lemma \<open>teste_maxime welt handlung (Maxime m) =
         (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlung))\<close>
@@ -115,6 +115,46 @@ Wenn \<^typ>\<open>'person\<close> aufzählbar ist haben wir ausführbaren Code:
 wobei @{const teste_maxime_exhaust} implementiert ist als @{thm teste_maxime_exhaust_def}.
 \<close>
 
+subsubsection\<open>Maximen Debugging\<close>
+text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
+Maxime verletzt ist:\<close>
+datatype ('person, 'world) verletzte_maxime = 
+  VerletzteMaxime
+    \<open>'person\<close> \<comment>\<open>verletzt für; das Opfer\<close>
+    \<open>'person\<close> \<comment>\<open>handelnde Person; der Täter\<close>
+    \<open>'world handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
+
+text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
+fun debug_maxime
+  :: "('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
+      ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime
+      \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
+where
+  "debug_maxime print_world welt handlung (Maxime m) =
+    {VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)) | p1 p2.
+      \<not>m p1 (handeln p2 welt handlung)}"
+
+
+text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
+lemma "debug_maxime print_world welt handlung maxime = {} \<longleftrightarrow> teste_maxime welt handlung maxime"
+  apply(case_tac maxime, rename_tac m, simp)
+  by(simp add: teste_maxime_unfold bevoelkerung_def)
+
+(*<*)
+definition debug_maxime_exhaust where
+  \<open>debug_maxime_exhaust bevoelk print_world welt handlung maxime \<equiv>
+    (case maxime of (Maxime m) \<Rightarrow> 
+      map (\<lambda>(p1,p2). VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)))
+        (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt handlung)) (List.product bevoelk bevoelk)))\<close>
+
+lemma debug_maxime_exhaust [code]:
+  \<open>debug_maxime print_world welt handlung maxime
+    = set (debug_maxime_exhaust enum_class.enum print_world welt handlung maxime)\<close>
+  apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
+  apply(simp add: debug_maxime_exhaust_def enum_UNIV)
+  by(simp add: image_Collect)
+(*>*)
+
 subsubsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
 
@@ -142,6 +182,15 @@ lemma \<open>teste_maxime
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
+lemma \<open>debug_maxime show_map
+            [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Maxime (\<lambda>person handlung.
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+  = {}\<close>
+  by eval
+
+
 text\<open>Wenn nun \<^const>\<open>Bob\<close> allerdings bereits 4 hat, würde die obige Handlung ein Verlust
 für ihn bedeuten und die Maxime ist nicht erfüllt.\<close>
 lemma \<open>\<not> teste_maxime
@@ -150,47 +199,74 @@ lemma \<open>\<not> teste_maxime
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
-
+lemma \<open>debug_maxime show_map
+            [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Maxime (\<lambda>person handlung.
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+  = {VerletzteMaxime Bob Bob
+     (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
+               [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
+  by eval
 
 
 subsection\<open>Allgemeines Gesetz Ableiten\<close>
 
-text\<open>Versuch ein allgemeines Gesetz abzuleiten:
-TODO: Nur aus einer von außen betrachteten Handlung
-      und einer Entscheidung ob diese Handlung ausgeführt werden soll
-      wird es schwer ein allgemeines Gesetz abzuleiten.
+text\<open>Wir wollen implementieren:
+
+\<^emph>\<open>„Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
+   dass sie ein \<^bold>\<open>allgemeines Gesetz\<close> werde.“\<close>
+
+Für eine gebene Welt haben wir schon eine Handlung nach einer Maxime untersucht:
+\<^term>\<open>teste_maxime::'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+
+Das Ergebnis sagt uns ob diese Handlung gut oder schlecht ist.
+Basierend darauf müssen wir nun ein allgemeines Gesetz ableiten.
+
+Ich habe keine Ahnung wie das genau funktionieren soll, deswegen schreibe ich
+einfach nur in einer Typsignatir auf, was yu tun ist:
+
+Gegeben:
+  \<^item> \<^typ>\<open>'world handlung\<close>: Die Handlung
+  \<^item> \<^typ>\<open>sollensanordnung\<close>: Das Ergebnis der moralischen Bewertung, ob die Handlung gut/schlecht.
+
+Gesucht:
+  \<^item> \<^typ>\<open>('a, 'b) rechtsnorm\<close>: ein allgemeines Gesetz
 \<close>
+
 type_synonym ('world, 'a, 'b) allgemeines_gesetz_ableiten =
   \<open>'world handlung \<Rightarrow> sollensanordnung \<Rightarrow> ('a, 'b) rechtsnorm\<close>
 
+text\<open>
+Soviel vorweg:
+Nur aus einer von außen betrachteten Handlung
+und einer Entscheidung ob diese Handlung ausgeführt werden soll
+wird es schwer ein allgemeines Gesetz abzuleiten.
+\<close>
+(*TODO: waere hier ('person, 'world) handlungF anstatt 'world handlung besser?*)
 
 subsection\<open>Implementierung Kategorischer Imperativ.\<close>
-text\<open>
-
-Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
-dass sie ein allgemeines Gesetz werde.
-
-\<close>
 (*TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?*)
-text\<open>Parameter
+text\<open>Und nun werfen wir alles zuammen:
 
+\<^emph>\<open>„Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
+   dass sie ein allgemeines Gesetz werde.“\<close>
+
+
+Eingabe:
  \<^item> \<^typ>\<open>'person\<close>: handelnde Person
  \<^item> \<^typ>\<open>'world\<close>: Die Welt in ihrem aktuellen Zustand
  \<^item> \<^typ>\<open>('person, 'world) handlungF\<close>: Eine mögliche Handlung,
     über die wir entscheiden wollen ob wir sie ausführen sollten.
- \<^item> \<^typ>\<open>('person, 'world) maxime\<close>: Persönliche Ethik?
+ \<^item> \<^typ>\<open>('person, 'world) maxime\<close>: Persönliche Ethik.
  \<^item> \<^typ>\<open>('world, 'a, 'b) allgemeines_gesetz_ableiten\<close>:
     wenn man keinen Plan hat wie man sowas implementiert, einfach als Eingabe annehmen.
- \<^item> \<^typ>\<open>(nat, 'a, 'b) gesetz\<close>: Allgemeines Gesetz (für alle Menschen)
-  Ergebnis:
+ \<^item> \<^typ>\<open>(nat, 'a, 'b) gesetz\<close>: Initiales allgemeines Gesetz (normalerweise am Anfang leer).
+
+Ausgabe:
    \<^typ>\<open>sollensanordnung\<close>: Sollen wir die Handlung ausführen?
    \<^typ>\<open>(nat, 'a, 'b) gesetz\<close>: Soll das allgemeine Gesetz entsprechend angepasst werden?
 \<close>
-definition kategorischer_imperativ ::
-  \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow>
-  ('person, 'world) maxime \<Rightarrow> ('world, 'a, 'b) allgemeines_gesetz_ableiten \<Rightarrow>
-  (nat, 'a, 'b) gesetz
-  \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close> where
   (*TODO: Wenn unsere Maximen perfekt und die Maximen aller Menschen konsisten sind,
         soll das Gesetz nur erweitert werden.*)
 (*
@@ -200,17 +276,26 @@ definition kategorischer_imperativ ::
   -- Es fehlt: "Wollen"
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 *)
-\<open>kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz \<equiv>
-  let soll_handeln = if teste_maxime welt handlung maxime
-                     then
-                       Erlaubnis
-                     else
-                       Verbot in
-    (
-      soll_handeln,
-      hinzufuegen (gesetz_ableiten (handeln ich welt handlung) soll_handeln) gesetz
-    )
-  \<close>
+
+definition kategorischer_imperativ ::
+  \<open>'person \<Rightarrow>
+   'world \<Rightarrow>
+   ('person, 'world) handlungF \<Rightarrow>
+   ('person, 'world) maxime \<Rightarrow>
+   ('world, 'a, 'b) allgemeines_gesetz_ableiten \<Rightarrow>
+   (nat, 'a, 'b) gesetz
+  \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
+where
+  \<open>kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz \<equiv>
+    let soll_handeln = if teste_maxime welt handlung maxime
+                       then
+                         Erlaubnis
+                       else
+                         Verbot in
+      (
+        soll_handeln,
+        hinzufuegen (gesetz_ableiten (handeln ich welt handlung) soll_handeln) gesetz
+      )\<close>
 
 
 end

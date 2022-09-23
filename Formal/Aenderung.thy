@@ -2,7 +2,7 @@ theory Aenderung
 imports Main ExecutableHelper BeispielPerson Handlung
 begin
 
-section\<open>Aenderungen in Welten\<close>
+section\<open>Änderungen in Welten\<close>
 
 datatype ('person, 'etwas) aenderung = Verliert 'person 'etwas | Gewinnt 'person 'etwas
 

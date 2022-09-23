@@ -3,15 +3,22 @@ imports Gesetz Handlung Kant
 begin
 
 section\<open>Simulation\<close>
+text\<open>Gegeben eine handelnde Person und eine Maxime,
+wir wollen simulieren was für ein allgemeines Gesetz abgeleitet werden könnte.\<close>
 
-datatype ('person, 'world, 'a, 'b) simulation_constants  = SimConsts
+
+datatype ('person, 'world, 'a, 'b) simulation_constants = SimConsts
     'person \<comment> \<open>handelnde Person\<close>
-    (*moeglich :: H.Handlung world -> Bool, -- brauch ich das oder geht das mit typen?*)
     "('person, 'world) maxime"
     "('world, 'a, 'b) allgemeines_gesetz_ableiten"
 
+    (*moeglich :: H.Handlung world -> Bool, -- brauch ich das oder geht das mit typen?*)
 
-text\<open>simulate one \<^typ>\<open>('person, 'world) handlungF\<close> once\<close>
+
+text\<open>...\<close>
+(*<*)
+
+text\<open>Simulate one \<^typ>\<open>('person, 'world) handlungF\<close> once:\<close>
 fun simulate_handlungF
     :: "('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
         ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
@@ -73,8 +80,25 @@ definition simulateOne
     "simulateOne simconsts i h w g \<equiv>
       let (welt, gesetz) = converge (simulate_handlungF simconsts h) i w g in
             gesetz"
+(*>*)
+text\<open>...
+Die Funktion \<^const>\<open>simulateOne\<close> nimmt
+eine Konfiguration \<^typ>\<open>('person, 'world, 'a, 'b) simulation_constants\<close>,
+eine Anzahl an Iterationen die durchgeführt werden sollen,
+eine Handlung,
+eine Initialwelt,
+ein Initialgesetz,
+und gibt das daraus resultierende Gesetz nach so vielen Iterationen zurück.
 
-text\<open>Example: Count 32..42\<close>
+
+Beispiel:
+Wir nehmen die mir-ist-alles-egal Maxime.
+Wir leiten ein allgemeines Gesetz ab indem wir einfach nur die Handlung wörtlich ins Gesetz
+übernehmen.
+Wir machen \<^term>\<open>10\<close> Iterationen.
+Die Welt ist nur eine Zahl und die initiale Welt sei \<^term>\<open>32\<close>.
+Die Handlung ist es diese Zahl um Eins zu erhöhen,
+Das Ergebnis der Simulation ist dann, dass wir einfach von \<^term>\<open>32\<close> bis \<^term>\<open>42\<close> zählen.\<close>
 lemma \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
         10 (HandlungF (\<lambda>p n. Suc n))
@@ -93,4 +117,18 @@ lemma \<open>simulateOne
    (Paragraph 1, Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))}\<close>
   by eval
 
+
+text\<open>Eine Iteration der Simulation liefert genau einen Paragraphen im Gesetz:\<close>
+lemma \<open>\<exists>tb rf. 
+  simulateOne
+    (SimConsts person maxime gesetz_ableiten)
+    1 handlungF
+    initialwelt
+    (Gesetz {})
+  = Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>
+  apply(simp add: simulateOne_def kategorischer_imperativ_def)
+  apply(case_tac maxime, simp)
+  apply(simp add: teste_maxime_unfold max_paragraph_def)
+  apply(intro conjI impI)
+  by(metis rechtsfolge.exhaust rechtsnorm.exhaust tatbestand.exhaust)+
 end

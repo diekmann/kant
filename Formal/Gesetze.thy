@@ -3,13 +3,15 @@ imports Gesetz Kant Aenderung
 begin
 
 section\<open>Gesetze\<close>
+text\<open>Wir implementieren Strategien um \<^typ>\<open>('world, 'a, 'b) allgemeines_gesetz_ableiten\<close>
+zu implementieren.\<close>
 
-subsection\<open>Case Law\<close>
+subsection\<open>Case Law Absolut\<close>
 
 text\<open>
-Gesetz beschreibt: (wenn vorher, wenn nachher) dann Erlaubt/Verboten,
+Gesetz beschreibt: wenn (vorher, nachher) dann Erlaubt/Verboten,
                     wobei vorher/nachher die Welt beschreiben.
-Paragraphen sind einfache \<^typ>\<open>nat\<close>\<close>
+Paragraphen sind einfache natürliche Zahlen.\<close>
 type_synonym 'world case_law = "(nat, ('world \<times> 'world), sollensanordnung) gesetz"
 
 text\<open>
@@ -29,9 +31,10 @@ definition printable_case_law_ableiten_absolut
   where
   "printable_case_law_ableiten_absolut print_world h \<equiv>
       case_law_ableiten_absolut (map_handlung print_world h)"
-  
 
-text\<open>Case Law etwas besser, wir zeigen nur die Änderung.\<close>
+subsection\<open>Case Law Relativ\<close>
+
+text\<open>Case Law etwas besser, wir zeigen nur die Änderungen der Welt.\<close>
 fun case_law_ableiten_relativ
     :: "('world handlung \<Rightarrow> (('person, 'etwas) aenderung) list)
         \<Rightarrow> ('world, (('person, 'etwas) aenderung) list, sollensanordnung)
