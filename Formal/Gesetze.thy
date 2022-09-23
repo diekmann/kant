@@ -9,9 +9,9 @@ zu implementieren.\<close>
 subsection\<open>Case Law Absolut\<close>
 
 text\<open>
-Gesetz beschreibt: (wenn vorher, wenn nachher) dann Erlaubt/Verboten,
+Gesetz beschreibt: wenn (vorher, nachher) dann Erlaubt/Verboten,
                     wobei vorher/nachher die Welt beschreiben.
-Paragraphen sind einfache \<^typ>\<open>nat\<close>\<close>
+Paragraphen sind einfache natürliche Zahlen.\<close>
 type_synonym 'world case_law = "(nat, ('world \<times> 'world), sollensanordnung) gesetz"
 
 text\<open>
