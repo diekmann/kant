@@ -140,6 +140,30 @@ Diese Maxime kann meiner Meinung nach nicht gewollt sein.
 \<close>
 
 
+subsection\<open>Maxime für Globales Optimum\<close>
+text\<open>Wir bauen nun eine Maxime, die das Individuum vernachlässigt und nur nach dem
+globalen Optimum strebt:\<close>
+fun globaler_strikter_fortschritt :: "zahlenwelt handlung \<Rightarrow> bool" where
+  "globaler_strikter_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) < (gesamtbesitz nach)"
+
+text\<open>Die Maxime ignoriert das \<^term>\<open>ich :: person\<close> komplett.
+
+Nun ist es \<^const>\<open>Alice\<close> wieder erlaubt, Wohlstand für sich selbst zu erzeugen,
+da sich dadurch auch der Gesamtwohlstand erhöht:\<close>
+lemma \<open>beispiel_case_law_relativ
+        (Maxime (\<lambda>ich. globaler_strikter_fortschritt))
+        (HandlungF (erschaffen 5)) =
+  Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
+  by eval
+
+text\<open>Allerdings ist auch diese Maxime auch sehr grausam, da sie Untätigkeit verbietet:\<close>
+lemma \<open>beispiel_case_law_relativ
+        (Maxime (\<lambda>ich. globaler_strikter_fortschritt))
+        (HandlungF (erschaffen 0)) =
+  Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
+  by eval
+
+subsection\<open>TODO\<close>
 (*Interessant: hard-coded Alice anstelle von 'ich' in maxime_zahlenfortschritt.*)
 
 
@@ -151,11 +175,8 @@ Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
 
 
 Größer (>) anstelle (>=) ist hier echt spannend!
-Es sagt, dass wir nicht handeln duerfen, wenn andere nicht die Möglichkeit haben!!
-Das >= ist kein strenger Fortschritt, eher kein Rückschritt.
+
 \<close>
-fun globaler_fortschritt :: "zahlenwelt handlung \<Rightarrow> bool" where
-  "globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz nach) \<ge> (gesamtbesitz vor)"
 
 text\<open>Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werden und die
 Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).\<close>
