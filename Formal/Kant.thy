@@ -134,6 +134,12 @@ where
     {VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)) | p1 p2.
       \<not>m p1 (handeln p2 welt handlung)}"
 
+
+text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
+lemma "debug_maxime print_world welt handlung maxime = {} \<longleftrightarrow> teste_maxime welt handlung maxime"
+  apply(case_tac maxime, rename_tac m, simp)
+  by(simp add: teste_maxime_unfold bevoelkerung_def)
+
 (*<*)
 definition debug_maxime_exhaust where
   \<open>debug_maxime_exhaust bevoelk print_world welt handlung maxime \<equiv>
