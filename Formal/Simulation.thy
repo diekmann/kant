@@ -131,5 +131,4 @@ lemma \<open>\<exists>tb rf.
   apply(simp add: teste_maxime_unfold max_paragraph_def)
   apply(intro conjI impI)
   by(metis rechtsfolge.exhaust rechtsnorm.exhaust tatbestand.exhaust)+
-  
 end

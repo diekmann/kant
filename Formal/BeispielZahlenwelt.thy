@@ -22,6 +22,7 @@ fun meins :: "person \<Rightarrow> zahlenwelt \<Rightarrow> int" where
 lemma "meins Carol (Zahlenwelt [Alice \<mapsto> 8, Carol \<mapsto> 4]) = 4" by eval
 
 (*<*)
+definition "show_zahlenwelt w \<equiv> case w of Zahlenwelt besitz \<Rightarrow> show_map besitz"
 fun delta_zahlenwelt :: "(zahlenwelt, person, int) delta" where
   "delta_zahlenwelt (Handlung (Zahlenwelt vor_besitz) (Zahlenwelt nach_besitz)) =
       Aenderung.delta_num_map (Handlung vor_besitz nach_besitz)"
@@ -52,8 +53,7 @@ definition "beispiel_case_law_absolut maxime handlung \<equiv>
     (SimConsts
       Alice
       maxime
-      (printable_case_law_ableiten_absolut
-        (\<lambda>w. case w of Zahlenwelt besitz \<Rightarrow> show_map besitz)))
+      (printable_case_law_ableiten_absolut show_zahlenwelt))
     10 handlung initialwelt (Gesetz {})"
 definition "beispiel_case_law_relativ maxime handlung \<equiv>
   simulateOne
@@ -127,17 +127,18 @@ lemma \<open>beispiel_case_law_relativ
   by eval
 
 
-(*TODO: hilffunktion die erklärt warum maxime verboten ist!*)
-value \<open>beispiel_case_law_absolut
-        (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich))
-        (HandlungF (erschaffen 5))\<close>
-
 text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des eigenen Wohlstands
 erlebt.
 Effektiv führt diese Maxime zu einem Gesetz, welches es einem Individuum nicht erlaubt
 mehr Besitz zu erschaffen, obwohl niemand dadurch einen Nachteil hat.
 Diese Maxime kann meiner Meinung nach nicht gewollt sein.
-\<close>
+
+
+Beispielsweise ist \<^const>\<open>Bob\<close> das Opfer wenn \<^const>\<open>Alice\<close> sich
+5 Wohlstand erschafft, aber \<^const>\<open>Bob\<close>'s Wohlstand sich nicht erhöht:\<close>
+lemma\<open>VerletzteMaxime Bob Alice (Handlung [(Alice, 5), (Bob, 10)] [(Alice, 10), (Bob, 10)])
+  \<in> debug_maxime show_zahlenwelt initialwelt
+      (HandlungF (erschaffen 5)) (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich))\<close> by eval
 
 
 subsection\<open>Maxime für Globales Optimum\<close>
@@ -162,6 +163,9 @@ lemma \<open>beispiel_case_law_relativ
         (HandlungF (erschaffen 0)) =
   Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
   by eval
+
+value\<open>debug_maxime show_zahlenwelt initialwelt
+        (HandlungF (erschaffen 0)) (Maxime (\<lambda>ich. globaler_strikter_fortschritt))\<close>
 
 subsection\<open>TODO\<close>
 (*Interessant: hard-coded Alice anstelle von 'ich' in maxime_zahlenfortschritt.*)

@@ -74,7 +74,7 @@ wobei jeder einmal als handelnde Person auftritt und einmal als betroffene Perso
 \<close>
 lemma teste_maxime_unfold:
   \<open>teste_maxime welt handlung (Maxime m) =
-        (\<forall>p\<in>bevoelkerung. \<forall>x\<in>bevoelkerung. m p (handeln x welt handlung))\<close>
+        (\<forall>p1\<in>bevoelkerung. \<forall>p2\<in>bevoelkerung. m p1 (handeln p2 welt handlung))\<close>
   by(simp add: teste_maxime_def wenn_jeder_so_handelt_def)
 lemma \<open>teste_maxime welt handlung (Maxime m) =
         (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlung))\<close>
@@ -115,6 +115,40 @@ Wenn \<^typ>\<open>'person\<close> aufzählbar ist haben wir ausführbaren Code:
 wobei @{const teste_maxime_exhaust} implementiert ist als @{thm teste_maxime_exhaust_def}.
 \<close>
 
+subsubsection\<open>Maximen Debugging\<close>
+text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
+Maxime verletzt ist:\<close>
+datatype ('person, 'world) verletzte_maxime = 
+  VerletzteMaxime
+    \<open>'person\<close> \<comment>\<open>verletzt für; das Opfer\<close>
+    \<open>'person\<close> \<comment>\<open>handelnde Person; der Täter\<close>
+    \<open>'world handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
+
+text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
+fun debug_maxime
+  :: "('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
+      ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime
+      \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
+where
+  "debug_maxime print_world welt handlung (Maxime m) =
+    {VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)) | p1 p2.
+      \<not>m p1 (handeln p2 welt handlung)}"
+
+(*<*)
+definition debug_maxime_exhaust where
+  \<open>debug_maxime_exhaust bevoelk print_world welt handlung maxime \<equiv>
+    (case maxime of (Maxime m) \<Rightarrow> 
+      map (\<lambda>(p1,p2). VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)))
+        (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt handlung)) (List.product bevoelk bevoelk)))\<close>
+
+lemma debug_maxime_exhaust [code]:
+  \<open>debug_maxime print_world welt handlung maxime
+    = set (debug_maxime_exhaust enum_class.enum print_world welt handlung maxime)\<close>
+  apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
+  apply(simp add: debug_maxime_exhaust_def enum_UNIV)
+  by(simp add: image_Collect)
+(*>*)
+
 subsubsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
 
@@ -142,6 +176,15 @@ lemma \<open>teste_maxime
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
+lemma \<open>debug_maxime show_map
+            [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Maxime (\<lambda>person handlung.
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+  = {}\<close>
+  by eval
+
+
 text\<open>Wenn nun \<^const>\<open>Bob\<close> allerdings bereits 4 hat, würde die obige Handlung ein Verlust
 für ihn bedeuten und die Maxime ist nicht erfüllt.\<close>
 lemma \<open>\<not> teste_maxime
@@ -150,7 +193,15 @@ lemma \<open>\<not> teste_maxime
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
   by eval
-
+lemma \<open>debug_maxime show_map
+            [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Maxime (\<lambda>person handlung.
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+  = {VerletzteMaxime Bob Bob
+     (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
+               [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
+  by eval
 
 
 subsection\<open>Allgemeines Gesetz Ableiten\<close>
