@@ -195,6 +195,27 @@ subsection\<open>Maxime für Globales Optimum\<close>
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
+  text\<open>Wir können die Maxime für globalen Fortschritt etwas lockern:\<close>
+  fun globaler_fortschritt :: "zahlenwelt handlung \<Rightarrow> bool" where
+   "globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) \<le> (gesamtbesitz nach)"
+
+  text\<open>Untätigkeit ist nun auch hier erlaubt:\<close>
+  lemma\<open>beispiel_case_law_relativ
+            (Maxime (\<lambda>ich. globaler_fortschritt))
+            (HandlungF (erschaffen 0))
+    =
+    Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
+    by eval
+
+  text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
+  lemma\<open>beispiel_case_law_relativ
+          (Maxime (\<lambda>ich. globaler_fortschritt))
+          (HandlungF (stehlen 5 Bob))
+    =
+    Gesetz
+    {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Erlaubnis))}\<close>
+    by eval
+
 subsection\<open>Alice stiehlt 5\<close>
   text\<open>Zurück zur einfachen \<^const>\<open>maxime_zahlenfortschritt\<close>.\<close>
   
@@ -264,20 +285,26 @@ subsection\<open>Schenken\<close>
 handlungF anstatt einer handlung nimmt.
 Evtl in neue Datei, damit sich dieses Beipsiel noch gut liesst.*)
 
-subsection\<open>TODO\<close>
-(*Interessant: hard-coded Alice anstelle von 'ich' in maxime_zahlenfortschritt.*)
-
-
-text\<open>
-Mehr ist mehr gut.
-Globaler Fortschritt erlaubt stehlen, solange dabei nichts vernichtet wird.
-
-
-Größer (>) anstelle (>=) ist hier echt spannend!
-
-\<close>
-
-text\<open>Dieser globale Fortschritt sollte eigentlich allgemeines Gesetz werden und die
-Maxime sollte individuelle Bereicherung sein (und die unsichtbare Hand macht den Rest. YOLO).\<close>
+subsection\<open>Ungültige Maxime\<close>
+  text\<open>Es ist verboten, in einer Maxime eine spezielle Person hardzucoden.
+  Da dies gegen die Gleichbehandlung aller Menschen verstoßen würde.
+  
+  Beispielsweise könnten wir \<^const>\<open>individueller_fortschritt\<close> nicht mehr parametrisiert verwenden,
+  sondern einfach \<^const>\<open>Alice\<close> reinschreiben:
+  \<close>
+  lemma "individueller_fortschritt Alice
+    = (\<lambda>h. case h of Handlung vor nach \<Rightarrow> (meins Alice vor) \<le> (meins Alice nach))"
+    apply(simp add: fun_eq_iff)
+    apply(intro allI, rename_tac h, case_tac h)
+    apply(simp)
+    done
+  text\<open>Dies würde es erlauben, dass \<^const>\<open>Alice\<close> Leute bestehlen darf:\<close>
+  lemma\<open>beispiel_case_law_relativ
+            (Maxime (\<lambda>ich. individueller_fortschritt Alice))
+            (HandlungF (stehlen 5 Bob))
+    =
+    Gesetz
+    {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Erlaubnis))}\<close>
+    by eval
 
 end
