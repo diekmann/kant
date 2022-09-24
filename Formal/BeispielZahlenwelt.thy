@@ -32,7 +32,7 @@ subsection\<open>Handlungen\<close>
 
 text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
 fun erschaffen :: "nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-  "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p := (besitz p) + int i))"
+  "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))"
 
 (*
 fun stehlen :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
