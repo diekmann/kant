@@ -118,10 +118,12 @@ wobei @{const teste_maxime_exhaust} implementiert ist als @{thm teste_maxime_exh
 subsubsection\<open>Maximen Debugging\<close>
 text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
 Maxime verletzt ist:\<close>
+datatype 'person opfer = Opfer 'person
+datatype 'person taeter = Taeter 'person
 datatype ('person, 'world) verletzte_maxime = 
   VerletzteMaxime
-    \<open>'person\<close> \<comment>\<open>verletzt für; das Opfer\<close>
-    \<open>'person\<close> \<comment>\<open>handelnde Person; der Täter\<close>
+    \<open>'person opfer\<close> \<comment>\<open>verletzt für; das Opfer\<close>
+    \<open>'person taeter\<close> \<comment>\<open>handelnde Person; der Täter\<close>
     \<open>'world handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
 
 text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
@@ -131,8 +133,10 @@ fun debug_maxime
       \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
 where
   "debug_maxime print_world welt handlung (Maxime m) =
-    {VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)) | p1 p2.
-      \<not>m p1 (handeln p2 welt handlung)}"
+    {VerletzteMaxime
+      (Opfer p1) (Taeter p2)
+      (map_handlung print_world (handeln p2 welt handlung)) | p1 p2.
+          \<not>m p1 (handeln p2 welt handlung)}"
 
 
 text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
@@ -144,7 +148,7 @@ lemma "debug_maxime print_world welt handlung maxime = {} \<longleftrightarrow> 
 definition debug_maxime_exhaust where
   \<open>debug_maxime_exhaust bevoelk print_world welt handlung maxime \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
-      map (\<lambda>(p1,p2). VerletzteMaxime p1 p2 (map_handlung print_world (handeln p2 welt handlung)))
+      map (\<lambda>(p1,p2). VerletzteMaxime (Opfer p1) (Taeter p2) (map_handlung print_world (handeln p2 welt handlung)))
         (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt handlung)) (List.product bevoelk bevoelk)))\<close>
 
 lemma debug_maxime_exhaust [code]:
@@ -204,7 +208,7 @@ lemma \<open>debug_maxime show_map
             (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-  = {VerletzteMaxime Bob Bob
+  = {VerletzteMaxime (Opfer Bob) (Taeter Bob)
      (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
                [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
   by eval

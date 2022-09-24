@@ -2,6 +2,8 @@ theory Steuern
 imports Main HOL.Real Percentage
 begin
 
+section\<open>Steuergesetzgebung\<close>
+
 (*<*)
 text\<open>Helper\<close>
 definition floor :: "real \<Rightarrow> nat" where
