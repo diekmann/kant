@@ -227,7 +227,7 @@ subsection\<open>Alice stiehlt 5\<close>
   
   Es besagt, dass Nichtstun verboten ist.\<close>
 
-  text\<open>Indem wir die beiden Handlungen Nichtstun Selbstbestehlen betrachten,
+  text\<open>Indem wir die beiden Handlungen Nichtstun und Selbstbestehlen betrachten,
   können wir sogar ein widersprüchliches Gesetz ableiten:\<close>
   lemma \<open>simulateOne
       (SimConsts
