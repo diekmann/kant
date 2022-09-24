@@ -1,11 +1,13 @@
 session Kant = HOL +
   (*pass document=pdf via iabelle build command line *)
   options [document_output="output", document_build = "pdflatex", document_variants="outline=-proof,-ML"]
+  sessions "HOL-Library"
   theories [document = false]
     ExecutableHelper
     Percentage
     Aenderung
   theories [show_question_marks = false]
+    SchnelleinstiegHOL
     Disclaimer
     Gesetz
     Kant

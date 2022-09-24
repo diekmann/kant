@@ -1,8 +1,8 @@
 theory Steuern
-imports Main HOL.Real Percentage
+imports Main HOL.Real Percentage ExecutableHelper
 begin
 
-section\<open>Steuergesetzgebung\<close>
+section\<open>Einkommensteuergesetzgebung\<close>
 
 (*<*)
 text\<open>Helper\<close>
@@ -21,12 +21,21 @@ lemma floor_minusD:
         nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
 (*>*)
 
-section\<open>Experiment: Steuergesetzgebung\<close>
 
 text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerrechts.
 Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Teil des 
-österreichischen Steuersystem gebaut mit deutschen Konstanten.\<close>
+österreichischen Steuersystem gebaut mit deutschen Konstanten.
+\<close>
 
+
+text\<open>Folgende @{command locale} nimmt an, dass wir eine Funktion
+@{term_type \<open>steuer :: nat \<Rightarrow> nat\<close>} haben, welche basierend auf dem Einkommen
+die zu zahlende Steuer berechnet.
+
+Die @{command locale} einhält einige Definition, gegeben die \<^term>\<open>steuer\<close> Funktion.
+
+Eine konkrete \<^term>\<open>steuer\<close> Funktion wird noch nicht gegeben.
+\<close>
 
 locale steuer_defs =
   fixes steuer :: "nat \<Rightarrow> nat" \<comment> \<open>Einkommen -> Steuer\<close>
@@ -61,7 +70,10 @@ lemma "steuer_defs.steuersatz beispiel_25prozent_steuer 103 =  percentage (25 / 
   by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
             steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
 
-
+text\<open>
+Folgende @{command locale} erweitert die \<^locale>\<open>steuer_defs\<close> @{command locale} und stellt
+einige Anforderungen die eine gültige \<^term>\<open>steuer\<close> Funktion erfüllen muss.
+\<close>
 locale steuersystem = steuer_defs +
   assumes wer_hat_der_gibt:
     "einkommen_a \<ge> einkommen_b \<Longrightarrow> steuer einkommen_a \<ge> steuer einkommen_b"
@@ -83,6 +95,7 @@ begin
 
 end
 
+(*<*)
 fun zonensteuer :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
    "zonensteuer ((zone, prozent)#zonen) spitzensteuer e =
         ((min zone e) * prozent) + (zonensteuer zonen spitzensteuer (e - zone))"
@@ -205,11 +218,18 @@ definition steuerzonen2022 :: "(nat \<times> percentage) list" where
                        (219229, percentage 0.42)
                       ]"
 
+
 fun steuerzonenAbs :: "(nat \<times> percentage) list \<Rightarrow> (nat \<times> percentage) list" where
    "steuerzonenAbs [] = []"
  |  "steuerzonenAbs ((zone, prozent)#zonen) = 
       (zone,prozent)#(map (\<lambda>(z,p). (zone+z, p)) (steuerzonenAbs zonen))"
+(*>*)
 
+text\<open>Die folgende Liste,
+basierend auf \<^url>\<open>https://de.wikipedia.org/wiki/Einkommensteuer_(Deutschland)#Tarif_2022\<close>,
+sagt in welchem Bereich welcher Prozentsatz an Steuern zu zahlen ist.
+Beispielsweise sind die ersten \<^term>\<open>10347::nat\<close> steuerfrei.
+\<close>
 definition steuerbuckets2022 :: "(nat \<times> percentage) list" where
   "steuerbuckets2022 \<equiv> [
                        (10347, percentage 0),
@@ -219,6 +239,9 @@ definition steuerbuckets2022 :: "(nat \<times> percentage) list" where
                       ]"
                        (*(\<infinity>, 0.45)*)
 
+text\<open>Wir ignorieren die Progressionsfaktoren in Zone 2 und 3.\<close>
+
+(*<*)
 lemma steuerbuckets2022: "steuerbuckets2022 = steuerzonenAbs steuerzonen2022"
   by(simp add: steuerbuckets2022_def steuerzonen2022_def)
 
@@ -226,14 +249,17 @@ fun wfSteuerbuckets :: "(nat \<times> percentage) list \<Rightarrow> bool" where
   "wfSteuerbuckets [] = True"
 | "wfSteuerbuckets [bs] = True"
 | "wfSteuerbuckets ((b1, p1)#(b2, p2)#bs) \<longleftrightarrow> b1 \<le> b2 \<and> wfSteuerbuckets ((b2,p2)#bs)"
+(*>*)
 
-(*TODO; get rid of the map, just have spans! and derive those separators as a view ..*)
+text\<open>Folgende Funktion berechnet die zu Zahlende Steuer, basierend auf einer Steuerbucketliste.\<close>
+
 fun bucketsteuerAbs :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
    "bucketsteuerAbs ((bis, prozent)#mehr) spitzensteuer e =
         ((min bis e) * prozent)
         + (bucketsteuerAbs (map (\<lambda>(s,p). (s-bis,p)) mehr) spitzensteuer (e - bis))"
 |  "bucketsteuerAbs [] spitzensteuer e = e*spitzensteuer"
 
+(*<*)
 lemma wfSteuerbucketsConsD: "wfSteuerbuckets (z#zs) \<Longrightarrow> wfSteuerbuckets zs"
   apply(case_tac z, simp)
   using wfSteuerbuckets.elims(3) by fastforce
@@ -274,8 +300,9 @@ lemma bucketsteuerAbs_zonensteuer:
   apply(simp)
   apply(drule wfSteuerbucketsConsD)
   using wfSteuerbucketsMapD by simp
-  
+(*>*)
 
+text\<open>Die Einkommenssteuerberechnung, mit Spitzensteuersatz 45 Prozent und finalem Abrunden.\<close>
 definition einkommenssteuer :: "nat \<Rightarrow> nat" where
   "einkommenssteuer einkommen \<equiv>
     floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) einkommen)"
@@ -289,6 +316,7 @@ lemma \<open>einkommenssteuer 20000 =
 value \<open>einkommenssteuer 40000\<close>
 value \<open>einkommenssteuer 60000\<close>
 
+(*<*)
 lemma einkommenssteuer:
   "einkommenssteuer einkommen =
     floor (zonensteuer steuerzonen2022 (percentage 0.45) einkommen)"
@@ -298,8 +326,12 @@ lemma einkommenssteuer:
    apply(simp add: steuerzonen2022_def; fail)
   apply(simp)
   done
+(*>*)
 
 (*TODO: geht das ohne immer steuer_defs zu schreiben?*)
+
+text\<open>Die \<^const>\<open>einkommenssteuer\<close> Funktion erfüllt die Anforderungen an \<^locale>\<open>steuersystem\<close>.\<close>
+
 interpretation steuersystem
   where steuer = einkommenssteuer
 proof
