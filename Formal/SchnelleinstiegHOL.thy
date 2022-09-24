@@ -50,6 +50,9 @@ eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat\<close>)
 fun beispielfunktion :: "nat \<Rightarrow> nat" where
   "beispielfunktion n = n + 10"
 
+
+text\<open>Funktionsaufrufe funktionieren ohne Klammern.\<close>
+
 lemma \<open>beispielfunktion 32 = 42\<close> by eval
 
 text\<open>Funktionen sind gecurried. Hier ist eine Funktion welche 2 natürliche Zahlen nimmt
@@ -57,7 +60,6 @@ und eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat \<Ri
 fun addieren :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
   "addieren a b = a + b"
 
-text\<open>Funktionsaufrufe funktionieren ohne Klammern.\<close>
 
 lemma \<open>addieren 32 10 = 42\<close> by eval
 
@@ -83,7 +85,12 @@ lemma "beispielfunktion = (\<lambda>n. n+10)"
   by(simp add: fun_eq_iff)
 
 subsection\<open>Mengen\<close>
-text\<open>Mengen funktionieren wie normale mathematische Mengen.\<close>
+text\<open>Mengen funktionieren wie normale mathematische Mengen.
+
+Beispiel. Die Menge der geraden Zahlen:
+\<close>
+lemma \<open>{0,2,4,6,8,10,12} \<subseteq> {n::int. n mod 2 = 0}\<close>
+  by(simp)
 
 
 end

@@ -1,5 +1,5 @@
 theory Steuern
-imports Main HOL.Real Percentage
+imports Main HOL.Real Percentage ExecutableHelper
 begin
 
 section\<open>Steuergesetzgebung\<close>
@@ -288,6 +288,7 @@ lemma \<open>einkommenssteuer 20000 =
         floor ((14926-10347)*0.14 + (20000-14926)*0.2397)\<close> by eval
 value \<open>einkommenssteuer 40000\<close>
 value \<open>einkommenssteuer 60000\<close>
+
 
 lemma einkommenssteuer:
   "einkommenssteuer einkommen =
