@@ -1,5 +1,5 @@
 theory Simulation
-imports Gesetz Handlung Kant
+imports Gesetz Handlung KategorischerImperativ
 begin
 
 section\<open>Simulation\<close>

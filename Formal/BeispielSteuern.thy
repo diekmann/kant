@@ -1,5 +1,5 @@
 theory BeispielSteuern
-imports Zahlenwelt Kant Gesetze Simulation Steuern
+imports Zahlenwelt Maxime Gesetze Simulation Steuern
 begin
 
 
