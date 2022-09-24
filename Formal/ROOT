@@ -6,6 +6,7 @@ session Kant = HOL +
     Percentage
     Aenderung
   theories [show_question_marks = false]
+    SchnelleinstiegHOL
     Disclaimer
     Gesetz
     Kant
