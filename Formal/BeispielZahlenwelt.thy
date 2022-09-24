@@ -1,5 +1,5 @@
 theory BeispielZahlenwelt
-imports Simulation Gesetze BeispielPerson
+imports Zahlenwelt Simulation Gesetze BeispielPerson
 begin
 
 section\<open>Beispiel: Zahlenwelt\<close>
@@ -7,36 +7,32 @@ section\<open>Beispiel: Zahlenwelt\<close>
 text\<open>Wir nehmen an, die Welt lässt sich durch eine Zahl darstellen,
 die den Besitz einer Person modelliert.\<close>
 datatype zahlenwelt = Zahlenwelt
-  "person \<Rightarrow> int option \<comment> \<open>besitz: Besitz jeder Person.\<close>"
+  "person \<Rightarrow> int \<comment> \<open>besitz: Besitz jeder Person.\<close>"
 
 fun gesamtbesitz :: "zahlenwelt \<Rightarrow> int" where
-  "gesamtbesitz (Zahlenwelt besitz) = sum_list (List.map_filter besitz Enum.enum)"
+  "gesamtbesitz (Zahlenwelt besitz) = sum_list (map besitz Enum.enum)"
 
-lemma "gesamtbesitz (Zahlenwelt [Alice \<mapsto> 4, Carol \<mapsto> 8]) = 12" by eval
-lemma "gesamtbesitz (Zahlenwelt [Alice \<mapsto> 4, Carol \<mapsto> 4]) = 8" by eval
+lemma "gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12" by eval
+lemma "gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8" by eval
 
 
 fun meins :: "person \<Rightarrow> zahlenwelt \<Rightarrow> int" where
-  "meins p (Zahlenwelt besitz) = the_default (besitz p) 0"
+  "meins p (Zahlenwelt besitz) = besitz p"
 
-lemma "meins Carol (Zahlenwelt [Alice \<mapsto> 8, Carol \<mapsto> 4]) = 4" by eval
+lemma "meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4" by eval
 
 (*<*)
-definition "show_zahlenwelt w \<equiv> case w of Zahlenwelt besitz \<Rightarrow> show_map besitz"
+definition "show_zahlenwelt w \<equiv> case w of Zahlenwelt besitz \<Rightarrow> show_num_fun besitz"
 fun delta_zahlenwelt :: "(zahlenwelt, person, int) delta" where
   "delta_zahlenwelt (Handlung (Zahlenwelt vor_besitz) (Zahlenwelt nach_besitz)) =
-      Aenderung.delta_num_map (Handlung vor_besitz nach_besitz)"
+      Aenderung.delta_num_fun (Handlung vor_besitz nach_besitz)"
 (*>*)
 
 subsection\<open>Handlungen\<close>
 
 text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
 fun erschaffen :: "nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-  "erschaffen i p (Zahlenwelt besitz) =
-    Zahlenwelt
-      (case besitz p
-        of None \<Rightarrow> besitz(p \<mapsto> int i)
-         | Some b \<Rightarrow> besitz(p \<mapsto> b + int i))"
+  "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p := (besitz p) + int i))"
 
 (*
 fun stehlen :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
@@ -58,7 +54,7 @@ stehlen i opfer dieb (Zahlenwelt r besitz) = Zahlenwelt r neuer_besitz
 
 subsection\<open>Setup\<close>
 
-definition "initialwelt \<equiv> Zahlenwelt [Alice \<mapsto> 5, Bob \<mapsto> 10]"
+definition "initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10]"
 
 text\<open>Wir nehmen an unsere handelnde Person ist \<^const>\<open>Alice\<close>.\<close>
 

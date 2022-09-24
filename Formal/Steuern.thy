@@ -2,6 +2,7 @@ theory Steuern
 imports Main HOL.Real Percentage
 begin
 
+(*<*)
 text\<open>Helper\<close>
 definition floor :: "real \<Rightarrow> nat" where
   "floor x \<equiv> nat \<lfloor>x\<rfloor>"
@@ -16,7 +17,7 @@ lemma floor_minusD:
   apply(simp add: floor_def)
   by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
         nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
-
+(*>*)
 
 section\<open>Experiment: Steuergesetzgebung\<close>
 

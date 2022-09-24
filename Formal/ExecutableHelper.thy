@@ -102,4 +102,9 @@ definition show_fun :: \<open>('a::enum \<Rightarrow> 'b) \<Rightarrow> ('a \<ti
   \<open>show_fun f \<equiv> map (\<lambda>p. (p, f p)) (enum_class.enum)\<close>
 
 
+definition show_num_fun :: \<open>('a::enum \<Rightarrow> 'b::zero) \<Rightarrow> ('a \<times> 'b) list\<close> where
+  \<open>show_num_fun f \<equiv> List.map_filter
+    (\<lambda>p. if (f p) = 0 then None else Some (p, f p)) (enum_class.enum)\<close>
+
+
 end

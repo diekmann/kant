@@ -1,11 +1,15 @@
 theory BeispielSteuern
-imports Kant Gesetze Simulation Steuern
+imports Zahlenwelt Kant Gesetze Simulation Steuern
 begin
 
 
 section\<open>Beispiel: Steuern\<close>
 
-text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...\<close>
+text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...
+
+Achtung: Im Unterschied zum BeispielZahlenwelt.thy modellieren wir hier nicht den Gesamtbesitz,
+sondern das Jahreseinkommen. Besitz wird ignoriert.
+\<close>
 datatype steuerwelt = Steuerwelt
         (get_einkommen: "person \<Rightarrow> int") \<comment> \<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
 
@@ -18,26 +22,24 @@ fun netto :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
   "netto p (Handlung vor nach) = (get_einkommen nach) p"
 
 
-text\<open>Default: kein Einkommen. Um Beispiele einfacher zu schreiben.\<close>
-definition KE :: "person \<Rightarrow> int" where
-  "KE \<equiv> \<lambda>p. 0"
+text\<open>Default: \<^const>\<open>DEFAULT\<close> entspricht keinem Einkommen. Um Beispiele einfacher zu schreiben.\<close>
 
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=8))) (Steuerwelt (KE(Alice:=5)))) = 3\<close>
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 3\<close>
   by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=8))) (Steuerwelt (KE(Alice:=0)))) = 8\<close>
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=0])) = 8\<close>
   by eval
-lemma \<open>steuerlast Bob   (Handlung (Steuerwelt (KE(Alice:=8))) (Steuerwelt (KE(Alice:=5)))) = 0\<close>
+lemma \<open>steuerlast Bob   (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 0\<close>
   by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=-3))) (Steuerwelt (KE(Alice:=-4)))) = 1\<close>
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=-3]) (Steuerwelt \<^url>[Alice:=-4])) = 1\<close>
   by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt (KE(Alice:=1))) (Steuerwelt (KE(Alice:=-1)))) = 2\<close>
+lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=1]) (Steuerwelt \<^url>[Alice:=-1])) = 2\<close>
   by eval
 
 fun mehrverdiener :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> person set" where
   "mehrverdiener ich (Handlung vor nach) = {p. (get_einkommen vor) p \<ge> (get_einkommen vor) ich}"
 
 lemma \<open>mehrverdiener Alice
-        (Handlung (Steuerwelt (KE(Alice:=8, Bob:=12, Eve:=7))) (Steuerwelt (KE(Alice:=5))))
+        (Handlung (Steuerwelt \<^url>[Alice:=8, Bob:=12, Eve:=7]) (Steuerwelt \<^url>[Alice:=5]))
        = {Alice, Bob}\<close> by eval
 
 (*TODO: eine andere test maxime sollte sein, dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
@@ -65,7 +67,7 @@ definition "sc' \<equiv> SimConsts
     maxime_steuern
     (case_law_ableiten_relativ delta_steuerwelt)"
 
-definition "initialwelt \<equiv> Steuerwelt (KE(Alice:=8, Bob:=3, Eve:= 5))"
+definition "initialwelt \<equiv> Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]"
 
 definition "beispiel_case_law h \<equiv> simulateOne sc 3 h initialwelt (Gesetz {})"
 definition "beispiel_case_law' h \<equiv> simulateOne sc' 20 h initialwelt (Gesetz {})"
@@ -145,7 +147,7 @@ lemma \<open>beispiel_case_law (HandlungF jeder_zahlt_einkommenssteuer ) =
 lemma \<open>simulateOne
   sc' 1
   (HandlungF jeder_zahlt_einkommenssteuer)
-  (Steuerwelt (KE(Alice:=10000, Bob:=14000, Eve:= 20000)))
+  (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
   (Gesetz {})
   =
   Gesetz
