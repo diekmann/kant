@@ -11,7 +11,7 @@ modellieren.
 
 Hier sind einige Hilfsfunktionen um mit \<^typ>\<open>person \<Rightarrow> int\<close> allgmein zu arbeiten.\<close>
 
-text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0\<close>:\<close>
+text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0::int\<close>:\<close>
 definition DEFAULT :: "person \<Rightarrow> int" where
   "DEFAULT \<equiv> \<lambda>p. 0"
 

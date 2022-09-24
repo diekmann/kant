@@ -46,7 +46,7 @@ subsection\<open>Handlungen\<close>
   
   text\<open>Da wir ganze Zahlen verwenden und der Besitz auch beliebig negativ werden kann,
   ist Stehlen äquivalent dazu einen negativen Betrag zu verschenken:\<close>
-  lemma "stehlen i = schenken (-i)"
+  lemma stehlen_ist_schenken: "stehlen i = schenken (-i)"
     apply(simp add: fun_eq_iff)
     apply(intro allI, rename_tac p1 p2 welt, case_tac welt)
     by auto
@@ -212,7 +212,7 @@ subsection\<open>Alice stiehlt 5\<close>
   
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> die abstrakte Handlung "Alice wird bestohlen" gar nicht gut
   fände, wenn sie jemand anderes ausführt:\<close>
-  value \<open>debug_maxime show_zahlenwelt initialwelt
+  lemma \<open>debug_maxime show_zahlenwelt initialwelt
           (HandlungF (stehlen 5 Alice)) maxime_zahlenfortschritt =
    {VerletzteMaxime (Opfer Alice) (Taeter Bob)
       (Handlung [(Alice, 5), (Bob, 10)] [(Bob, 15)]),
@@ -221,6 +221,7 @@ subsection\<open>Alice stiehlt 5\<close>
     VerletzteMaxime (Opfer Alice) (Taeter Eve)
       (Handlung [(Alice, 5), (Bob, 10)] [(Bob, 10), (Eve, 5)])
    }\<close>
+    by eval
   
   text\<open>Leider ist das hier abgeleitete Gesetz sehr fragwürdig:
   \<^term>\<open>Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot)\<close>
@@ -240,14 +241,28 @@ subsection\<open>Alice stiehlt 5\<close>
     Gesetz
   {(Paragraph 2, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot)),
    (Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
-  by eval
+    by eval
 
+  text\<open>Meine persönliche Conclusion: Wir müssen irgendwie die Absicht mit ins Gesetz schreiben.\<close>
+
+subsection\<open>Schenken\<close>
+  text\<open>Es ist \<^const>\<open>Alice\<close> verboten, etwas zu verschenken:\<close>
+  lemma\<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (schenken 5 Bob))
+    =
+    Gesetz
+      {(Paragraph 1,
+        Rechtsnorm (Tatbestand [Verliert Alice 5, Gewinnt Bob 5]) (Rechtsfolge Verbot))}\<close>
+    by eval
+  text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> dabei etwas verliert und
+  die \<^const>\<open>maxime_zahlenfortschritt\<close> dies nicht Erlaubt.
+  Es fehlt eine Möglichkeit zu modellieren, dass \<^const>\<open>Alice\<close> damit einverstanden ist,
+  etwas abzugeben.
+  Doch wir haben bereits in @{thm stehlen_ist_schenken} gesehen,
+  dass \<^const>\<open>stehlen\<close> und \<^const>\<open>schenken\<close> nicht unterscheidbar sind.\<close>
 
 subsection\<open>TODO\<close>
 (*Interessant: hard-coded Alice anstelle von 'ich' in maxime_zahlenfortschritt.*)
 
-
-(*TODO: den Fall der Untätigkeit verbietet anschauen.*)
 
 text\<open>
 Mehr ist mehr gut.
