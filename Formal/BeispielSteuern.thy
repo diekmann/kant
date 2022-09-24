@@ -22,8 +22,6 @@ fun netto :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
   "netto p (Handlung vor nach) = (get_einkommen nach) p"
 
 
-text\<open>Default: \<^const>\<open>DEFAULT\<close> entspricht keinem Einkommen. Um Beispiele einfacher zu schreiben.\<close>
-
 lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 3\<close>
   by eval
 lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=0])) = 8\<close>
@@ -54,9 +52,11 @@ definition maxime_steuern :: "(person, steuerwelt) maxime" where
   (*do we also need: \<and> steuerlast ich handlung \<le> brutto ich handlung*)
 
 
+(*<*)
 fun delta_steuerwelt :: "(steuerwelt, person, int) delta" where
   "delta_steuerwelt (Handlung vor nach) =
       Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))"
+(*>*)
 
 definition "sc \<equiv> SimConsts
     Alice
