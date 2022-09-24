@@ -15,8 +15,6 @@ text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0\<close>:\<c
 definition DEFAULT :: "person \<Rightarrow> int" where
   "DEFAULT \<equiv> \<lambda>p. 0"
 
-
-
 (*<*)
 syntax
   "_ZahlenWelt"  :: "updbinds \<Rightarrow> 'a" ("(1\<^url>[_])")
@@ -36,5 +34,18 @@ lemma \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] Bob = 3\<close> by eval
 lemma \<open>show_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Bob, 0), (Carol, 4), (Eve, 0)]\<close> by eval
 lemma \<open>show_num_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Carol, 4)]\<close> by eval
 
+
+definition num_fun_add :: "('a \<Rightarrow> 'b::plus) \<Rightarrow> 'a \<Rightarrow> 'b \<Rightarrow> ('a \<Rightarrow> 'b)"  where
+  "num_fun_add f p n \<equiv> (f(p := (f p) + n))"
+
+(*from joint_probability
+abbreviation joint_probability ("\<P>'(_ ; _') _") where
+"\<P>(X ; Y) x \<equiv> \<P>(\<lambda>x. (X x, Y x)) x
+*)
+
+abbreviation num_fun_add_syntax ("_ '(_ += _')") where
+  "f(p += n) \<equiv> num_fun_add f p n"
+
+lemma \<open>(\<^url>[Alice:=8, Bob:=3, Eve:= 5])(Bob += 4) Bob = 7\<close> by eval
 
 end
