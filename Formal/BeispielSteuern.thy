@@ -75,7 +75,7 @@ definition "beispiel_case_law' h \<equiv> simulateOne sc' 20 h initialwelt (Gese
 text\<open>Keiner zahlt steuern: funktioniert\<close>
 value \<open>beispiel_case_law (HandlungF (\<lambda>ich welt. welt))\<close>
 lemma \<open>beispiel_case_law' (HandlungF (\<lambda>ich welt. welt)) =
-  Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close> by eval
+  Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close> by eval
 
 text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber?
 Achjaaaaaa, jeder muss ja Steuer zahlen, ....\<close>
@@ -83,7 +83,7 @@ definition "ich_zahle_1_steuer ich welt \<equiv>
   Steuerwelt ((get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1))"
 lemma \<open>beispiel_case_law (HandlungF ich_zahle_1_steuer) =
   Gesetz
-  {(Paragraph 1,
+  {(\<section> 1,
     Rechtsnorm
      (Tatbestand
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
@@ -91,7 +91,7 @@ lemma \<open>beispiel_case_law (HandlungF ich_zahle_1_steuer) =
      (Rechtsfolge Verbot))}\<close> by eval
 lemma \<open>beispiel_case_law' (HandlungF ich_zahle_1_steuer) =
   Gesetz
-  {(Paragraph 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
+  {(\<section> 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
                             (Rechtsfolge Verbot))}\<close> by eval
   
 text\<open>Jeder muss steuern zahlen:
@@ -102,19 +102,19 @@ definition "jeder_zahle_1_steuer ich welt \<equiv>
   Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt))"
 lemma \<open>beispiel_case_law (HandlungF jeder_zahle_1_steuer) =
 Gesetz
-  {(Paragraph 3,
+  {(\<section> 3,
     Rechtsnorm
      (Tatbestand
        ([(Alice, 6), (Bob, 1), (Carol, - 2), (Eve, 3)],
         [(Alice, 5), (Bob, 0), (Carol, - 3), (Eve, 2)]))
      (Rechtsfolge Erlaubnis)),
-   (Paragraph 2,
+   (\<section> 2,
     Rechtsnorm
      (Tatbestand
        ([(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)],
         [(Alice, 6), (Bob, 1), (Carol, - 2), (Eve, 3)]))
      (Rechtsfolge Erlaubnis)),
-   (Paragraph 1,
+   (\<section> 1,
     Rechtsnorm
      (Tatbestand
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
@@ -122,7 +122,7 @@ Gesetz
      (Rechtsfolge Erlaubnis))}\<close> by eval
 lemma \<open>beispiel_case_law' (HandlungF jeder_zahle_1_steuer) =
   Gesetz
-  {(Paragraph 1,
+  {(\<section> 1,
     Rechtsnorm
      (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
      (Rechtsfolge Erlaubnis))}\<close> by eval
@@ -137,7 +137,7 @@ definition "jeder_zahlt steuerberechnung ich welt \<equiv>
 definition "jeder_zahlt_einkommenssteuer \<equiv> jeder_zahlt einkommenssteuer"
 lemma \<open>beispiel_case_law (HandlungF jeder_zahlt_einkommenssteuer ) = 
   Gesetz
-  {(Paragraph 1,
+  {(\<section> 1,
     Rechtsnorm
      (Tatbestand
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
@@ -151,7 +151,7 @@ lemma \<open>simulateOne
   (Gesetz {})
   =
   Gesetz
-  {(Paragraph 1,
+  {(\<section> 1,
     Rechtsnorm (Tatbestand [Verliert Bob 511, Verliert Eve 1857])
      (Rechtsfolge Erlaubnis))}\<close> by eval
 

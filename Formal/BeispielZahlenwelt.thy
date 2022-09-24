@@ -92,34 +92,34 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   lemma \<open>beispiel_case_law_absolut maxime_zahlenfortschritt (HandlungF (erschaffen 5))
   =
   Gesetz
-    {(Paragraph 10,
+    {(\<section> 10,
       Rechtsnorm (Tatbestand ([(Alice, 50), (Bob, 10)], [(Alice, 55), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 9,
+     (\<section> 9,
       Rechtsnorm (Tatbestand ([(Alice, 45), (Bob, 10)], [(Alice, 50), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 8,
+     (\<section> 8,
       Rechtsnorm (Tatbestand ([(Alice, 40), (Bob, 10)], [(Alice, 45), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 7,
+     (\<section> 7,
       Rechtsnorm (Tatbestand ([(Alice, 35), (Bob, 10)], [(Alice, 40), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 6,
+     (\<section> 6,
       Rechtsnorm (Tatbestand ([(Alice, 30), (Bob, 10)], [(Alice, 35), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 5,
+     (\<section> 5,
       Rechtsnorm (Tatbestand ([(Alice, 25), (Bob, 10)], [(Alice, 30), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 4,
+     (\<section> 4,
       Rechtsnorm (Tatbestand ([(Alice, 20), (Bob, 10)], [(Alice, 25), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 3,
+     (\<section> 3,
       Rechtsnorm (Tatbestand ([(Alice, 15), (Bob, 10)], [(Alice, 20), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 2,
+     (\<section> 2,
       Rechtsnorm (Tatbestand ([(Alice, 10), (Bob, 10)], [(Alice, 15), (Bob, 10)]))
        (Rechtsfolge Erlaubnis)),
-     (Paragraph 1,
+     (\<section> 1,
       Rechtsnorm (Tatbestand ([(Alice, 5), (Bob, 10)], [(Alice, 10), (Bob, 10)]))
        (Rechtsfolge Erlaubnis))}
   \<close> by eval
@@ -128,7 +128,7 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   text\<open>Die gleiche Handlung, wir schreiben aber nur die Änderung der Welt ins Gesetz:\<close>
   lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (erschaffen 5)) =
     Gesetz
-    {(Paragraph 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
+    {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
 subsection\<open>Kleine Änderung in der Maxime\<close>
@@ -144,7 +144,7 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich))
           (HandlungF (erschaffen 5)) =
-    Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Verbot))}\<close>
+    Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Verbot))}\<close>
     by eval
   
   
@@ -177,14 +177,14 @@ subsection\<open>Maxime für Globales Optimum\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt))
           (HandlungF (erschaffen 5)) =
-    Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
+    Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
     by eval
   
   text\<open>Allerdings ist auch diese Maxime auch sehr grausam, da sie Untätigkeit verbietet:\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt))
           (HandlungF (erschaffen 0)) =
-    Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
+    Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
     by eval
 
 
@@ -192,7 +192,7 @@ subsection\<open>Maxime für Globales Optimum\<close>
   lemma \<open>beispiel_case_law_relativ
           maxime_zahlenfortschritt
           (HandlungF (erschaffen 0)) =
-    Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
+    Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
 subsection\<open>Alice stiehlt 5\<close>
@@ -201,13 +201,13 @@ subsection\<open>Alice stiehlt 5\<close>
   text\<open>Stehlen ist verboten:\<close>
   lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) =
     Gesetz
-    {(Paragraph 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Verbot))}\<close>
+    {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Verbot))}\<close>
     by eval
   
   text\<open>Auch wenn \<^const>\<open>Alice\<close> von sich selbst stehlen möchte ist dies verboten,
   obwohl hier keiner etwas verliert:\<close>
   lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (stehlen 5 Alice)) =
-    Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
+    Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
     by eval
   
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> die abstrakte Handlung "Alice wird bestohlen" gar nicht gut
@@ -239,8 +239,8 @@ subsection\<open>Alice stiehlt 5\<close>
       (beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (erschaffen 0)))
     =
     Gesetz
-  {(Paragraph 2, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot)),
-   (Paragraph 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
+  {(\<section> 2, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot)),
+   (\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
   text\<open>Meine persönliche Conclusion: Wir müssen irgendwie die Absicht mit ins Gesetz schreiben.\<close>
@@ -250,7 +250,7 @@ subsection\<open>Schenken\<close>
   lemma\<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (schenken 5 Bob))
     =
     Gesetz
-      {(Paragraph 1,
+      {(\<section> 1,
         Rechtsnorm (Tatbestand [Verliert Alice 5, Gewinnt Bob 5]) (Rechtsfolge Verbot))}\<close>
     by eval
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> dabei etwas verliert und
@@ -259,6 +259,10 @@ subsection\<open>Schenken\<close>
   etwas abzugeben.
   Doch wir haben bereits in @{thm stehlen_ist_schenken} gesehen,
   dass \<^const>\<open>stehlen\<close> und \<^const>\<open>schenken\<close> nicht unterscheidbar sind.\<close>
+
+(*TODO: kategorischen Imperativ aendern, so dass allgemeines gesetz ableiten eine
+handlungF anstatt einer handlung nimmt.
+Evtl in neue Datei, damit sich dieses Beipsiel noch gut liesst.*)
 
 subsection\<open>TODO\<close>
 (*Interessant: hard-coded Alice anstelle von 'ich' in maxime_zahlenfortschritt.*)
