@@ -1,5 +1,5 @@
 theory Gesetze
-imports Gesetz Kant Aenderung
+imports Gesetz KategorischerImperativ Aenderung
 begin
 
 section\<open>Gesetze\<close>

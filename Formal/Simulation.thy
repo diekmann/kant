@@ -1,5 +1,5 @@
 theory Simulation
-imports Gesetz Handlung Kant
+imports Gesetz Handlung KategorischerImperativ
 begin
 
 section\<open>Simulation\<close>
@@ -45,7 +45,7 @@ lemma \<open>simulate_handlungF
        (Gesetz {})= 
   (33,
    Gesetz
-    {(Paragraph (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
+    {(\<section> (Suc 0), Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))})\<close>
   by eval
 
 text\<open>Funktion begrenzt oft anwenden bis sich die Welt nicht mehr ändert.
@@ -105,16 +105,16 @@ lemma \<open>simulateOne
         32
         (Gesetz {}) =
   Gesetz
-  {(Paragraph 10, Rechtsnorm (Tatbestand (Handlung 41 42)) (Rechtsfolge ''count'')),
-   (Paragraph 9, Rechtsnorm (Tatbestand (Handlung 40 41)) (Rechtsfolge ''count'')),
-   (Paragraph 8, Rechtsnorm (Tatbestand (Handlung 39 40)) (Rechtsfolge ''count'')),
-   (Paragraph 7, Rechtsnorm (Tatbestand (Handlung 38 39)) (Rechtsfolge ''count'')),
-   (Paragraph 6, Rechtsnorm (Tatbestand (Handlung 37 38)) (Rechtsfolge ''count'')),
-   (Paragraph 5, Rechtsnorm (Tatbestand (Handlung 36 37)) (Rechtsfolge ''count'')),
-   (Paragraph 4, Rechtsnorm (Tatbestand (Handlung 35 36)) (Rechtsfolge ''count'')),
-   (Paragraph 3, Rechtsnorm (Tatbestand (Handlung 34 35)) (Rechtsfolge ''count'')),
-   (Paragraph 2, Rechtsnorm (Tatbestand (Handlung 33 34)) (Rechtsfolge ''count'')),
-   (Paragraph 1, Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))}\<close>
+  {(\<section> 10, Rechtsnorm (Tatbestand (Handlung 41 42)) (Rechtsfolge ''count'')),
+   (\<section> 9, Rechtsnorm (Tatbestand (Handlung 40 41)) (Rechtsfolge ''count'')),
+   (\<section> 8, Rechtsnorm (Tatbestand (Handlung 39 40)) (Rechtsfolge ''count'')),
+   (\<section> 7, Rechtsnorm (Tatbestand (Handlung 38 39)) (Rechtsfolge ''count'')),
+   (\<section> 6, Rechtsnorm (Tatbestand (Handlung 37 38)) (Rechtsfolge ''count'')),
+   (\<section> 5, Rechtsnorm (Tatbestand (Handlung 36 37)) (Rechtsfolge ''count'')),
+   (\<section> 4, Rechtsnorm (Tatbestand (Handlung 35 36)) (Rechtsfolge ''count'')),
+   (\<section> 3, Rechtsnorm (Tatbestand (Handlung 34 35)) (Rechtsfolge ''count'')),
+   (\<section> 2, Rechtsnorm (Tatbestand (Handlung 33 34)) (Rechtsfolge ''count'')),
+   (\<section> 1, Rechtsnorm (Tatbestand (Handlung 32 33)) (Rechtsfolge ''count''))}\<close>
   by eval
 
 
@@ -125,7 +125,7 @@ lemma \<open>\<exists>tb rf.
     1 handlungF
     initialwelt
     (Gesetz {})
-  = Gesetz {(Paragraph 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>
+  = Gesetz {(\<section> 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>
   apply(simp add: simulateOne_def kategorischer_imperativ_def)
   apply(case_tac maxime, simp)
   apply(simp add: teste_maxime_unfold max_paragraph_def)
