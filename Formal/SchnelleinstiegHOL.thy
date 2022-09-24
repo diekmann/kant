@@ -57,6 +57,7 @@ und eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat \<Ri
 fun addieren :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
   "addieren a b = a + b"
 
+text\<open>Funktionsaufrufe funktionieren ohne Klammern.\<close>
 
 lemma \<open>addieren 32 10 = 42\<close> by eval
 
