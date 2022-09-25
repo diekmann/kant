@@ -32,6 +32,10 @@ text\<open>Folgende @{command locale} nimmt an, dass wir eine Funktion
 @{term_type \<open>steuer :: nat \<Rightarrow> nat\<close>} haben, welche basierend auf dem Einkommen
 die zu zahlende Steuer berechnet.
 
+Die \<^term>\<open>steuer\<close> Funktion arbeitet auf natürlichen Zahlen.
+Wir nehmen an, dass einfach immer auf ganze Geldbeträge gerundet wird.
+Wie im deutschen System.
+
 Die @{command locale} einhält einige Definition, gegeben die \<^term>\<open>steuer\<close> Funktion.
 
 Eine konkrete \<^term>\<open>steuer\<close> Funktion wird noch nicht gegeben.
@@ -49,30 +53,27 @@ begin
 end
 
 
-text\<open>Beispiel\<close>
+text\<open>Beispiel. Die \<^term>\<open>steuer\<close> Funktion sagt, man muss 25 Prozent Steuern zahlen:\<close>
 definition beispiel_25prozent_steuer :: "nat \<Rightarrow> nat" where
   "beispiel_25prozent_steuer e \<equiv> nat \<lfloor>real e * (percentage 0.25)\<rfloor>"
 
-lemma "beispiel_25prozent_steuer 100 = 25"
-      "steuer_defs.brutto 100 = 100"
-      "steuer_defs.netto beispiel_25prozent_steuer 100 = 75"
-      "steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25"
+lemma
+  "beispiel_25prozent_steuer 100 = 25"
+  "steuer_defs.brutto 100 = 100"
+  "steuer_defs.netto beispiel_25prozent_steuer 100 = 75"
+  "steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25"
   by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
             steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
 
-
-(*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-wegen dem Abrunden gilt die progression nicht!!
-*)
-lemma "steuer_defs.steuersatz beispiel_25prozent_steuer 103 =  percentage (25 / 103)"
-      "percentage (25 / 103) \<le> percentage 0.25"
-      "(103::nat) > 100"
-  by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
-            steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
 
 text\<open>
 Folgende @{command locale} erweitert die \<^locale>\<open>steuer_defs\<close> @{command locale} und stellt
 einige Anforderungen die eine gültige \<^term>\<open>steuer\<close> Funktion erfüllen muss.
+
+  \<^item> Wer mehr Einkommen hat, muss auch mehr Steuern zahlen.
+  \<^item> Leistung muss sich lohnen:
+    Wer mehr Einkommen hat muss auch nach Abzug der Steuer mehr übrig haben.
+  \<^item> Existenzminimum: Es gibt ein Existenzminimum, welches nicht besteuert werden darf.
 \<close>
 locale steuersystem = steuer_defs +
   assumes wer_hat_der_gibt:
@@ -94,6 +95,39 @@ locale steuersystem = steuer_defs +
 begin
 
 end
+
+text\<open>Eigentlich hätte ich gerne noch eine weitere Anforderung.
+\<^url>\<open>https://de.wikipedia.org/wiki/Steuerprogression\<close> sagt
+"Steuerprogression bedeutet das Ansteigen des Steuersatzes in Abhängigkeit vom zu
+ versteuernden Einkommen oder Vermögen."
+
+Formal betrachtet würde das bedeuten
+\<^term>\<open>einkommen_a \<ge> einkommen_b
+  \<Longrightarrow> steuer_defs.steuersatz einkommen_a \<ge> steuer_defs.steuersatz einkommen_b\<close>
+
+Leider haben wir bereits jetzt in dem Modell eine Annahme getroffen,
+die es uns quasi unmöglich macht, ein Steuersystem zu implementieren, welches die
+Steuerprogression erfüllt.
+Der Grund ist, dass wir die Steuerfunktion auf ganzen Zahlen definiert haben.
+Aufgrund von Rundung können wir also immer Fälle haben, indem ein höheres
+Einkommen einen leicht geringeren Steuersatz hat als ein geringeres Einkommen.
+Beispielsweise bedeutet das für \<^const>\<open>beispiel_25prozent_steuer\<close>, dass
+jemand mit 100 EUR Einkommen genau 25 Prozent Steuer zahlt,
+jemand mit 103 EUR Einkommen aber nur ca 24,3 Prozent Steuer zahlt. 
+\<close>
+
+lemma
+  "steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25"
+  "steuer_defs.steuersatz beispiel_25prozent_steuer 103 = percentage (25 / 103)"
+  "percentage (25 / 103) < percentage 0.25"
+  "(103::nat) > 100"
+  by(simp add: steuer_defs.brutto_def beispiel_25prozent_steuer_def
+            steuer_defs.netto_def percentage_code steuer_defs.steuersatz_def)+
+
+text\<open>In der Praxis sollten diese kleinen Rundungsfehler kein Problem darstellen,
+in diesem theoretischen Modell sorgen sie aber dafür,
+dass unser Steuersystem (und wir modellieren eine vereinfachte Version des
+deutschen Steuerystems) keine Steuerprogression erfüllt.\<close>
 
 (*<*)
 fun zonensteuer :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
@@ -239,7 +273,8 @@ definition steuerbuckets2022 :: "(nat \<times> percentage) list" where
                       ]"
                        (*(\<infinity>, 0.45)*)
 
-text\<open>Wir ignorieren die Progressionsfaktoren in Zone 2 und 3.\<close>
+text\<open>Für jedes Einkommen über 277825 gilt der Spitzensteuersatz von 45 Prozent.
+Wir ignorieren die Progressionsfaktoren in Zone 2 und 3.\<close>
 
 (*<*)
 lemma steuerbuckets2022: "steuerbuckets2022 = steuerzonenAbs steuerzonen2022"
@@ -251,7 +286,7 @@ fun wfSteuerbuckets :: "(nat \<times> percentage) list \<Rightarrow> bool" where
 | "wfSteuerbuckets ((b1, p1)#(b2, p2)#bs) \<longleftrightarrow> b1 \<le> b2 \<and> wfSteuerbuckets ((b2,p2)#bs)"
 (*>*)
 
-text\<open>Folgende Funktion berechnet die zu Zahlende Steuer, basierend auf einer Steuerbucketliste.\<close>
+text\<open>Folgende Funktion berechnet die zu zahlende Steuer, basierend auf einer Steuerbucketliste.\<close>
 
 fun bucketsteuerAbs :: "(nat \<times> percentage) list \<Rightarrow> percentage \<Rightarrow> nat \<Rightarrow> real" where
    "bucketsteuerAbs ((bis, prozent)#mehr) spitzensteuer e =
@@ -307,14 +342,25 @@ definition einkommenssteuer :: "nat \<Rightarrow> nat" where
   "einkommenssteuer einkommen \<equiv>
     floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) einkommen)"
 
-value \<open>einkommenssteuer 10\<close>
+text\<open>Beispiel. Alles unter dem Existenzminimum ist steuerfrei:\<close>
 lemma \<open>einkommenssteuer 10 = 0\<close> by eval
 lemma \<open>einkommenssteuer 10000 = 0\<close> by eval
+
+text\<open>Für ein Einkommen nur knapp über dem Existenzminimum fällt sehr wenig Steuer an:\<close>
 lemma \<open>einkommenssteuer 14000 = floor ((14000-10347)*0.14)\<close> by eval
+lemma \<open>einkommenssteuer 14000 = 511\<close> by eval
+
+
+text\<open>Bei einem Einkommen von 20000 EUR wird ein Teil bereits mit den höheren Steuersatz der
+3. Zone besteuert:\<close>
+lemma \<open>einkommenssteuer 20000 = 1857\<close> by eval
 lemma \<open>einkommenssteuer 20000 =
         floor ((14926-10347)*0.14 + (20000-14926)*0.2397)\<close> by eval
-value \<open>einkommenssteuer 40000\<close>
-value \<open>einkommenssteuer 60000\<close>
+
+
+text\<open>Höhere Einkommen führen zu einer höheren Steuer:\<close>
+lemma \<open>einkommenssteuer 40000 = 6651\<close> by eval
+lemma \<open>einkommenssteuer 60000 = 11698\<close> by eval
 
 (*<*)
 lemma einkommenssteuer:
