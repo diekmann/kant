@@ -98,7 +98,7 @@ Wenn \<^typ>\<open>'person\<close> aufzählbar ist haben wir ausführbaren Code:
 wobei @{const teste_maxime_exhaust} implementiert ist als @{thm teste_maxime_exhaust_def}.
 \<close>
 
-subsubsection\<open>Maximen Debugging\<close>
+subsection\<open>Maximen Debugging\<close>
 text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
 Maxime verletzt ist:\<close>
 datatype 'person opfer = Opfer 'person
@@ -142,7 +142,7 @@ lemma debug_maxime_exhaust [code]:
   by(simp add: image_Collect)
 (*>*)
 
-subsubsection \<open>Beispiel\<close>
+subsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
 
 (*this causes

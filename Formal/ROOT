@@ -5,10 +5,10 @@ session Kant = HOL +
   theories [document = false]
     ExecutableHelper
     Percentage
-    Aenderung
   theories [show_question_marks = false]
     SchnelleinstiegHOL
     Disclaimer
+    Handlung
     Gesetz
     Kant
     Maxime
