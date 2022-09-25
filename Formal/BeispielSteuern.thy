@@ -60,30 +60,39 @@ fun delta_steuerwelt :: "(steuerwelt, person, int) delta" where
       Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))"
 (*>*)
 
-definition "sc \<equiv> SimConsts
-    Alice
-    maxime_steuern
-    (printable_case_law_ableiten_absolut (\<lambda>w. show_fun (get_einkommen w)))"
-definition "sc' \<equiv> SimConsts
-    Alice
-    maxime_steuern
-    (case_law_ableiten_relativ delta_steuerwelt)"
+
+subsection\<open>Setup für Beispiele\<close>
 
 definition "initialwelt \<equiv> Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]"
 
-definition "beispiel_case_law h \<equiv> simulateOne sc 3 h initialwelt (Gesetz {})"
-definition "beispiel_case_law' h \<equiv> simulateOne sc' 20 h initialwelt (Gesetz {})"
+definition "beispiel_case_law_absolut welt steuerfun \<equiv>
+  simulateOne
+    (SimConsts
+      Alice
+      maxime_steuern
+      (printable_case_law_ableiten_absolut (\<lambda>w. show_fun (get_einkommen w))))
+    3 steuerfun welt (Gesetz {})"
+definition "beispiel_case_law_relativ welt steuerfun \<equiv>
+  simulateOne
+    (SimConsts
+      Alice
+      maxime_steuern
+      (case_law_ableiten_relativ delta_steuerwelt))
+    1 steuerfun welt (Gesetz {})"
 
-text\<open>Keiner zahlt steuern: funktioniert\<close>
-value \<open>beispiel_case_law (HandlungF (\<lambda>ich welt. welt))\<close>
-lemma \<open>beispiel_case_law' (HandlungF (\<lambda>ich welt. welt)) =
+
+subsection\<open>Beispiel: Keiner Zahlt Steuern\<close>
+
+text\<open>Die Maxime ist erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
+lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF (\<lambda>ich welt. welt)) =
   Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close> by eval
 
-text\<open>Ich zahle 1 Steuer: funnktioniert nicht, .... komisch, sollte aber?
-Achjaaaaaa, jeder muss ja Steuer zahlen, ....\<close>
+
+subsection\<open>Beiepiel: Ich zahle 1 Steuer\<close>
+text\<open>Das funktioniert nicht:\<close>
 definition "ich_zahle_1_steuer ich welt \<equiv>
-  Steuerwelt ((get_einkommen welt)(ich := ((get_einkommen welt) ich) - 1))"
-lemma \<open>beispiel_case_law (HandlungF ich_zahle_1_steuer) =
+  Steuerwelt ((get_einkommen welt)(ich -= 1))"
+lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF ich_zahle_1_steuer) =
   Gesetz
   {(\<section> 1,
     Rechtsnorm
@@ -91,18 +100,25 @@ lemma \<open>beispiel_case_law (HandlungF ich_zahle_1_steuer) =
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 3), (Carol, 0), (Eve, 5)]))
      (Rechtsfolge Verbot))}\<close> by eval
-lemma \<open>beispiel_case_law' (HandlungF ich_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF ich_zahle_1_steuer) =
   Gesetz
   {(\<section> 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
                             (Rechtsfolge Verbot))}\<close> by eval
-  
+
+text\<open>Denn jeder muss Steuer zahlen!
+Ich finde es super spannend, dass hier faktisch ein Gleichbehandlungsgrundsatz rausfällt,
+ohne dass wir soewtas jemals explizit gefordert haben.
+\<close>
+
+
+subsection\<open>Beiepiel: Jeder zahle 1 Steuer\<close>
 text\<open>Jeder muss steuern zahlen:
   funktioniert, ist aber doof, denn am Ende sind alle im Minus.
 
 Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
 definition "jeder_zahle_1_steuer ich welt \<equiv>
   Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt))"
-lemma \<open>beispiel_case_law (HandlungF jeder_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF jeder_zahle_1_steuer) =
 Gesetz
   {(\<section> 3,
     Rechtsnorm
@@ -122,21 +138,26 @@ Gesetz
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)]))
      (Rechtsfolge Erlaubnis))}\<close> by eval
-lemma \<open>beispiel_case_law' (HandlungF jeder_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF jeder_zahle_1_steuer) =
   Gesetz
   {(\<section> 1,
     Rechtsnorm
      (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
+
+subsection\<open>Beiepiel: Vereinfachtes Deutsches Steuersystem\<close>
 text\<open>Jetzt kommt die Steuern.thy ins Spiel.\<close>
 
-text\<open>Bei dem geringen Einkommen zahlt keiner Steuern.\<close>
-definition "jeder_zahlt steuerberechnung ich welt \<equiv>
-  Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> nat \<circ> (get_einkommen welt))"
+definition jeder_zahlt :: "(nat \<Rightarrow> nat) \<Rightarrow> 'a \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt" where
+  "jeder_zahlt steuerberechnung ich welt \<equiv>
+    Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> nat \<circ> (get_einkommen welt))"
 
 definition "jeder_zahlt_einkommenssteuer \<equiv> jeder_zahlt einkommenssteuer"
-lemma \<open>beispiel_case_law (HandlungF jeder_zahlt_einkommenssteuer ) = 
+
+
+text\<open>Bei dem geringen Einkommen der \<^const>\<open>initialwelt\<close> zahlt keiner Steuern.\<close>
+lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF jeder_zahlt_einkommenssteuer ) = 
   Gesetz
   {(\<section> 1,
     Rechtsnorm
@@ -145,20 +166,22 @@ lemma \<open>beispiel_case_law (HandlungF jeder_zahlt_einkommenssteuer ) =
         [(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)]))
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
-lemma \<open>simulateOne
-  sc' 1
-  (HandlungF jeder_zahlt_einkommenssteuer)
+
+text\<open>Für höhere Einkommen erhalten wir plausible Werte und niemand rutscht ins negative:\<close>
+lemma \<open>beispiel_case_law_relativ
   (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
-  (Gesetz {})
+  (HandlungF jeder_zahlt_einkommenssteuer)
   =
   Gesetz
   {(\<section> 1,
     Rechtsnorm (Tatbestand [Verliert Bob 511, Verliert Eve 1857])
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
-(*TODO: eigentlich sollte das folgende gelten in beide richtungen:*)
+
+section\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
 text\<open>Die Anforderungen fuer ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
-lemma "steuersystem steuersystem_impl \<Longrightarrow>
+lemma steuersystem_imp_maxime:
+  "steuersystem steuersystem_impl \<Longrightarrow>
         (\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern)"
    apply(simp add: maxime_steuern_def teste_maxime_unfold)
    apply(simp add: jeder_zahlt_def bevoelkerung_def)
@@ -177,9 +200,7 @@ lemma "steuersystem steuersystem_impl \<Longrightarrow>
    apply(simp; fail)
   by (simp add: steuer_defs.netto_def)
 
-lemma "a \<le> x \<Longrightarrow> int x - int (x - a) = a" by simp
 
-(*TODO*)
 text\<open>Danke ihr nats. Macht also keinen Sinn das als Annahme in die Maxime zu packen....\<close>
 lemma steuern_kleiner_einkommen_nat:
       "steuerlast ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))
@@ -190,7 +211,8 @@ lemma steuern_kleiner_einkommen_nat:
   done
 
 (*Braucht ein paar Annahmen.*)
-lemma "(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
+lemma maxime_imp_steuersystem:
+    "(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
        (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
         \<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern
         \<Longrightarrow> steuersystem steuersystem_impl"
@@ -241,5 +263,21 @@ next
     by simp
 qed
 
+
+text\<open>
+Für jedes @{term_type \<open>steuersystem_impl :: nat \<Rightarrow> nat\<close>},
+mit zwei weiteren Annahmen,
+gilt das \<^locale>\<open>steuersystem\<close> und \<^const>\<open>maxime_steuern\<close> in der \<^const>\<open>jeder_zahlt\<close> Implementierung
+äquivalent sind.
+\<close>
+theorem
+  fixes steuersystem_impl :: "nat \<Rightarrow> nat"
+  assumes steuer_kleiner_einkommen: "\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen"
+      and existenzminimum: "\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0"
+    shows
+   "(\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern)
+        \<longleftrightarrow> steuersystem steuersystem_impl"
+  using steuersystem_imp_maxime maxime_imp_steuersystem
+  using assms by blast 
 
 end
