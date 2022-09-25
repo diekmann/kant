@@ -66,6 +66,57 @@
 </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>value</span></span><span> </span><span class="quoted"><span>‹</span><a class="entity_ref" href="Handlung.html#Handlung.beispiel_handlungf|const"><span>beispiel_handlungf</span></a><span class="main"><span>::</span></span><span class="main"><span>(</span></span><span>nat</span><span class="main"><span>,</span></span><span> </span><span>int</span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span>›</span></span><span class="antiquote"><span>}</span></span></span><span>›</span></span></span><span>
 
 
+
+</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Interpretation: Gesinnungsethik vs. Verantwortungethik</span><span>›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>
+</span><span>Sei eine Ethik eine Funktion, welche einem beliebigen </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="tfree"><span>'α</span></span><span>›</span></span></span><span> eine</span><span>
+</span><span>Bewertung Gut = </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">const</span><span class="hidden">&gt;</span></span></span><span>‹</span><span>True</span><span>›</span></span><span>, Schlecht = </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">const</span><span class="hidden">&gt;</span></span></span><span>‹</span><span>False</span><span>›</span></span><span> zuordnet.</span><span>
+
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span>Eine Ethik hat demnach den Typ: </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="tfree"><span>'α</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span></span><span>.</span><span>
+
+</span><span class="antiquoted"><span class="operator"><span>┉</span></span></span><span>
+
+</span><span>Laut </span><span class="antiquoted"><span class="operator"><span>🌐</span></span><span>‹https://de.wikipedia.org/wiki/Gesinnungsethik›</span></span><span> ist eine Gesinnugsethik</span><span>
+</span><span>"[..] eine der moralischen Theorien,</span><span>
+ </span><span>die Handlungen nach der Handlungsabsicht [...]  bewertet,</span><span>
+ </span><span>und zwar ungeachtet der nach erfolgter Handlung eingetretenen Handlungsfolgen."</span><span>
+
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span>Demnach ist eine Gesinnungsethik: </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span></span><span>.</span><span>
+
+</span><span class="antiquoted"><span class="operator"><span>┈</span></span></span><span>
+
+</span><span>Nach </span><span class="antiquoted"><span class="operator"><span>🌐</span></span><span>‹https://de.wikipedia.org/wiki/Verantwortungsethik›</span></span><span> steht die Verantwortungsethik</span><span>
+</span><span>dazu im strikten Gegensatz, da die Verantwortungsethik</span><span>
+</span><span>"in der Bewertung des Handelns die Verantwortbarkeit der </span><span class="antiquoted"><span class="operator"><span>∗</span></span><span class="plain_text"><span>‹</span><span>tatsächlichen Ergebnisse</span><span>›</span></span></span><span> betont."</span><span>
+
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span>Demnach ist eine Verantwortungsethik: </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="tfree"><span>'world</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlung|type"><span>handlung</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span></span><span>.</span><span>
+
+
+</span><span class="antiquoted"><span class="operator"><span>┉</span></span></span><span>
+
+</span><span>Da </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">const</span><span class="hidden">&gt;</span></span></span><span>‹</span><a class="entity_ref" href="Handlung.html#Handlung.handeln|const"><span>handeln</span></a><span>›</span></span><span> eine Handlungsabsicht </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span>›</span></span></span><span>
+</span><span>in eine konkrete Änderung der Welt </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="tfree"><span>'world</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlung|type"><span>handlung</span></a><span>›</span></span></span><span> überführt,</span><span>
+</span><span>können wie die beiden Ethiktypen miteinander in Verbindungs setzen.</span><span>
+</span><span>Wir sagen, eine Gesinnungsethik und eine Verantwortungsethik sind konsistent,</span><span>
+</span><span>genau dann wenn für jede Handlungsabsicht, die</span><span>
+</span><span>Gesinnungsethik die Handlungsabsicht genau so bewertet,</span><span>
+</span><span>wie die Verantwortungsethik die Handlungsabsicht bewerten würde,</span><span>
+</span><span>wenn die die Handlungsabsicht in jeder möglichen Welt und</span><span>
+</span><span>als jede mögliche handelnde Person tatsächlich ausführt wird und die Folgen betrachtet werden:</span><span>
+</span><span>›</span></span></span><span>
+
+</span><span class="keyword1"><span class="command"><span class="entity_def" id="Handlung.gesinnungsethik_verantwortungsethik_konsistent_def|fact"><span class="entity_def" id="Handlung.gesinnungsethik_verantwortungsethik_konsistent_def|thm"><span class="entity_def" id="Handlung.gesinnungsethik_verantwortungsethik_konsistent_def_raw|axiom"><span>definition</span></span></span></span></span></span><span> </span><span class="entity"><span class="entity_def" id="Handlung.gesinnungsethik_verantwortungsethik_konsistent|const"><span>gesinnungsethik_verantwortungsethik_konsistent</span></span></span><span>
+  </span><span class="main"><span>::</span></span><span> </span><span class="quoted"><span class="quoted"><span>"</span><span class="main"><span>(</span></span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span class="main"><span>)</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'world</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlung|type"><span>handlung</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span class="main"><span>)</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>"</span></span></span><span> </span><span class="keyword2"><span class="keyword"><span>where</span></span></span><span>
+</span><span class="quoted"><span class="quoted"><span>"</span><span class="free"><span>gesinnungsethik_verantwortungsethik_konsistent</span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>gesinnungsethik</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>verantwortungsethik</span></span></span></span><span> </span><span class="main"><span>≡</span></span><span>
+  </span><span class="main"><span>∀</span></span><span class="bound"><span>handlungsabsicht</span></span><span class="main"><span>.</span></span><span>
+    </span><span class="free"><span class="bound"><span class="entity"><span>gesinnungsethik</span></span></span></span><span> </span><span class="bound"><span>handlungsabsicht</span></span><span> </span><span class="main"><span>⟷</span></span><span>
+      </span><span class="main"><span>(</span></span><span class="main"><span>∀</span></span><span class="bound"><span>person</span></span><span> </span><span class="bound"><span>welt</span></span><span class="main"><span>.</span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>verantwortungsethik</span></span></span></span><span> </span><span class="main"><span>(</span></span><a class="entity_ref" href="Handlung.html#Handlung.handeln|const"><span>handeln</span></a><span> </span><span class="bound"><span>person</span></span><span> </span><span class="bound"><span>welt</span></span><span> </span><span class="bound"><span>handlungsabsicht</span></span><span class="main"><span>)</span></span><span class="main"><span>)</span></span><span>"</span></span></span><span>
+
+
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Ich habe kein Beispiel für eine Gesinnungsethik
+</span><span>und eine Verantwortungsethik,
+</span><span>die tatsächlich konsistent sind.</span><span>›</span></span></span><span>
+
 </span><span class="keyword2"><span class="keyword"><span>end</span></span></span></pre>
 </body>
 
