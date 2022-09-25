@@ -5,13 +5,13 @@ begin
 
 section\<open>Beispiel: Steuern\<close>
 
-text\<open>Wenn die Welt sich durch eine Zahl darstellen lässt, ...
+text\<open>Wir nehmen eine einfach Welt an, in der jeder Person ihr Einkommen zugeordnet wird.
 
 Achtung: Im Unterschied zum BeispielZahlenwelt.thy modellieren wir hier nicht den Gesamtbesitz,
 sondern das Jahreseinkommen. Besitz wird ignoriert.
 \<close>
 datatype steuerwelt = Steuerwelt
-        (get_einkommen: "person \<Rightarrow> int") \<comment> \<open>einkommen: einkommen jeder Person (im Zweifel 0).\<close>
+        (get_einkommen: "person \<Rightarrow> int") \<comment> \<open>einkommen jeder Person (im Zweifel 0).\<close>
 
 fun steuerlast :: "person \<Rightarrow> steuerwelt handlung \<Rightarrow> int" where
   "steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)"
@@ -40,7 +40,9 @@ lemma \<open>mehrverdiener Alice
         (Handlung (Steuerwelt \<^url>[Alice:=8, Bob:=12, Eve:=7]) (Steuerwelt \<^url>[Alice:=5]))
        = {Alice, Bob}\<close> by eval
 
-(*TODO: eine andere test maxime sollte sein, dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
+text\<open>Folgende Maxime versucht Steuergerechtigkeit festzuschreiben:\<close>
+(*TODO: eine andere test maxime sollte sein,
+dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
 definition maxime_steuern :: "(person, steuerwelt) maxime" where
   "maxime_steuern \<equiv> Maxime 
       (\<lambda>ich handlung.
@@ -128,7 +130,6 @@ lemma \<open>beispiel_case_law' (HandlungF jeder_zahle_1_steuer) =
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
 text\<open>Jetzt kommt die Steuern.thy ins Spiel.\<close>
-(*wow ist das langsam!*)
 
 text\<open>Bei dem geringen Einkommen zahlt keiner Steuern.\<close>
 definition "jeder_zahlt steuerberechnung ich welt \<equiv>
@@ -239,6 +240,6 @@ next
         \<Longrightarrow> einkommen \<le> 9888 \<Longrightarrow> steuersystem_impl einkommen = 0"
     by simp
 qed
-    
+
 
 end
