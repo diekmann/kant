@@ -60,20 +60,20 @@ subsection\<open>Setup\<close>
   
   text\<open>Wir nehmen an unsere handelnde Person ist \<^const>\<open>Alice\<close>.\<close>
   
-  definition "beispiel_case_law_absolut maxime handlung \<equiv>
+  definition "beispiel_case_law_absolut maxime handlungsabsicht \<equiv>
     simulateOne
       (SimConsts
         Alice
         maxime
         (printable_case_law_ableiten_absolut show_zahlenwelt))
-      10 handlung initialwelt (Gesetz {})"
-  definition "beispiel_case_law_relativ maxime handlung \<equiv>
+      10 handlungsabsicht initialwelt (Gesetz {})"
+  definition "beispiel_case_law_relativ maxime handlungsabsicht \<equiv>
     simulateOne
       (SimConsts
         Alice
         maxime
         (case_law_ableiten_relativ delta_zahlenwelt))
-      20 handlung initialwelt (Gesetz {})"
+      20 handlungsabsicht initialwelt (Gesetz {})"
 
 subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
 

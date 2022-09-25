@@ -38,41 +38,41 @@ definition bevoelkerung :: \<open>'person set\<close> where \<open>bevoelkerung 
 definition wenn_jeder_so_handelt
     :: \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('world handlung) set\<close>
   where
-    \<open>wenn_jeder_so_handelt welt handlung \<equiv>
-      (\<lambda>handelnde_person. handeln handelnde_person welt handlung) ` bevoelkerung\<close>
+    \<open>wenn_jeder_so_handelt welt handlungsabsicht \<equiv>
+      (\<lambda>handelnde_person. handeln handelnde_person welt handlungsabsicht) ` bevoelkerung\<close>
 fun was_wenn_jeder_so_handelt_aus_sicht_von
     :: \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
-    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt handlung (Maxime m) betroffene_person =
-        (\<forall> h \<in> wenn_jeder_so_handelt welt handlung. m betroffene_person h)\<close>
+    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht (Maxime m) betroffene_person =
+        (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. m betroffene_person h)\<close>
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
 definition teste_maxime ::
   \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
-\<open>teste_maxime welt handlung maxime \<equiv>
-  \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlung maxime p\<close>
+\<open>teste_maxime welt handlungsabsicht maxime \<equiv>
+  \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht maxime p\<close>
 
 text\<open>
 Faktisch bedeutet diese Definition, wir bilden das Kreuzprodukt Bevölkerung x Bevölkerung,
 wobei jeder einmal als handelnde Person auftritt und einmal als betroffene Person.
 \<close>
 lemma teste_maxime_unfold:
-  \<open>teste_maxime welt handlung (Maxime m) =
-        (\<forall>p1\<in>bevoelkerung. \<forall>p2\<in>bevoelkerung. m p1 (handeln p2 welt handlung))\<close>
+  \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+        (\<forall>p1\<in>bevoelkerung. \<forall>p2\<in>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
   by(simp add: teste_maxime_def wenn_jeder_so_handelt_def)
-lemma \<open>teste_maxime welt handlung (Maxime m) =
-        (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlung))\<close>
+lemma \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+        (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding teste_maxime_unfold by simp
 
 (*<*)
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
 definition teste_maxime_exhaust where
-  \<open>teste_maxime_exhaust bevoelk welt handlung maxime \<equiv>
+  \<open>teste_maxime_exhaust bevoelk welt handlungsabsicht maxime \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
-      list_all (\<lambda>(p,x). m p (handeln x welt handlung)) (List.product bevoelk bevoelk))\<close>
+      list_all (\<lambda>(p,x). m p (handeln x welt handlungsabsicht)) (List.product bevoelk bevoelk))\<close>
 
 lemma teste_maxime_exhaust_univ: \<open>set b = (UNIV::'person set) \<Longrightarrow>
-        teste_maxime welt handlung maxime = teste_maxime_exhaust b welt handlung maxime\<close>
+        teste_maxime welt ha maxime = teste_maxime_exhaust b welt ha maxime\<close>
   apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
   unfolding teste_maxime_unfold teste_maxime_exhaust_def bevoelkerung_def
   apply(simp)
@@ -115,28 +115,29 @@ fun debug_maxime
       ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime
       \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
 where
-  "debug_maxime print_world welt handlung (Maxime m) =
+  "debug_maxime print_world welt handlungsabsicht (Maxime m) =
     {VerletzteMaxime
       (Opfer p1) (Taeter p2)
-      (map_handlung print_world (handeln p2 welt handlung)) | p1 p2.
-          \<not>m p1 (handeln p2 welt handlung)}"
+      (map_handlung print_world (handeln p2 welt handlungsabsicht)) | p1 p2.
+          \<not>m p1 (handeln p2 welt handlungsabsicht)}"
 
 
 text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
-lemma "debug_maxime print_world welt handlung maxime = {} \<longleftrightarrow> teste_maxime welt handlung maxime"
+lemma "debug_maxime print_world welt handlungsabsicht maxime = {}
+        \<longleftrightarrow> teste_maxime welt handlungsabsicht maxime"
   apply(case_tac maxime, rename_tac m, simp)
   by(simp add: teste_maxime_unfold bevoelkerung_def)
 
 (*<*)
 definition debug_maxime_exhaust where
-  \<open>debug_maxime_exhaust bevoelk print_world welt handlung maxime \<equiv>
+  \<open>debug_maxime_exhaust bevoelk print_world welt ha maxime \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
-      map (\<lambda>(p1,p2). VerletzteMaxime (Opfer p1) (Taeter p2) (map_handlung print_world (handeln p2 welt handlung)))
-        (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt handlung)) (List.product bevoelk bevoelk)))\<close>
+      map (\<lambda>(p1,p2). VerletzteMaxime (Opfer p1) (Taeter p2) (map_handlung print_world (handeln p2 welt ha)))
+        (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt ha)) (List.product bevoelk bevoelk)))\<close>
 
 lemma debug_maxime_exhaust [code]:
-  \<open>debug_maxime print_world welt handlung maxime
-    = set (debug_maxime_exhaust enum_class.enum print_world welt handlung maxime)\<close>
+  \<open>debug_maxime print_world welt ha maxime
+    = set (debug_maxime_exhaust enum_class.enum print_world welt ha maxime)\<close>
   apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
   apply(simp add: debug_maxime_exhaust_def enum_UNIV)
   by(simp add: image_Collect)
@@ -151,7 +152,8 @@ when we don't use teste_maxime_exhaust.
 So when code fails with "Kant.teste_maxime", make sure the 'person implements enum.*)
 
 text\<open>Beispiel:
-Die Welt sei nur eine Zahl und die zu betrachtende Handlung sei, dass wir diese Zahl erhöhen.
+Die Welt sei nur eine Zahl und die zu betrachtende Handlungsabsicht sei,
+dass wir diese Zahl erhöhen.
 Die Mir-ist-alles-Recht Maxime ist hier erfüllt:\<close>
 lemma \<open>teste_maxime
             (42::nat)

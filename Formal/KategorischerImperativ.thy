@@ -79,15 +79,15 @@ definition kategorischer_imperativ ::
    (nat, 'a, 'b) gesetz
   \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
 where
-  \<open>kategorischer_imperativ ich welt handlung maxime gesetz_ableiten gesetz \<equiv>
-    let soll_handeln = if teste_maxime welt handlung maxime
+  \<open>kategorischer_imperativ ich welt handlungsabsicht maxime gesetz_ableiten gesetz \<equiv>
+    let soll_handeln = if teste_maxime welt handlungsabsicht maxime
                        then
                          Erlaubnis
                        else
                          Verbot in
       (
         soll_handeln,
-        hinzufuegen (gesetz_ableiten (handeln ich welt handlung) soll_handeln) gesetz
+        hinzufuegen (gesetz_ableiten (handeln ich welt handlungsabsicht) soll_handeln) gesetz
       )\<close>
 
 

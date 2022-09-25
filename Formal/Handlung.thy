@@ -56,7 +56,7 @@ text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>b
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
 text\<open>
 Sei eine Ethik eine Funktion, welche einem beliebigen \<^typ>\<open>'\<alpha>\<close> eine
-Bewertung Gut = \<^const>\<open>True\<close>, Schlecht = \<^const>\<open>False\<close> zuordent.
+Bewertung Gut = \<^const>\<open>True\<close>, Schlecht = \<^const>\<open>False\<close> zuordnet.
 
   \<^item> Eine Ethik hat demnach den Typ: \<^typ>\<open>'\<alpha> \<Rightarrow> bool\<close>.
 
