@@ -52,4 +52,55 @@ text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>b
 @{value \<open>beispiel_handlungf::(nat, int) handlungF\<close>}\<close>
 
 
+
+subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
+text\<open>
+Sei eine Ethik eine Funktion, welche einem beliebigen \<^typ>\<open>'\<alpha>\<close> eine
+Bewertung Gut = \<^const>\<open>True\<close>, Schlecht = \<^const>\<open>False\<close> zuordnet.
+
+  \<^item> Eine Ethik hat demnach den Typ: \<^typ>\<open>'\<alpha> \<Rightarrow> bool\<close>.
+
+\<^medskip>
+
+Laut \<^url>\<open>https://de.wikipedia.org/wiki/Gesinnungsethik\<close> ist eine Gesinnugsethik
+"[..] eine der moralischen Theorien,
+ die Handlungen nach der Handlungsabsicht [...]  bewertet,
+ und zwar ungeachtet der nach erfolgter Handlung eingetretenen Handlungsfolgen."
+
+  \<^item> Demnach ist eine Gesinnungsethik: \<^typ>\<open>('person, 'world) handlungF \<Rightarrow> bool\<close>.
+
+\<^smallskip>
+
+Nach \<^url>\<open>https://de.wikipedia.org/wiki/Verantwortungsethik\<close> steht die Verantwortungsethik
+dazu im strikten Gegensatz, da die Verantwortungsethik
+"in der Bewertung des Handelns die Verantwortbarkeit der \<^emph>\<open>tatsächlichen Ergebnisse\<close> betont."
+
+  \<^item> Demnach ist eine Verantwortungsethik: \<^typ>\<open>'world handlung \<Rightarrow> bool\<close>.
+
+
+\<^medskip>
+
+Da \<^const>\<open>handeln\<close> eine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungF\<close>
+in eine konkrete Änderung der Welt \<^typ>\<open>'world handlung\<close> überführt,
+können wie die beiden Ethiktypen miteinander in Verbindungs setzen.
+Wir sagen, eine Gesinnungsethik und eine Verantwortungsethik sind konsistent,
+genau dann wenn für jede Handlungsabsicht, die
+Gesinnungsethik die Handlungsabsicht genau so bewertet,
+wie die Verantwortungsethik die Handlungsabsicht bewerten würde,
+wenn die die Handlungsabsicht in jeder möglichen Welt und
+als jede mögliche handelnde Person tatsächlich ausführt wird und die Folgen betrachtet werden:
+\<close>
+
+definition gesinnungsethik_verantwortungsethik_konsistent
+  :: "(('person, 'world) handlungF \<Rightarrow> bool) \<Rightarrow> ('world handlung \<Rightarrow> bool) \<Rightarrow> bool" where
+"gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
+  \<forall>handlungsabsicht.
+    gesinnungsethik handlungsabsicht \<longleftrightarrow>
+      (\<forall>person welt. verantwortungsethik (handeln person welt handlungsabsicht))"
+
+
+text\<open>Ich habe kein Beispiel für eine Gesinnungsethik
+und eine Verantwortungsethik,
+die tatsächlich konsistent sind.\<close>
+
 end

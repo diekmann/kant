@@ -24,11 +24,11 @@ fun simulate_handlungF
         ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
         \<Rightarrow> ('world \<times> (nat, 'a, 'b) gesetz)"
   where
-    "simulate_handlungF (SimConsts person maxime aga) h welt g =
-    (let (sollensanordnung, g') = kategorischer_imperativ person welt h maxime aga g in
+    "simulate_handlungF (SimConsts person maxime aga) ha welt g =
+    (let (sollensanordnung, g') = kategorischer_imperativ person welt ha maxime aga g in
       let w' = (if sollensanordnung = Erlaubnis
                 then
-                  nachher (handeln person welt h)
+                  nachher (handeln person welt ha)
                 else
                   welt
                ) in
@@ -77,8 +77,8 @@ definition simulateOne
         nat \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
         \<Rightarrow> (nat, 'a, 'b) gesetz"
     where
-    "simulateOne simconsts i h w g \<equiv>
-      let (welt, gesetz) = converge (simulate_handlungF simconsts h) i w g in
+    "simulateOne simconsts i ha w g \<equiv>
+      let (welt, gesetz) = converge (simulate_handlungF simconsts ha) i w g in
             gesetz"
 (*>*)
 text\<open>...
@@ -122,7 +122,7 @@ text\<open>Eine Iteration der Simulation liefert genau einen Paragraphen im Gese
 lemma \<open>\<exists>tb rf. 
   simulateOne
     (SimConsts person maxime gesetz_ableiten)
-    1 handlungF
+    1 handlungsabsicht
     initialwelt
     (Gesetz {})
   = Gesetz {(\<section> 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>

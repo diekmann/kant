@@ -1,3 +1,4 @@
+(*<*)
 theory Aenderung
 imports Main ExecutableHelper BeispielPerson Handlung
 begin
@@ -67,3 +68,4 @@ lemma delta_num_map: "delta_num_map (Handlung m1 m2) =
 
 
 end
+(*>*)
