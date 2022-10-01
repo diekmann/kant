@@ -4,6 +4,7 @@ begin
 
 section\<open>Maxime\<close>
 text\<open>
+Alles in diesem Abschnitt ist darauf ausgelegt, später den kategorischen Imperativ zu modellieren.
 Modell einer \<^emph>\<open>Maxime\<close>:
 Eine Maxime in diesem Modell beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 
@@ -12,7 +13,8 @@ Faktisch ist eine Maxime
   \<^item> \<^typ>\<open>'world handlung\<close>: die zu betrachtende Handlung.
   \<^item> \<^typ>\<open>bool\<close>: Das Ergebnis der Betrachtung. \<^const>\<open>True\<close> = Gut; \<^const>\<open>False\<close> = Schlecht.
 
-Wir brauchen sowohl die \<^typ>\<open>'world handlung\<close> als auch die handelnde \<^typ>\<open>'person\<close>,
+Wir brauchen sowohl die \<^typ>\<open>'world handlung\<close> als auch die \<^typ>\<open>'person\<close> aus deren Sicht die Maxime
+definiert ist,
 da es einen großen Unterschied machen kann ob ich selber handel,
 ob ich Betroffener einer fremden Handlung bin, oder nur Außenstehender.
 \<close>
@@ -22,6 +24,23 @@ datatype ('person, 'world) maxime = Maxime \<open>'person \<Rightarrow> 'world h
 text\<open>Beispiel\<close>
 definition maxime_mir_ist_alles_recht :: \<open>('person, 'world) maxime\<close> where
   \<open>maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)\<close>
+
+text\<open>Kants kategorischer Imperativ ist eine deontologische Ethik,
+d.h.,
+"Es wird eben nicht bewertet, was die Handlung bewirkt, sondern wie die Absicht beschaffen ist."
+\<^url>\<open>https://de.wikipedia.org/wiki/Kategorischer_Imperativ\<close>.
+
+Wenn wir Kants kategorischen Imperativ bauen wollen, dürfen wir also nicht die Folgen einer
+Handlung betrachten, sondern nur die Absicht dahinter.
+Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'world handlung\<close>, also eine konkrete Handlung,
+die nur durch ihre Folgen gegeben ist.
+Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungF\<close>.
+
+Dies mag nun als Fehler in unserem Modell verstanden werden.
+Doch irgendwo müssen wir praktisch werden.
+Nur von Handlungsabsichten zu reden, ohne dass die beabsichtigten Folgen betrachtet werden
+ist mir einfach zu abstrakt und nicht greifbar.
+\<close>
 
 (*
 TODO: in einer Maxime darf keine konkrete Person hardcoded sein.
@@ -46,6 +65,7 @@ fun was_wenn_jeder_so_handelt_aus_sicht_von
     \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht (Maxime m) betroffene_person =
         (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. m betroffene_person h)\<close>
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
+(*TODO: rename zu moralisch*)
 definition teste_maxime ::
   \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
 \<open>teste_maxime welt handlungsabsicht maxime \<equiv>
@@ -64,6 +84,12 @@ lemma \<open>teste_maxime welt handlungsabsicht (Maxime m) =
   unfolding teste_maxime_unfold by simp
 
 (*<*)
+lemma teste_maxime_simp:
+  \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+        (\<forall>p1. \<forall>p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
+  unfolding teste_maxime_unfold
+  by (simp add: bevoelkerung_def)
+
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
 definition teste_maxime_exhaust where
