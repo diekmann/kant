@@ -100,9 +100,13 @@ Der Trick dabei ist nicht, dass wir einer verletzten Maxime \<^term>\<open>-\<in
 sondern der Trick besteht in \<^const>\<open>maximeNeutralisieren\<close>, welche nicht erlaubt Glück
 aufzuaddieren und mit Leid zu verrechnen, sondern dank des Allquantors dafür sorgt,
 dass auch nur das kleinste Leid dazu führt, dass sofort \<^const>\<open>False\<close> zurückgegebn wird.
+
+Aber wenn wir ordentlich aufsummieren, jedoch einer verletzten Maxime \<^term>\<open>-\<infinity>::ereal\<close>
+Nutzen zuordnen und zusätzlich annehmen, dass die Bevölkerung endlich ist,
+dann funktioniert das auch:
 \<close>
 
-(*
+
 fun maxime_als_summe_wohlergehen
   :: "('person, 'world) maxime \<Rightarrow> 'world glueck_messen"
 where
@@ -112,47 +116,75 @@ where
                                   | False \<Rightarrow> - \<infinity>))"
 
 (*<*)
-thm infinite_finite_induct
-thm finite.induct
-lemma 
-  \<open>(0::ereal) \<le> (\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)
-        \<longleftrightarrow> (\<forall>p\<in>B. f p)\<close>
-  apply(rule finite.induct)
-  defer
-    apply(simp; fail)
-   apply(simp)
-   apply(subst sum.insert_if)
-     apply(simp; fail)
-   apply(simp)
-   apply(intro impI conjI)
-    apply(blast)
-   apply(case_tac "f a")
-    apply(simp)
-  defer
-    apply(simp)
-  apply (smt (verit, del_insts) MInfty_neq_PInfty(1) ereal_plus_eq_MInfty ereal_times(1) not_MInfty_nonneg sum_Pinfty)
-  apply(simp)
-  apply(simp add: sum_def )
-  apply(simp add: bool.split_sel)
-  apply(simp add: bevoelkerung_def)
-  apply(simp add: sum_def)
-  thm Finite_Set.finite.induct
 
-lemma \<open>(0::ereal) \<le> (\<Sum>p\<in>bevoelkerung. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)
-        \<longleftrightarrow> (\<forall>p. f p)\<close>
-  apply(simp add: bevoelkerung_def)
-  apply(simp add: sum_def)
-  thm Finite_Set.finite.induct
-  apply(rule Finite_Set.finite.induct)
-    defer
+lemma "(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) < (\<infinity>::ereal)"
+  by (simp add: case_bool_if sum_Pinfty)
+
+
+lemma helper_finite_wohlergehen_sum_cases:
+  "finite B \<Longrightarrow>
+(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) = (- \<infinity>::ereal)
+\<or>
+((0::ereal) \<le> (\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>))"
+  apply(induction rule: finite.induct)
+   apply(simp; fail)
+  apply (simp add: case_bool_if)
+  apply(simp add: sum.insert_if)
+  apply(intro allI impI conjI)
+  apply(elim disjE)
+   apply(simp)
   apply(simp)
- apply (simp add: bool.split_sel)
+  done
+    
+thm ereal_MInfty_eq_plus ereal_less_eq(1) ereal_times(1) not_MInfty_nonneg sum_Pinfty
+
+lemma helper_wohlergehen_sum_cases_iff:
+  \<open>finite B \<Longrightarrow>
+    (0::ereal) \<le> (\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)
+        \<longleftrightarrow> (\<forall>p\<in>B. f p)\<close>
+
+  apply(frule_tac helper_finite_wohlergehen_sum_cases[of _ f])
+  apply(elim disjE)
+   apply(simp)
+   apply (smt (verit) not_MInfty_nonneg sum_nonneg zero_less_one_ereal)
+  apply(simp)
+
+  apply(induction rule: finite.induct)
+   apply(simp; fail)
+  apply (simp add: case_bool_if)
+  apply(simp add: sum.insert_if)
+  apply(intro allI impI conjI)
+   apply (smt (verit) ereal_MInfty_eq_plus ereal_less_eq(1) ereal_times(1) not_MInfty_nonneg sum_Pinfty)
+  apply(case_tac "a \<in> A")
+   apply(simp)
+  apply(simp)
+  apply(case_tac "f a")
+  apply(simp)
+  apply(frule_tac helper_finite_wohlergehen_sum_cases[of _ f, simplified case_bool_if])
+  apply(elim disjE)
+    apply(simp)
+   apply(simp)
+  apply(simp)
+  using not_MInfty_nonneg by fastforce
+  
+  
+
+lemma \<open>finite (bevoelkerung::'person set) \<Longrightarrow>
+          (0::ereal) \<le> (\<Sum>p\<in>(bevoelkerung::'person set). case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)
+        \<longleftrightarrow> (\<forall>p\<in>bevoelkerung. f p)\<close>
+  apply(rule helper_wohlergehen_sum_cases_iff)
+  by simp
+ 
 
 (*>*)
 
-theorem "gesinnungsethik_verantwortungsethik_konsistent
-        (kant_als_gesinnungsethik maxime)
-        (utilitarismus_als_verantwortungsethik (maxime_als_summe_wohlergehen maxime))"
+theorem
+  fixes maxime :: \<open>('person, 'world) maxime\<close>
+  assumes "finite (bevoelkerung:: 'person set)"
+  shows 
+    "gesinnungsethik_verantwortungsethik_konsistent
+      (kant_als_gesinnungsethik maxime)
+      (utilitarismus_als_verantwortungsethik (maxime_als_summe_wohlergehen maxime))"
   apply(cases maxime, rename_tac m, simp)
   apply(simp add: gesinnungsethik_verantwortungsethik_konsistent_def
                   kant_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
@@ -160,8 +192,9 @@ theorem "gesinnungsethik_verantwortungsethik_konsistent
   apply(intro allI)
   apply(case_tac handlungsabsicht, rename_tac h, simp)
   apply(simp add: teste_maxime_simp)
-  apply(simp add: ereal_zero_geq_case)
-  by blast
+  apply(subst helper_wohlergehen_sum_cases_iff[OF \<open>finite bevoelkerung\<close>])
+  apply(auto simp add: bevoelkerung_def)
+  done
 
-*)
+
 end

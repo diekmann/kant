@@ -25,6 +25,23 @@ text\<open>Beispiel\<close>
 definition maxime_mir_ist_alles_recht :: \<open>('person, 'world) maxime\<close> where
   \<open>maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)\<close>
 
+text\<open>Kants kategorischer Imperativ ist eine deontologische Ethik,
+d.h.,
+"Es wird eben nicht bewertet, was die Handlung bewirkt, sondern wie die Absicht beschaffen ist."
+\<^url>\<open>https://de.wikipedia.org/wiki/Kategorischer_Imperativ\<close>.
+
+Wenn wir Kants kategorischen Imperativ bauen wollen, dürfen wir also nicht die Folgen einer
+Handlung betrachten, sondern nur die Absicht dahinter.
+Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'world handlung\<close>, also eine konkrete Handlung,
+die nur durch ihre Folgen gegeben ist.
+Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungF\<close>.
+
+Dies mag nun als Fehler in unserem Modell verstanden werden.
+Doch irgendwo müssen wir praktisch werden.
+Nur von Handlungsabsichten zu reden, ohne dass die beabsichtigten Folgen betrachtet werden
+ist mir einfach zu abstrakt und nicht greifbar.
+\<close>
+
 (*
 TODO: in einer Maxime darf keine konkrete Person hardcoded sein.
  Verboten: Maxime (\ich _ -> if ich == "konkrete Person" then ...)
