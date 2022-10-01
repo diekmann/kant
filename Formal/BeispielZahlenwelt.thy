@@ -148,8 +148,8 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
     by eval
   
   
-  text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des eigenen Wohlstands
-  erlebt.
+  text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des
+  eigenen Wohlstands erlebt.
   Effektiv führt diese Maxime zu einem Gesetz, welches es einem Individuum nicht erlaubt
   mehr Besitz zu erschaffen, obwohl niemand dadurch einen Nachteil hat.
   Diese Maxime kann meiner Meinung nach nicht gewollt sein.

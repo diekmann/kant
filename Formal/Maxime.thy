@@ -4,6 +4,7 @@ begin
 
 section\<open>Maxime\<close>
 text\<open>
+Alles in diesem Abschnitt ist darauf ausgelegt, später den kategorischen Imperativ zu modellieren.
 Modell einer \<^emph>\<open>Maxime\<close>:
 Eine Maxime in diesem Modell beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 
@@ -12,7 +13,8 @@ Faktisch ist eine Maxime
   \<^item> \<^typ>\<open>'world handlung\<close>: die zu betrachtende Handlung.
   \<^item> \<^typ>\<open>bool\<close>: Das Ergebnis der Betrachtung. \<^const>\<open>True\<close> = Gut; \<^const>\<open>False\<close> = Schlecht.
 
-Wir brauchen sowohl die \<^typ>\<open>'world handlung\<close> als auch die handelnde \<^typ>\<open>'person\<close>,
+Wir brauchen sowohl die \<^typ>\<open>'world handlung\<close> als auch die \<^typ>\<open>'person\<close> aus deren Sicht die Maxime
+definiert ist,
 da es einen großen Unterschied machen kann ob ich selber handel,
 ob ich Betroffener einer fremden Handlung bin, oder nur Außenstehender.
 \<close>
@@ -46,6 +48,7 @@ fun was_wenn_jeder_so_handelt_aus_sicht_von
     \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht (Maxime m) betroffene_person =
         (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. m betroffene_person h)\<close>
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
+(*TODO: rename zu moralisch*)
 definition teste_maxime ::
   \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
 \<open>teste_maxime welt handlungsabsicht maxime \<equiv>
@@ -64,6 +67,12 @@ lemma \<open>teste_maxime welt handlungsabsicht (Maxime m) =
   unfolding teste_maxime_unfold by simp
 
 (*<*)
+lemma teste_maxime_simp:
+  \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+        (\<forall>p1. \<forall>p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
+  unfolding teste_maxime_unfold
+  by (simp add: bevoelkerung_def)
+
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
 definition teste_maxime_exhaust where
