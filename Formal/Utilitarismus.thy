@@ -73,8 +73,7 @@ where
 
 (*<*)
 lemma ereal_zero_geq_case:
-  \<open>((0::ereal) \<le> (case (\<forall>p. f p) of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>))
-      \<longleftrightarrow> (\<forall>p. f p)\<close>
+  \<open>((0::ereal) \<le> (case (\<forall>p. f p) of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)) \<longleftrightarrow> (\<forall>p. f p)\<close>
   by (simp add: bool.split_sel)
 (*>*)
 
@@ -117,18 +116,20 @@ where
 
 (*<*)
 
-lemma "(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) < (\<infinity>::ereal)"
-  by (simp add: case_bool_if sum_Pinfty)
+lemma sum_wohlergehen_simp:
+  "(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) = (\<Sum>p\<in>B. if f p then 1 else - \<infinity>)"
+  by (simp add: case_bool_if)
+lemma "(\<Sum>p\<in>B. if f p then 1 else - \<infinity>) < (\<infinity>::ereal)"
+  by (simp add: sum_Pinfty)
 
 
 lemma helper_finite_wohlergehen_sum_cases:
   "finite B \<Longrightarrow>
-(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) = (- \<infinity>::ereal)
-\<or>
-((0::ereal) \<le> (\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>))"
+    (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) = (- \<infinity>::ereal)
+    \<or>
+    ((0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>))"
   apply(induction rule: finite.induct)
    apply(simp; fail)
-  apply (simp add: case_bool_if)
   apply(simp add: sum.insert_if)
   apply(intro allI impI conjI)
   apply(elim disjE)
@@ -136,44 +137,53 @@ lemma helper_finite_wohlergehen_sum_cases:
   apply(simp)
   done
     
-thm ereal_MInfty_eq_plus ereal_less_eq(1) ereal_times(1) not_MInfty_nonneg sum_Pinfty
-
-lemma helper_wohlergehen_sum_cases_iff:
-  \<open>finite B \<Longrightarrow>
-    (0::ereal) \<le> (\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)
-        \<longleftrightarrow> (\<forall>p\<in>B. f p)\<close>
-
-  apply(frule_tac helper_finite_wohlergehen_sum_cases[of _ f])
+lemma helper_wohlergehen_sum_IH:
+  "finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>insert b B. if f p then 1 else - \<infinity>)
+    \<Longrightarrow>  (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>)"
+  apply(frule helper_finite_wohlergehen_sum_cases[of _ f])
   apply(elim disjE)
+   apply(simp add: sum.insert_if)
+   apply(case_tac "b \<in> B")
+    apply(simp; fail)
    apply(simp)
-   apply (smt (verit) not_MInfty_nonneg sum_nonneg zero_less_one_ereal)
-  apply(simp)
+   apply (metis (full_types) ereal_plus_1(3) not_MInfty_nonneg plus_ereal.simps(6))
+  apply (simp)
+  done
 
-  apply(induction rule: finite.induct)
+lemma helper_wohlergehen_sum_minfty:
+  "(\<Sum>p\<in>B. if f p then 1 else - \<infinity>) = (-\<infinity>::ereal) \<Longrightarrow> \<exists>x\<in>B. \<not> f x"
+  by (metis (mono_tags, lifting) not_MInfty_nonneg sum_nonneg zero_less_one_ereal)
+
+lemma helper_wohlergehen_sum_pos:
+  "finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) \<Longrightarrow> \<forall>p\<in>B. f p"
+  apply(induction B rule: finite.induct)
    apply(simp; fail)
-  apply (simp add: case_bool_if)
+  apply(frule(1) helper_wohlergehen_sum_IH)
+  apply(simp)
   apply(simp add: sum.insert_if)
-  apply(intro allI impI conjI)
-   apply (smt (verit) ereal_MInfty_eq_plus ereal_less_eq(1) ereal_times(1) not_MInfty_nonneg sum_Pinfty)
   apply(case_tac "a \<in> A")
-   apply(simp)
+   apply(simp; fail)
   apply(simp)
   apply(case_tac "f a")
+   apply(simp; fail)
   apply(simp)
-  apply(frule_tac helper_finite_wohlergehen_sum_cases[of _ f, simplified case_bool_if])
+  by (metis MInfty_neq_PInfty(2) ereal_plus_eq_MInfty ereal_times(1) not_MInfty_nonneg sum_Pinfty)
+
+lemma helper_wohlergehen_sum_iff:
+  \<open>finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) \<longleftrightarrow> (\<forall>p\<in>B. f p)\<close>
+  apply(frule helper_finite_wohlergehen_sum_cases[of _ f])
   apply(elim disjE)
-    apply(simp)
-   apply(simp)
+   apply(simp add: helper_wohlergehen_sum_minfty; fail)
   apply(simp)
-  using not_MInfty_nonneg by fastforce
+  using helper_wohlergehen_sum_pos by blast
   
   
 
-lemma \<open>finite (bevoelkerung::'person set) \<Longrightarrow>
+lemma helper_wohlergehen_sum_cases_iff:
+  \<open>finite (bevoelkerung::'person set) \<Longrightarrow>
           (0::ereal) \<le> (\<Sum>p\<in>(bevoelkerung::'person set). case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>)
         \<longleftrightarrow> (\<forall>p\<in>bevoelkerung. f p)\<close>
-  apply(rule helper_wohlergehen_sum_cases_iff)
-  by simp
+  using helper_wohlergehen_sum_iff sum_wohlergehen_simp by metis
  
 
 (*>*)
