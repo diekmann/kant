@@ -5,7 +5,7 @@ pdf:
 	echo "running Isabelle locally to build the proof document"
 	mkdir -p output
 	echo "add -c for a clean build"
-	cd Formal; $(ISABELLE) build -v -D . -c -o document=pdf
+	cd Formal; $(ISABELLE) build -v -D . -o document=pdf
 
 slidesonly:
 	echo "only slides"
