@@ -90,6 +90,8 @@ lemma teste_maxime_simp:
   unfolding teste_maxime_unfold
   by (simp add: bevoelkerung_def)
 
+
+
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
 definition teste_maxime_exhaust where
@@ -224,6 +226,54 @@ lemma \<open>debug_maxime show_map
                [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
   by eval
 
+
+
+
+(*Scratch: TODO! teste_maxime ist die Goldene Regel. Wir wollen*)
+term teste_maxime
+
+text\<open>
+Goldene Regel: \<^url>\<open>https://de.wikipedia.org/wiki/Goldene_Regel\<close>
+
+  Behandle andere so, wie du von ihnen behandelt werden willst.
+
+  Was du nicht willst, das[s] man dir tu’, das füg auch keinem andern zu
+
+
+oder anders: die handlung muss okay sein, egal wer sie ausfuehrt.
+das sagt teste_maxime_simp schon!! TODO!
+\<close>
+
+text\<open>
+Oder anders: wenn eine Handlung fuer dich okay ist,
+dann muss sie auch Okay sein, wenn jemand anderes sie ausfuehrt.
+\<close>
+
+lemma "teste_maxime welt handlungsabsicht (Maxime m) \<Longrightarrow>
+  (\<forall>p1. m p1 (handeln p1 welt handlungsabsicht) \<longrightarrow>
+          (\<forall>p2. m p1 (handeln p2 welt handlungsabsicht)))"
+  by (simp add: teste_maxime_simp)
+lemma "(\<forall>p1. m p1 (handeln p1 welt handlungsabsicht) \<longrightarrow>
+          (\<forall>p2. m p1 (handeln p2 welt handlungsabsicht)))
+ \<Longrightarrow> teste_maxime welt handlungsabsicht (Maxime m)"
+  apply (simp add: teste_maxime_simp)
+  quickcheck
+
+fun kat_imperativ ::
+  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
+\<open>kat_imperativ welt (Maxime m) =
+  (\<forall>h :: ('person, 'world) handlungF.
+    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> teste_maxime welt h (Maxime m))\<close>
+
+(*ist der \<exists> wirklich korrekt? Eigentlich will ich doch \<forall>*)
+
+(*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
+zu
+(\<forall>h :: ('person, 'world) handlungF.
+    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> (\<forall>p::'person. m p ()))
+*)
+
+value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
 
 
 
