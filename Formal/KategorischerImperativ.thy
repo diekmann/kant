@@ -11,7 +11,7 @@ text\<open>Wir wollen implementieren:
    dass sie ein \<^bold>\<open>allgemeines Gesetz\<close> werde.“\<close>
 
 Für eine gebene Welt haben wir schon eine Handlung nach einer Maxime untersucht:
-\<^term>\<open>teste_maxime::'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+\<^term>\<open>moralisch::'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
 
 Das Ergebnis sagt uns ob diese Handlung gut oder schlecht ist.
 Basierend darauf müssen wir nun ein allgemeines Gesetz ableiten.
@@ -38,7 +38,7 @@ wird es schwer ein allgemeines Gesetz abzuleiten.
 \<close>
 (*TODO: waere hier ('person, 'world) handlungF anstatt 'world handlung besser?*)
 
-subsection\<open>Implementierung Kategorischer Imperativ.\<close>
+subsection\<open>Implementierung Moralisch ein Allgemeines Gesetz Ableiten\<close>
 (*TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?*)
 text\<open>Und nun werfen wir alles zuammen:
 
@@ -70,17 +70,17 @@ Ausgabe:
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 *)
 
-definition kategorischer_imperativ ::
+definition moarlisch_gesetz_ableiten ::
   \<open>'person \<Rightarrow>
    'world \<Rightarrow>
-   ('person, 'world) handlungF \<Rightarrow>
    ('person, 'world) maxime \<Rightarrow>
+   ('person, 'world) handlungF \<Rightarrow>
    ('world, 'a, 'b) allgemeines_gesetz_ableiten \<Rightarrow>
    (nat, 'a, 'b) gesetz
   \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
 where
-  \<open>kategorischer_imperativ ich welt handlungsabsicht maxime gesetz_ableiten gesetz \<equiv>
-    let soll_handeln = if teste_maxime welt handlungsabsicht maxime
+  \<open>moarlisch_gesetz_ableiten ich welt maxime handlungsabsicht gesetz_ableiten gesetz \<equiv>
+    let soll_handeln = if moralisch welt maxime handlungsabsicht
                        then
                          Erlaubnis
                        else
@@ -89,6 +89,53 @@ where
         soll_handeln,
         hinzufuegen (gesetz_ableiten (handeln ich welt handlungsabsicht) soll_handeln) gesetz
       )\<close>
+
+
+subsection\<open>Kategorischer Imperativ\<close>
+
+text\<open>
+Wir haben mit der goldenen Regel bereits definiert, 
+wann für eine gegebene Welt und eine gegebene maxime, eine Handlungsabsicht moralisch ist:
+
+ \<^item> @{term_type \<open>moralisch :: 
+     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>}
+
+Effektiv testet die goldene Regel eine Handlungsabsicht.
+
+Nach meinem Verständnis generalisiert Kant mit dem Kategorischen Imperativ diese Regel,
+indem die Maxime nicht mehr als gegeben angenommen wird,
+sondern die Maxime selbst getestet wird.
+Sei die Welt weiterhin gegeben,
+dass müsste der kategorische Imperativ folgende Typsignatur haben:
+
+  \<^item> \<^typ>\<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+
+Eine Implementierung muss dann über alle möglichen Handlungsabsichten allquantifizieren.
+
+TODO: implementieren!!!
+\<close>
+(*TODO: kategorischer Imperativ*)
+
+
+(*
+fun kat_imperativ ::
+  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
+\<open>kat_imperativ welt (Maxime m) =
+  (\<forall>h :: ('person, 'world) handlungF.
+    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+
+ist der \<exists> wirklich korrekt? Eigentlich will ich doch \<forall>*)
+
+(*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
+zu
+(\<forall>h :: ('person, 'world) handlungF.
+    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> (\<forall>p::'person. m p ()))
+
+value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
+*)
+
+(*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
+
 
 
 end

@@ -182,8 +182,8 @@ section\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
 text\<open>Die Anforderungen fuer ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
 lemma steuersystem_imp_maxime:
   "steuersystem steuersystem_impl \<Longrightarrow>
-        (\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern)"
-   apply(simp add: maxime_steuern_def teste_maxime_unfold)
+        (\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl)))"
+   apply(simp add: maxime_steuern_def moralisch_unfold)
    apply(simp add: jeder_zahlt_def bevoelkerung_def)
    apply(intro allI impI conjI)
    apply(rename_tac welt p1 p2)
@@ -214,11 +214,11 @@ lemma steuern_kleiner_einkommen_nat:
 lemma maxime_imp_steuersystem:
     "(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
        (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
-        \<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern
+        \<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl))
         \<Longrightarrow> steuersystem steuersystem_impl"
 proof
   fix einkommen_b einkommen_a :: nat
-  assume m: "\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern"
+  assume m: "\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl))"
      and a: "einkommen_b \<le> einkommen_a"
      and bezahlbar: "\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen"
   from m have m':
@@ -228,7 +228,7 @@ proof
              \<le> get_einkommen welt pB -
                 int (nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB)))"
     for welt :: steuerwelt and pA pB :: person
-    by(simp add: maxime_steuern_def teste_maxime_unfold jeder_zahlt_def bevoelkerung_def)
+    by(simp add: maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
   from m'[where welt="Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)"
                 and pA=Bob and pB=Alice] a
   have almost:
@@ -240,14 +240,14 @@ proof
     by simp
 next
   fix einkommen_b einkommen_a :: nat
-  assume m: "\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern"
+  assume m: "\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl))"
      and a: "einkommen_b \<le> einkommen_a"
   from m have m':
     "get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
        nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA))
        \<le> nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB))"
     for welt :: steuerwelt and pA pB :: person
-    by(simp add: maxime_steuern_def teste_maxime_unfold jeder_zahlt_def bevoelkerung_def)
+    by(simp add: maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
   from m'[where welt="Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)"
                 and pA=Bob and pB=Alice] a
   have "einkommen_b - steuersystem_impl einkommen_b \<le> einkommen_a - steuersystem_impl einkommen_a"
@@ -275,7 +275,7 @@ theorem
   assumes steuer_kleiner_einkommen: "\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen"
       and existenzminimum: "\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0"
     shows
-   "(\<forall>welt. teste_maxime welt (HandlungF (jeder_zahlt steuersystem_impl)) maxime_steuern)
+   "(\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl)))
         \<longleftrightarrow> steuersystem steuersystem_impl"
   using steuersystem_imp_maxime maxime_imp_steuersystem
   using assms by blast 

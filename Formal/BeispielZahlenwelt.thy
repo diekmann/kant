@@ -160,7 +160,7 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
   lemma\<open>VerletzteMaxime (Opfer Bob) (Taeter Alice)
           (Handlung [(Alice, 5), (Bob, 10)] [(Alice, 10), (Bob, 10)])
           \<in> debug_maxime show_zahlenwelt initialwelt
-            (HandlungF (erschaffen 5)) (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich))\<close>
+            (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5)) \<close>
     by eval
 
 
@@ -234,7 +234,7 @@ subsection\<open>Alice stiehlt 5\<close>
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> die abstrakte Handlung "Alice wird bestohlen" gar nicht gut
   fände, wenn sie jemand anderes ausführt:\<close>
   lemma \<open>debug_maxime show_zahlenwelt initialwelt
-          (HandlungF (stehlen 5 Alice)) maxime_zahlenfortschritt =
+          maxime_zahlenfortschritt (HandlungF (stehlen 5 Alice)) =
    {VerletzteMaxime (Opfer Alice) (Taeter Bob)
       (Handlung [(Alice, 5), (Bob, 10)] [(Bob, 15)]),
     VerletzteMaxime (Opfer Alice) (Taeter Carol)

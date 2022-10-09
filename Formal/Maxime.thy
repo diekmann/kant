@@ -3,8 +3,12 @@ imports Handlung BeispielPerson ExecutableHelper
 begin
 
 section\<open>Maxime\<close>
+
 text\<open>
-Alles in diesem Abschnitt ist darauf ausgelegt, später den kategorischen Imperativ zu modellieren.
+Nach \<^url>\<open>https://de.wikipedia.org/wiki/Maxime\<close> ist eine Maxime ein
+persönlicher Grundsatz des Wollens und Handelns.
+Nach Kant ist eine Maxime ein "subjektives Prinzip des Wollens".
+
 Modell einer \<^emph>\<open>Maxime\<close>:
 Eine Maxime in diesem Modell beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 
@@ -25,6 +29,7 @@ text\<open>Beispiel\<close>
 definition maxime_mir_ist_alles_recht :: \<open>('person, 'world) maxime\<close> where
   \<open>maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)\<close>
 
+subsection\<open>Maxime in Sinne Kants?\<close>
 text\<open>Kants kategorischer Imperativ ist eine deontologische Ethik,
 d.h.,
 "Es wird eben nicht bewertet, was die Handlung bewirkt, sondern wie die Absicht beschaffen ist."
@@ -40,18 +45,38 @@ Dies mag nun als Fehler in unserem Modell verstanden werden.
 Doch irgendwo müssen wir praktisch werden.
 Nur von Handlungsabsichten zu reden, ohne dass die beabsichtigten Folgen betrachtet werden
 ist mir einfach zu abstrakt und nicht greifbar.
+
+Kants kategorischer Imperativ und die Goldene Regel grundverschieden:
+\<^url>\<open>https://web.archive.org/web/20220123174117/https://www.goethegymnasium-hildesheim.de/index.php/faecher/faecher/gesellschaftswissenschaften/philosophie\<close>
+Dennoch, betrachten wir den kategorischen Imperativ als eine Verallgemeinerung
+der goldenen Regel.
 \<close>
 
 (*
 TODO: in einer Maxime darf keine konkrete Person hardcoded sein.
  Verboten: Maxime (\ich _ -> if ich == "konkrete Person" then ...)
+
+das muss formalisiert werden!
+Maximen duerfen nicht _diskriminierend_ sein.
 *)
 
+subsection\<open>Die Goldene Regel\<close>
+text\<open>Die Goldene Regel nach \<^url>\<open>https://de.wikipedia.org/wiki/Goldene_Regel\<close> sagt:
 
-text\<open>
+  „Behandle andere so, wie du von ihnen behandelt werden willst.“
+
+  „Was du nicht willst, dass man dir tu, das füg auch keinem andern zu.“
+
+
+So wie wir behandelt werden wollen ist modelliert durch eine \<^typ>\<open>('person, 'world) maxime\<close>.
+
+Die goldene Regel testet ob eine Handlung, bzw. Handlungsabsicht moralisch ist.
 Um eine Handlung gegen eine Maxime zu testen fragen wir uns:
   \<^item> Was wenn jeder so handeln würde?
-  \<^item> Was wenn jeder diese Maxime hätte? Bsp: stehlen und bestohlen werden.
+  \<^item> Was wenn jeder nach dieser Maxime handeln würde?
+
+Beispielsweise mag "stehlen" und "bestohlen werden" die gleiche Handlung sein,
+jedoch wird sie von Täter und Opfer grundverschieden wahrgenommen.
 \<close>
 definition bevoelkerung :: \<open>'person set\<close> where \<open>bevoelkerung \<equiv> UNIV\<close>
 definition wenn_jeder_so_handelt
@@ -60,68 +85,89 @@ definition wenn_jeder_so_handelt
     \<open>wenn_jeder_so_handelt welt handlungsabsicht \<equiv>
       (\<lambda>handelnde_person. handeln handelnde_person welt handlungsabsicht) ` bevoelkerung\<close>
 fun was_wenn_jeder_so_handelt_aus_sicht_von
-    :: \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> bool\<close>
+    :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
-    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht (Maxime m) betroffene_person =
+    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt (Maxime m) handlungsabsicht betroffene_person =
         (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. m betroffene_person h)\<close>
-(*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
-(*TODO: rename zu moralisch*)
-definition teste_maxime ::
-  \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
-\<open>teste_maxime welt handlungsabsicht maxime \<equiv>
+
+
+text\<open>Für eine gegebene Welt und eine gegebene Maxime nennen wir eine Handlungsabsicht
+genau dann moralisch, wenn die Handlung auch die eigene Maxime erfüllt,
+wenn die Handlung von anderen durchgeführt würde.\<close>
+definition moralisch ::
+  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close> where
+\<open>moralisch welt handlungsabsicht maxime \<equiv>
   \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht maxime p\<close>
 
 text\<open>
 Faktisch bedeutet diese Definition, wir bilden das Kreuzprodukt Bevölkerung x Bevölkerung,
 wobei jeder einmal als handelnde Person auftritt und einmal als betroffene Person.
 \<close>
-lemma teste_maxime_unfold:
-  \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+lemma moralisch_unfold:
+  \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>p1\<in>bevoelkerung. \<forall>p2\<in>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
-  by(simp add: teste_maxime_def wenn_jeder_so_handelt_def)
-lemma \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+  by(simp add: moralisch_def wenn_jeder_so_handelt_def)
+lemma \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
-  unfolding teste_maxime_unfold by simp
+  unfolding moralisch_unfold by simp
 
-(*<*)
-lemma teste_maxime_simp:
-  \<open>teste_maxime welt handlungsabsicht (Maxime m) =
+lemma moralisch_simp:
+  \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>p1. \<forall>p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
-  unfolding teste_maxime_unfold
+  unfolding moralisch_unfold
   by (simp add: bevoelkerung_def)
 
+text\<open>
+Wir können die goldene Regel auch umformulieren,
+nicht als Imperativ, sondern als Beobachtung eines Wunschzustandes:
+Wenn eine Handlung für eine Perosn okay ist, dann muss sie auch Okay sein,
+wenn jemand anderes diese Handlung ausführt.
+
+Genau dies können wir aus unserer Definition von \<^const>\<open>moralisch\<close> ableiten:\<close>
+
+theorem goldene_regel:
+  "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
+      (\<forall>p1. m p1 (handeln p1 welt handlungsabsicht) \<longrightarrow>
+            (\<forall>p2. m p1 (handeln p2 welt handlungsabsicht)))"
+  by (simp add: moralisch_simp)
+
+text\<open>Die umgekehrte Richtung gilt nicht, weil diese Formulierung nur die Handlungen betrachtet,
+die okay sind.\<close>
+
+
+(*<*)
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
-definition teste_maxime_exhaust where
-  \<open>teste_maxime_exhaust bevoelk welt handlungsabsicht maxime \<equiv>
+definition moralisch_exhaust where
+  \<open>moralisch_exhaust bevoelk welt maxime handlungsabsicht \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
       list_all (\<lambda>(p,x). m p (handeln x welt handlungsabsicht)) (List.product bevoelk bevoelk))\<close>
 
-lemma teste_maxime_exhaust_univ: \<open>set b = (UNIV::'person set) \<Longrightarrow>
-        teste_maxime welt ha maxime = teste_maxime_exhaust b welt ha maxime\<close>
+lemma moralisch_exhaust_univ: \<open>set b = (UNIV::'person set) \<Longrightarrow>
+        moralisch welt maxime ha = moralisch_exhaust b welt maxime ha\<close>
   apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
-  unfolding teste_maxime_unfold teste_maxime_exhaust_def bevoelkerung_def
+  unfolding moralisch_unfold moralisch_exhaust_def bevoelkerung_def
   apply(simp)
   by(simp add: list_all_iff)
 
 subsection \<open>Making it executable\<close>
   (*TODO: for reasons I do not understand,
-    teste_maxime_exhaust [Alice, Bob, Carol, Eve] (not enum) needs [code_unfold]
+    moralisch_exhaust [Alice, Bob, Carol, Eve] (not enum) needs [code_unfold]
     but
-    teste_maxime_exhaust (enum) needs [code]
+    moralisch_exhaust (enum) needs [code]
     ? ? ?*)
-  lemma teste_maxime_exhaust [code]: \<open>teste_maxime = teste_maxime_exhaust enum_class.enum\<close>
+  lemma moralisch_exhaust [code]: \<open>moralisch = moralisch_exhaust enum_class.enum\<close>
     apply(simp add: fun_eq_iff)
     apply(rule allI)+
-    apply(rule teste_maxime_exhaust_univ)
+    apply(rule moralisch_exhaust_univ)
     using enum_UNIV by simp
   
-  declare teste_maxime_def[code del] \<comment> \<open>Only use executable \<^const>\<open>teste_maxime_exhaust\<close>\<close>
+  declare moralisch_def[code del] \<comment> \<open>Only use executable \<^const>\<open>moralisch_exhaust\<close>\<close>
 (*>*)
 
 text\<open>Hier schlägt das Programmiererherz höher:
-Wenn \<^typ>\<open>'person\<close> aufzählbar ist haben wir ausführbaren Code: @{thm teste_maxime_exhaust}
-wobei @{const teste_maxime_exhaust} implementiert ist als @{thm teste_maxime_exhaust_def}.
+Wenn \<^typ>\<open>'person\<close> aufzählbar ist haben wir ausführbaren Code: @{thm moralisch_exhaust}
+wobei @{const moralisch_exhaust} implementiert ist als @{thm moralisch_exhaust_def}.
 \<close>
 
 subsection\<open>Maximen Debugging\<close>
@@ -138,10 +184,10 @@ datatype ('person, 'world) verletzte_maxime =
 text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
 fun debug_maxime
   :: "('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
-      ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime
+      ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF
       \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
 where
-  "debug_maxime print_world welt handlungsabsicht (Maxime m) =
+  "debug_maxime print_world welt (Maxime m) handlungsabsicht =
     {VerletzteMaxime
       (Opfer p1) (Taeter p2)
       (map_handlung print_world (handeln p2 welt handlungsabsicht)) | p1 p2.
@@ -149,21 +195,21 @@ where
 
 
 text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
-lemma "debug_maxime print_world welt handlungsabsicht maxime = {}
-        \<longleftrightarrow> teste_maxime welt handlungsabsicht maxime"
+lemma "debug_maxime print_world welt maxime handlungsabsicht = {}
+        \<longleftrightarrow> moralisch welt maxime handlungsabsicht"
   apply(case_tac maxime, rename_tac m, simp)
-  by(simp add: teste_maxime_unfold bevoelkerung_def)
+  by(simp add: moralisch_unfold bevoelkerung_def)
 
 (*<*)
 definition debug_maxime_exhaust where
-  \<open>debug_maxime_exhaust bevoelk print_world welt ha maxime \<equiv>
+  \<open>debug_maxime_exhaust bevoelk print_world welt maxime ha \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
       map (\<lambda>(p1,p2). VerletzteMaxime (Opfer p1) (Taeter p2) (map_handlung print_world (handeln p2 welt ha)))
         (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt ha)) (List.product bevoelk bevoelk)))\<close>
 
 lemma debug_maxime_exhaust [code]:
-  \<open>debug_maxime print_world welt ha maxime
-    = set (debug_maxime_exhaust enum_class.enum print_world welt ha maxime)\<close>
+  \<open>debug_maxime print_world welt maxime ha
+    = set (debug_maxime_exhaust enum_class.enum print_world welt maxime ha)\<close>
   apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
   apply(simp add: debug_maxime_exhaust_def enum_UNIV)
   by(simp add: image_Collect)
@@ -173,58 +219,56 @@ subsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
 
 (*this causes
-  fun teste_maxime _ _ _ = raise Fail "Kant.teste_maxime";
-when we don't use teste_maxime_exhaust.
-So when code fails with "Kant.teste_maxime", make sure the 'person implements enum.*)
+  fun moralisch _ _ _ = raise Fail "Kant.moralisch";
+when we don't use moralisch_exhaust.
+So when code fails with "Kant.moralisch", make sure the 'person implements enum.*)
 
 text\<open>Beispiel:
 Die Welt sei nur eine Zahl und die zu betrachtende Handlungsabsicht sei,
 dass wir diese Zahl erhöhen.
 Die Mir-ist-alles-Recht Maxime ist hier erfüllt:\<close>
-lemma \<open>teste_maxime
+lemma \<open>moralisch
             (42::nat)
-            (HandlungF (\<lambda>(person::person) welt. welt + 1))
-            maxime_mir_ist_alles_recht\<close> by eval
+             maxime_mir_ist_alles_recht
+            (HandlungF (\<lambda>(person::person) welt. welt + 1))\<close> by eval
 
 text\<open>Beispiel:
 Die Welt ist modelliert als eine Abbildung von Person auf Besitz.
 Die Maxime sagt, dass Leute immer mehr oder gleich viel wollen, aber nie etwas verlieren wollen.
 In einer Welt in der keiner etwas hat, erfuellt die Handlung jemanden 3 zu geben die Maxime.
 \<close>
-lemma \<open>teste_maxime
+lemma \<open>moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
             (Maxime (\<lambda>person handlung.
-                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
   by eval
 lemma \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
   = {}\<close>
   by eval
 
 
 text\<open>Wenn nun \<^const>\<open>Bob\<close> allerdings bereits 4 hat, würde die obige Handlung ein Verlust
 für ihn bedeuten und die Maxime ist nicht erfüllt.\<close>
-lemma \<open>\<not> teste_maxime
+lemma \<open>\<not> moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
             (Maxime (\<lambda>person handlung.
-                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))\<close>
+                (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
   by eval
 lemma \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
+            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
   = {VerletzteMaxime (Opfer Bob) (Taeter Bob)
      (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
                [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
   by eval
-
-
 
 
 end
