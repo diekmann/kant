@@ -32,11 +32,12 @@ In diese kleinen Intermezzo werden wir zeigen, wie sich die Gesinnungsethik Kant
 in die Verantwortungsethik des Utilitarismus übersetzen lässt.
 \<close>
 
+(*TODO: das ist die goldene Regel? Kant braucht \<forall>Maxime.*)
 definition kant_als_gesinnungsethik
   :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool"
 where
   "kant_als_gesinnungsethik maxime handlungsabsicht \<equiv>
-    \<forall>welt. teste_maxime welt handlungsabsicht maxime"
+    \<forall>welt. moralisch welt maxime handlungsabsicht"
 
 definition utilitarismus_als_verantwortungsethik
   :: "'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool"
@@ -53,7 +54,7 @@ und die Maxime so allgemeingültiger machen.
 Alle Personen müssen gleich behandelt werden
 Um die maxime unabhängig von einer bestimmten Person zu machen,
 fordern wir einfach, dass die Maxime für aller Personen erfüllt sein muss.\<close>
-(*TODO: gegen teste_maxime beweisen?
+(*TODO: gegen moralisch beweisen?
 und erklaeren! Warum \<forall>
 Macht eine maxime unabhängig von der person*)
 fun maximeNeutralisieren :: "('person, 'world) maxime \<Rightarrow> ('world handlung \<Rightarrow> bool)" where
@@ -89,7 +90,7 @@ theorem "gesinnungsethik_verantwortungsethik_konsistent
                   moralisch_richtig_def maxime_als_nutzenkalkuel_def)
   apply(intro allI)
   apply(case_tac handlungsabsicht, rename_tac h, simp)
-  apply(simp add: teste_maxime_simp)
+  apply(simp add: moralisch_simp)
   apply(simp add: ereal_zero_geq_case)
   by blast
 
@@ -201,7 +202,7 @@ theorem
                   moralisch_richtig_def)
   apply(intro allI)
   apply(case_tac handlungsabsicht, rename_tac h, simp)
-  apply(simp add: teste_maxime_simp)
+  apply(simp add: moralisch_simp)
   apply(subst helper_wohlergehen_sum_cases_iff[OF \<open>finite bevoelkerung\<close>])
   apply(auto simp add: bevoelkerung_def)
   done

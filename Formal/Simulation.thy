@@ -25,7 +25,7 @@ fun simulate_handlungF
         \<Rightarrow> ('world \<times> (nat, 'a, 'b) gesetz)"
   where
     "simulate_handlungF (SimConsts person maxime aga) ha welt g =
-    (let (sollensanordnung, g') = kategorischer_imperativ person welt ha maxime aga g in
+    (let (sollensanordnung, g') = kategorischer_imperativ person welt maxime ha aga g in
       let w' = (if sollensanordnung = Erlaubnis
                 then
                   nachher (handeln person welt ha)
@@ -128,7 +128,7 @@ lemma \<open>\<exists>tb rf.
   = Gesetz {(\<section> 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>
   apply(simp add: simulateOne_def kategorischer_imperativ_def)
   apply(case_tac maxime, simp)
-  apply(simp add: teste_maxime_unfold max_paragraph_def)
+  apply(simp add: moralisch_unfold max_paragraph_def)
   apply(intro conjI impI)
   by(metis rechtsfolge.exhaust rechtsnorm.exhaust tatbestand.exhaust)+
 end

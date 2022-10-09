@@ -11,7 +11,7 @@ text\<open>Wir wollen implementieren:
    dass sie ein \<^bold>\<open>allgemeines Gesetz\<close> werde.“\<close>
 
 Für eine gebene Welt haben wir schon eine Handlung nach einer Maxime untersucht:
-\<^term>\<open>teste_maxime::'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+\<^term>\<open>moralisch::'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
 
 Das Ergebnis sagt uns ob diese Handlung gut oder schlecht ist.
 Basierend darauf müssen wir nun ein allgemeines Gesetz ableiten.
@@ -73,14 +73,14 @@ Ausgabe:
 definition kategorischer_imperativ ::
   \<open>'person \<Rightarrow>
    'world \<Rightarrow>
-   ('person, 'world) handlungF \<Rightarrow>
    ('person, 'world) maxime \<Rightarrow>
+   ('person, 'world) handlungF \<Rightarrow>
    ('world, 'a, 'b) allgemeines_gesetz_ableiten \<Rightarrow>
    (nat, 'a, 'b) gesetz
   \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
 where
-  \<open>kategorischer_imperativ ich welt handlungsabsicht maxime gesetz_ableiten gesetz \<equiv>
-    let soll_handeln = if teste_maxime welt handlungsabsicht maxime
+  \<open>kategorischer_imperativ ich welt maxime handlungsabsicht gesetz_ableiten gesetz \<equiv>
+    let soll_handeln = if moralisch welt maxime handlungsabsicht
                        then
                          Erlaubnis
                        else
