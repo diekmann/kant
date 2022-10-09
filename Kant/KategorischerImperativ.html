@@ -25,7 +25,7 @@
 </span><span>   dass sie ein </span><span class="antiquoted"><span class="operator"><span>❙</span></span><span class="plain_text"><span>‹</span><span>allgemeines Gesetz</span><span>›</span></span></span><span> werde.“</span><span>›</span></span></span><span>
 
 </span><span>Für eine gebene Welt haben wir schon eine Handlung nach einer Maxime untersucht:</span><span>
-</span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">term</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><a class="entity_ref" href="Maxime.html#Maxime.teste_maxime|const"><span>teste_maxime</span></a><span class="main"><span>::</span></span><span class="tfree"><span>'world</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.maxime|type"><span>maxime</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span></span><span>
+</span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">term</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><a class="entity_ref" href="Maxime.html#Maxime.moralisch|const"><span>moralisch</span></a><span class="main"><span>::</span></span><span class="tfree"><span>'world</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.maxime|type"><span>maxime</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span></span><span>
 
 </span><span>Das Ergebnis sagt uns ob diese Handlung gut oder schlecht ist.</span><span>
 </span><span>Basierend darauf müssen wir nun ein allgemeines Gesetz ableiten.</span><span>
@@ -52,7 +52,7 @@
 </span><span>›</span></span></span><span>
 </span><span class="comment1"><span>(</span><span>*</span><span>TODO: waere hier ('person, 'world) handlungF anstatt 'world handlung besser?</span><span>*</span><span>)</span></span><span>
 
-</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Implementierung Kategorischer Imperativ.</span><span>›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Implementierung Moralisch ein Allgemeines Gesetz Ableiten</span><span>›</span></span></span><span>
 </span><span class="comment1"><span>(</span><span>*</span><span>TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?</span><span>*</span><span>)</span></span><span>
 </span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Und nun werfen wir alles zuammen:</span><span>
 
@@ -84,17 +84,17 @@
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 </span><span>*</span><span>)</span></span><span>
 
-</span><span class="keyword1"><span class="command"><span class="entity_def" id="KategorischerImperativ.kategorischer_imperativ_def|fact"><span class="entity_def" id="KategorischerImperativ.kategorischer_imperativ_def|thm"><span class="entity_def" id="KategorischerImperativ.kategorischer_imperativ_def_raw|axiom"><span>definition</span></span></span></span></span></span><span> </span><span class="entity"><span class="entity_def" id="KategorischerImperativ.kategorischer_imperativ|const"><span>kategorischer_imperativ</span></span></span><span> </span><span class="main"><span>::</span></span><span>
+</span><span class="keyword1"><span class="command"><span class="entity_def" id="KategorischerImperativ.moarlisch_gesetz_ableiten_def|fact"><span class="entity_def" id="KategorischerImperativ.moarlisch_gesetz_ableiten_def|thm"><span class="entity_def" id="KategorischerImperativ.moarlisch_gesetz_ableiten_def_raw|axiom"><span>definition</span></span></span></span></span></span><span> </span><span class="entity"><span class="entity_def" id="KategorischerImperativ.moarlisch_gesetz_ableiten|const"><span>moarlisch_gesetz_ableiten</span></span></span><span> </span><span class="main"><span>::</span></span><span>
   </span><span class="quoted"><span class="quoted"><span>‹</span><span class="tfree"><span>'person</span></span><span> </span><span class="main"><span>⇒</span></span><span>
    </span><span class="tfree"><span>'world</span></span><span> </span><span class="main"><span>⇒</span></span><span>
-   </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span>
    </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.maxime|type"><span>maxime</span></a><span> </span><span class="main"><span>⇒</span></span><span>
+   </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span>
    </span><span class="main"><span>(</span></span><span class="tfree"><span>'world</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'a</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'b</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="KategorischerImperativ.html#KategorischerImperativ.allgemeines_gesetz_ableiten|type"><span>allgemeines_gesetz_ableiten</span></a><span> </span><span class="main"><span>⇒</span></span><span>
    </span><span class="main"><span>(</span></span><span>nat</span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'a</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'b</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Gesetz.html#Gesetz.gesetz|type"><span>gesetz</span></a><span>
   </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><a class="entity_ref" href="Gesetz.html#Gesetz.sollensanordnung|type"><span>sollensanordnung</span></a><span> </span><span class="main"><span>×</span></span><span> </span><span class="main"><span>(</span></span><span>nat</span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'a</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'b</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Gesetz.html#Gesetz.gesetz|type"><span>gesetz</span></a><span class="main"><span>)</span></span><span>›</span></span></span><span>
 </span><span class="keyword2"><span class="keyword"><span>where</span></span></span><span>
-  </span><span class="quoted"><span class="quoted"><span>‹</span><span class="free"><span>kategorischer_imperativ</span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>ich</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>welt</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>handlungsabsicht</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>maxime</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>gesetz_ableiten</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>gesetz</span></span></span></span><span> </span><span class="main"><span>≡</span></span><span>
-    </span><span class="keyword1"><span>let</span></span><span> </span><span class="bound"><span>soll_handeln</span></span><span> </span><span class="main"><span>=</span></span><span> </span><span class="keyword1"><span>if</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.teste_maxime|const"><span>teste_maxime</span></a><span> </span><span class="free"><span class="bound"><span class="entity"><span>welt</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>handlungsabsicht</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>maxime</span></span></span></span><span>
+  </span><span class="quoted"><span class="quoted"><span>‹</span><span class="free"><span>moarlisch_gesetz_ableiten</span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>ich</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>welt</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>maxime</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>handlungsabsicht</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>gesetz_ableiten</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>gesetz</span></span></span></span><span> </span><span class="main"><span>≡</span></span><span>
+    </span><span class="keyword1"><span>let</span></span><span> </span><span class="bound"><span>soll_handeln</span></span><span> </span><span class="main"><span>=</span></span><span> </span><span class="keyword1"><span>if</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.moralisch|const"><span>moralisch</span></a><span> </span><span class="free"><span class="bound"><span class="entity"><span>welt</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>maxime</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>handlungsabsicht</span></span></span></span><span>
                        </span><span class="keyword1"><span>then</span></span><span>
                          </span><a class="entity_ref" href="Gesetz.html#Gesetz.sollensanordnung.Erlaubnis|const"><span>Erlaubnis</span></a><span>
                        </span><span class="keyword1"><span>else</span></span><span>
@@ -103,6 +103,53 @@
         </span><span class="bound"><span>soll_handeln</span></span><span class="main"><span>,</span></span><span>
         </span><a class="entity_ref" href="Gesetz.html#Gesetz.hinzufuegen|const"><span>hinzufuegen</span></a><span> </span><span class="main"><span>(</span></span><span class="free"><span class="bound"><span class="entity"><span>gesetz_ableiten</span></span></span></span><span> </span><span class="main"><span>(</span></span><a class="entity_ref" href="Handlung.html#Handlung.handeln|const"><span>handeln</span></a><span> </span><span class="free"><span class="bound"><span class="entity"><span>ich</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>welt</span></span></span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>handlungsabsicht</span></span></span></span><span class="main"><span>)</span></span><span> </span><span class="bound"><span>soll_handeln</span></span><span class="main"><span>)</span></span><span> </span><span class="free"><span class="bound"><span class="entity"><span>gesetz</span></span></span></span><span>
       </span><span class="main"><span>)</span></span><span>›</span></span></span><span>
+
+
+</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Kategorischer Imperativ</span><span>›</span></span></span><span>
+
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>
+</span><span>Wir haben mit der goldenen Regel bereits definiert, </span><span>
+</span><span>wann für eine gegebene Welt und eine gegebene maxime, eine Handlungsabsicht moralisch ist:</span><span>
+
+</span><span> </span><span class="antiquoted"><span>▪</span></span><span> </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>term_type</span></span><span> </span><span class="quoted"><span>‹</span><a class="entity_ref" href="Maxime.html#Maxime.moralisch|const"><span>moralisch</span></a><span> </span><span class="main"><span>::</span></span><span> 
+     </span><span class="tfree"><span>'world</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.maxime|type"><span>maxime</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Handlung.html#Handlung.handlungF|type"><span>handlungF</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span><span class="antiquote"><span>}</span></span></span><span>
+
+</span><span>Effektiv testet die goldene Regel eine Handlungsabsicht.</span><span>
+
+</span><span>Nach meinem Verständnis generalisiert Kant mit dem Kategorischen Imperativ diese Regel,</span><span>
+</span><span>indem die Maxime nicht mehr als gegeben angenommen wird,</span><span>
+</span><span>sondern die Maxime selbst getestet wird.</span><span>
+</span><span>Sei die Welt weiterhin gegeben,</span><span>
+</span><span>dass müsste der kategorische Imperativ folgende Typsignatur haben:</span><span>
+
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><span class="tfree"><span>'world</span></span><span> </span><span class="main"><span>⇒</span></span><span> </span><span class="main"><span>(</span></span><span class="tfree"><span>'person</span></span><span class="main"><span>,</span></span><span> </span><span class="tfree"><span>'world</span></span><span class="main"><span>)</span></span><span> </span><a class="entity_ref" href="Maxime.html#Maxime.maxime|type"><span>maxime</span></a><span> </span><span class="main"><span>⇒</span></span><span> </span><span>bool</span><span>›</span></span></span><span>
+
+</span><span>Eine Implementierung muss dann über alle möglichen Handlungsabsichten allquantifizieren.</span><span>
+
+</span><span>TODO: implementieren!!!</span><span>
+</span><span>›</span></span></span><span>
+</span><span class="comment1"><span>(</span><span>*</span><span>TODO: kategorischer Imperativ</span><span>*</span><span>)</span></span><span>
+
+
+</span><span class="comment1"><span>(</span><span>*</span><span>
+fun kat_imperativ ::
+  ‹'world ⇒ ('person, 'world) maxime ⇒ bool› where
+‹kat_imperativ welt (Maxime m) =
+  (∀h :: ('person, 'world) handlungF.
+    (∃p::'person. m p (handeln p welt h)) ⟶ moralisch welt (Maxime m) h)›
+
+ist der ∃ wirklich korrekt? Eigentlich will ich doch ∀</span><span>*</span><span>)</span></span><span>
+
+</span><span class="comment1"><span>(</span><span>*</span><span>Wenn wir wirklich ∀handlungsabsichten haben, dann sollte sich das vereinfachen lassen
+zu
+(∀h :: ('person, 'world) handlungF.
+    (∃p::'person. m p (handeln p welt h)) ⟶ (∀p::'person. m p ()))
+
+value ‹kat_imperativ (0::nat) (Maxime (λ ich handlung. True))›
+</span><span>*</span><span>)</span></span><span>
+
+</span><span class="comment1"><span>(</span><span>*</span><span>Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!</span><span>*</span><span>)</span></span><span>
+
 
 
 </span><span class="keyword2"><span class="keyword"><span>end</span></span></span></pre>
