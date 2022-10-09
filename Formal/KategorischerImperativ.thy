@@ -70,7 +70,7 @@ Ausgabe:
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 *)
 
-definition moarlisch_gesetz_abeiten ::
+definition moarlisch_gesetz_ableiten ::
   \<open>'person \<Rightarrow>
    'world \<Rightarrow>
    ('person, 'world) maxime \<Rightarrow>
@@ -79,7 +79,7 @@ definition moarlisch_gesetz_abeiten ::
    (nat, 'a, 'b) gesetz
   \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
 where
-  \<open>moarlisch_gesetz_abeiten ich welt maxime handlungsabsicht gesetz_ableiten gesetz \<equiv>
+  \<open>moarlisch_gesetz_ableiten ich welt maxime handlungsabsicht gesetz_ableiten gesetz \<equiv>
     let soll_handeln = if moralisch welt maxime handlungsabsicht
                        then
                          Erlaubnis
