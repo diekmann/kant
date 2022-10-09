@@ -45,6 +45,11 @@ Dies mag nun als Fehler in unserem Modell verstanden werden.
 Doch irgendwo müssen wir praktisch werden.
 Nur von Handlungsabsichten zu reden, ohne dass die beabsichtigten Folgen betrachtet werden
 ist mir einfach zu abstrakt und nicht greifbar.
+
+Kants kategorischer Imperativ und die Goldene Regel grundverschieden:
+\<^url>\<open>https://web.archive.org/web/20220123174117/https://www.goethegymnasium-hildesheim.de/index.php/faecher/faecher/gesellschaftswissenschaften/philosophie\<close>
+Dennoch, betrachten wir den kategorischen Imperativ als eine Verallgemeinerung
+der goldenen Regel.
 \<close>
 
 (*
@@ -56,17 +61,16 @@ Maximen duerfen nicht _diskriminierend_ sein.
 *)
 
 subsection\<open>Die Goldene Regel\<close>
-text\<open>Die Goldene Regel nach \<^url>\<open>https://de.wikipedia.org/wiki/Goldene_Regel sagt\<close>:
+text\<open>Die Goldene Regel nach \<^url>\<open>https://de.wikipedia.org/wiki/Goldene_Regel\<close> sagt:
 
-TODO TODO pull up.
+  „Behandle andere so, wie du von ihnen behandelt werden willst.“
 
-Kants kategorischer Imperativ und Goldene Regel grundverschieden.
-\<^url>\<open>https://web.archive.org/web/20220123174117/https://www.goethegymnasium-hildesheim.de/index.php/faecher/faecher/gesellschaftswissenschaften/philosophie\<close>
+  „Was du nicht willst, dass man dir tu, das füg auch keinem andern zu.“
 
-Dennoch, ....
-\<close>
 
-text\<open>
+So wie wir behandelt werden wollen ist modelliert durch eine \<^typ>\<open>('person, 'world) maxime\<close>.
+
+Die goldene Regel testet ob eine Handlung, bzw. Handlungsabsicht moralisch ist.
 Um eine Handlung gegen eine Maxime zu testen fragen wir uns:
   \<^item> Was wenn jeder so handeln würde?
   \<^item> Was wenn jeder nach dieser Maxime handeln würde?
@@ -88,7 +92,8 @@ fun was_wenn_jeder_so_handelt_aus_sicht_von
 
 
 text\<open>Für eine gegebene Welt und eine gegebene Maxime nennen wir eine Handlungsabsicht
-genau dann moralisch, wenn sie ... TODO\<close>
+genau dann moralisch, wenn die Handlung auch die eigene Maxime erfüllt,
+wenn die Handlung von anderen durchgeführt würde.\<close>
 definition moralisch ::
   \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close> where
 \<open>moralisch welt handlungsabsicht maxime \<equiv>
@@ -106,15 +111,31 @@ lemma \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold by simp
 
-(*<*)
 lemma moralisch_simp:
   \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>p1. \<forall>p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold
   by (simp add: bevoelkerung_def)
 
+text\<open>
+Wir können die goldene Regel auch umformulieren,
+nicht als Imperativ, sondern als Beobachtung eines Wunschzustandes:
+Wenn eine Handlung für eine Perosn okay ist, dann muss sie auch Okay sein,
+wenn jemand anderes diese Handlung ausführt.
+
+Genau dies können wir aus unserer Definition von \<^const>\<open>moralisch\<close> ableiten:\<close>
+
+theorem goldene_regel:
+  "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
+      (\<forall>p1. m p1 (handeln p1 welt handlungsabsicht) \<longrightarrow>
+            (\<forall>p2. m p1 (handeln p2 welt handlungsabsicht)))"
+  by (simp add: moralisch_simp)
+
+text\<open>Die umgekehrte Richtung gilt nicht, weil diese Formulierung nur die Handlungen betrachtet,
+die okay sind.\<close>
 
 
+(*<*)
 text\<open>Versuch eine executable version zu bauen.
 Wir müssen die Bevölkerung enumerieren.\<close>
 definition moralisch_exhaust where
@@ -248,59 +269,6 @@ lemma \<open>debug_maxime show_map
      (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
                [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
   by eval
-
-
-
-
-subsection\<open>Scratch: TODO\<close>
-(*Scratch: TODO! moralisch ist die Goldene Regel. Wir wollen*)
-
-term moralisch
-(*<*)
-text\<open>
-irgendwas hier latex-compiliert nicht:
-
-Goldene Regel: \<^url>\<open>https://de.wikipedia.org/wiki/Goldene_Regel\<close>
-
-  Behandle andere so, wie du von ihnen behandelt werden willst.
-
-  Was du nicht willst, dass man dir tu, das füg auch keinem andern zu
-
-
-oder anders: die handlung muss okay sein, egal wer sie ausfuehrt.
-das sagt moralisch_simp schon!! TODO!
-\<close>
-(*>*)
-
-text\<open>
-Oder anders: wenn eine Handlung fuer dich okay ist,
-dann muss sie auch Okay sein, wenn jemand anderes sie ausfuehrt.
-\<close>
-
-lemma "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
-  (\<forall>p1. m p1 (handeln p1 welt handlungsabsicht) \<longrightarrow>
-          (\<forall>p2. m p1 (handeln p2 welt handlungsabsicht)))"
-  by (simp add: moralisch_simp)
-
-(*
-fun kat_imperativ ::
-  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
-\<open>kat_imperativ welt (Maxime m) =
-  (\<forall>h :: ('person, 'world) handlungF.
-    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
-
-ist der \<exists> wirklich korrekt? Eigentlich will ich doch \<forall>*)
-
-(*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
-zu
-(\<forall>h :: ('person, 'world) handlungF.
-    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> (\<forall>p::'person. m p ()))
-
-value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
-*)
-
-(*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
-
 
 
 end

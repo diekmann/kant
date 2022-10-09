@@ -38,7 +38,7 @@ wird es schwer ein allgemeines Gesetz abzuleiten.
 \<close>
 (*TODO: waere hier ('person, 'world) handlungF anstatt 'world handlung besser?*)
 
-subsection\<open>Implementierung Kategorischer Imperativ.\<close>
+subsection\<open>Implementierung Moralisch ein Allgemeines Gesetz Ableiten\<close>
 (*TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?*)
 text\<open>Und nun werfen wir alles zuammen:
 
@@ -70,6 +70,7 @@ Ausgabe:
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 *)
 
+(*TODO: rename*)
 definition kategorischer_imperativ ::
   \<open>'person \<Rightarrow>
    'world \<Rightarrow>
@@ -89,6 +90,53 @@ where
         soll_handeln,
         hinzufuegen (gesetz_ableiten (handeln ich welt handlungsabsicht) soll_handeln) gesetz
       )\<close>
+
+
+subsection\<open>Kategorischer Imperativ\<close>
+
+text\<open>
+Wir haben mit der goldenen Regel bereits definiert, 
+wann für eine gegebene Welt und eine gegebene maxime, eine Handlungsabsicht moralisch ist:
+
+ \<^item> @{term_type \<open>moralisch :: 
+     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>}
+
+Effektiv testet die goldene Regel eine Handlungsabsicht.
+
+Nach meinem Verständnis generalisiert Kant mit dem Kategorischen Imperativ diese Regel,
+indem die Maxime nicht mehr als gegeben angenommen wird,
+sondern die Maxime selbst getestet wird.
+Sei die Welt weiterhin gegeben,
+dass müsste der kategorische Imperativ folgende Typsignatur haben:
+
+  \<^item> \<^typ>\<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+
+Eine Implementierung muss dann über alle möglichen Handlungsabsichten allquantifizieren.
+
+TODO: implementieren!!!
+\<close>
+(*TODO: kategorischer Imperativ*)
+
+
+(*
+fun kat_imperativ ::
+  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
+\<open>kat_imperativ welt (Maxime m) =
+  (\<forall>h :: ('person, 'world) handlungF.
+    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+
+ist der \<exists> wirklich korrekt? Eigentlich will ich doch \<forall>*)
+
+(*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
+zu
+(\<forall>h :: ('person, 'world) handlungF.
+    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> (\<forall>p::'person. m p ()))
+
+value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
+*)
+
+(*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
+
 
 
 end
