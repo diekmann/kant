@@ -26,17 +26,17 @@ lemma \<open>(\<lambda>h::ereal handlung. case h of Handlung vor nach \<Rightarr
 definition moralisch_richtig :: "'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool" where
   "moralisch_richtig glueck_messen handlung \<equiv> (glueck_messen handlung) \<ge> 0"
 
-subsection\<open>Kant und Utilitarismus im Einklang\<close>
+subsection\<open>Goldene Regel und Utilitarismus im Einklang\<close>
 text\<open>
-In diese kleinen Intermezzo werden wir zeigen, wie sich die Gesinnungsethik Kants
+In diese kleinen Intermezzo werden wir zeigen, wie sich die Gesinnungsethik der goldenen Regel
 in die Verantwortungsethik des Utilitarismus übersetzen lässt.
 \<close>
 
 (*TODO: das ist die goldene Regel? Kant braucht \<forall>Maxime.*)
-definition kant_als_gesinnungsethik
+definition goldene_regel_als_gesinnungsethik
   :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool"
 where
-  "kant_als_gesinnungsethik maxime handlungsabsicht \<equiv>
+  "goldene_regel_als_gesinnungsethik maxime handlungsabsicht \<equiv>
     \<forall>welt. moralisch welt maxime handlungsabsicht"
 
 definition utilitarismus_als_verantwortungsethik
@@ -79,14 +79,14 @@ lemma ereal_zero_geq_case:
 (*>*)
 
 text\<open>Für diese Übersetzung können wir beweisen,
-dass die kantische Gesinnungsethik und die utilitaristische Verantwortungsethik
+dass die Gesinnungsethik der goldenen Regel und die utilitaristische Verantwortungsethik
 konsistent sind:\<close>
 theorem "gesinnungsethik_verantwortungsethik_konsistent
-        (kant_als_gesinnungsethik maxime)
+        (goldene_regel_als_gesinnungsethik maxime)
         (utilitarismus_als_verantwortungsethik (maxime_als_nutzenkalkuel maxime))"
   apply(cases maxime, rename_tac m, simp)
   apply(simp add: gesinnungsethik_verantwortungsethik_konsistent_def
-                  kant_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
+                  goldene_regel_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
                   moralisch_richtig_def maxime_als_nutzenkalkuel_def)
   apply(intro allI)
   apply(case_tac handlungsabsicht, rename_tac h, simp)
@@ -194,11 +194,11 @@ theorem
   assumes "finite (bevoelkerung:: 'person set)"
   shows 
     "gesinnungsethik_verantwortungsethik_konsistent
-      (kant_als_gesinnungsethik maxime)
+      (goldene_regel_als_gesinnungsethik maxime)
       (utilitarismus_als_verantwortungsethik (maxime_als_summe_wohlergehen maxime))"
   apply(cases maxime, rename_tac m, simp)
   apply(simp add: gesinnungsethik_verantwortungsethik_konsistent_def
-                  kant_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
+                  goldene_regel_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
                   moralisch_richtig_def)
   apply(intro allI)
   apply(case_tac handlungsabsicht, rename_tac h, simp)
