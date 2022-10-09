@@ -70,8 +70,7 @@ Ausgabe:
   -- TODO: Wir unterstützen nur Erlaubnis/Verbot.
 *)
 
-(*TODO: rename*)
-definition kategorischer_imperativ ::
+definition moarlisch_gesetz_abeiten ::
   \<open>'person \<Rightarrow>
    'world \<Rightarrow>
    ('person, 'world) maxime \<Rightarrow>
@@ -80,7 +79,7 @@ definition kategorischer_imperativ ::
    (nat, 'a, 'b) gesetz
   \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
 where
-  \<open>kategorischer_imperativ ich welt maxime handlungsabsicht gesetz_ableiten gesetz \<equiv>
+  \<open>moarlisch_gesetz_abeiten ich welt maxime handlungsabsicht gesetz_ableiten gesetz \<equiv>
     let soll_handeln = if moralisch welt maxime handlungsabsicht
                        then
                          Erlaubnis
