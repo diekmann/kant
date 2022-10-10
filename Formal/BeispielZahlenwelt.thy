@@ -83,8 +83,18 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     "individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) \<le> (meins p nach)"
   definition maxime_zahlenfortschritt :: "(person, zahlenwelt) maxime" where
     "maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)"
-  
-  
+
+
+(**TODO: move, do stuff**)
+  lemma "moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))"
+    apply(cases welt)
+    by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+
+(* TODO:
+lemma "kategorischer_imperativ welt maxime_zahlenfortschritt"
+  apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+  try
+*)
   
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
   Das entstehende Gesetz ist nicht sehr gut, da es einfach jedes Mal einen
@@ -139,15 +149,18 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
   
   fun individueller_strikter_fortschritt :: "person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool" where
     "individueller_strikter_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) < (meins p nach)"
-  
+
   text\<open>Nun ist es \<^const>\<open>Alice\<close> verboten Wohlstand für sich selbst zu erzeugen.\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich))
           (HandlungF (erschaffen 5)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Verbot))}\<close>
     by eval
-  
-  
+    
+  lemma "\<not> moralisch welt (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5))"
+    apply(cases welt)
+    by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
+
   text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des
   eigenen Wohlstands erlebt.
   Effektiv führt diese Maxime zu einem Gesetz, welches es einem Individuum nicht erlaubt
@@ -179,6 +192,12 @@ subsection\<open>Maxime für Globales Optimum\<close>
           (HandlungF (erschaffen 5)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
     by eval
+
+
+  lemma "moralisch initialwelt (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (HandlungF (erschaffen 5))"
+  by(eval)
+    
+    
   
   text\<open>Allerdings ist auch diese Maxime auch sehr grausam, da sie Untätigkeit verbietet:\<close>
   lemma \<open>beispiel_case_law_relativ
@@ -224,6 +243,10 @@ subsection\<open>Alice stiehlt 5\<close>
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Verbot))}\<close>
     by eval
+
+  lemma "\<not> moralisch welt maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob))"
+    apply(cases welt)
+    by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
   
   text\<open>Auch wenn \<^const>\<open>Alice\<close> von sich selbst stehlen möchte ist dies verboten,
   obwohl hier keiner etwas verliert:\<close>

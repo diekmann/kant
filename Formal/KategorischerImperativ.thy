@@ -117,14 +117,61 @@ TODO: implementieren!!!
 (*TODO: kategorischer Imperativ*)
 
 
-(*
-fun kat_imperativ ::
+text\<open>
+Für alle möglichen Handlungsabsichten:
+Wenn es eine Person gibt für die diese Handlungsabsicht moralisch ist,
+dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen Regel) sein.
+\<close>
+fun kategorischer_imperativ ::
   \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
-\<open>kat_imperativ welt (Maxime m) =
+\<open>kategorischer_imperativ welt (Maxime m) =
   (\<forall>h :: ('person, 'world) handlungF.
     (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
 
-ist der \<exists> wirklich korrekt? Eigentlich will ich doch \<forall>*)
+text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
+
+lemma
+  "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
+    (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> moralisch welt (Maxime m) h)"
+  apply(simp del: kategorischer_imperativ.simps)
+  by(simp)
+
+
+lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
+  (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))"
+  apply(simp add: moralisch_simp)
+  by auto
+
+lemma "(\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))
+  \<Longrightarrow> kategorischer_imperativ welt (Maxime m)"
+  apply(simp add: moralisch_simp)
+  apply(intro allI impI)
+  apply(elim exE)
+  apply(erule_tac x=h in allE)
+  oops
+  
+text\<open>WOW:
+
+Die Maxime die keine Handlung erlaubt (weil immer False) erfuellt den kategorischen
+Imperativ\<close>
+lemma "kategorischer_imperativ welt (Maxime (\<lambda>ich h. False))"
+  by(simp)
+
+lemma "\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h"
+  by(simp add: moralisch_simp)
+
+
+lemma "kategorischer_imperativ welt (Maxime (\<lambda>ich h. True))"
+  by(simp add: moralisch_simp)
+
+lemma "moralisch welt (Maxime (\<lambda>ich h. True)) h"
+  by(simp add: moralisch_simp)
+
+lemma "kategorischer_imperativ welt (Maxime (\<lambda>ich_ignored h. P h))"
+  apply(simp add: moralisch_simp)
+  apply(intro allI impI, elim exE)
+  oops (*hmmm, bekomme ich das mit dem Steuersystem verbunden?*)
+
 
 (*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
 zu
@@ -133,6 +180,15 @@ zu
 
 value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
 *)
+
+thm goldene_regel
+
+lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
+  m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
+  by auto
+  
+
+
 
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
 
