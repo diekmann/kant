@@ -150,6 +150,8 @@ where
 
 (* Hat was von dem Urzustand Schleier von Rawls? *)
 
+
+
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
 
 lemma

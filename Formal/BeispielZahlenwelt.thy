@@ -97,15 +97,31 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     apply(cases welt)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
-  lemma "kategorischer_imperativ welt maxime_zahlenfortschritt"
+  (*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
+      einfach aus den `ich` ein \<forall>ich. machen?*)
+  lemma "kategorischer_imperativ welt
+    (Maxime (\<lambda>(ich::person) h. (\<forall>p. individueller_fortschritt p h)))"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    apply(intro allI impI, elim exE)
+    apply(intro allI impI)
     apply(cases welt, rename_tac besitz, simp)
     apply(case_tac h, rename_tac h, simp)
     apply(case_tac "h = erschaffen 5", simp)
     apply(case_tac "h = stehlen 5 Bob", simp)
     apply(case_tac "h = schenken 5 Bob", simp)
-    apply(case_tac "h = reset", simp)
+      apply(case_tac "h = reset", simp)
+    oops
+
+  lemma "kategorischer_imperativ welt
+    (Maxime (\<lambda>ich. individueller_fortschritt ich))"
+    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    apply(intro allI impI)
+    apply(cases welt, rename_tac besitz, simp)
+    apply(case_tac h, rename_tac h, simp)
+    apply(case_tac "h = erschaffen 5", simp)
+    apply(case_tac "h = stehlen 5 Bob", simp)
+    apply(case_tac "h = schenken 5 Bob", simp)
+      apply(case_tac "h = reset", simp)
+    oops
   (*TODO*)
 
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
