@@ -56,8 +56,9 @@ subsection\<open>Handlungen\<close>
 
   text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
   fun reset :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "reset ich (Zahlenwelt besitz) =
-        Zahlenwelt (\<lambda> _. 0)"
+    "reset ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. 0)"
+
+  (*TODO: eigentlich keine gute handlung, aber fuer einen verschuldeten egoisten gut.*)
 
 
 subsection\<open>Setup\<close>
@@ -98,7 +99,8 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
 
   lemma "kategorischer_imperativ welt maxime_zahlenfortschritt"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    try
+    apply(intro allI impI, elim exE)
+    
   (*TODO*)
 
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.

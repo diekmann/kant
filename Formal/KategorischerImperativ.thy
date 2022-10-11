@@ -116,6 +116,25 @@ TODO: implementieren!!!
 \<close>
 (*TODO: kategorischer Imperativ*)
 
+(*
+Kategorischer Imperativ umformuliert:
+
+Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst, 
+  dass sie ein allgemeines Gesetz werde.
+
+Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
+   dass sie jeder befolgt, im Sinne der goldenen Regel.
+
+Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
+   dass sie (Handlung+Maxime) moralisch ist.
+
+Wenn es jemanden gibt der nach einer Maxime handeln will,
+   dann muss diese Handlung nach der Maxime moralsich sein.
+
+Für jede Handlungsabsicht muss gelten:
+  Wenn jemand in jeder welt nach der Handlungsabsicht handeln würde,
+  dann muss diese Handlung moralisch sein.
+*)
 
 text\<open>
 Für alle möglichen Handlungsabsichten:
@@ -126,28 +145,36 @@ fun kategorischer_imperativ ::
   \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
 \<open>kategorischer_imperativ welt (Maxime m) =
   (\<forall>h :: ('person, 'world) handlungF.
-    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+    (\<exists>p::'person. \<forall>w. m p (handeln p w h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+
+(* Hat was von dem Urzustand Schleier von Rawls? *)
 
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
 
 lemma
   "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
-    (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> moralisch welt (Maxime m) h)"
+    (\<forall>h ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> moralisch welt (Maxime m) h)"
   apply(simp del: kategorischer_imperativ.simps)
   by(simp)
 
+(*TODO: will ich das???*)
+lemma
+  "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
+    (\<forall>h p1 p2 p. (\<forall>w. m p (handeln p w h)) \<longrightarrow> m p1 (handeln p2 welt h))"
+  by (simp add: moralisch_simp)
 
 lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
-  (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))"
+  (\<forall>h ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))"
   apply(simp add: moralisch_simp)
   by auto
 
-lemma "(\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))
+lemma "(\<forall>h ich. (\<forall>w. m ich (handeln ich welt h)) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))
   \<Longrightarrow> kategorischer_imperativ welt (Maxime m)"
   apply(simp add: moralisch_simp)
   apply(intro allI impI)
   apply(elim exE)
   apply(erule_tac x=h in allE)
+  (*quickcheck found a counterexample*)
   oops
   
 text\<open>WOW:
@@ -181,11 +208,20 @@ zu
 value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
 *)
 
-thm goldene_regel
+  thm goldene_regel
 
+(*
+Handlung fuer mich okay == m ich (handeln ich welt h) 
+*)
+
+
+(*Der allquantor gefaullt mir nicht*)
 lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
-  m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
+  \<forall>welt. m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
+  apply(simp)
   by auto
+  
+  
   
 
 
