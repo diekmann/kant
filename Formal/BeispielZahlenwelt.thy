@@ -54,9 +54,15 @@ subsection\<open>Handlungen\<close>
   text\<open>Das Modell ist nicht ganz perfekt, .... Aber passt schon um damit zu spielen.\<close>
 
 
-subsection\<open>Setup\<close>
+  text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
+  fun reset :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
+    "reset ich (Zahlenwelt besitz) =
+        Zahlenwelt (\<lambda> _. 0)"
 
-  definition "initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10]"
+
+subsection\<open>Setup\<close>
+  text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
+  definition "initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3]"
   
   text\<open>Wir nehmen an unsere handelnde Person ist \<^const>\<open>Alice\<close>.\<close>
   
@@ -66,14 +72,14 @@ subsection\<open>Setup\<close>
         Alice
         maxime
         (printable_case_law_ableiten_absolut show_zahlenwelt))
-      10 handlungsabsicht initialwelt (Gesetz {})"
+      5 handlungsabsicht initialwelt (Gesetz {})"
   definition "beispiel_case_law_relativ maxime handlungsabsicht \<equiv>
     simulateOne
       (SimConsts
         Alice
         maxime
         (case_law_ableiten_relativ delta_zahlenwelt))
-      20 handlungsabsicht initialwelt (Gesetz {})"
+      10 handlungsabsicht initialwelt (Gesetz {})"
 
 subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
 
@@ -85,53 +91,42 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     "maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)"
 
 
-(**TODO: move, do stuff**)
+  text\<open>In jeder Welt ist die Handlung \<^const>\<open>moralisch\<close>:\<close>
   lemma "moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))"
     apply(cases welt)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
-(* TODO:
-lemma "kategorischer_imperativ welt maxime_zahlenfortschritt"
-  apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-  try
-*)
-  
+  lemma "kategorischer_imperativ welt maxime_zahlenfortschritt"
+    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    try
+  (*TODO*)
+
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
   Das entstehende Gesetz ist nicht sehr gut, da es einfach jedes Mal einen
   Snapshot der Welt aufschreibt und nicht sehr generisch ist.\<close>
   lemma \<open>beispiel_case_law_absolut maxime_zahlenfortschritt (HandlungF (erschaffen 5))
   =
   Gesetz
-    {(\<section> 10,
-      Rechtsnorm (Tatbestand ([(Alice, 50), (Bob, 10)], [(Alice, 55), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 9,
-      Rechtsnorm (Tatbestand ([(Alice, 45), (Bob, 10)], [(Alice, 50), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 8,
-      Rechtsnorm (Tatbestand ([(Alice, 40), (Bob, 10)], [(Alice, 45), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 7,
-      Rechtsnorm (Tatbestand ([(Alice, 35), (Bob, 10)], [(Alice, 40), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 6,
-      Rechtsnorm (Tatbestand ([(Alice, 30), (Bob, 10)], [(Alice, 35), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 5,
-      Rechtsnorm (Tatbestand ([(Alice, 25), (Bob, 10)], [(Alice, 30), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 4,
-      Rechtsnorm (Tatbestand ([(Alice, 20), (Bob, 10)], [(Alice, 25), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 3,
-      Rechtsnorm (Tatbestand ([(Alice, 15), (Bob, 10)], [(Alice, 20), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 2,
-      Rechtsnorm (Tatbestand ([(Alice, 10), (Bob, 10)], [(Alice, 15), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis)),
-     (\<section> 1,
-      Rechtsnorm (Tatbestand ([(Alice, 5), (Bob, 10)], [(Alice, 10), (Bob, 10)]))
-       (Rechtsfolge Erlaubnis))}
+  {(\<section> 5,
+    Rechtsnorm
+     (Tatbestand ([(Alice, 25), (Bob, 10), (Carol, - 3)], [(Alice, 30), (Bob, 10), (Carol, - 3)]))
+     (Rechtsfolge Erlaubnis)),
+   (\<section> 4,
+    Rechtsnorm
+     (Tatbestand ([(Alice, 20), (Bob, 10), (Carol, - 3)], [(Alice, 25), (Bob, 10), (Carol, - 3)]))
+     (Rechtsfolge Erlaubnis)),
+   (\<section> 3,
+    Rechtsnorm
+     (Tatbestand ([(Alice, 15), (Bob, 10), (Carol, - 3)], [(Alice, 20), (Bob, 10), (Carol, - 3)]))
+     (Rechtsfolge Erlaubnis)),
+   (\<section> 2,
+    Rechtsnorm
+     (Tatbestand ([(Alice, 10), (Bob, 10), (Carol, - 3)], [(Alice, 15), (Bob, 10), (Carol, - 3)]))
+     (Rechtsfolge Erlaubnis)),
+   (\<section> 1,
+    Rechtsnorm
+     (Tatbestand ([(Alice, 5), (Bob, 10), (Carol, - 3)], [(Alice, 10), (Bob, 10), (Carol, - 3)]))
+     (Rechtsfolge Erlaubnis))}
   \<close> by eval
   
   
@@ -157,7 +152,9 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Verbot))}\<close>
     by eval
     
-  lemma "\<not> moralisch welt (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5))"
+  text\<open>In keiner Welt ist die Handlung nun \<^const>\<open>moralisch\<close>:\<close>
+lemma "\<not> moralisch welt
+          (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5))"
     apply(cases welt)
     by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
@@ -171,7 +168,7 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
   Beispielsweise ist \<^const>\<open>Bob\<close> das Opfer wenn \<^const>\<open>Alice\<close> sich
   5 Wohlstand erschafft, aber \<^const>\<open>Bob\<close>'s Wohlstand sich nicht erhöht:\<close>
   lemma\<open>VerletzteMaxime (Opfer Bob) (Taeter Alice)
-          (Handlung [(Alice, 5), (Bob, 10)] [(Alice, 10), (Bob, 10)])
+          (Handlung [(Alice, 5), (Bob, 10), (Carol, -3)] [(Alice, 10), (Bob, 10), (Carol, -3)])
           \<in> debug_maxime show_zahlenwelt initialwelt
             (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5)) \<close>
     by eval
@@ -194,7 +191,8 @@ subsection\<open>Maxime für Globales Optimum\<close>
     by eval
 
 
-  lemma "moralisch initialwelt (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (HandlungF (erschaffen 5))"
+  lemma "moralisch initialwelt
+          (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (HandlungF (erschaffen 5))"
   by(eval)
     
     
@@ -244,6 +242,7 @@ subsection\<open>Alice stiehlt 5\<close>
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Verbot))}\<close>
     by eval
 
+  text\<open>In kein Welt ist Stehlen \<^const>\<open>moralisch\<close>:\<close>
   lemma "\<not> moralisch welt maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob))"
     apply(cases welt)
     by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
@@ -259,11 +258,11 @@ subsection\<open>Alice stiehlt 5\<close>
   lemma \<open>debug_maxime show_zahlenwelt initialwelt
           maxime_zahlenfortschritt (HandlungF (stehlen 5 Alice)) =
    {VerletzteMaxime (Opfer Alice) (Taeter Bob)
-      (Handlung [(Alice, 5), (Bob, 10)] [(Bob, 15)]),
+     (Handlung [(Alice, 5), (Bob, 10), (Carol, - 3)] [(Bob, 15), (Carol, - 3)]),
     VerletzteMaxime (Opfer Alice) (Taeter Carol)
-      (Handlung [(Alice, 5), (Bob, 10)] [(Bob, 10), (Carol, 5)]),
+     (Handlung [(Alice, 5), (Bob, 10), (Carol, - 3)] [(Bob, 10), (Carol, 2)]),
     VerletzteMaxime (Opfer Alice) (Taeter Eve)
-      (Handlung [(Alice, 5), (Bob, 10)] [(Bob, 10), (Eve, 5)])
+     (Handlung [(Alice, 5), (Bob, 10), (Carol, - 3)] [(Bob, 10), (Carol, - 3), (Eve, 5)])
    }\<close>
     by eval
   
