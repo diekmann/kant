@@ -100,7 +100,12 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   lemma "kategorischer_imperativ welt maxime_zahlenfortschritt"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
     apply(intro allI impI, elim exE)
-    
+    apply(cases welt, rename_tac besitz, simp)
+    apply(case_tac h, rename_tac h, simp)
+    apply(case_tac "h = erschaffen 5", simp)
+    apply(case_tac "h = stehlen 5 Bob", simp)
+    apply(case_tac "h = schenken 5 Bob", simp)
+    apply(case_tac "h = reset", simp)
   (*TODO*)
 
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.

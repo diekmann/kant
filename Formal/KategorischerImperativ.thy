@@ -141,11 +141,12 @@ Für alle möglichen Handlungsabsichten:
 Wenn es eine Person gibt für die diese Handlungsabsicht moralisch ist,
 dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen Regel) sein.
 \<close>
-fun kategorischer_imperativ ::
-  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close> where
-\<open>kategorischer_imperativ welt (Maxime m) =
-  (\<forall>h :: ('person, 'world) handlungF.
-    (\<exists>p::'person. \<forall>w. m p (handeln p w h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+fun kategorischer_imperativ
+  :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+where
+  \<open>kategorischer_imperativ welt (Maxime m) =
+    (\<forall>h :: ('person, 'world) handlungF.
+      (\<exists>p::'person. \<forall>w. m p (handeln p w h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
 
 (* Hat was von dem Urzustand Schleier von Rawls? *)
 
@@ -160,7 +161,7 @@ lemma
 (*TODO: will ich das???*)
 lemma
   "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
-    (\<forall>h p1 p2 p. (\<forall>w. m p (handeln p w h)) \<longrightarrow> m p1 (handeln p2 welt h))"
+    (\<forall>h p1 p2 ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> m p1 (handeln p2 welt h))"
   by (simp add: moralisch_simp)
 
 lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
