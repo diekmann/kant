@@ -119,7 +119,7 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   *)
   lemma "\<not>kategorischer_imperativ welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
-        apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
     apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
     apply(simp)
     apply(intro conjI)
@@ -130,6 +130,12 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     apply(cases welt, rename_tac besitz)
     apply(simp)
     done
+
+  (*Was muesste denn eine Maxime sein die den katimp erfuellt?*)
+  lemma "kategorischer_imperativ welt
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
+    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    oops
 
   lemma "kategorischer_imperativ welt
     (Maxime (\<lambda>ich. individueller_fortschritt ich))"
@@ -266,6 +272,15 @@ subsection\<open>Maxime für Globales Optimum\<close>
     =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
+
+(*TODO: eine Person in eine Handlungsabsicht als handelnde hardzucoden ist illegal!*)
+lemma "\<not>kategorischer_imperativ initialwelt (Maxime (\<lambda>ich::person. globaler_fortschritt))"
+  apply(simp add: moralisch_simp)
+  apply(simp add: initialwelt_def)
+  apply(rule_tac x="HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))" in exI)
+  apply(simp)
+  apply(eval)
+  done
 
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
   lemma\<open>beispiel_case_law_relativ
