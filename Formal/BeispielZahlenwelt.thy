@@ -273,7 +273,13 @@ subsection\<open>Maxime für Globales Optimum\<close>
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
-(*TODO: eine Person in eine Handlungsabsicht als handelnde hardzucoden ist illegal!*)
+(*TODO: eine Person als handelnde Person in eine Handlungsabsicht
+ hardzucoden ist illegal!
+
+eine Person also Opfer hardzucoden muss aber gehen.
+HandlungF (stehlen 5 Bob)
+sollte eine wohlgeformte Handlungsabsicht sein.
+*)
 lemma "\<not>kategorischer_imperativ initialwelt (Maxime (\<lambda>ich::person. globaler_fortschritt))"
   apply(simp add: moralisch_simp)
   apply(simp add: initialwelt_def)
