@@ -114,18 +114,22 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     done
 
   (*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
-      einfach aus den `ich` ein \<forall>ich. machen?*)
-  lemma "kategorischer_imperativ welt
-    (Maxime (\<lambda>(ich::person) h. (\<forall>p. individueller_fortschritt p h)))"
-    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    apply(intro allI impI)
-    apply(cases welt, rename_tac besitz, simp)
-    apply(case_tac h, rename_tac h, simp)
-    apply(case_tac "h = erschaffen 5", simp)
-    apply(case_tac "h = stehlen 5 Bob", simp)
-    apply(case_tac "h = schenken 5 Bob", simp)
-      apply(case_tac "h = reset", simp)
-    oops
+      einfach aus den `ich` ein \<forall>ich. machen?
+    so einfach ist es nicht:
+  *)
+  lemma "\<not>kategorischer_imperativ welt
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
+        apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
+    apply(simp)
+    apply(intro conjI)
+     apply(rule_tac x=Bob in exI)
+     apply(case_tac welt, simp; fail)
+    apply(rule_tac x=Alice in exI)
+    apply(rule_tac x=Bob in exI)
+    apply(cases welt, rename_tac besitz)
+    apply(simp)
+    done
 
   lemma "kategorischer_imperativ welt
     (Maxime (\<lambda>ich. individueller_fortschritt ich))"

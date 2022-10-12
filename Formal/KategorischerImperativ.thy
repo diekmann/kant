@@ -252,5 +252,6 @@ lemma altruistische_maxime_katimp:
   " kategorischer_imperativ welt (Maxime (\<lambda>ich h. \<forall>p. m p h))"
   apply(simp add: moralisch_simp)
   nitpick (*\<exists>h p1 p2. m p1 h \<noteq> m p2 h \<Longrightarrow> macht besseres gegenbsp*)
+  oops
 
 end
