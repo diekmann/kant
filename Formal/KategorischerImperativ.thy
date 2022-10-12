@@ -232,6 +232,25 @@ lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
 
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
 
+text\<open>Wenn eine Maxime jede Handlungsabsicht als morlaisch bewertet
+erfüllt diese Maxime den kategorischen Imperativ.
+Da diese Maxime jede Handlung erlaubt, ist es dennoch eine wohl ungeeignete Maxime.\<close>
+lemma "\<forall>h. moralisch welt maxime h \<Longrightarrow> kategorischer_imperativ welt maxime"
+  apply(cases maxime, rename_tac m)
+  by(simp add: moralisch_simp)
 
+text\<open>Eine Maxime die das ich und die Handlung ignoriert und etwas für alle fordert erfüllt den
+kategorischen Imperativ.\<close>
+lemma blinde_maxime_katimp:
+  "kategorischer_imperativ welt (Maxime (\<lambda>ich h. \<forall>p. m p))"
+  by(simp add: moralisch_simp)
+
+text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
+kategorischen Imperativ.\<close> (*?*)
+(*Wuerde das vllt gehen wenn die maxime nicht diskriminierend waere?*)
+lemma altruistische_maxime_katimp:
+  " kategorischer_imperativ welt (Maxime (\<lambda>ich h. \<forall>p. m p h))"
+  apply(simp add: moralisch_simp)
+  nitpick (*\<exists>h p1 p2. m p1 h \<noteq> m p2 h \<Longrightarrow> macht besseres gegenbsp*)
 
 end
