@@ -97,6 +97,23 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     apply(cases welt)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
+  (*AWESOME!*)
+  text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt nicht den \<^const>\<open>kategorischer_imperativ\<close>
+  da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehen würde.\<close>
+  lemma "\<not> kategorischer_imperativ welt maxime_zahlenfortschritt"
+    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
+    apply(simp)
+    apply(intro conjI)
+     apply(rule_tac x=Alice in exI)
+     apply(intro allI, rename_tac w)
+     apply(case_tac w, simp; fail)
+    apply(rule_tac x=Bob in exI)
+    apply(rule_tac x=Alice in exI)
+    apply(cases welt, rename_tac besitz)
+    apply(simp)
+    done
+
   (*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
       einfach aus den `ich` ein \<forall>ich. machen?*)
   lemma "kategorischer_imperativ welt
