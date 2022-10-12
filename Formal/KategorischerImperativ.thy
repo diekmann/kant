@@ -145,8 +145,8 @@ fun kategorischer_imperativ
   :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
   \<open>kategorischer_imperativ welt (Maxime m) =
-    (\<forall>h :: ('person, 'world) handlungF.
-      (\<exists>p::'person. \<forall>w. m p (handeln p w h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+    (\<forall>h.
+      (\<exists>p. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
 
 (* Hat was von dem Urzustand Schleier von Rawls? *)
 
@@ -156,16 +156,19 @@ text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:
 
 lemma
   "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
-    (\<forall>h ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> moralisch welt (Maxime m) h)"
+    (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> moralisch welt (Maxime m) h)"
   apply(simp del: kategorischer_imperativ.simps)
   by(simp)
 
-(*TODO: will ich das???*)
+text\<open>Für jede Handlungsabsicht:
+  wenn ich so handeln würde muss es auch okay sein, wenn zwei beliebige
+  personen so handeln, wobei iner Täter und einer Opfer ist.\<close>
 lemma
   "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
-    (\<forall>h p1 p2 ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> m p1 (handeln p2 welt h))"
+    (\<forall>h p1 p2 ich. m ich (handeln ich welt h) \<longrightarrow> m p1 (handeln p2 welt h))"
   by (simp add: moralisch_simp)
 
+(*hmmm, interessant, ...*)
 lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
   (\<forall>h ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))"
   apply(simp add: moralisch_simp)
@@ -218,13 +221,11 @@ Handlung fuer mich okay == m ich (handeln ich welt h)
 *)
 
 
-(*Der allquantor gefaullt mir nicht*)
 lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
-  \<forall>welt. m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
+  m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
   apply(simp)
   by auto
-  
-  
+
   
 
 
