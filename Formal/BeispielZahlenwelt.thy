@@ -288,6 +288,37 @@ lemma "\<not>kategorischer_imperativ initialwelt (Maxime (\<lambda>ich::person. 
   apply(eval)
   done
 
+lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
+  by(cases h, simp)
+lemma nachher_handeln: "nachher (handeln p welt (HandlungF h)) = h p welt"
+  by(simp)
+
+(*hmm, this does not pull polymorphism into HOL*)
+lemma\<open>{h::'p\<Rightarrow>int\<Rightarrow>int. \<exists>h'::'p'\<Rightarrow>int\<Rightarrow>int. \<exists>translate::'p'\<Rightarrow>'p. \<forall>p. h' p = h (translate p)}
+        = {h::'p\<Rightarrow>int\<Rightarrow>int. True}\<close>
+  apply(rule Collect_eqI)
+  apply(simp)
+  apply(rule_tac x="(\<lambda>p' i. x (t p') i)" in exI)
+  by fastforce
+  
+  
+
+lemma "set P = UNIV \<Longrightarrow>
+       sum_list (map welt P) \<le> sum_list (map (x p welt) P) \<Longrightarrow>
+       sum_list (map welt P) \<le> sum_list (map (x p2 welt) P)"
+  (*darf nicht gelten, weil es instanziierungen gaebe, fuer die das definitif falsch ware.*)
+  oops
+lemma "kategorischer_imperativ (welt::'p::enum \<Rightarrow> int)
+        (Maxime (\<lambda>(ich::'p) h.
+            sum_list (map (vorher h) Enum.enum) \<le> sum_list (map (nachher h) Enum.enum)))"
+  apply(simp add: moralisch_simp)
+  apply(intro allI impI)
+  apply(elim exE)
+  apply(case_tac h, simp)
+  apply(rule sum_list_mono)
+  oops (*gilt nicht, weil polymorphismus kein allquantor ist.*)
+
+
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
   lemma\<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_fortschritt))
