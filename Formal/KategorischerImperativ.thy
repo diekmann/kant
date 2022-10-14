@@ -95,11 +95,11 @@ where
 (*welt rawls schleier um handlung verallgemeinern. Definition*)
 definition wohlgeformte_handlungsabsicht
   :: "('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow>
-      'world \<Rightarrow> ('person, 'world) handlungF
+      ('person, 'world) handlungF
       \<Rightarrow> bool"
 where
-  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
-    \<forall>p1 p2. (handeln p1 welt h) =
+  "wohlgeformte_handlungsabsicht welt_personen_swap h \<equiv>
+    \<forall>welt p1 p2. (handeln p1 welt h) =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
 (*TODO: geht das in de Zahlenwelt? koennen wir welt_personen_swap implementieren?
 nur h welche das erfuellen sind generisch und erlaubt, ....
@@ -162,7 +162,7 @@ fun kategorischer_imperativ
 where
   \<open>kategorischer_imperativ welt_personen_swap welt (Maxime m) =
     (\<forall>h.
-          wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
+          wohlgeformte_handlungsabsicht welt_personen_swap h \<and>
           (\<exists>p. m p (handeln p welt h))
               \<longrightarrow> moralisch welt (Maxime m) h)\<close>
 

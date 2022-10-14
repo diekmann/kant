@@ -57,14 +57,17 @@ subsection\<open>Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: "nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (erschaffen n))"
-    by(cases welt, simp add: wohlgeformte_handlungsabsicht_def swap_def)
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap (HandlungF (erschaffen n))"
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(intro allI, case_tac welt, simp)
+    apply(simp add: swap_def)
+    done
   
   fun stehlen :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen n p))"
-    apply(cases welt, simp add: wohlgeformte_handlungsabsicht_def swap_def)
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap (HandlungF (stehlen n p))"
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
     oops (*MIST*)
   
   fun schenken :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
@@ -393,6 +396,7 @@ lemma gesamtbesitz_swap:
   apply(rule sum_list_swap)
   using enum_class.in_enum enum_class.enum_distinct by auto
 
+
 lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
         (Maxime (\<lambda>ich::person. globaler_fortschritt))"
   apply(simp add: moralisch_simp)
@@ -401,24 +405,34 @@ lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
   apply(case_tac h, rename_tac h p1 p2 ha, simp)
 proof -
   fix h p1 p2 ha
-  assume a_handlung: "\<forall>p1 p2.
-          ha p1 (Zahlenwelt besitz) =
-          zahlenwelt_personen_swap p2 p1 (ha p2 (Zahlenwelt (swap p1 p2 besitz)))"
+  assume a_handlung: "\<forall>welt p1 p2.
+          welt = zahlenwelt_personen_swap p2 p1 (zahlenwelt_personen_swap p1 p2 welt) \<and>
+          ha p1 welt = zahlenwelt_personen_swap p2 p1 (ha p2 (zahlenwelt_personen_swap p1 p2 welt))"
     and a_sum: "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p2 (Zahlenwelt besitz))"
 
-  from a_handlung
-  have "gesamtbesitz (ha p1 (Zahlenwelt besitz)) = gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz)))"
-    apply(erule_tac x=p1 in allE)
-    apply(erule_tac x=p2 in allE)
+  from a_handlung have a_handlung':
+    "ha pA welt = zahlenwelt_personen_swap pB pA (ha pB (zahlenwelt_personen_swap pA pB welt))"
+    for welt pA pB
+    by simp
+  from a_handlung'[where welt="Zahlenwelt besitz" and pA=p1 and pB=p2]
+  have 1: "gesamtbesitz (ha p1 (Zahlenwelt besitz)) = gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz)))"
     apply(simp)
     apply(simp add: gesamtbesitz_swap)
     done
-  from a_handlung
-  have "gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz))) = gesamtbesitz (ha p2 (Zahlenwelt besitz))"
-    (*brauche a_handlung wo besitz = (swap p1 p2 besitz)*)
-  
 
+
+  thm a_handlung'[where welt="Zahlenwelt (swap p1 p2 besitz)" and pA=p1 and pB=p2, simplified]
+  have 2: "gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz)))
+            = gesamtbesitz (ha p2 (Zahlenwelt besitz))"
+    apply(simp)
+    
+    (*brauche a_handlung wo besitz = (swap p1 p2 besitz)*)
+    (*ne, brauche ich nicht! Das wird irgendwie nix *)
+  oops
+
+  from a_sum 1 2
   show "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p1 (Zahlenwelt besitz))"
+    by simp
   (*TODO: need to use assm twice?*)
   
 
