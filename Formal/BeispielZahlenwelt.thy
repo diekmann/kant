@@ -399,10 +399,26 @@ lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
   apply(intro allI impI, elim conjE exE)
   apply(case_tac h, rename_tac h p1 p2 ha, simp)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
-  apply(simp)
-  apply(simp add: gesamtbesitz_swap)
+proof -
+  fix h p1 p2 ha
+  assume a_handlung: "\<forall>p1 p2.
+          ha p1 (Zahlenwelt besitz) =
+          zahlenwelt_personen_swap p2 p1 (ha p2 (Zahlenwelt (swap p1 p2 besitz)))"
+    and a_sum: "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p2 (Zahlenwelt besitz))"
+
+  from a_handlung
+  have "gesamtbesitz (ha p1 (Zahlenwelt besitz)) = gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz)))"
+    apply(erule_tac x=p1 in allE)
+    apply(erule_tac x=p2 in allE)
+    apply(simp)
+    apply(simp add: gesamtbesitz_swap)
+    done
+  from a_handlung
+  have "gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz))) = gesamtbesitz (ha p2 (Zahlenwelt besitz))"
+    (*brauche a_handlung wo besitz = (swap p1 p2 besitz)*)
+  
+
+  show "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p1 (Zahlenwelt besitz))"
   (*TODO: need to use assm twice?*)
   
 
