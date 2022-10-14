@@ -30,15 +30,42 @@ section\<open>Beispiel: Zahlenwelt\<close>
         Aenderung.delta_num_fun (Handlung vor_besitz nach_besitz)"
   (*>*)
 
+(*TODO: mode up*)
+definition swap :: "'a \<Rightarrow> 'a \<Rightarrow> ('a \<Rightarrow> 'b) \<Rightarrow> 'a \<Rightarrow> 'b" where
+  "swap a b f \<equiv> f(a:=f b, b:= f a)"
+
+lemma swap1[simp]: "swap a b (swap a b f) = f"
+  by(simp add: swap_def)
+lemma swap2[simp]: "swap b a (swap a b f) = f"
+  by(simp add: swap_def)
+lemma swap_id[simp]: "swap a a f = f"
+  by(simp add: swap_def)
+lemma "f_swapped = (swap a b f) \<Longrightarrow> f_swapped a = f b \<and> f_swapped b = f a"
+  by(simp add: swap_def)
+lemma swap_symmetric: "swap a b = swap b a"
+  by(simp add: fun_eq_iff swap_def)
+
+fun zahlenwelt_personen_swap :: "person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
+  "zahlenwelt_personen_swap p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)"
+
+lemma \<open>zahlenwelt_personen_swap Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
+  = (Zahlenwelt \<^url>[Alice := 8, Bob := 6, Carol := 4])\<close>
+  by eval
+
 subsection\<open>Handlungen\<close>
 
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: "nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))"
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (erschaffen n))"
+    by(cases welt, simp add: wohlgeformte_handlungsabsicht_def swap_def)
   
   fun stehlen :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))"
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen n p))"
+    apply(cases welt, simp add: wohlgeformte_handlungsabsicht_def swap_def)
+    oops (*MIST*)
   
   fun schenken :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "schenken betrag empfaenger schenker (Zahlenwelt besitz) =
@@ -97,6 +124,7 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     apply(cases welt)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
+(*
   (*AWESOME!*)
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt nicht den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehen würde.\<close>
@@ -149,6 +177,8 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
       apply(case_tac "h = reset", simp)
     oops
   (*TODO*)
+*)
+
 
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
   Das entstehende Gesetz ist nicht sehr gut, da es einfach jedes Mal einen
@@ -280,13 +310,101 @@ eine Person also Opfer hardzucoden muss aber gehen.
 HandlungF (stehlen 5 Bob)
 sollte eine wohlgeformte Handlungsabsicht sein.
 *)
-lemma "\<not>kategorischer_imperativ initialwelt (Maxime (\<lambda>ich::person. globaler_fortschritt))"
-  apply(simp add: moralisch_simp)
-  apply(simp add: initialwelt_def)
-  apply(rule_tac x="HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))" in exI)
-  apply(simp)
+lemma "\<not>wohlgeformte_handlungsabsicht
+  zahlenwelt_personen_swap initialwelt
+  (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))"
+  apply(simp add: initialwelt_def wohlgeformte_handlungsabsicht_def swap_def)
   apply(eval)
   done
+
+(*hieran arbeite ich gerade*)
+thm sum_list_map_eq_sum_count
+lemma helper_sum_int_if: "a \<notin> set P \<Longrightarrow>
+(\<Sum>x\<in>set P. int (if a = x then A1 x else A2 x) * B x) =
+  (\<Sum>x\<in>set P. int (A2 x) * B x)"
+  by (smt (verit, del_insts) sum.cong)
+lemma sum_list_map_eq_sum_count_int:
+  fixes f :: "'a \<Rightarrow> int"
+  shows "sum_list (map f xs) = sum (\<lambda>x. (int (count_list xs x)) * f x) (set xs)"
+proof(induction xs)
+  case (Cons x xs)
+  show ?case (is "?l = ?r")
+  proof cases
+    assume "x \<in> set xs"
+    have XXX: "(\<Sum>xa\<in>set xs - {x}. int (if x = xa then count_list xs xa + 1 else count_list xs xa) * f xa)
+  = (\<Sum>xa\<in>set xs - {x}. int (count_list xs xa) * f xa)"
+      thm helper_sum_int_if
+      by (smt (verit, ccfv_SIG) Diff_insert_absorb \<open>x \<in> set xs\<close> mk_disjoint_insert sum.cong) 
+    have "?l = f x + (\<Sum>x\<in>set xs. (int (count_list xs x)) * f x)" by (simp add: Cons.IH)
+    also have "set xs = insert x (set xs - {x})" using \<open>x \<in> set xs\<close>by blast
+    also have "f x + (\<Sum>x\<in>insert x (set xs - {x}). (int (count_list xs x)) * f x) = ?r"
+      apply(simp add: sum.insert_remove XXX)
+      by (simp add: mult.commute ring_class.ring_distribs(1))
+    finally show ?thesis .
+  next
+    assume "x \<notin> set xs"
+    hence "\<And>xa. xa \<in> set xs \<Longrightarrow> x \<noteq> xa" by blast
+    thus ?thesis by (simp add: Cons.IH \<open>x \<notin> set xs\<close>)
+  qed
+qed simp
+
+lemma map_swap_none: "a \<notin> set P \<Longrightarrow> b \<notin> set P \<Longrightarrow> map (swap a b f) P = map f P"
+  by(simp add: swap_def)
+lemma map_swap_one: "a \<notin> set P \<Longrightarrow>  map (swap a b f) P = map (f(b:=f a)) P"
+  by(simp add: swap_def)
+lemma swap_a: "swap a b f a = f b"
+  by(simp add: swap_def)
+lemma swap_b: "swap a b f b = f a"
+  by(simp add: swap_def)
+lemma sum_swap_none: "a \<notin> P \<Longrightarrow> b \<notin> P \<Longrightarrow> sum (swap a b f) P = sum f P"
+  apply(simp add: swap_def)
+  by (smt (verit, best) fun_upd_other sum.cong)
+lemma swap_nothing: "a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a"
+  by(simp add: swap_def)
+
+  thm sum.remove
+lemma sum_swap_a: "finite P \<Longrightarrow> a \<notin> P \<Longrightarrow> b \<in> P \<Longrightarrow> sum (swap a b f) P = f a + sum f (P - {b})"
+  apply(subst sum.remove[of P b])
+  by(simp_all add: swap_b sum_swap_none)
+  
+  
+lemma count_list_distinct: "distinct P \<Longrightarrow> x \<in> set P \<Longrightarrow> count_list P x = 1"
+  apply(induction P)
+   apply(simp; fail)
+  by(auto)
+lemma sum_list_swap: "p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Longrightarrow> distinct P \<Longrightarrow>
+        sum_list (map (swap p1 p2 f) P) = sum_list (map (f::'a\<Rightarrow>int) P)"
+  apply(simp add: sum_list_map_eq_sum_count_int)
+  apply(simp add: count_list_distinct)
+  thm sum.cong
+  apply(induction P arbitrary: p1 p2)
+   apply(simp)
+  apply(simp)
+  apply(elim disjE)
+     apply(simp_all)
+    apply(simp add: swap_a sum_swap_a sum.remove[symmetric]; fail)
+   apply(simp add: swap_symmetric swap_a sum_swap_a sum.remove[symmetric]; fail)
+  apply(rule swap_nothing)
+  by auto
+  
+lemma gesamtbesitz_swap:
+  "gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt"
+  apply(cases welt, simp)
+  apply(rule sum_list_swap)
+  using enum_class.in_enum enum_class.enum_distinct by auto
+
+lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
+        (Maxime (\<lambda>ich::person. globaler_fortschritt))"
+  apply(simp add: moralisch_simp)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(intro allI impI, elim conjE exE)
+  apply(case_tac h, rename_tac h p1 p2 ha, simp)
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(simp)
+  apply(simp add: gesamtbesitz_swap)
+  (*TODO: need to use assm twice?*)
+  
 
 lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
   by(cases h, simp)

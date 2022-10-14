@@ -91,6 +91,20 @@ where
       )\<close>
 
 
+(*TODO: move to Handlung? Gleiched fuer maxime.*)
+(*welt rawls schleier um handlung verallgemeinern. Definition*)
+definition wohlgeformte_handlungsabsicht
+  :: "('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow>
+      'world \<Rightarrow> ('person, 'world) handlungF
+      \<Rightarrow> bool"
+where
+  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
+    \<forall>p1 p2. (handeln p1 welt h) =
+            map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
+(*TODO: geht das in de Zahlenwelt? koennen wir welt_personen_swap implementieren?
+nur h welche das erfuellen sind generisch und erlaubt, ....
+*)
+
 subsection\<open>Kategorischer Imperativ\<close>
 
 text\<open>
@@ -136,17 +150,21 @@ Für jede Handlungsabsicht muss gelten:
   dann muss diese Handlung moralisch sein.
 *)
 
+
+
 text\<open>
 Für alle möglichen Handlungsabsichten:
 Wenn es eine Person gibt für die diese Handlungsabsicht moralisch ist,
 dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen Regel) sein.
 \<close>
 fun kategorischer_imperativ
-  :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  :: \<open>('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
-  \<open>kategorischer_imperativ welt (Maxime m) =
+  \<open>kategorischer_imperativ welt_personen_swap welt (Maxime m) =
     (\<forall>h.
-      (\<exists>p. m p (handeln p welt h)) \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+          wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
+          (\<exists>p. m p (handeln p welt h))
+              \<longrightarrow> moralisch welt (Maxime m) h)\<close>
 
 (* Hat was von dem Urzustand Schleier von Rawls? *)
 
@@ -154,6 +172,7 @@ where
 
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
 
+(*
 lemma
   "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
     (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> moralisch welt (Maxime m) h)"
@@ -249,9 +268,10 @@ text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüll
 kategorischen Imperativ.\<close> (*?*)
 (*Wuerde das vllt gehen wenn die maxime nicht diskriminierend waere?*)
 lemma altruistische_maxime_katimp:
-  " kategorischer_imperativ welt (Maxime (\<lambda>ich h. \<forall>p. m p h))"
+  "kategorischer_imperativ welt (Maxime (\<lambda>ich h. \<forall>p. m p h))"
   apply(simp add: moralisch_simp)
   nitpick (*\<exists>h p1 p2. m p1 h \<noteq> m p2 h \<Longrightarrow> macht besseres gegenbsp*)
   oops
 
+*)
 end
