@@ -149,38 +149,50 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
 definition the_single_elem :: "'a set \<Rightarrow> 'a option" where
   "the_single_elem s \<equiv> if card s = 1 then Some (Set.the_elem s) else None"
 
-thm is_singleton_def singleton_iff
+thm is_singleton_def singleton_iff is_singleton_the_elem
+
+lemma the_single_elem:
+  "the_single_elem s = (if is_singleton s then Some (Set.the_elem s) else None)"
+  apply(simp add: is_singleton_the_elem the_single_elem_def card_1_singleton_iff)
+  by auto
 
 lemma "the_single_elem {a} = Some a"
   by(simp add: the_single_elem_def)
 lemma "a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None"
   by(simp add: the_single_elem_def)
 
-(*brauchen wir inj_on?*)
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
   "distinct ps \<Longrightarrow> 
   opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
           the_single_elem {p \<in> set ps. besitz p = opfer_nach_besitz}"
-  apply(simp add: the_single_elem_def)
+  apply(simp add: the_single_elem)
   apply(safe)
-  apply(induction ps)
+   apply(induction ps)
+    apply (simp add: is_singleton_altdef; fail)
    apply(simp)
-  apply(simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
-   apply(safe)
-    apply(simp add: card_1_singleton_iff)
-   apply (smt (verit, ccfv_threshold) empty_filter_conv list.simps(4) mem_Collect_eq singleton_iff the_elem_eq)
-  apply (smt (z3) Collect_cong)
+   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+   apply(simp add: is_singleton_the_elem)
+   apply(safe) thm is_singleton_the_elem
+    apply (smt (verit) CollectI empty_filter_conv list.simps(4) singletonD)
+    apply (smt (z3) Collect_cong)
 
   apply(induction ps)
-   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def; fail)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
    apply(safe)
-   apply(simp_all add: card_1_singleton_iff)
-  apply (smt (verit, ccfv_SIG) Collect_cong empty_filter_conv list.case_eq_if singleton_conv)
+  apply (smt (z3) empty_filter_conv empty_set filter_set is_singletonI' list.case_eq_if mem_Collect_eq member_filter)
+  thm card_1_singleton_iff Collect_cong empty_filter_conv list.case_eq_if singleton_conv
   thm Set.filter_def empty_Collect_eq empty_set filter_set is_singletonI' is_singleton_the_elem list.exhaust list.simps(5) mem_Collect_eq
   by (smt (z3) Collect_cong)
 
+
+lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall:
+  "opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz enum_class.enum =
+          the_single_elem {p. besitz p = opfer_nach_besitz}"
+  apply(subst opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem)
+  using enum_class.enum_distinct apply(simp)
+  apply(simp add: enum_class.enum_UNIV)
+  done
 
 fun stehlen4 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
@@ -201,78 +213,98 @@ value\<open>map_handlung show_zahlenwelt
       (handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 8, Carol := -3])
               (HandlungF (stehlen4 3 10)))\<close>
 
+
+lemma the_elem_singleton_swap:
+  "p1 \<in> set ps \<Longrightarrow>
+    p2 \<in> set ps \<Longrightarrow>
+    the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} = p2 \<Longrightarrow>
+    is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p} \<Longrightarrow>
+    is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow> the_elem {pa \<in> set ps. besitz pa = p} = p1"
+  by (smt (verit, del_insts) is_singleton_the_elem mem_Collect_eq singleton_iff swap_b)
+
+lemma the_elem_singleton_swap_none:
+    "p1 \<in> set ps \<Longrightarrow>
+    p2 \<in> set ps \<Longrightarrow>
+    the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} \<noteq> p2 \<Longrightarrow>
+    the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} \<noteq> p1 \<Longrightarrow>
+    is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow>
+    is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p} \<Longrightarrow>
+    the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} = the_elem {pa \<in> set ps. besitz pa = p}"
+  by (smt (verit, del_insts) CollectI empty_Collect_eq empty_iff insertI1 is_singleton_the_elem singletonD swap_nothing)
+
+
+lemma is_singleton_swap:
+  "p1 \<in> set ps \<Longrightarrow>
+   p2 \<in> set ps \<Longrightarrow>
+    is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p}
+    \<longleftrightarrow> is_singleton {pa \<in> set ps. besitz pa = p}"
+  apply(cases "p2 \<noteq> p1") (*smt lol*)
+  subgoal by (smt (verit) CollectD CollectI insertCI is_singletonI' is_singleton_the_elem singleton_iff swap_a swap_b swap_nothing)
+  apply(simp)
+  done
+
+
 lemma if_swap_person_help_same: "p1 = a \<Longrightarrow>
        p2 = a \<Longrightarrow>
        (\<lambda>p. if p = a then p2 else if p = p2 then p1 else p) = id"
   by auto
-lemma "p1 \<in> set ps \<Longrightarrow>
-       p2 \<in> set ps \<Longrightarrow>
-       distinct ps \<Longrightarrow>
+(*TODO: das if will in ne definition*)
+lemma opfer_eindeutig_nach_besitz_auswaehlen_swap:
+    "p1 \<in> set ps \<Longrightarrow>
+     p2 \<in> set ps \<Longrightarrow>
+     distinct ps \<Longrightarrow>
   map_option
         (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
         (opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps)
   = opfer_eindeutig_nach_besitz_auswaehlen p besitz ps"
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem)
-  apply(simp add: the_single_elem_def)
-  apply(safe, simp_all add: card_1_singleton_iff swap_a swap_b swap_nothing)
-          apply (metis (no_types, lifting) insertCI mem_Collect_eq singletonD swap_a swap_nothing the_elem_eq)
-  oops
-  
+  apply(simp add: the_single_elem)
+  apply(safe, simp_all add: swap_a swap_b swap_nothing is_singleton_swap)
+    apply(rule sym)
+    apply(rule the_elem_singleton_swap, simp_all)
+    apply(simp add: is_singleton_swap; fail)
+   apply(rule sym)
+   apply(rule the_elem_singleton_swap, simp_all)
+    apply(simp add: swap_symmetric; fail)
+   apply(simp add: is_singleton_swap; fail)
+  apply(rule the_elem_singleton_swap_none, simp_all)
+  using is_singleton_swap by fast
 
-  apply(induction ps)
-   apply(simp)
-  apply(simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
-  apply(elim disjE impE)
-     apply(intro conjI impI)
-        apply(simp_all)
-      apply(simp_all add: if_swap_person_help_same map_option.id)
-      apply(simp_all add: swap_a swap_b)
-     apply(intro conjI impI)
-       apply (smt (verit, best) filter_empty_conv list.case_eq_if map_option_case option.simps(4) swap_b)
-  
-  (*cont here*)
-  
-  oops
 lemma "p1 \<in> set ps \<Longrightarrow>
        p2 \<in> set ps \<Longrightarrow>
        distinct ps \<Longrightarrow>
   filter (\<lambda>pa. swap p1 p2 besitz pa = p) ps =
   map (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) (filter (\<lambda>pa. besitz pa = p) ps)"
   (*nitpick found a counterexample*)
-  apply(induction ps)
-   apply(simp)
   oops
-lemma "p1 \<in> set ps \<Longrightarrow>
-       p2 \<in> set ps \<Longrightarrow>
-       distinct ps \<Longrightarrow>
+lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_alt:
+  "p1 \<in> set ps \<Longrightarrow>
+   p2 \<in> set ps \<Longrightarrow>
+   distinct ps \<Longrightarrow>
 opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps =
   map_option (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
     (opfer_eindeutig_nach_besitz_auswaehlen p besitz ps)"
-  apply(induction ps)
-   apply(simp)
-  apply(simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
-  apply(elim disjE impE)
-     apply(intro conjI impI)
-  apply(simp_all)
-  apply (simp add: list.case_eq_if)
-     apply (simp add: list.case_eq_if)
-  oops
+  using opfer_eindeutig_nach_besitz_auswaehlen_swap[of p1 ps p2 p "(swap p1 p2 besitz)", simplified swap1]
+  by simp
 
-lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap
-  (Zahlenwelt \<^url>[Alice := 10, Bob := 8, Carol := -3]) (HandlungF (stehlen4 n 10))"
-    apply(simp add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI)
-    apply(simp add: enum_person_def)
-  apply(auto simp add: )
-    done
+lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
+"opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) enum_class.enum =
+  map_option (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
+    (opfer_eindeutig_nach_besitz_auswaehlen p besitz enum_class.enum)"
+  apply(rule opfer_eindeutig_nach_besitz_auswaehlen_swap_alt)
+  using enum_class.in_enum enum_class.enum_distinct by auto
+
+
+  (*WUHUUUUU*)
   lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))"
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     apply(intro allI, case_tac welt, simp)
-    apply(simp add: enum_person_def)
-    apply(simp add: swap_def)
-    done
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+    apply(simp add: the_single_elem)
+    apply(safe)
+     apply (simp add: swap_def; fail)
+    by (simp add: fun_upd_twist swap_def)
 
 
   fun schenken :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
