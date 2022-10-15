@@ -149,6 +149,12 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
 definition the_single_elem :: "'a set \<Rightarrow> 'a option" where
   "the_single_elem s \<equiv> if card s = 1 then Some (Set.the_elem s) else None"
 
+thm is_singleton_def singleton_iff
+
+lemma "the_single_elem {a} = Some a"
+  by(simp add: the_single_elem_def)
+lemma "a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None"
+  by(simp add: the_single_elem_def)
 
 (*brauchen wir inj_on?*)
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
@@ -175,10 +181,6 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
   thm Set.filter_def empty_Collect_eq empty_set filter_set is_singletonI' is_singleton_the_elem list.exhaust list.simps(5) mem_Collect_eq
   by (smt (z3) Collect_cong)
 
-lemma "the_single_elem {a} = Some a"
-  by(simp add: the_single_elem_def)
-lemma "a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None"
-  by(simp add: the_single_elem_def)
 
 fun stehlen4 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
@@ -210,6 +212,13 @@ lemma "p1 \<in> set ps \<Longrightarrow>
         (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
         (opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps)
   = opfer_eindeutig_nach_besitz_auswaehlen p besitz ps"
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem)
+  apply(simp add: the_single_elem_def)
+  apply(safe, simp_all add: card_1_singleton_iff swap_a swap_b swap_nothing)
+          apply (metis (no_types, lifting) insertCI mem_Collect_eq singletonD swap_a swap_nothing the_elem_eq)
+  oops
+  
+
   apply(induction ps)
    apply(simp)
   apply(simp)
