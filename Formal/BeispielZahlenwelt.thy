@@ -57,7 +57,7 @@ subsection\<open>Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: "nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap (HandlungF (erschaffen n))"
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (erschaffen n))"
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     apply(intro allI, case_tac welt, simp)
     apply(simp add: swap_def)
@@ -66,9 +66,11 @@ subsection\<open>Handlungen\<close>
   fun stehlen :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap (HandlungF (stehlen n p))"
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen n p))"
     apply(simp add: wohlgeformte_handlungsabsicht_def)
-    oops (*MIST*)
+    oops (*MIST. Aber okay, die Handlung diskriminiert!*)
+
+(*TODO: Handlung stehlen, aber opfer wird nach Besitz ausgesucht, nicht nach namen.*)
   
   fun schenken :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "schenken betrag empfaenger schenker (Zahlenwelt besitz) =
@@ -121,6 +123,16 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   definition maxime_zahlenfortschritt :: "(person, zahlenwelt) maxime" where
     "maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)"
 
+
+lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (erschaffen 5)) p"
+  apply(simp add: maxime_zahlenfortschritt_def, intro allI)
+  apply(case_tac w1, case_tac w2, simp)
+  done
+
+lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) p"
+  apply(simp add: maxime_zahlenfortschritt_def, intro allI)
+  apply(case_tac w1, case_tac w2, simp)
+  done
 
   text\<open>In jeder Welt ist die Handlung \<^const>\<open>moralisch\<close>:\<close>
   lemma "moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))"
@@ -320,6 +332,14 @@ lemma "\<not>wohlgeformte_handlungsabsicht
   apply(eval)
   done
 
+
+lemma "\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt
+        (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))) Carol"
+  apply(simp add: maxime_zahlenfortschritt_def)
+  apply(rule_tac x="Zahlenwelt (\<lambda>_. -1)" in exI, simp)
+  apply(rule_tac x="Zahlenwelt (\<lambda>_. 1)" in exI, simp)
+  done
+
 (*hieran arbeite ich gerade*)
 thm sum_list_map_eq_sum_count
 lemma helper_sum_int_if: "a \<notin> set P \<Longrightarrow>
@@ -403,6 +423,19 @@ lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
   apply(intro allI impI, elim conjE exE)
   apply(case_tac h, rename_tac h p1 p2 ha, simp)
+
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(simp)
+  apply(simp add: gesamtbesitz_swap)
+  apply(erule_tac x="Zahlenwelt besitz" in allE)
+  apply(erule_tac x="Zahlenwelt (swap p1 p2 besitz)" in allE)
+  thm gesamtbesitz_swap[where welt="Zahlenwelt besitz", simplified]
+  apply(simp)
+  apply(simp add: gesamtbesitz_swap[where welt="Zahlenwelt besitz", simplified])
+  done
+
+(*
 proof -
   fix h p1 p2 ha
   assume a_handlung: "\<forall>welt p1 p2.
@@ -420,21 +453,12 @@ proof -
     apply(simp add: gesamtbesitz_swap)
     done
 
-
-  thm a_handlung'[where welt="Zahlenwelt (swap p1 p2 besitz)" and pA=p1 and pB=p2, simplified]
-  have 2: "gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz)))
-            = gesamtbesitz (ha p2 (Zahlenwelt besitz))"
-    apply(simp)
-    
-    (*brauche a_handlung wo besitz = (swap p1 p2 besitz)*)
-    (*ne, brauche ich nicht! Das wird irgendwie nix *)
   oops
 
   from a_sum 1 2
   show "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p1 (Zahlenwelt besitz))"
     by simp
-  (*TODO: need to use assm twice?*)
-  
+*)
 
 lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
   by(cases h, simp)
@@ -456,15 +480,6 @@ lemma "set P = UNIV \<Longrightarrow>
        sum_list (map welt P) \<le> sum_list (map (x p2 welt) P)"
   (*darf nicht gelten, weil es instanziierungen gaebe, fuer die das definitif falsch ware.*)
   oops
-lemma "kategorischer_imperativ (welt::'p::enum \<Rightarrow> int)
-        (Maxime (\<lambda>(ich::'p) h.
-            sum_list (map (vorher h) Enum.enum) \<le> sum_list (map (nachher h) Enum.enum)))"
-  apply(simp add: moralisch_simp)
-  apply(intro allI impI)
-  apply(elim exE)
-  apply(case_tac h, simp)
-  apply(rule sum_list_mono)
-  oops (*gilt nicht, weil polymorphismus kein allquantor ist.*)
 
 
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>

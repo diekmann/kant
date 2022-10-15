@@ -95,15 +95,23 @@ where
 (*welt rawls schleier um handlung verallgemeinern. Definition*)
 definition wohlgeformte_handlungsabsicht
   :: "('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow>
-      ('person, 'world) handlungF
+      'world \<Rightarrow> ('person, 'world) handlungF
       \<Rightarrow> bool"
 where
-  "wohlgeformte_handlungsabsicht welt_personen_swap h \<equiv>
-    \<forall>welt p1 p2. (handeln p1 welt h) =
+  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
+    \<forall>p1 p2. (handeln p1 welt h) =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
 (*TODO: geht das in de Zahlenwelt? koennen wir welt_personen_swap implementieren?
 nur h welche das erfuellen sind generisch und erlaubt, ....
 *)
+(*warum kein \<forall>welt?*)
+
+fun maxime_und_handlungsabsicht_generalisieren
+  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool"
+where
+  "maxime_und_handlungsabsicht_generalisieren (Maxime m) h p =
+    (\<forall>w1 w2. m p (handeln p w1 h) \<longleftrightarrow> m p (handeln p w2 h))"
+  
 
 subsection\<open>Kategorischer Imperativ\<close>
 
@@ -162,12 +170,14 @@ fun kategorischer_imperativ
 where
   \<open>kategorischer_imperativ welt_personen_swap welt (Maxime m) =
     (\<forall>h.
-          wohlgeformte_handlungsabsicht welt_personen_swap h \<and>
-          (\<exists>p. m p (handeln p welt h))
+          wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
+          (\<exists>p. maxime_und_handlungsabsicht_generalisieren (Maxime m) h p \<and> m p (handeln p welt h))
               \<longrightarrow> moralisch welt (Maxime m) h)\<close>
 
 (* Hat was von dem Urzustand Schleier von Rawls? *)
 
+(*TODO: ist das equivalent einfach \<forall>welt im \<exists>Teil zu fordern?
+  kann ich das maxime_und_handlungsabsicht_generalisieren aus dem \<exists> rausziehen?*)
 
 
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
