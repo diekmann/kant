@@ -131,6 +131,22 @@ definition opfer_eindeutig_nach_besitz_auswaehlen
         of [opfer] \<Rightarrow> Some opfer
          | _ \<Rightarrow> None)"
 
+lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
+  "opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = Some opfer
+  \<Longrightarrow> inj_on besitz {p \<in> set ps. besitz p = opfer_nach_besitz}"
+  apply(simp add: inj_on_def)
+  apply(safe)
+  apply(induction ps)
+   apply(simp)
+  apply(simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+  apply(safe)
+    apply(simp_all)
+    apply (metis (mono_tags, lifting) filter_empty_conv list.case_eq_if option.distinct(1))
+   apply (metis (mono_tags, lifting) empty_filter_conv list.case_eq_if option.distinct(1))
+  by (smt (verit, del_insts) filter_empty_conv list.simps(5) neq_Nil_conv option.discI)
+
+
 fun stehlen4 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
       (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
@@ -150,12 +166,38 @@ value\<open>map_handlung show_zahlenwelt
       (handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 8, Carol := -3])
               (HandlungF (stehlen4 3 10)))\<close>
 
+lemma if_swap_person_help_same: "p1 = a \<Longrightarrow>
+       p2 = a \<Longrightarrow>
+       (\<lambda>p. if p = a then p2 else if p = p2 then p1 else p) = id"
+  by auto
+lemma "p1 \<in> set ps \<Longrightarrow>
+       p2 \<in> set ps \<Longrightarrow>
+       distinct ps \<Longrightarrow>
+  map_option
+        (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
+        (opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps)
+  = opfer_eindeutig_nach_besitz_auswaehlen p besitz ps"
+  apply(induction ps)
+   apply(simp)
+  apply(simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+  apply(elim disjE impE)
+     apply(intro conjI impI)
+        apply(simp_all)
+      apply(simp_all add: if_swap_person_help_same map_option.id)
+      apply(simp_all add: swap_a swap_b)
+     apply(intro conjI impI)
+       apply (smt (verit, best) filter_empty_conv list.case_eq_if map_option_case option.simps(4) swap_b)
+  
+  (*cont here*)
+  
+  oops
 lemma "p1 \<in> set ps \<Longrightarrow>
        p2 \<in> set ps \<Longrightarrow>
        distinct ps \<Longrightarrow>
   filter (\<lambda>pa. swap p1 p2 besitz pa = p) ps =
   map (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) (filter (\<lambda>pa. besitz pa = p) ps)"
-  nitpick
+  (*nitpick found a counterexample*)
   apply(induction ps)
    apply(simp)
   oops
