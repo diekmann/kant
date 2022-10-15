@@ -90,7 +90,8 @@ subsection\<open>Handlungen\<close>
   lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen2 n p))"
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     apply(intro allI, case_tac welt, simp)
-    oops (*TODO. THE. ist etwas hart, evtl sollte ich das als Liste implementieren.*)
+    oops (*TODO. THE. ist etwas hart, evtl sollte ich das als Liste implementieren.
+  wird eh nix wegen nichtdeterminismus*)
 
 fun opfer_nach_besitz_auswaehlen :: "int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option" where
   "opfer_nach_besitz_auswaehlen _ _ [] = None"
@@ -404,9 +405,23 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
     apply(simp add: initialwelt_def, eval)
     done
 
-  (*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
+
+(*hieran arbeite ich gerade*)
+(*sollte das gelten? Vermutlich, .... TODO*)
+  lemma "kategorischer_imperativ zahlenwelt_personen_swap welt
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
+    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    apply(intro allI impI, elim conjE exE)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(case_tac h, rename_tac haa p1 p2 pX ha, simp)
+
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+    oops
+
+  (*(*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
       einfach aus den `ich` ein \<forall>ich. machen?
-    so einfach ist es nicht:
+    so einfach ist es nicht: - alte kat imp definition! gilt vllt jetzt?
   *)
   lemma "\<not>kategorischer_imperativ zahlenwelt_personen_swap welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
@@ -420,27 +435,7 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
     apply(rule_tac x=Bob in exI)
     apply(cases welt, rename_tac besitz)
     apply(simp)
-    done
-
-  (*Was muesste denn eine Maxime sein die den katimp erfuellt?*)
-  lemma "kategorischer_imperativ welt
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
-    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    oops
-
-  lemma "kategorischer_imperativ welt
-    (Maxime (\<lambda>ich. individueller_fortschritt ich))"
-    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    apply(intro allI impI)
-    apply(cases welt, rename_tac besitz, simp)
-    apply(case_tac h, rename_tac h, simp)
-    apply(case_tac "h = erschaffen 5", simp)
-    apply(case_tac "h = stehlen 5 Bob", simp)
-    apply(case_tac "h = schenken 5 Bob", simp)
-      apply(case_tac "h = reset", simp)
-    oops
-  (*TODO*)
-*)
+    done*)
 
 
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
@@ -588,7 +583,6 @@ lemma "\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschrit
   apply(rule_tac x="Zahlenwelt (\<lambda>_. 1)" in exI, simp)
   done
 
-(*hieran arbeite ich gerade*)
 thm sum_list_map_eq_sum_count
 lemma helper_sum_int_if: "a \<notin> set P \<Longrightarrow>
 (\<Sum>x\<in>set P. int (if a = x then A1 x else A2 x) * B x) =
