@@ -152,7 +152,7 @@ definition the_single_elem :: "'a set \<Rightarrow> 'a option" where
 
 (*brauchen wir inj_on?*)
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
-  "distinct ps \<Longrightarrow> inj_on besitz {p \<in> set ps. besitz p = opfer_nach_besitz} \<Longrightarrow>
+  "distinct ps \<Longrightarrow> 
   opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
           the_single_elem {p \<in> set ps. besitz p = opfer_nach_besitz}"
   apply(simp add: the_single_elem_def)
@@ -163,15 +163,16 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
    apply(safe)
     apply(simp add: card_1_singleton_iff)
-  apply (smt (verit, best) filter_False inj_on_eq_iff insertI1 list.simps(4) mem_Collect_eq the_elem_eq)
-   apply (smt (z3) Collect_cong)
+   apply (smt (verit, ccfv_threshold) empty_filter_conv list.simps(4) mem_Collect_eq singleton_iff the_elem_eq)
+  apply (smt (z3) Collect_cong)
 
   apply(induction ps)
    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
    apply(safe)
-    apply(simp_all add: card_1_singleton_iff)
-  apply (smt (z3) Collect_cong inj_on_eq_iff mem_Collect_eq singleton_conv)
+   apply(simp_all add: card_1_singleton_iff)
+  apply (smt (verit, ccfv_SIG) Collect_cong empty_filter_conv list.case_eq_if singleton_conv)
+  thm Set.filter_def empty_Collect_eq empty_set filter_set is_singletonI' is_singleton_the_elem list.exhaust list.simps(5) mem_Collect_eq
   by (smt (z3) Collect_cong)
 
 lemma "the_single_elem {a} = Some a"
