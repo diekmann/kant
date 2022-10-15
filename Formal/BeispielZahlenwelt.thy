@@ -30,7 +30,7 @@ section\<open>Beispiel: Zahlenwelt\<close>
         Aenderung.delta_num_fun (Handlung vor_besitz nach_besitz)"
   (*>*)
 
-(*TODO: mode up*)
+(*TODO: move up*)
 definition swap :: "'a \<Rightarrow> 'a \<Rightarrow> ('a \<Rightarrow> 'b) \<Rightarrow> 'a \<Rightarrow> 'b" where
   "swap a b f \<equiv> f(a:=f b, b:= f a)"
 
@@ -106,7 +106,7 @@ fun stehlen3 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlen
 value\<open>map_handlung show_zahlenwelt
       (handeln Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
               (HandlungF (stehlen3 3 10)))\<close>
-(*wenn es mehrere potenzielle opfer gibt ist die auswahl irgendwie random*)
+(*wenn es mehrere potenzielle opfer gibt ist die auswahl irgendwie random. Das diskriminiert.*)
 value\<open>map_handlung show_zahlenwelt
       (handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
               (HandlungF (stehlen3 3 10)))\<close>
@@ -119,11 +119,12 @@ value\<open>map_handlung show_zahlenwelt
 value\<open>map_handlung show_zahlenwelt
       (handeln Carol (Zahlenwelt \<^url>[Alice := -3, Bob := 10, Carol := 10])
               (HandlungF (stehlen3 3 10)))\<close>
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen3 n p))"
-    quickcheck
-    oops
-(*TODO: wenn ich kein stehlen implementieren kann ist wohlgeformte_handlungsabsicht wohl doof*)
+lemma "\<not>wohlgeformte_handlungsabsicht
+    zahlenwelt_personen_swap (Zahlenwelt (\<lambda>x. 0)) (HandlungF (stehlen3 (1) 0))"
+  by(eval)
 
+
+(*So wird das was*)
 definition opfer_eindeutig_nach_besitz_auswaehlen
   :: "int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option" where
   "opfer_eindeutig_nach_besitz_auswaehlen b besitz ps = 
@@ -148,8 +149,6 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
 
 definition the_single_elem :: "'a set \<Rightarrow> 'a option" where
   "the_single_elem s \<equiv> if card s = 1 then Some (Set.the_elem s) else None"
-
-thm is_singleton_def singleton_iff is_singleton_the_elem
 
 lemma the_single_elem:
   "the_single_elem s = (if is_singleton s then Some (Set.the_elem s) else None)"
@@ -296,7 +295,8 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
 
 
   (*WUHUUUUU*)
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))"
+lemma wohlgeformte_handlungsabsicht_stehlen4:
+  "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))"
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     apply(intro allI, case_tac welt, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
@@ -377,18 +377,31 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
 
   (*AWESOME!*)
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt nicht den \<^const>\<open>kategorischer_imperativ\<close>
-  da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehen würde.\<close>
-  lemma "\<not> kategorischer_imperativ zahlenwelt_personen_swap welt maxime_zahlenfortschritt"
+  da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen würde.\<close>
+  lemma "\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
-    apply(simp)
+    apply(rule_tac x="HandlungF (stehlen4 1 10)" in exI)
+    apply(simp add: wohlgeformte_handlungsabsicht_stehlen4)
     apply(intro conjI)
      apply(rule_tac x=Alice in exI)
-     apply(case_tac welt, simp; fail)
+     apply(intro conjI allI)
+      apply(case_tac w1, case_tac w2, simp)
+      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+    apply(case_tac "the_single_elem {p. x p = 10}", simp)
+       apply(case_tac "the_single_elem {p. xa p = 10}")
+    apply(simp; fail)
+       apply(case_tac "the_single_elem {p. xa p = 10}")
+        apply(simp; fail)
+       apply(simp; fail)
+      apply(simp)
+       apply(case_tac "the_single_elem {p. xa p = 10}")
+        apply(simp; fail)
+      apply(simp; fail)
+    apply(simp add: initialwelt_def, eval)
+
     apply(rule_tac x=Bob in exI)
     apply(rule_tac x=Alice in exI)
-    apply(cases welt, rename_tac besitz)
-    apply(simp)
+    apply(simp add: initialwelt_def, eval)
     done
 
   (*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
