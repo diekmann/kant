@@ -146,6 +146,38 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
    apply (metis (mono_tags, lifting) empty_filter_conv list.case_eq_if option.distinct(1))
   by (smt (verit, del_insts) filter_empty_conv list.simps(5) neq_Nil_conv option.discI)
 
+definition the_single_elem :: "'a set \<Rightarrow> 'a option" where
+  "the_single_elem s \<equiv> if card s = 1 then Some (Set.the_elem s) else None"
+
+
+(*brauchen wir inj_on?*)
+lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
+  "distinct ps \<Longrightarrow> inj_on besitz {p \<in> set ps. besitz p = opfer_nach_besitz} \<Longrightarrow>
+  opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
+          the_single_elem {p \<in> set ps. besitz p = opfer_nach_besitz}"
+  apply(simp add: the_single_elem_def)
+  apply(safe)
+  apply(induction ps)
+   apply(simp)
+  apply(simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+   apply(safe)
+    apply(simp add: card_1_singleton_iff)
+  apply (smt (verit, best) filter_False inj_on_eq_iff insertI1 list.simps(4) mem_Collect_eq the_elem_eq)
+   apply (smt (z3) Collect_cong)
+
+  apply(induction ps)
+   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+   apply(safe)
+    apply(simp_all add: card_1_singleton_iff)
+  apply (smt (z3) Collect_cong inj_on_eq_iff mem_Collect_eq singleton_conv)
+  by (smt (z3) Collect_cong)
+
+lemma "the_single_elem {a} = Some a"
+  by(simp add: the_single_elem_def)
+lemma "a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None"
+  by(simp add: the_single_elem_def)
 
 fun stehlen4 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
