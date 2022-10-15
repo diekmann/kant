@@ -44,6 +44,19 @@ lemma "f_swapped = (swap a b f) \<Longrightarrow> f_swapped a = f b \<and> f_swa
   by(simp add: swap_def)
 lemma swap_symmetric: "swap a b = swap b a"
   by(simp add: fun_eq_iff swap_def)
+lemma map_swap_none: "a \<notin> set P \<Longrightarrow> b \<notin> set P \<Longrightarrow> map (swap a b f) P = map f P"
+  by(simp add: swap_def)
+lemma map_swap_one: "a \<notin> set P \<Longrightarrow>  map (swap a b f) P = map (f(b:=f a)) P"
+  by(simp add: swap_def)
+lemma swap_a: "swap a b f a = f b"
+  by(simp add: swap_def)
+lemma swap_b: "swap a b f b = f a"
+  by(simp add: swap_def)
+lemma sum_swap_none: "a \<notin> P \<Longrightarrow> b \<notin> P \<Longrightarrow> sum (swap a b f) P = sum f P"
+  apply(simp add: swap_def)
+  by (smt (verit, best) fun_upd_other sum.cong)
+lemma swap_nothing: "a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a"
+  by(simp add: swap_def)
 
 fun zahlenwelt_personen_swap :: "person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
   "zahlenwelt_personen_swap p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)"
@@ -71,7 +84,113 @@ subsection\<open>Handlungen\<close>
     oops (*MIST. Aber okay, die Handlung diskriminiert!*)
 
 (*TODO: Handlung stehlen, aber opfer wird nach Besitz ausgesucht, nicht nach namen.*)
-  
+  fun stehlen2 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
+    "stehlen2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+        Zahlenwelt (besitz((THE opfer. besitz opfer = opfer_nach_besitz) -= beute)(dieb += beute))"
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen2 n p))"
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(intro allI, case_tac welt, simp)
+    oops (*TODO. THE. ist etwas hart, evtl sollte ich das als Liste implementieren.*)
+
+fun opfer_nach_besitz_auswaehlen :: "int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option" where
+  "opfer_nach_besitz_auswaehlen _ _ [] = None"
+| "opfer_nach_besitz_auswaehlen b besitz (p#ps) = 
+    (if besitz p = b then Some p else opfer_nach_besitz_auswaehlen b besitz ps)"
+
+fun stehlen3 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
+    "stehlen3 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+      (case opfer_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
+         of None \<Rightarrow> (Zahlenwelt besitz)
+          | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+      )"
+value\<open>map_handlung show_zahlenwelt
+      (handeln Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+              (HandlungF (stehlen3 3 10)))\<close>
+(*wenn es mehrere potenzielle opfer gibt ist die auswahl irgendwie random*)
+value\<open>map_handlung show_zahlenwelt
+      (handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+              (HandlungF (stehlen3 3 10)))\<close>
+value\<open>map_handlung show_zahlenwelt
+      (handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+              (HandlungF (stehlen3 3 10)))\<close>
+value\<open>map_handlung show_zahlenwelt
+      (handeln Carol (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+              (HandlungF (stehlen3 3 10)))\<close>
+value\<open>map_handlung show_zahlenwelt
+      (handeln Carol (Zahlenwelt \<^url>[Alice := -3, Bob := 10, Carol := 10])
+              (HandlungF (stehlen3 3 10)))\<close>
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen3 n p))"
+    quickcheck
+    oops
+(*TODO: wenn ich kein stehlen implementieren kann ist wohlgeformte_handlungsabsicht wohl doof*)
+
+definition opfer_eindeutig_nach_besitz_auswaehlen
+  :: "int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option" where
+  "opfer_eindeutig_nach_besitz_auswaehlen b besitz ps = 
+     (case filter (\<lambda>p. besitz p = b) ps
+        of [opfer] \<Rightarrow> Some opfer
+         | _ \<Rightarrow> None)"
+
+fun stehlen4 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
+    "stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+      (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
+         of None \<Rightarrow> (Zahlenwelt besitz)
+          | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+      )"
+value\<open>map_handlung show_zahlenwelt
+      (handeln Alice (Zahlenwelt \<^url>[Alice := 8, Bob := 10, Carol := -3])
+              (HandlungF (stehlen4 3 10)))\<close>
+value\<open>map_handlung show_zahlenwelt
+      (handeln Bob (Zahlenwelt \<^url>[Alice := 8, Bob := 10, Carol := -3])
+              (HandlungF (stehlen4 3 10)))\<close>
+value\<open>map_handlung show_zahlenwelt
+      (handeln Carol (Zahlenwelt \<^url>[Alice := 8, Bob := 10, Carol := -3])
+              (HandlungF (stehlen4 3 10)))\<close>
+value\<open>map_handlung show_zahlenwelt
+      (handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 8, Carol := -3])
+              (HandlungF (stehlen4 3 10)))\<close>
+
+lemma "p1 \<in> set ps \<Longrightarrow>
+       p2 \<in> set ps \<Longrightarrow>
+       distinct ps \<Longrightarrow>
+  filter (\<lambda>pa. swap p1 p2 besitz pa = p) ps =
+  map (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) (filter (\<lambda>pa. besitz pa = p) ps)"
+  nitpick
+  apply(induction ps)
+   apply(simp)
+  oops
+lemma "p1 \<in> set ps \<Longrightarrow>
+       p2 \<in> set ps \<Longrightarrow>
+       distinct ps \<Longrightarrow>
+opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps =
+  map_option (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
+    (opfer_eindeutig_nach_besitz_auswaehlen p besitz ps)"
+  apply(induction ps)
+   apply(simp)
+  apply(simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+  apply(elim disjE impE)
+     apply(intro conjI impI)
+  apply(simp_all)
+  apply (simp add: list.case_eq_if)
+     apply (simp add: list.case_eq_if)
+  oops
+
+lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap
+  (Zahlenwelt \<^url>[Alice := 10, Bob := 8, Carol := -3]) (HandlungF (stehlen4 n 10))"
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(intro allI)
+    apply(simp add: enum_person_def)
+  apply(auto simp add: )
+    done
+  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))"
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(intro allI, case_tac welt, simp)
+    apply(simp add: enum_person_def)
+    apply(simp add: swap_def)
+    done
+
+
   fun schenken :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
     "schenken betrag empfaenger schenker (Zahlenwelt besitz) =
         Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag))"
@@ -139,11 +258,11 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
     apply(cases welt)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
-(*
+
   (*AWESOME!*)
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt nicht den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehen würde.\<close>
-  lemma "\<not> kategorischer_imperativ welt maxime_zahlenfortschritt"
+  lemma "\<not> kategorischer_imperativ zahlenwelt_personen_swap welt maxime_zahlenfortschritt"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
     apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
     apply(simp)
@@ -160,7 +279,7 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
       einfach aus den `ich` ein \<forall>ich. machen?
     so einfach ist es nicht:
   *)
-  lemma "\<not>kategorischer_imperativ welt
+  lemma "\<not>kategorischer_imperativ zahlenwelt_personen_swap welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
     apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
@@ -371,19 +490,7 @@ proof(induction xs)
   qed
 qed simp
 
-lemma map_swap_none: "a \<notin> set P \<Longrightarrow> b \<notin> set P \<Longrightarrow> map (swap a b f) P = map f P"
-  by(simp add: swap_def)
-lemma map_swap_one: "a \<notin> set P \<Longrightarrow>  map (swap a b f) P = map (f(b:=f a)) P"
-  by(simp add: swap_def)
-lemma swap_a: "swap a b f a = f b"
-  by(simp add: swap_def)
-lemma swap_b: "swap a b f b = f a"
-  by(simp add: swap_def)
-lemma sum_swap_none: "a \<notin> P \<Longrightarrow> b \<notin> P \<Longrightarrow> sum (swap a b f) P = sum f P"
-  apply(simp add: swap_def)
-  by (smt (verit, best) fun_upd_other sum.cong)
-lemma swap_nothing: "a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a"
-  by(simp add: swap_def)
+
 
   thm sum.remove
 lemma sum_swap_a: "finite P \<Longrightarrow> a \<notin> P \<Longrightarrow> b \<in> P \<Longrightarrow> sum (swap a b f) P = f a + sum f (P - {b})"
