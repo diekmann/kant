@@ -509,6 +509,10 @@ lemma "P = individueller_fortschritt \<Longrightarrow>
     = P pX (Handlung welt welt')"
   by(simp add:hlp3)
 
+(*TODO: die 3 Eiggenschaften sind nur ueber die Maxime und die swap funktion.
+evtl muss ich die in den kategorischen imperativ uebernehmen?
+Auf jeden fall sollte ich testen, ob das auch fuer den globalen fortschritt gilt!
+*)
 lemma
   assumes kom: "Maxime_kommutiert P welt"
      and unrel1: "Maxime_swap_unrelated P welt"
