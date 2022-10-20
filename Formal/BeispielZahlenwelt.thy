@@ -65,6 +65,10 @@ lemma \<open>zahlenwelt_personen_swap Alice Carol (Zahlenwelt \<^url>[Alice := 4
   = (Zahlenwelt \<^url>[Alice := 8, Bob := 6, Carol := 4])\<close>
   by eval
 
+lemma zahlenwelt_personen_swap_sym:
+  "zahlenwelt_personen_swap p1 p2 welt = zahlenwelt_personen_swap p2 p1 welt"
+  by(cases welt, simp add: swap_symmetric)
+
 subsection\<open>Handlungen\<close>
 
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
@@ -405,19 +409,66 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
     apply(simp add: initialwelt_def, eval)
     done
 
+lemma hlp1: "meins p1 (zahlenwelt_personen_swap p1 p2 welt) = meins p2 welt"
+  by(cases welt, simp add: swap_def)
+lemma hlp2: "meins p2 (zahlenwelt_personen_swap p1 p2 welt) = meins p1 welt"
+  by(cases welt, simp add: swap_def)
+
+lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+       meins p (zahlenwelt_personen_swap p1 p2 welt) = meins p welt"
+  by(cases welt, simp add: swap_def)
 
 (*hieran arbeite ich gerade*)
 (*sollte das gelten? Vermutlich, .... TODO*)
+(*AWESOME!*)
   lemma "kategorischer_imperativ zahlenwelt_personen_swap welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
     apply(intro allI impI, elim conjE exE)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
-  apply(case_tac h, rename_tac haa p1 p2 pX ha, simp)
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(case_tac h, rename_tac ha p2 pX p1 h, simp)
 
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
-    oops
+
+    apply(subgoal_tac "meins pX welt \<le> meins pX (h p1 welt)")
+    prefer 2 apply(simp; fail)
+
+    apply(erule_tac x=p2 in allE) (*? richtig rum ?*)
+    apply(erule_tac x=p1 in allE) back
+    apply(elim conjE)
+    apply(simp)
+    apply(case_tac "p1 = p2")
+     apply(simp; fail)
+
+    apply(case_tac "pX = p1")
+     apply(simp add: hlp1)
+     apply(erule_tac x="zahlenwelt_personen_swap p1 p2 welt" in allE)
+     apply(erule_tac x="welt" in allE)
+
+     apply(case_tac "(\<forall>pX. meins pX (zahlenwelt_personen_swap p1 p2 welt)
+               \<le> meins pX (h p1 (zahlenwelt_personen_swap p1 p2 welt)))")
+      prefer 2 apply(simp; fail)
+     apply(simp)
+     apply(erule_tac x=p2 in allE) back
+     apply(simp add: hlp2)
+     apply (simp add: zahlenwelt_personen_swap_sym; fail)
+    
+
+    apply(case_tac "pX = p2")
+     apply(simp)
+     apply(simp add: hlp2)
+     apply(erule_tac x="zahlenwelt_personen_swap p2 p1 welt" in allE)
+     apply(erule_tac x="welt" in allE)
+     apply(case_tac "(\<forall>pX. meins pX (zahlenwelt_personen_swap p2 p1 welt)
+               \<le> meins pX (h p1 (zahlenwelt_personen_swap p2 p1 welt)))")
+      prefer 2 apply(simp; fail)
+     apply(simp)
+     apply(erule_tac x=p1 in allE) back
+     apply(simp add: hlp2; fail)
+
+    
+    apply(simp add: hlp3)
+    by (metis hlp3)
+
 
   (*(*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
       einfach aus den `ich` ein \<forall>ich. machen?
@@ -664,31 +715,6 @@ lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
   apply(simp)
   apply(simp add: gesamtbesitz_swap[where welt="Zahlenwelt besitz", simplified])
   done
-
-(*
-proof -
-  fix h p1 p2 ha
-  assume a_handlung: "\<forall>welt p1 p2.
-          welt = zahlenwelt_personen_swap p2 p1 (zahlenwelt_personen_swap p1 p2 welt) \<and>
-          ha p1 welt = zahlenwelt_personen_swap p2 p1 (ha p2 (zahlenwelt_personen_swap p1 p2 welt))"
-    and a_sum: "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p2 (Zahlenwelt besitz))"
-
-  from a_handlung have a_handlung':
-    "ha pA welt = zahlenwelt_personen_swap pB pA (ha pB (zahlenwelt_personen_swap pA pB welt))"
-    for welt pA pB
-    by simp
-  from a_handlung'[where welt="Zahlenwelt besitz" and pA=p1 and pB=p2]
-  have 1: "gesamtbesitz (ha p1 (Zahlenwelt besitz)) = gesamtbesitz (ha p2 (Zahlenwelt (swap p1 p2 besitz)))"
-    apply(simp)
-    apply(simp add: gesamtbesitz_swap)
-    done
-
-  oops
-
-  from a_sum 1 2
-  show "sum_list (map besitz enum_class.enum) \<le> gesamtbesitz (ha p1 (Zahlenwelt besitz))"
-    by simp
-*)
 
 lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
   by(cases h, simp)
