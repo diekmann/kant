@@ -432,7 +432,7 @@ lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p 
     apply(subgoal_tac "meins pX welt \<le> meins pX (h p1 welt)")
     prefer 2 apply(simp; fail)
 
-    apply(erule_tac x=p2 in allE) (*? richtig rum ?*)
+    apply(erule_tac x=p2 in allE)
     apply(erule_tac x=p1 in allE) back
     apply(elim conjE)
     apply(simp)
@@ -468,25 +468,6 @@ lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p 
     
     apply(simp add: hlp3)
     by (metis hlp3)
-
-
-  (*(*TODO: wenn wir aus einer maxime ein allgemeines gesetz ableiten, wollen wir dann
-      einfach aus den `ich` ein \<forall>ich. machen?
-    so einfach ist es nicht: - alte kat imp definition! gilt vllt jetzt?
-  *)
-  lemma "\<not>kategorischer_imperativ zahlenwelt_personen_swap welt
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
-    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    apply(rule_tac x="HandlungF (stehlen 1 Bob)" in exI)
-    apply(simp)
-    apply(intro conjI)
-     apply(rule_tac x=Bob in exI)
-     apply(case_tac welt, simp; fail)
-    apply(rule_tac x=Alice in exI)
-    apply(rule_tac x=Bob in exI)
-    apply(cases welt, rename_tac besitz)
-    apply(simp)
-    done*)
 
 
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
