@@ -326,6 +326,7 @@ Auf jeden fall sollte ich testen, ob das auch fuer den globalen fortschritt gilt
 *)
 text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
+(*
 theorem altruistische_maxime_katimp:
   fixes P :: "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
   assumes kom: "wpsm_kommutiert (Maxime P) welt_personen_swap welt"
@@ -335,9 +336,12 @@ theorem altruistische_maxime_katimp:
   shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
   apply(simp add: moralisch_simp)
   apply(intro allI impI, elim conjE exE)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(rename_tac h p2 p1 p)
   apply(case_tac h, rename_tac ha p2 p1 p h, simp)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
 
+  apply(case_tac "p = p2")
+   apply(simp; fail)
 
   apply(subgoal_tac "P p1 (Handlung welt (h p welt))")
    prefer 2 apply(simp; fail)
@@ -347,8 +351,6 @@ theorem altruistische_maxime_katimp:
   apply(elim conjE)
   apply(thin_tac "welt = _")
   apply(simp)
-  apply(case_tac "p = p2")
-   apply(simp; fail)
   apply(thin_tac "h p2 welt = _")
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def)
 
@@ -392,7 +394,7 @@ theorem altruistische_maxime_katimp:
 
   using unrel2[simplified wpsm_unbeteiligt2_def] apply(simp)
   done
-
+*)
 
 theorem altruistische_maxime_katimp:
   fixes P :: "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
@@ -402,12 +404,12 @@ theorem altruistische_maxime_katimp:
       and welt_personen_swap_sym:
         "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
   shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
-proof(rule kategorischer_imperativI)
+proof(rule kategorischer_imperativI, simp, intro allI)
   fix ha :: "('person, 'world) handlungF"
   and p1 p2 p :: 'person
   assume wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
      and mhg: "maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha p"
-     and okayp: "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p (handeln p welt ha)"
+     and okayp: "\<forall>pX. P pX (handeln p welt ha)"
 
   obtain h where h: "ha = HandlungF h"
     by(cases ha, blast)
@@ -416,9 +418,59 @@ proof(rule kategorischer_imperativI)
     using h okayp by auto
 
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
-  have "h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))"
+  have 1: "h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))"
+    by simp
+  from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
+  have 2:
+  "\<forall>pX. P pX (Handlung (welt_personen_swap p2 p welt) (h p (welt_personen_swap p2 p welt)))"
+    by auto
+  from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] welt_personen_swap_sym
+  have 3:
+  "(\<forall>pX. P pX (Handlung (welt_personen_swap p2 p welt) (h p (welt_personen_swap p2 p welt)))) =
+       (\<forall>pX. P pX (Handlung welt (h p welt)))"
     by simp
 
-  show "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p1 (handeln p2 welt ha)"
-oops (*TODO isar proof*)
+  from okayp[simplified h] 2
+  have 4:
+    "P p (Handlung (welt_personen_swap p2 p welt) (h p (welt_personen_swap p2 p welt)))"
+    by(simp)
+
+  show "P p1 (handeln p2 welt ha)"
+  proof(cases "p = p2")
+    case True
+    then show ?thesis
+      using okayp by auto 
+  next
+    case False
+    assume "p \<noteq> p2"
+    then show ?thesis
+    proof(cases "p1 = p")
+      case True
+      assume "p1 = p"
+      with 4 kom[simplified wpsm_kommutiert_def okay.simps] show ?thesis
+        apply(simp add: h 1)
+        using 2 welt_personen_swap_sym by fastforce
+    next
+      case False
+      assume "p1 \<noteq> p"
+      show ?thesis
+      proof(cases "p1 = p2")
+        case True
+        with 4 kom[simplified wpsm_kommutiert_def okay.simps]  show ?thesis
+          apply(simp)
+          apply(simp add: h 1)
+          using 2 welt_personen_swap_sym by fastforce
+      next
+        case False
+        assume "p1 \<noteq> p2"
+        with \<open>p \<noteq> p2\<close> \<open>p1 \<noteq> p\<close> show ?thesis
+        using unrel1[simplified wpsm_unbeteiligt1_def]
+           unrel2[simplified wpsm_unbeteiligt2_def]
+        apply(simp)
+        apply(simp add: h)
+        using 1 2 by metis
+      qed
+    qed
+  qed
+qed
 end
