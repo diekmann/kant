@@ -257,9 +257,9 @@ lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p 
   lemma "kategorischer_imperativ zahlenwelt_personen_swap welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
     apply(rule altruistische_maxime_katimp)
-       apply (simp add: Maxime_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym; fail)
-      apply (simp add: Maxime_swap_unrelated_def hlp3; fail)
-     apply (simp add: hlp3; fail)
+       apply (simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym; fail)
+      apply (simp add: wpsm_unbeteiligt1_def hlp3; fail)
+     apply (simp add: wpsm_unbeteiligt2_def hlp3; fail)
     by (simp add: zahlenwelt_personen_swap_sym)
 
 

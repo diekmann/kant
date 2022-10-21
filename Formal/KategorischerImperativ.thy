@@ -93,8 +93,12 @@ where
 
 (*TODO: move to Handlung? Gleiched fuer maxime.*)
 (*welt rawls schleier um handlung verallgemeinern. Definition*)
+
+text\<open>Welt-Personen Swap\<close>
+type_synonym ('person, 'world) wp_swap = "'person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world"
+
 definition wohlgeformte_handlungsabsicht
-  :: "('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow>
+  :: "('person, 'world) wp_swap \<Rightarrow>
       'world \<Rightarrow> ('person, 'world) handlungF
       \<Rightarrow> bool"
 where
@@ -163,7 +167,7 @@ Wenn es eine Person gibt für die diese Handlungsabsicht moralisch ist,
 dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen Regel) sein.
 \<close>
 fun kategorischer_imperativ
-  :: \<open>('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
   \<open>kategorischer_imperativ welt_personen_swap welt m =
     (\<forall>h.
@@ -281,18 +285,37 @@ lemma blinde_maxime_katimp:
 *)
 
 
+text\<open>wpsm: Welt Person Swap Maxime\<close>
 
-
-definition "Maxime_kommutiert m welt_personen_swap welt \<equiv> \<forall> p1 p2 h.
+definition wpsm_kommutiert
+  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
+where
+  "wpsm_kommutiert m welt_personen_swap welt \<equiv>
+\<forall> p1 p2 h.
   okay m p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
   \<longleftrightarrow>
   okay m p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
 
-definition "Maxime_swap_unrelated m welt_personen_swap (welt::'world) \<equiv> \<forall> p1 p2 pX h (welt'::'world).
+definition wpsm_unbeteiligt1
+  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
+where
+  "wpsm_unbeteiligt1 m welt_personen_swap welt \<equiv>
+\<forall> p1 p2 pX welt'.
+  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow> 
+    okay m pX (Handlung (welt_personen_swap p2 p1 welt) welt')
+    \<longleftrightarrow>
+    okay m pX (Handlung welt welt')"
+
+definition wpsm_unbeteiligt2
+  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
+where
+  "wpsm_unbeteiligt2 m welt_personen_swap welt \<equiv>
+\<forall> p1 p2 pX h (welt'::'world).
   p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-  okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
-  \<longleftrightarrow>
-  okay m pX (Handlung welt (h p1 welt'))"
+    okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
+    \<longleftrightarrow>
+    okay m pX (Handlung welt (h p1 welt'))"
+
 
 
 (*TODO: die 3 Eiggenschaften sind nur ueber die Maxime und die swap funktion.
@@ -302,16 +325,13 @@ Auf jeden fall sollte ich testen, ob das auch fuer den globalen fortschritt gilt
 text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
 theorem altruistische_maxime_katimp:
-  assumes kom: "Maxime_kommutiert (Maxime P) welt_personen_swap welt"
-     and unrel1: "Maxime_swap_unrelated (Maxime P) welt_personen_swap welt"
-    (* das ist Maxime_swap_unrelated nur auf 1. param.*)
-     and unrel2: "\<forall> p1 p2 pX welt'.
-  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow> 
-    P pX (Handlung (welt_personen_swap p2 p1 welt) welt')
-    \<longleftrightarrow> P pX (Handlung welt welt')"
-     and welt_personen_swap_sym: "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
+  fixes P :: "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
+  assumes kom: "wpsm_kommutiert (Maxime P) welt_personen_swap welt"
+      and unrel1: "wpsm_unbeteiligt1 (Maxime P) welt_personen_swap welt"
+      and unrel2: "wpsm_unbeteiligt2 (Maxime P) welt_personen_swap welt"
+      and welt_personen_swap_sym: "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
   shows "kategorischer_imperativ welt_personen_swap welt
-    (Maxime (\<lambda>ich h. (\<forall>pX::'person. P pX h)))"
+    (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
   apply(simp add: moralisch_simp)
   apply(intro allI impI, elim conjE exE)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
@@ -340,7 +360,7 @@ theorem altruistische_maxime_katimp:
     prefer 2 apply(simp; fail)
    apply(simp)
    apply(erule_tac x=p2 in allE) back
-  using kom[simplified Maxime_kommutiert_def] apply(simp; fail)
+  using kom[simplified wpsm_kommutiert_def] apply(simp; fail)
 
 
   apply(case_tac "pX = p2")
@@ -353,14 +373,14 @@ theorem altruistische_maxime_katimp:
     prefer 2 apply(simp; fail)
    apply(simp)
    apply(erule_tac x=p1 in allE) back
-  using kom[simplified Maxime_kommutiert_def]
+  using kom[simplified wpsm_kommutiert_def]
   using welt_personen_swap_sym apply fastforce 
 
   apply(erule_tac x="welt_personen_swap p2 p1 welt" in allE)
   apply(erule_tac x="welt" in allE)
   apply(simp)
   apply(erule_tac x=pX in allE) back
-  using unrel1[simplified Maxime_swap_unrelated_def] 
+  using unrel1[simplified wpsm_unbeteiligt1_def] 
   apply(simp)
   apply(erule_tac x=p1 in allE) back
   apply(erule_tac x=p2 in allE) back
@@ -368,7 +388,7 @@ theorem altruistische_maxime_katimp:
   apply(erule_tac x=pX in allE) back
   apply(elim impE, (simp; fail)+)
 
-  apply(simp add: unrel2)
+  using unrel2[simplified wpsm_unbeteiligt2_def] apply(simp)
   done
 
 end
