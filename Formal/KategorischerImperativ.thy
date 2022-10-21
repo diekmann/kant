@@ -474,4 +474,7 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   qed
 qed
 
+(*TODO: bekomme ich auch die struktur von globaler_fortschritt bewiesen?
+Also eine Maxime die einfach das ich ignoriert, aber kein Allquantor hat*)
+
 end

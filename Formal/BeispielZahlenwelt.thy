@@ -500,7 +500,7 @@ lemma gesamtbesitz_swap:
   using enum_class.in_enum enum_class.enum_distinct by auto
 
 
-lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
+theorem "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
         (Maxime (\<lambda>ich::person. globaler_fortschritt))"
   apply(simp add: moralisch_simp)
   apply(simp add: wohlgeformte_handlungsabsicht_def maxime_und_handlungsabsicht_generalisieren_def)
