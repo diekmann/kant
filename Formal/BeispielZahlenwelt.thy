@@ -490,6 +490,17 @@ lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
   apply(simp add: gesamtbesitz_swap[where welt="Zahlenwelt besitz", simplified])
   done
 
+lemma "wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+  apply(simp add: wpsm_kommutiert_def)
+  by (simp add: gesamtbesitz_swap zahlenwelt_personen_swap_sym)
+lemma "wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+  apply(simp add: wpsm_unbeteiligt1_def)
+  by (simp add: gesamtbesitz_swap)
+lemma "wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+  apply(simp add: wpsm_unbeteiligt2_def)
+  by (simp add: gesamtbesitz_swap)
+  
+
 lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
   by(cases h, simp)
 lemma nachher_handeln: "nachher (handeln p welt (HandlungF h)) = h p welt"
