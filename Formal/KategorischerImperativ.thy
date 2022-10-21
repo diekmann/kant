@@ -289,6 +289,7 @@ lemma blinde_maxime_katimp:
 
 text\<open>wpsm: Welt Person Swap Maxime\<close>
 
+
 definition wpsm_kommutiert
   :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
 where
@@ -297,6 +298,14 @@ where
   okay m p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
   \<longleftrightarrow>
   okay m p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
+
+lemma "wpsm_kommutiert m welt_personen_swap welt =
+(\<forall> p1 p2 h.
+  okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) (HandlungF h))
+  \<longleftrightarrow>
+  okay m p1 (handeln p1 welt (HandlungF (\<lambda>p w. welt_personen_swap p1 p2 (h p (welt_personen_swap p2 p1 w)))))
+)"
+  by(simp add: wpsm_kommutiert_def)
 
 definition wpsm_unbeteiligt1
   :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
@@ -414,25 +423,16 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   obtain h where h: "ha = HandlungF h"
     by(cases ha, blast)
 
-  have "P p1 (Handlung welt (h p welt))"
-    using h okayp by auto
-
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
   have 1: "h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))"
     by simp
   from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
   have 2:
-  "\<forall>pX. P pX (Handlung (welt_personen_swap p2 p welt) (h p (welt_personen_swap p2 p welt)))"
-    by auto
-  from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] welt_personen_swap_sym
-  have 3:
-  "(\<forall>pX. P pX (Handlung (welt_personen_swap p2 p welt) (h p (welt_personen_swap p2 p welt)))) =
-       (\<forall>pX. P pX (Handlung welt (h p welt)))"
-    by simp
-
+  "\<forall>pX. P pX (handeln p (welt_personen_swap p2 p welt) ha)"
+    by(auto simp add: h)
   from okayp[simplified h] 2
   have 4:
-    "P p (Handlung (welt_personen_swap p2 p welt) (h p (welt_personen_swap p2 p welt)))"
+    "P p (handeln p (welt_personen_swap p2 p welt) ha)"
     by(simp)
 
   show "P p1 (handeln p2 welt ha)"
@@ -447,19 +447,19 @@ proof(rule kategorischer_imperativI, simp, intro allI)
     proof(cases "p1 = p")
       case True
       assume "p1 = p"
-      with 4 kom[simplified wpsm_kommutiert_def okay.simps] show ?thesis
+      with 4[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] show ?thesis
         apply(simp add: h 1)
-        using 2 welt_personen_swap_sym by fastforce
+        using 2[simplified handeln.simps h] welt_personen_swap_sym by fastforce
     next
       case False
       assume "p1 \<noteq> p"
       show ?thesis
       proof(cases "p1 = p2")
         case True
-        with 4 kom[simplified wpsm_kommutiert_def okay.simps]  show ?thesis
+        with 4 kom[simplified wpsm_kommutiert_def okay.simps] show ?thesis
           apply(simp)
           apply(simp add: h 1)
-          using 2 welt_personen_swap_sym by fastforce
+          using welt_personen_swap_sym by fastforce
       next
         case False
         assume "p1 \<noteq> p2"
@@ -468,9 +468,10 @@ proof(rule kategorischer_imperativI, simp, intro allI)
            unrel2[simplified wpsm_unbeteiligt2_def]
         apply(simp)
         apply(simp add: h)
-        using 1 2 by metis
+        using 1[simplified handeln.simps h] 2[simplified handeln.simps h] by metis
       qed
     qed
   qed
 qed
+
 end
