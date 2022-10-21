@@ -102,7 +102,7 @@ where
     \<forall>p1 p2. (handeln p1 welt h) =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
 (*TODO: geht das in de Zahlenwelt? koennen wir welt_personen_swap implementieren?
-nur h welche das erfuellen sind generisch und erlaubt, ....
+ja
 *)
 (*warum kein \<forall>welt?*)
 
@@ -211,29 +211,31 @@ lemma "(\<forall>h ich. (\<forall>w. m ich (handeln ich welt h)) \<longrightarro
   apply(erule_tac x=h in allE)
   (*quickcheck found a counterexample*)
   oops
-  
+
+*)
 text\<open>WOW:
 
 Die Maxime die keine Handlung erlaubt (weil immer False) erfuellt den kategorischen
 Imperativ\<close>
-lemma "kategorischer_imperativ welt (Maxime (\<lambda>ich h. False))"
+lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. False))"
   by(simp)
 
 lemma "\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h"
   by(simp add: moralisch_simp)
 
 
-lemma "kategorischer_imperativ welt (Maxime (\<lambda>ich h. True))"
+lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. True))"
   by(simp add: moralisch_simp)
 
 lemma "moralisch welt (Maxime (\<lambda>ich h. True)) h"
   by(simp add: moralisch_simp)
 
-lemma "kategorischer_imperativ welt (Maxime (\<lambda>ich_ignored h. P h))"
+(*
+lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich_ignored h. P h))"
   apply(simp add: moralisch_simp)
   apply(intro allI impI, elim exE)
   oops (*hmmm, bekomme ich das mit dem Steuersystem verbunden?*)
-
+*)
 
 (*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
 zu
@@ -250,7 +252,10 @@ Handlung fuer mich okay == m ich (handeln ich welt h)
 *)
 
 
-lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
+(*TODO: das \<forall>w1 w2. will ne definition*)
+lemma "kategorischer_imperativ welt_personen_swap welt (Maxime m) \<Longrightarrow>
+  wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
+  (\<forall>w1 w2. m ich (handeln ich w1 h) = m ich (handeln ich w2 h)) \<Longrightarrow>
   m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
   apply(simp)
   by auto
