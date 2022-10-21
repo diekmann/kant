@@ -25,6 +25,11 @@ ob ich Betroffener einer fremden Handlung bin, oder nur Außenstehender.
 datatype ('person, 'world) maxime = Maxime \<open>'person \<Rightarrow> 'world handlung \<Rightarrow> bool\<close>
                                  (*          ich    -> Auswirkung      -> gut/schlecht  *)
 
+text\<open>Auswertung einer Maxime:\<close>
+fun okay :: "('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> 'world handlung \<Rightarrow> bool" where
+  "okay (Maxime m) p h = m p h"
+
+
 text\<open>Beispiel\<close>
 definition maxime_mir_ist_alles_recht :: \<open>('person, 'world) maxime\<close> where
   \<open>maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)\<close>
@@ -87,8 +92,8 @@ definition wenn_jeder_so_handelt
 fun was_wenn_jeder_so_handelt_aus_sicht_von
     :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
-    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt (Maxime m) handlungsabsicht betroffene_person =
-        (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. m betroffene_person h)\<close>
+    \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt m handlungsabsicht betroffene_person =
+        (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. okay m betroffene_person h)\<close>
 
 
 text\<open>Für eine gegebene Welt und eine gegebene Maxime nennen wir eine Handlungsabsicht
@@ -111,11 +116,12 @@ lemma \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold by simp
 
+(*TODO: use okay here?*)
 lemma moralisch_simp:
-  \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
-        (\<forall>p1 p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
+  \<open>moralisch welt m handlungsabsicht \<longleftrightarrow>
+        (\<forall>p1 p2. okay m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold
-  by (simp add: bevoelkerung_def)
+  by (cases m, simp add: bevoelkerung_def moralisch_unfold)
 
 text\<open>
 Wir können die goldene Regel auch umformulieren,
@@ -129,9 +135,9 @@ Formal:
 Genau dies können wir aus unserer Definition von \<^const>\<open>moralisch\<close> ableiten:\<close>
 
 lemma goldene_regel:
-  "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
-   m ich (handeln ich welt handlungsabsicht) \<Longrightarrow>
-   \<forall>p2. m ich (handeln p2 welt handlungsabsicht)"
+  "moralisch welt m handlungsabsicht \<Longrightarrow>
+   okay m ich (handeln ich welt handlungsabsicht) \<Longrightarrow>
+   \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)"
   by (simp add: moralisch_simp)
 
 text\<open>Für das obige lemma brauchen wir die Annahme
@@ -141,8 +147,8 @@ Wenn für eine gegebene \<^term>\<open>Maxime m\<close> eine Handlungsabsicht mo
 dann ist es auch okay, wenn ich von der Handlungsabsicht betroffen bin,
 egal wer sie ausführt.\<close>
 corollary
-  "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
-   \<forall>p2. m ich (handeln p2 welt handlungsabsicht)"
+  "moralisch welt m handlungsabsicht \<Longrightarrow>
+   \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)"
   by (simp add: moralisch_simp)
 
 text\<open>Die umgekehrte Richtung gilt nicht, weil diese Formulierung nur die Handlungen betrachtet,
@@ -201,11 +207,11 @@ fun debug_maxime
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF
       \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
 where
-  "debug_maxime print_world welt (Maxime m) handlungsabsicht =
+  "debug_maxime print_world welt m handlungsabsicht =
     {VerletzteMaxime
       (Opfer p1) (Taeter p2)
       (map_handlung print_world (handeln p2 welt handlungsabsicht)) | p1 p2.
-          \<not>m p1 (handeln p2 welt handlungsabsicht)}"
+          \<not>okay m p1 (handeln p2 welt handlungsabsicht)}"
 
 
 text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>

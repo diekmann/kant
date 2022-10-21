@@ -101,16 +101,13 @@ where
   "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
     \<forall>p1 p2. (handeln p1 welt h) =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
-(*TODO: geht das in de Zahlenwelt? koennen wir welt_personen_swap implementieren?
-ja
-*)
-(*warum kein \<forall>welt?*)
+
 
 fun maxime_und_handlungsabsicht_generalisieren
   :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool"
 where
-  "maxime_und_handlungsabsicht_generalisieren (Maxime m) h p =
-    (\<forall>w1 w2. m p (handeln p w1 h) \<longleftrightarrow> m p (handeln p w2 h))"
+  "maxime_und_handlungsabsicht_generalisieren m h p =
+    (\<forall>w1 w2. okay m p (handeln p w1 h) \<longleftrightarrow> okay m p (handeln p w2 h))"
   
 
 subsection\<open>Kategorischer Imperativ\<close>
@@ -168,11 +165,11 @@ dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen
 fun kategorischer_imperativ
   :: \<open>('person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world) \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
-  \<open>kategorischer_imperativ welt_personen_swap welt (Maxime m) =
+  \<open>kategorischer_imperativ welt_personen_swap welt m =
     (\<forall>h.
           wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
-          (\<exists>p. maxime_und_handlungsabsicht_generalisieren (Maxime m) h p \<and> m p (handeln p welt h))
-              \<longrightarrow> moralisch welt (Maxime m) h)\<close>
+          (\<exists>p. maxime_und_handlungsabsicht_generalisieren m h p \<and> okay m p (handeln p welt h))
+              \<longrightarrow> moralisch welt m h)\<close>
 
 (* Hat was von dem Urzustand Schleier von Rawls? *)
 
@@ -253,10 +250,10 @@ Handlung fuer mich okay == m ich (handeln ich welt h)
 
 
 (*TODO: das \<forall>w1 w2. will ne definition*)
-lemma "kategorischer_imperativ welt_personen_swap welt (Maxime m) \<Longrightarrow>
+lemma "kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
-  (\<forall>w1 w2. m ich (handeln ich w1 h) = m ich (handeln ich w2 h)) \<Longrightarrow>
-  m ich (handeln ich welt h) \<Longrightarrow> moralisch welt (Maxime m) h"
+  (\<forall>w1 w2. okay m ich (handeln ich w1 h) = okay m ich (handeln ich w2 h)) \<Longrightarrow>
+  okay m ich (handeln ich welt h) \<Longrightarrow> moralisch welt m h"
   apply(simp)
   by auto
 
@@ -286,16 +283,16 @@ lemma blinde_maxime_katimp:
 
 
 
-definition "Maxime_kommutiert P welt_personen_swap welt \<equiv> \<forall> p1 p2 h.
-  P p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
+definition "Maxime_kommutiert m welt_personen_swap welt \<equiv> \<forall> p1 p2 h.
+  okay m p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
   \<longleftrightarrow>
-  P p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
+  okay m p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
 
-definition "Maxime_swap_unrelated P welt_personen_swap (welt::'world) \<equiv> \<forall> p1 p2 pX h (welt'::'world).
+definition "Maxime_swap_unrelated m welt_personen_swap (welt::'world) \<equiv> \<forall> p1 p2 pX h (welt'::'world).
   p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-  P pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
+  okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
   \<longleftrightarrow>
-  P pX (Handlung welt (h p1 welt'))"
+  okay m pX (Handlung welt (h p1 welt'))"
 
 
 (*TODO: die 3 Eiggenschaften sind nur ueber die Maxime und die swap funktion.
@@ -305,8 +302,8 @@ Auf jeden fall sollte ich testen, ob das auch fuer den globalen fortschritt gilt
 text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
 theorem altruistische_maxime_katimp:
-  assumes kom: "Maxime_kommutiert P welt_personen_swap welt"
-     and unrel1: "Maxime_swap_unrelated P welt_personen_swap welt"
+  assumes kom: "Maxime_kommutiert (Maxime P) welt_personen_swap welt"
+     and unrel1: "Maxime_swap_unrelated (Maxime P) welt_personen_swap welt"
     (* das ist Maxime_swap_unrelated nur auf 1. param.*)
      and unrel2: "\<forall> p1 p2 pX welt'.
   p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow> 
