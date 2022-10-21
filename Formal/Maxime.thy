@@ -113,7 +113,7 @@ lemma \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
 
 lemma moralisch_simp:
   \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
-        (\<forall>p1. \<forall>p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
+        (\<forall>p1 p2. m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold
   by (simp add: bevoelkerung_def)
 
@@ -123,12 +123,26 @@ nicht als Imperativ, sondern als Beobachtung eines Wunschzustandes:
 Wenn eine Handlung für eine Perosn okay ist, dann muss sie auch Okay sein,
 wenn jemand anderes diese Handlung ausführt.
 
+Formal:
+\<^term>\<open>m ich (handeln ich welt handlungsabsicht) \<Longrightarrow> \<forall>p2. m ich (handeln p2 welt handlungsabsicht)\<close>
+
 Genau dies können wir aus unserer Definition von \<^const>\<open>moralisch\<close> ableiten:\<close>
 
-theorem goldene_regel:
+lemma goldene_regel:
   "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
-      (\<forall>p1. m p1 (handeln p1 welt handlungsabsicht) \<longrightarrow>
-            (\<forall>p2. m p1 (handeln p2 welt handlungsabsicht)))"
+   m ich (handeln ich welt handlungsabsicht) \<Longrightarrow>
+   \<forall>p2. m ich (handeln p2 welt handlungsabsicht)"
+  by (simp add: moralisch_simp)
+
+text\<open>Für das obige lemma brauchen wir die Annahme
+\<^term>\<open>m ich (handeln ich welt handlungsabsicht)\<close> gar nicht.
+
+Wenn für eine gegebene \<^term>\<open>Maxime m\<close> eine Handlungsabsicht moralisch ist,
+dann ist es auch okay, wenn ich von der Handlungsabsicht betroffen bin,
+egal wer sie ausführt.\<close>
+corollary
+  "moralisch welt (Maxime m) handlungsabsicht \<Longrightarrow>
+   \<forall>p2. m ich (handeln p2 welt handlungsabsicht)"
   by (simp add: moralisch_simp)
 
 text\<open>Die umgekehrte Richtung gilt nicht, weil diese Formulierung nur die Handlungen betrachtet,
