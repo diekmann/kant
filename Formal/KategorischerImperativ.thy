@@ -280,14 +280,98 @@ lemma blinde_maxime_katimp:
   "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. \<forall>p. m p))"
   apply(simp add: moralisch_simp)
 
-text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
-kategorischen Imperativ.\<close> (*?*)
-(*Wuerde das vllt gehen wenn die maxime nicht diskriminierend waere?*)
-lemma altruistische_maxime_katimp:
-  "kategorischer_imperativ welt (Maxime (\<lambda>ich h. \<forall>p. m p h))"
-  apply(simp add: moralisch_simp)
-  nitpick (*\<exists>h p1 p2. m p1 h \<noteq> m p2 h \<Longrightarrow> macht besseres gegenbsp*)
-  oops
 
 *)
+
+
+
+
+definition "Maxime_kommutiert P welt_personen_swap welt \<equiv> \<forall> p1 p2 h.
+  P p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
+  \<longleftrightarrow>
+  P p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
+
+definition "Maxime_swap_unrelated P welt_personen_swap (welt::'world) \<equiv> \<forall> p1 p2 pX h (welt'::'world).
+  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
+  P pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
+  \<longleftrightarrow>
+  P pX (Handlung welt (h p1 welt'))"
+
+
+(*TODO: die 3 Eiggenschaften sind nur ueber die Maxime und die swap funktion.
+evtl muss ich die in den kategorischen imperativ uebernehmen?
+Auf jeden fall sollte ich testen, ob das auch fuer den globalen fortschritt gilt!
+*)
+text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
+kategorischen Imperativ.\<close>
+theorem altruistische_maxime_katimp:
+  assumes kom: "Maxime_kommutiert P welt_personen_swap welt"
+     and unrel1: "Maxime_swap_unrelated P welt_personen_swap welt"
+    (* das ist Maxime_swap_unrelated nur auf 1. param.*)
+     and unrel2: "\<forall> p1 p2 pX welt'.
+  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow> 
+    P pX (Handlung (welt_personen_swap p2 p1 welt) welt')
+    \<longleftrightarrow> P pX (Handlung welt welt')"
+     and welt_personen_swap_sym: "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
+  shows "kategorischer_imperativ welt_personen_swap welt
+    (Maxime (\<lambda>ich h. (\<forall>pX::'person. P pX h)))"
+  apply(simp add: moralisch_simp)
+  apply(intro allI impI, elim conjE exE)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(case_tac h, rename_tac ha p2 pX p1 h, simp)
+
+
+  apply(subgoal_tac "P pX (Handlung welt (h p1 welt))")
+   prefer 2 apply(simp; fail)
+
+  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=p1 in allE) back
+  apply(elim conjE)
+  apply(simp)
+  apply(thin_tac "welt = _")
+  apply(case_tac "p1 = p2")
+   apply(simp; fail)
+  apply(thin_tac "h p2 welt = _")
+
+  apply(case_tac "pX = p1", simp)
+   apply(erule_tac x="welt_personen_swap p1 p2 welt" in allE)
+   apply(erule_tac x="welt" in allE)
+
+   apply(case_tac "(\<forall>pX. P pX
+              (Handlung (welt_personen_swap p1 p2 welt)
+                (h p1 (welt_personen_swap p1 p2 welt))))")
+    prefer 2 apply(simp; fail)
+   apply(simp)
+   apply(erule_tac x=p2 in allE) back
+  using kom[simplified Maxime_kommutiert_def] apply(simp; fail)
+
+
+  apply(case_tac "pX = p2")
+   apply(simp)
+   apply(erule_tac x="welt_personen_swap p2 p1 welt" in allE)
+   apply(erule_tac x="welt" in allE)
+   apply(case_tac "(\<forall>pX. P pX
+              (Handlung (welt_personen_swap p2 p1 welt)
+                (h p1 (welt_personen_swap p2 p1 welt))))")
+    prefer 2 apply(simp; fail)
+   apply(simp)
+   apply(erule_tac x=p1 in allE) back
+  using kom[simplified Maxime_kommutiert_def]
+  using welt_personen_swap_sym apply fastforce 
+
+  apply(erule_tac x="welt_personen_swap p2 p1 welt" in allE)
+  apply(erule_tac x="welt" in allE)
+  apply(simp)
+  apply(erule_tac x=pX in allE) back
+  using unrel1[simplified Maxime_swap_unrelated_def] 
+  apply(simp)
+  apply(erule_tac x=p1 in allE) back
+  apply(erule_tac x=p2 in allE) back
+  apply(elim impE, (simp; fail))
+  apply(erule_tac x=pX in allE) back
+  apply(elim impE, (simp; fail)+)
+
+  apply(simp add: unrel2)
+  done
+
 end
