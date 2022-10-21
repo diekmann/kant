@@ -267,8 +267,6 @@ lemma kategorischer_imperativI:
  \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m"
   by(auto simp add: moralisch_simp)
 
-
-
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
 
 text\<open>Wenn eine Maxime jede Handlungsabsicht als morlaisch bewertet
@@ -338,58 +336,58 @@ theorem altruistische_maxime_katimp:
   apply(simp add: moralisch_simp)
   apply(intro allI impI, elim conjE exE)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
-  apply(case_tac h, rename_tac ha p2 pX p1 h, simp)
+  apply(case_tac h, rename_tac ha p2 p1 p h, simp)
 
 
-  apply(subgoal_tac "P pX (Handlung welt (h p1 welt))")
+  apply(subgoal_tac "P p1 (Handlung welt (h p welt))")
    prefer 2 apply(simp; fail)
 
   apply(erule_tac x=p2 in allE)
-  apply(erule_tac x=p1 in allE) back
+  apply(erule_tac x=p in allE) back
   apply(elim conjE)
-  apply(simp)
   apply(thin_tac "welt = _")
-  apply(case_tac "p1 = p2")
+  apply(simp)
+  apply(case_tac "p = p2")
    apply(simp; fail)
   apply(thin_tac "h p2 welt = _")
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def)
 
-  apply(case_tac "pX = p1", simp)
-   apply(erule_tac x="welt_personen_swap p1 p2 welt" in allE)
+  apply(case_tac "p1 = p", simp)
+   apply(erule_tac x="welt_personen_swap p p2 welt" in allE)
    apply(erule_tac x="welt" in allE)
 
    apply(case_tac "(\<forall>pX. P pX
-              (Handlung (welt_personen_swap p1 p2 welt)
-                (h p1 (welt_personen_swap p1 p2 welt))))")
+              (Handlung (welt_personen_swap p p2 welt)
+                (h p (welt_personen_swap p p2 welt))))")
     prefer 2 apply(simp; fail)
    apply(simp)
    apply(erule_tac x=p2 in allE) back
   using kom[simplified wpsm_kommutiert_def] apply(simp; fail)
 
 
-  apply(case_tac "pX = p2")
+  apply(case_tac "p1 = p2")
    apply(simp)
-   apply(erule_tac x="welt_personen_swap p2 p1 welt" in allE)
+   apply(erule_tac x="welt_personen_swap p2 p welt" in allE)
    apply(erule_tac x="welt" in allE)
    apply(case_tac "(\<forall>pX. P pX
-              (Handlung (welt_personen_swap p2 p1 welt)
-                (h p1 (welt_personen_swap p2 p1 welt))))")
+              (Handlung (welt_personen_swap p2 p welt)
+                (h p (welt_personen_swap p2 p welt))))")
     prefer 2 apply(simp; fail)
    apply(simp)
-   apply(erule_tac x=p1 in allE) back
+   apply(erule_tac x=p in allE) back
   using kom[simplified wpsm_kommutiert_def]
   using welt_personen_swap_sym apply fastforce 
 
-  apply(erule_tac x="welt_personen_swap p2 p1 welt" in allE)
+  apply(erule_tac x="welt_personen_swap p2 p welt" in allE)
   apply(erule_tac x="welt" in allE)
   apply(simp)
-  apply(erule_tac x=pX in allE) back
+  apply(erule_tac x=p1 in allE) back
   using unrel1[simplified wpsm_unbeteiligt1_def] 
   apply(simp)
-  apply(erule_tac x=p1 in allE) back
+  apply(erule_tac x=p in allE) back
   apply(erule_tac x=p2 in allE) back
   apply(elim impE, (simp; fail))
-  apply(erule_tac x=pX in allE) back
+  apply(erule_tac x=p1 in allE) back
   apply(elim impE, (simp; fail)+)
 
   using unrel2[simplified wpsm_unbeteiligt2_def] apply(simp)
@@ -405,11 +403,22 @@ theorem altruistische_maxime_katimp:
         "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
   shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
 proof(rule kategorischer_imperativI)
-  fix h :: "('person, 'world) handlungF"
+  fix ha :: "('person, 'world) handlungF"
   and p1 p2 p :: 'person
-  assume "wohlgeformte_handlungsabsicht welt_personen_swap welt h"
-     and "maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) h p"
-     and "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p (handeln p welt h)"
-  show "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p1 (handeln p2 welt h)"
+  assume wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+     and mhg: "maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha p"
+     and okayp: "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p (handeln p welt ha)"
+
+  obtain h where h: "ha = HandlungF h"
+    by(cases ha, blast)
+
+  have "P p1 (Handlung welt (h p welt))"
+    using h okayp by auto
+
+  from wfh[simplified wohlgeformte_handlungsabsicht_def h]
+  have "h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))"
+    by simp
+
+  show "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p1 (handeln p2 welt ha)"
 oops (*TODO isar proof*)
 end
