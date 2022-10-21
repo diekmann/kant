@@ -46,6 +46,9 @@ section\<open>Beispiel: Zahlenwelt\<close>
   lemma zahlenwelt_personen_swap_sym:
     "zahlenwelt_personen_swap p1 p2 welt = zahlenwelt_personen_swap p2 p1 welt"
     by(cases welt, simp add: swap_symmetric)
+
+  lemma zahlenwelt_personen_swap_id: "zahlenwelt_personen_swap p p w = w"
+    by(cases w, simp)
   (*>*)
 
 subsection\<open>Handlungen\<close>
@@ -253,6 +256,25 @@ lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p 
        meins p (zahlenwelt_personen_swap p1 p2 welt) = meins p welt"
   by(cases welt, simp add: swap_def)
 
+lemma "wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwelt_personen_swap welt"
+  by(simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym)
+
+
+(*TODO: Diese Maxime braucht einen Namen!*)
+lemma "wpsm_kommutiert
+         (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+         zahlenwelt_personen_swap welt"
+  apply(simp add: wpsm_kommutiert_def)
+  apply(safe)
+   apply(case_tac "p1 = p2")
+    apply(simp add: zahlenwelt_personen_swap_id; fail)
+   apply(case_tac "pX = p1")
+    apply(simp)
+    apply (metis hlp1 zahlenwelt_personen_swap_sym)
+   apply (metis hlp2 hlp3 zahlenwelt_personen_swap_sym)
+  by (metis hlp2 hlp3 zahlenwelt_personen_swap_id zahlenwelt_personen_swap_sym)
+  
+
 (*AWESOME!*)
   lemma "kategorischer_imperativ zahlenwelt_personen_swap welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
@@ -297,6 +319,12 @@ lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p 
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
     by eval
+
+  (*TODO: Beispiele mit der guten maxime!*)
+  lemma \<open>beispiel_case_law_relativ
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (HandlungF (erschaffen 5)) =
+  Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
+  by eval
 
 subsection\<open>Kleine Änderung in der Maxime\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
