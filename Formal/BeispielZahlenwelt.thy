@@ -200,12 +200,12 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
 
 
 lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (erschaffen 5)) p"
-  apply(simp add: maxime_zahlenfortschritt_def, intro allI)
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac w1, case_tac w2, simp)
   done
 
 lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) p"
-  apply(simp add: maxime_zahlenfortschritt_def, intro allI)
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac w1, case_tac w2, simp)
   done
 
@@ -221,7 +221,7 @@ lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Hand
   lemma "\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt"
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
     apply(rule_tac x="HandlungF (stehlen4 1 10)" in exI)
-    apply(simp add: wohlgeformte_handlungsabsicht_stehlen4)
+    apply(simp add: wohlgeformte_handlungsabsicht_stehlen4 maxime_und_handlungsabsicht_generalisieren_def)
     apply(intro conjI)
      apply(rule_tac x=Alice in exI)
      apply(intro conjI allI)
@@ -403,7 +403,7 @@ lemma "\<not>wohlgeformte_handlungsabsicht
 
 lemma "\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt
         (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))) Carol"
-  apply(simp add: maxime_zahlenfortschritt_def)
+  apply(simp add: maxime_zahlenfortschritt_def maxime_und_handlungsabsicht_generalisieren_def)
   apply(rule_tac x="Zahlenwelt (\<lambda>_. -1)" in exI, simp)
   apply(rule_tac x="Zahlenwelt (\<lambda>_. 1)" in exI, simp)
   done
@@ -475,7 +475,7 @@ lemma gesamtbesitz_swap:
 lemma "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
         (Maxime (\<lambda>ich::person. globaler_fortschritt))"
   apply(simp add: moralisch_simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(simp add: wohlgeformte_handlungsabsicht_def maxime_und_handlungsabsicht_generalisieren_def)
   apply(intro allI impI, elim conjE exE)
   apply(case_tac h, rename_tac h p1 p2 ha, simp)
 

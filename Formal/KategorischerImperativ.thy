@@ -107,7 +107,7 @@ where
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
 
 
-fun maxime_und_handlungsabsicht_generalisieren
+definition maxime_und_handlungsabsicht_generalisieren
   :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool"
 where
   "maxime_und_handlungsabsicht_generalisieren m h p =
@@ -247,21 +247,25 @@ value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<clo
 *)
 
   thm goldene_regel
-
 (*
 Handlung fuer mich okay == m ich (handeln ich welt h) 
 *)
 
 
-(*TODO: das \<forall>w1 w2. will ne definition*)
 lemma "kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
-  (\<forall>w1 w2. okay m ich (handeln ich w1 h) = okay m ich (handeln ich w2 h)) \<Longrightarrow>
+  maxime_und_handlungsabsicht_generalisieren m h ich \<Longrightarrow>
   okay m ich (handeln ich welt h) \<Longrightarrow> moralisch welt m h"
   apply(simp)
   by auto
 
-  
+lemma kategorischer_imperativI:
+  "(\<And>h p1 p2 p. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
+   maxime_und_handlungsabsicht_generalisieren m h p \<Longrightarrow>
+   okay m p (handeln p welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
+   )
+ \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m"
+  by(auto simp add: moralisch_simp)
 
 
 
@@ -330,8 +334,7 @@ theorem altruistische_maxime_katimp:
       and unrel1: "wpsm_unbeteiligt1 (Maxime P) welt_personen_swap welt"
       and unrel2: "wpsm_unbeteiligt2 (Maxime P) welt_personen_swap welt"
       and welt_personen_swap_sym: "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
-  shows "kategorischer_imperativ welt_personen_swap welt
-    (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
+  shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
   apply(simp add: moralisch_simp)
   apply(intro allI impI, elim conjE exE)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
@@ -349,6 +352,7 @@ theorem altruistische_maxime_katimp:
   apply(case_tac "p1 = p2")
    apply(simp; fail)
   apply(thin_tac "h p2 welt = _")
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def)
 
   apply(case_tac "pX = p1", simp)
    apply(erule_tac x="welt_personen_swap p1 p2 welt" in allE)
@@ -391,4 +395,21 @@ theorem altruistische_maxime_katimp:
   using unrel2[simplified wpsm_unbeteiligt2_def] apply(simp)
   done
 
+
+theorem altruistische_maxime_katimp:
+  fixes P :: "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
+  assumes kom: "wpsm_kommutiert (Maxime P) welt_personen_swap welt"
+      and unrel1: "wpsm_unbeteiligt1 (Maxime P) welt_personen_swap welt"
+      and unrel2: "wpsm_unbeteiligt2 (Maxime P) welt_personen_swap welt"
+      and welt_personen_swap_sym:
+        "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
+  shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
+proof(rule kategorischer_imperativI)
+  fix h :: "('person, 'world) handlungF"
+  and p1 p2 p :: 'person
+  assume "wohlgeformte_handlungsabsicht welt_personen_swap welt h"
+     and "maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) h p"
+     and "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p (handeln p welt h)"
+  show "okay (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) p1 (handeln p2 welt h)"
+oops (*TODO isar proof*)
 end
