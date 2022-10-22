@@ -11,6 +11,8 @@ session Kant = Cache +
   theories [document = false]
     ExecutableHelper
     Percentage
+    Swap
+    Helper
   theories [show_question_marks = false]
     SchnelleinstiegHOL
     Disclaimer

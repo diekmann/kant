@@ -43,7 +43,7 @@ fun handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'worl
 \<open>handeln handelnde_person welt (HandlungF h) = Handlung welt (h handelnde_person welt)\<close>
 
 text\<open>
-Beispiel, für eine Welt die nur aus einer Zahl bestehtÖ
+Beispiel, für eine Welt die nur aus einer Zahl besteht:
 Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
 \<close>
 definition \<open>beispiel_handlungf \<equiv> HandlungF (\<lambda>p n. if n < 9000 then n+1 else n)\<close>
@@ -52,6 +52,12 @@ text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>b
 @{value \<open>beispiel_handlungf::(nat, int) handlungF\<close>}\<close>
 
 
+(*<*)
+lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
+  by(cases h, simp)
+lemma nachher_handeln: "nachher (handeln p welt (HandlungF h)) = h p welt"
+  by(simp)
+(*>*)
 
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
 text\<open>
