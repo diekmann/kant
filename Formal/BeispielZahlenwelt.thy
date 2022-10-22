@@ -493,62 +493,38 @@ lemma sum_list_swap: "p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Longrigh
   apply(rule swap_nothing)
   by auto
   
-lemma gesamtbesitz_swap:
-  "gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt"
-  apply(cases welt, simp)
-  apply(rule sum_list_swap)
-  using enum_class.in_enum enum_class.enum_distinct by auto
+  lemma gesamtbesitz_swap:
+    "gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt"
+    apply(cases welt, simp)
+    apply(rule sum_list_swap)
+    using enum_class.in_enum enum_class.enum_distinct by auto
 
 
-theorem "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
-        (Maxime (\<lambda>ich::person. globaler_fortschritt))"
-  apply(simp add: moralisch_simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def maxime_und_handlungsabsicht_generalisieren_def)
-  apply(intro allI impI, elim conjE exE)
-  apply(case_tac h, rename_tac h p1 p2 ha, simp)
-
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
-  apply(simp)
-  apply(simp add: gesamtbesitz_swap)
-  apply(erule_tac x="Zahlenwelt besitz" in allE)
-  apply(erule_tac x="Zahlenwelt (swap p1 p2 besitz)" in allE)
-  thm gesamtbesitz_swap[where welt="Zahlenwelt besitz", simplified]
-  apply(simp)
-  apply(simp add: gesamtbesitz_swap[where welt="Zahlenwelt besitz", simplified])
-  done
-
-lemma "wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
-  apply(simp add: wpsm_kommutiert_def)
-  by (simp add: gesamtbesitz_swap zahlenwelt_personen_swap_sym)
-lemma "wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
-  apply(simp add: wpsm_unbeteiligt1_def)
-  by (simp add: gesamtbesitz_swap)
-lemma "wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
-  apply(simp add: wpsm_unbeteiligt2_def)
-  by (simp add: gesamtbesitz_swap)
+  lemma globaler_fortschritt_kommutiert:
+    "wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+    by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwelt_personen_swap_sym)
+  lemma globaler_fortschritt_unbeteiligt1:
+    "wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+    by(simp add: wpsm_unbeteiligt1_def gesamtbesitz_swap)
+  lemma globaler_fortschritt_unbeteiligt2:
+    "wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+    by(simp add: wpsm_unbeteiligt2_def gesamtbesitz_swap)
+    
   
+  theorem "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
+          (Maxime (\<lambda>ich::person. globaler_fortschritt))"
+    apply(rule globale_maxime_katimp)
+       apply(simp add: globaler_fortschritt_kommutiert; fail)
+      apply(simp add: globaler_fortschritt_unbeteiligt1; fail)
+     apply(simp add: globaler_fortschritt_unbeteiligt2; fail)
+    apply(simp add: zahlenwelt_personen_swap_sym)
+    done
+
 
 lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
   by(cases h, simp)
 lemma nachher_handeln: "nachher (handeln p welt (HandlungF h)) = h p welt"
   by(simp)
-
-(*hmm, this does not pull polymorphism into HOL*)
-lemma\<open>{h::'p\<Rightarrow>int\<Rightarrow>int. \<exists>h'::'p'\<Rightarrow>int\<Rightarrow>int. \<exists>translate::'p'\<Rightarrow>'p. \<forall>p. h' p = h (translate p)}
-        = {h::'p\<Rightarrow>int\<Rightarrow>int. True}\<close>
-  apply(rule Collect_eqI)
-  apply(simp)
-  apply(rule_tac x="(\<lambda>p' i. x (t p') i)" in exI)
-  by fastforce
-  
-  
-
-lemma "set P = UNIV \<Longrightarrow>
-       sum_list (map welt P) \<le> sum_list (map (x p welt) P) \<Longrightarrow>
-       sum_list (map welt P) \<le> sum_list (map (x p2 welt) P)"
-  (*darf nicht gelten, weil es instanziierungen gaebe, fuer die das definitif falsch ware.*)
-  oops
 
 
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
