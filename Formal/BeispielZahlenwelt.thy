@@ -20,7 +20,7 @@ section\<open>Beispiel: Zahlenwelt\<close>
   
   lemma "gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12" by eval
   lemma "gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8" by eval
-  
+
   
   fun meins :: "person \<Rightarrow> zahlenwelt \<Rightarrow> int" where
     "meins p (Zahlenwelt besitz) = besitz p"
@@ -49,6 +49,13 @@ section\<open>Beispiel: Zahlenwelt\<close>
 
   lemma zahlenwelt_personen_swap_id: "zahlenwelt_personen_swap p p w = w"
     by(cases w, simp)
+
+
+  lemma gesamtbesitz_swap:
+    "gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt"
+    apply(cases welt, simp)
+    apply(rule sum_list_swap)
+    using enum_class.in_enum enum_class.enum_distinct by auto
   (*>*)
 
 subsection\<open>Handlungen\<close>
@@ -436,70 +443,9 @@ lemma "\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschrit
   apply(rule_tac x="Zahlenwelt (\<lambda>_. 1)" in exI, simp)
   done
 
-thm sum_list_map_eq_sum_count
-lemma helper_sum_int_if: "a \<notin> set P \<Longrightarrow>
-(\<Sum>x\<in>set P. int (if a = x then A1 x else A2 x) * B x) =
-  (\<Sum>x\<in>set P. int (A2 x) * B x)"
-  by (smt (verit, del_insts) sum.cong)
-lemma sum_list_map_eq_sum_count_int:
-  fixes f :: "'a \<Rightarrow> int"
-  shows "sum_list (map f xs) = sum (\<lambda>x. (int (count_list xs x)) * f x) (set xs)"
-proof(induction xs)
-  case (Cons x xs)
-  show ?case (is "?l = ?r")
-  proof cases
-    assume "x \<in> set xs"
-    have XXX: "(\<Sum>xa\<in>set xs - {x}. int (if x = xa then count_list xs xa + 1 else count_list xs xa) * f xa)
-  = (\<Sum>xa\<in>set xs - {x}. int (count_list xs xa) * f xa)"
-      thm helper_sum_int_if
-      by (smt (verit, ccfv_SIG) Diff_insert_absorb \<open>x \<in> set xs\<close> mk_disjoint_insert sum.cong) 
-    have "?l = f x + (\<Sum>x\<in>set xs. (int (count_list xs x)) * f x)" by (simp add: Cons.IH)
-    also have "set xs = insert x (set xs - {x})" using \<open>x \<in> set xs\<close>by blast
-    also have "f x + (\<Sum>x\<in>insert x (set xs - {x}). (int (count_list xs x)) * f x) = ?r"
-      apply(simp add: sum.insert_remove XXX)
-      by (simp add: mult.commute ring_class.ring_distribs(1))
-    finally show ?thesis .
-  next
-    assume "x \<notin> set xs"
-    hence "\<And>xa. xa \<in> set xs \<Longrightarrow> x \<noteq> xa" by blast
-    thus ?thesis by (simp add: Cons.IH \<open>x \<notin> set xs\<close>)
-  qed
-qed simp
-
-
-
-  thm sum.remove
-lemma sum_swap_a: "finite P \<Longrightarrow> a \<notin> P \<Longrightarrow> b \<in> P \<Longrightarrow> sum (swap a b f) P = f a + sum f (P - {b})"
-  apply(subst sum.remove[of P b])
-  by(simp_all add: swap_b sum_swap_none)
   
-  
-lemma count_list_distinct: "distinct P \<Longrightarrow> x \<in> set P \<Longrightarrow> count_list P x = 1"
-  apply(induction P)
-   apply(simp; fail)
-  by(auto)
-lemma sum_list_swap: "p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Longrightarrow> distinct P \<Longrightarrow>
-        sum_list (map (swap p1 p2 f) P) = sum_list (map (f::'a\<Rightarrow>int) P)"
-  apply(simp add: sum_list_map_eq_sum_count_int)
-  apply(simp add: count_list_distinct)
-  thm sum.cong
-  apply(induction P arbitrary: p1 p2)
-   apply(simp)
-  apply(simp)
-  apply(elim disjE)
-     apply(simp_all)
-    apply(simp add: swap_a sum_swap_a sum.remove[symmetric]; fail)
-   apply(simp add: swap_symmetric swap_a sum_swap_a sum.remove[symmetric]; fail)
-  apply(rule swap_nothing)
-  by auto
-  
-  lemma gesamtbesitz_swap:
-    "gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt"
-    apply(cases welt, simp)
-    apply(rule sum_list_swap)
-    using enum_class.in_enum enum_class.enum_distinct by auto
 
-
+(*<*)
   lemma globaler_fortschritt_kommutiert:
     "wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
     by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwelt_personen_swap_sym)
@@ -509,7 +455,7 @@ lemma sum_list_swap: "p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Longrigh
   lemma globaler_fortschritt_unbeteiligt2:
     "wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
     by(simp add: wpsm_unbeteiligt2_def gesamtbesitz_swap)
-    
+(*>*)
   
   theorem "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
           (Maxime (\<lambda>ich::person. globaler_fortschritt))"
@@ -519,12 +465,6 @@ lemma sum_list_swap: "p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Longrigh
      apply(simp add: globaler_fortschritt_unbeteiligt2; fail)
     apply(simp add: zahlenwelt_personen_swap_sym)
     done
-
-
-lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
-  by(cases h, simp)
-lemma nachher_handeln: "nachher (handeln p welt (HandlungF h)) = h p welt"
-  by(simp)
 
 
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>

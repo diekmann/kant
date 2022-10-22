@@ -1,5 +1,5 @@
 theory Swap
-imports Main
+imports Main Helper
 begin
 
 section\<open>Swap\<close>
@@ -31,5 +31,25 @@ lemma sum_swap_none: "a \<notin> P \<Longrightarrow> b \<notin> P \<Longrightarr
 lemma swap_nothing: "a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a"
   by(simp add: swap_def)
 
+
+thm sum.remove
+lemma sum_swap_a: "finite P \<Longrightarrow> a \<notin> P \<Longrightarrow> b \<in> P \<Longrightarrow> sum (swap a b f) P = f a + sum f (P - {b})"
+  apply(subst sum.remove[of P b])
+  by(simp_all add: swap_b sum_swap_none)
+
+lemma sum_list_swap: "p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Longrightarrow> distinct P \<Longrightarrow>
+        sum_list (map (swap p1 p2 f) P) = sum_list (map (f::'a\<Rightarrow>int) P)"
+  apply(simp add: sum_list_map_eq_sum_count_int)
+  apply(simp add: count_list_distinct)
+  thm sum.cong
+  apply(induction P arbitrary: p1 p2)
+   apply(simp)
+  apply(simp)
+  apply(elim disjE)
+     apply(simp_all)
+    apply(simp add: swap_a sum_swap_a sum.remove[symmetric]; fail)
+   apply(simp add: swap_symmetric swap_a sum_swap_a sum.remove[symmetric]; fail)
+  apply(rule swap_nothing)
+  by auto
 
 end
