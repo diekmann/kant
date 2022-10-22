@@ -9,34 +9,34 @@ section\<open>Beispiel: Zahlenwelt\<close>
   
   Der Besitz ist als ganze Zahl \<^typ>\<open>int\<close> modelliert und kann auch beliebig negativ werden.\<close>
   datatype zahlenwelt = Zahlenwelt
-    "person \<Rightarrow> int \<comment> \<open>besitz: Besitz jeder Person.\<close>"
+    \<open>person \<Rightarrow> int \<comment> \<open>besitz: Besitz jeder Person.\<close>\<close>
   
-  fun gesamtbesitz :: "zahlenwelt \<Rightarrow> int" where
-    "gesamtbesitz (Zahlenwelt besitz) = sum_list (map besitz Enum.enum)"
+  fun gesamtbesitz :: \<open>zahlenwelt \<Rightarrow> int\<close> where
+    \<open>gesamtbesitz (Zahlenwelt besitz) = sum_list (map besitz Enum.enum)\<close>
 
-  lemma "gesamtbesitz (Zahlenwelt besitz) = (\<Sum>p\<leftarrow>[Alice,Bob,Carol,Eve]. besitz p)"
+  lemma \<open>gesamtbesitz (Zahlenwelt besitz) = (\<Sum>p\<leftarrow>[Alice,Bob,Carol,Eve]. besitz p)\<close>
     by(simp add: enum_person_def)
   
   
-  lemma "gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12" by eval
-  lemma "gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8" by eval
+  lemma \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12\<close> by eval
+  lemma \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8\<close> by eval
 
   
-  fun meins :: "person \<Rightarrow> zahlenwelt \<Rightarrow> int" where
-    "meins p (Zahlenwelt besitz) = besitz p"
+  fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> where
+    \<open>meins p (Zahlenwelt besitz) = besitz p\<close>
   
-  lemma "meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4" by eval
+  lemma \<open>meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4\<close> by eval
   
   (*<*)
-  definition "show_zahlenwelt w \<equiv> case w of Zahlenwelt besitz \<Rightarrow> show_num_fun besitz"
-  fun delta_zahlenwelt :: "(zahlenwelt, person, int) delta" where
-    "delta_zahlenwelt (Handlung (Zahlenwelt vor_besitz) (Zahlenwelt nach_besitz)) =
-        Aenderung.delta_num_fun (Handlung vor_besitz nach_besitz)"
+  definition \<open>show_zahlenwelt w \<equiv> case w of Zahlenwelt besitz \<Rightarrow> show_num_fun besitz\<close>
+  fun delta_zahlenwelt :: \<open>(zahlenwelt, person, int) delta\<close> where
+    \<open>delta_zahlenwelt (Handlung (Zahlenwelt vor_besitz) (Zahlenwelt nach_besitz)) =
+        Aenderung.delta_num_fun (Handlung vor_besitz nach_besitz)\<close>
   (*>*)
 
 
-  fun zahlenwelt_personen_swap :: "person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "zahlenwelt_personen_swap p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)"
+  fun zahlenwelt_personen_swap :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>zahlenwelt_personen_swap p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)\<close>
   
   lemma \<open>zahlenwelt_personen_swap Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
     = (Zahlenwelt \<^url>[Alice := 8, Bob := 6, Carol := 4])\<close>
@@ -44,16 +44,16 @@ section\<open>Beispiel: Zahlenwelt\<close>
 
   (*<*)
   lemma zahlenwelt_personen_swap_sym:
-    "zahlenwelt_personen_swap p1 p2 welt = zahlenwelt_personen_swap p2 p1 welt"
-    by(cases welt, simp add: swap_symmetric)
+    \<open>zahlenwelt_personen_swap p1 p2 welt = zahlenwelt_personen_swap p2 p1 welt\<close>
+    by(cases \<open>welt\<close>, simp add: swap_symmetric)
 
-  lemma zahlenwelt_personen_swap_id: "zahlenwelt_personen_swap p p w = w"
-    by(cases w, simp)
+  lemma zahlenwelt_personen_swap_id: \<open>zahlenwelt_personen_swap p p w = w\<close>
+    by(cases \<open>w\<close>, simp)
 
 
   lemma gesamtbesitz_swap:
-    "gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt"
-    apply(cases welt, simp)
+    \<open>gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt\<close>
+    apply(cases \<open>welt\<close>, simp)
     apply(rule sum_list_swap)
     using enum_class.in_enum enum_class.enum_distinct by auto
   (*>*)
@@ -61,43 +61,43 @@ section\<open>Beispiel: Zahlenwelt\<close>
 subsection\<open>Handlungen\<close>
 
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
-  fun erschaffen :: "nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (erschaffen n))"
+  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (erschaffen n))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI, case_tac welt, simp)
+    apply(intro allI, case_tac \<open>welt\<close>, simp)
     apply(simp add: swap_def)
     done
   
-  fun stehlen :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "stehlen beute opfer dieb (Zahlenwelt besitz) =
-        Zahlenwelt (besitz(opfer -= beute)(dieb += beute))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap
-    (Zahlenwelt (\<lambda>x. 0)) (HandlungF (stehlen n p))"
+  fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
+        Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap
+    (Zahlenwelt (\<lambda>x. 0)) (HandlungF (stehlen n p))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     oops (*MIST. Aber okay, die Handlung diskriminiert!*)
 
 (*TODO: Handlung stehlen, aber opfer wird nach Besitz ausgesucht, nicht nach namen.*)
-  fun stehlen2 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "stehlen2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
-        Zahlenwelt (besitz((THE opfer. besitz opfer = opfer_nach_besitz) -= beute)(dieb += beute))"
-  lemma "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen2 n p))"
+  fun stehlen2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>stehlen2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+        Zahlenwelt (besitz((THE opfer. besitz opfer = opfer_nach_besitz) -= beute)(dieb += beute))\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen2 n p))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI, case_tac welt, simp)
+    apply(intro allI, case_tac \<open>welt\<close>, simp)
     oops (*TODO. THE. ist etwas hart, evtl sollte ich das als Liste implementieren.
   wird eh nix wegen nichtdeterminismus*)
 
-fun opfer_nach_besitz_auswaehlen :: "int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option" where
-  "opfer_nach_besitz_auswaehlen _ _ [] = None"
-| "opfer_nach_besitz_auswaehlen b besitz (p#ps) = 
-    (if besitz p = b then Some p else opfer_nach_besitz_auswaehlen b besitz ps)"
+fun opfer_nach_besitz_auswaehlen :: \<open>int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option\<close> where
+  \<open>opfer_nach_besitz_auswaehlen _ _ [] = None\<close>
+| \<open>opfer_nach_besitz_auswaehlen b besitz (p#ps) = 
+    (if besitz p = b then Some p else opfer_nach_besitz_auswaehlen b besitz ps)\<close>
 
-fun stehlen3 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "stehlen3 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+fun stehlen3 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>stehlen3 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
       (case opfer_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
          of None \<Rightarrow> (Zahlenwelt besitz)
           | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
-      )"
+      )\<close>
 value\<open>map_handlung show_zahlenwelt
       (handeln Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
               (HandlungF (stehlen3 3 10)))\<close>
@@ -114,19 +114,19 @@ value\<open>map_handlung show_zahlenwelt
 value\<open>map_handlung show_zahlenwelt
       (handeln Carol (Zahlenwelt \<^url>[Alice := -3, Bob := 10, Carol := 10])
               (HandlungF (stehlen3 3 10)))\<close>
-lemma "\<not>wohlgeformte_handlungsabsicht
-    zahlenwelt_personen_swap (Zahlenwelt (\<lambda>x. 0)) (HandlungF (stehlen3 (1) 0))"
+lemma \<open>\<not>wohlgeformte_handlungsabsicht
+    zahlenwelt_personen_swap (Zahlenwelt (\<lambda>x. 0)) (HandlungF (stehlen3 (1) 0))\<close>
   by(eval)
 
 
 
 
-fun stehlen4 :: "int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
       (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
          of None \<Rightarrow> (Zahlenwelt besitz)
           | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
-      )"
+      )\<close>
 value\<open>map_handlung show_zahlenwelt
       (handeln Alice (Zahlenwelt \<^url>[Alice := 8, Bob := 10, Carol := -3])
               (HandlungF (stehlen4 3 10)))\<close>
@@ -146,9 +146,9 @@ value\<open>map_handlung show_zahlenwelt
 
   (*WUHUUUUU*)
 lemma wohlgeformte_handlungsabsicht_stehlen4:
-  "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))"
+  \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI, case_tac welt, simp)
+    apply(intro allI, case_tac \<open>welt\<close>, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
     apply(simp add: the_single_elem)
@@ -157,125 +157,125 @@ lemma wohlgeformte_handlungsabsicht_stehlen4:
     by (simp add: fun_upd_twist swap_def)
 
 
-  fun schenken :: "int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "schenken betrag empfaenger schenker (Zahlenwelt besitz) =
-        Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag))"
+  fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>schenken betrag empfaenger schenker (Zahlenwelt besitz) =
+        Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag))\<close>
   
   text\<open>Da wir ganze Zahlen verwenden und der Besitz auch beliebig negativ werden kann,
   ist Stehlen äquivalent dazu einen negativen Betrag zu verschenken:\<close>
-  lemma stehlen_ist_schenken: "stehlen i = schenken (-i)"
+  lemma stehlen_ist_schenken: \<open>stehlen i = schenken (-i)\<close>
     apply(simp add: fun_eq_iff)
-    apply(intro allI, rename_tac p1 p2 welt, case_tac welt)
+    apply(intro allI, rename_tac p1 p2 welt, case_tac \<open>welt\<close>)
     by auto
   
   text\<open>Das Modell ist nicht ganz perfekt, .... Aber passt schon um damit zu spielen.\<close>
 
 
   text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
-  fun reset :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt" where
-    "reset ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. 0)"
+  fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>reset ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. 0)\<close>
 
   (*TODO: eigentlich keine gute handlung, aber fuer einen verschuldeten egoisten gut.*)
 
 
 subsection\<open>Setup\<close>
   text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
-  definition "initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3]"
+  definition \<open>initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3]\<close>
   
   text\<open>Wir nehmen an unsere handelnde Person ist \<^const>\<open>Alice\<close>.\<close>
   
-  definition "beispiel_case_law_absolut maxime handlungsabsicht \<equiv>
+  definition \<open>beispiel_case_law_absolut maxime handlungsabsicht \<equiv>
     simulateOne
       (SimConsts
         Alice
         maxime
         (printable_case_law_ableiten_absolut show_zahlenwelt))
-      5 handlungsabsicht initialwelt (Gesetz {})"
-  definition "beispiel_case_law_relativ maxime handlungsabsicht \<equiv>
+      5 handlungsabsicht initialwelt (Gesetz {})\<close>
+  definition \<open>beispiel_case_law_relativ maxime handlungsabsicht \<equiv>
     simulateOne
       (SimConsts
         Alice
         maxime
         (case_law_ableiten_relativ delta_zahlenwelt))
-      10 handlungsabsicht initialwelt (Gesetz {})"
+      10 handlungsabsicht initialwelt (Gesetz {})\<close>
 
 subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
 
   text\<open>Wir definieren eine Maxime die besagt,
   dass sich der Besitz einer Person nicht verringern darf:\<close>
-  fun individueller_fortschritt :: "person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool" where
-    "individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) \<le> (meins p nach)"
-  definition maxime_zahlenfortschritt :: "(person, zahlenwelt) maxime" where
-    "maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)"
+  fun individueller_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
+    \<open>individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) \<le> (meins p nach)\<close>
+  definition maxime_zahlenfortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
+    \<open>maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)\<close>
 
 
-lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (erschaffen 5)) p"
+lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (erschaffen 5)) p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
-  apply(case_tac w1, case_tac w2, simp)
+  apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
   done
 
-lemma "maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) p"
+lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
-  apply(case_tac w1, case_tac w2, simp)
+  apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
   done
 
   text\<open>In jeder Welt ist die Handlung \<^const>\<open>moralisch\<close>:\<close>
-  lemma "moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))"
-    apply(cases welt)
+  lemma \<open>moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))\<close>
+    apply(cases \<open>welt\<close>)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
 
   (*AWESOME!*)
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt nicht den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen würde.\<close>
-  lemma "\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt"
+  lemma \<open>\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt\<close>
     apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
-    apply(rule_tac x="HandlungF (stehlen4 1 10)" in exI)
+    apply(rule_tac x=\<open>HandlungF (stehlen4 1 10)\<close> in exI)
     apply(simp add: wohlgeformte_handlungsabsicht_stehlen4 maxime_und_handlungsabsicht_generalisieren_def)
     apply(intro conjI)
-     apply(rule_tac x=Alice in exI)
+     apply(rule_tac x=\<open>Alice\<close> in exI)
      apply(intro conjI allI)
-      apply(case_tac w1, case_tac w2, simp)
+      apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
-    apply(case_tac "the_single_elem {p. x p = 10}", simp)
-       apply(case_tac "the_single_elem {p. xa p = 10}")
+    apply(case_tac \<open>the_single_elem {p. x p = 10}\<close>, simp)
+       apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
     apply(simp; fail)
-       apply(case_tac "the_single_elem {p. xa p = 10}")
+       apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
         apply(simp; fail)
        apply(simp; fail)
       apply(simp)
-       apply(case_tac "the_single_elem {p. xa p = 10}")
+       apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
         apply(simp; fail)
       apply(simp; fail)
     apply(simp add: initialwelt_def, eval)
 
-    apply(rule_tac x=Bob in exI)
-    apply(rule_tac x=Alice in exI)
+    apply(rule_tac x=\<open>Bob\<close> in exI)
+    apply(rule_tac x=\<open>Alice\<close> in exI)
     apply(simp add: initialwelt_def, eval)
     done
 
-lemma hlp1: "meins p1 (zahlenwelt_personen_swap p1 p2 welt) = meins p2 welt"
-  by(cases welt, simp add: swap_def)
-lemma hlp2: "meins p2 (zahlenwelt_personen_swap p1 p2 welt) = meins p1 welt"
-  by(cases welt, simp add: swap_def)
+lemma hlp1: \<open>meins p1 (zahlenwelt_personen_swap p1 p2 welt) = meins p2 welt\<close>
+  by(cases \<open>welt\<close>, simp add: swap_def)
+lemma hlp2: \<open>meins p2 (zahlenwelt_personen_swap p1 p2 welt) = meins p1 welt\<close>
+  by(cases \<open>welt\<close>, simp add: swap_def)
 
-lemma hlp3: "p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
-       meins p (zahlenwelt_personen_swap p1 p2 welt) = meins p welt"
-  by(cases welt, simp add: swap_def)
+lemma hlp3: \<open>p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+       meins p (zahlenwelt_personen_swap p1 p2 welt) = meins p welt\<close>
+  by(cases \<open>welt\<close>, simp add: swap_def)
 
-lemma "wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwelt_personen_swap welt"
+lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwelt_personen_swap welt\<close>
   by(simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym)
 
 
 (*TODO: Diese Maxime braucht einen Namen!*)
-lemma "wpsm_kommutiert
+lemma \<open>wpsm_kommutiert
          (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
-         zahlenwelt_personen_swap welt"
+         zahlenwelt_personen_swap welt\<close>
   apply(simp add: wpsm_kommutiert_def)
   apply(safe)
-   apply(case_tac "p1 = p2")
+   apply(case_tac \<open>p1 = p2\<close>)
     apply(simp add: zahlenwelt_personen_swap_id; fail)
-   apply(case_tac "pX = p1")
+   apply(case_tac \<open>pX = p1\<close>)
     apply(simp)
     apply (metis hlp1 zahlenwelt_personen_swap_sym)
    apply (metis hlp2 hlp3 zahlenwelt_personen_swap_sym)
@@ -283,8 +283,8 @@ lemma "wpsm_kommutiert
   
 
 (*AWESOME!*)
-  lemma "kategorischer_imperativ zahlenwelt_personen_swap welt
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
+  lemma \<open>kategorischer_imperativ zahlenwelt_personen_swap welt
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))\<close>
     apply(rule altruistische_maxime_katimp)
        apply (simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym; fail)
       apply (simp add: wpsm_unbeteiligt1_def hlp3; fail)
@@ -339,8 +339,8 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
   Was wenn wir nun echten Fortschritt fordern:
    \<^term>\<open>(meins p nach) > (meins p vor)\<close>.\<close>
   
-  fun individueller_strikter_fortschritt :: "person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool" where
-    "individueller_strikter_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) < (meins p nach)"
+  fun individueller_strikter_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
+    \<open>individueller_strikter_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) < (meins p nach)\<close>
 
   text\<open>Nun ist es \<^const>\<open>Alice\<close> verboten Wohlstand für sich selbst zu erzeugen.\<close>
   lemma \<open>beispiel_case_law_relativ
@@ -350,9 +350,9 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
     by eval
     
   text\<open>In keiner Welt ist die Handlung nun \<^const>\<open>moralisch\<close>:\<close>
-lemma "\<not> moralisch welt
-          (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5))"
-    apply(cases welt)
+lemma \<open>\<not> moralisch welt
+          (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5))\<close>
+    apply(cases \<open>welt\<close>)
     by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
   text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des
@@ -374,8 +374,8 @@ lemma "\<not> moralisch welt
 subsection\<open>Maxime für Globales Optimum\<close>
   text\<open>Wir bauen nun eine Maxime, die das Individuum vernachlässigt und nur nach dem
   globalen Optimum strebt:\<close>
-  fun globaler_strikter_fortschritt :: "zahlenwelt handlung \<Rightarrow> bool" where
-    "globaler_strikter_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) < (gesamtbesitz nach)"
+  fun globaler_strikter_fortschritt :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close> where
+    \<open>globaler_strikter_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) < (gesamtbesitz nach)\<close>
   
   text\<open>Die Maxime ignoriert das \<^term>\<open>ich :: person\<close> komplett.
   
@@ -388,8 +388,8 @@ subsection\<open>Maxime für Globales Optimum\<close>
     by eval
 
 
-  lemma "moralisch initialwelt
-          (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (HandlungF (erschaffen 5))"
+  lemma \<open>moralisch initialwelt
+          (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (HandlungF (erschaffen 5))\<close>
   by(eval)
     
     
@@ -410,8 +410,8 @@ subsection\<open>Maxime für Globales Optimum\<close>
     by eval
 
   text\<open>Wir können die Maxime für globalen Fortschritt etwas lockern:\<close>
-  fun globaler_fortschritt :: "zahlenwelt handlung \<Rightarrow> bool" where
-   "globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) \<le> (gesamtbesitz nach)"
+  fun globaler_fortschritt :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close> where
+   \<open>globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) \<le> (gesamtbesitz nach)\<close>
 
   text\<open>Untätigkeit ist nun auch hier erlaubt:\<close>
   lemma\<open>beispiel_case_law_relativ
@@ -428,37 +428,37 @@ eine Person also Opfer hardzucoden muss aber gehen.
 HandlungF (stehlen 5 Bob)
 sollte eine wohlgeformte Handlungsabsicht sein.
 *)
-lemma "\<not>wohlgeformte_handlungsabsicht
+lemma \<open>\<not>wohlgeformte_handlungsabsicht
   zahlenwelt_personen_swap initialwelt
-  (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))"
+  (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
   apply(simp add: initialwelt_def wohlgeformte_handlungsabsicht_def swap_def)
   apply(eval)
   done
 
 
-lemma "\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt
-        (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))) Carol"
+lemma \<open>\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt
+        (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))) Carol\<close>
   apply(simp add: maxime_zahlenfortschritt_def maxime_und_handlungsabsicht_generalisieren_def)
-  apply(rule_tac x="Zahlenwelt (\<lambda>_. -1)" in exI, simp)
-  apply(rule_tac x="Zahlenwelt (\<lambda>_. 1)" in exI, simp)
+  apply(rule_tac x=\<open>Zahlenwelt (\<lambda>_. -1)\<close> in exI, simp)
+  apply(rule_tac x=\<open>Zahlenwelt (\<lambda>_. 1)\<close> in exI, simp)
   done
 
   
 
 (*<*)
   lemma globaler_fortschritt_kommutiert:
-    "wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+    \<open>wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt\<close>
     by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwelt_personen_swap_sym)
   lemma globaler_fortschritt_unbeteiligt1:
-    "wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+    \<open>wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt\<close>
     by(simp add: wpsm_unbeteiligt1_def gesamtbesitz_swap)
   lemma globaler_fortschritt_unbeteiligt2:
-    "wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt"
+    \<open>wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt\<close>
     by(simp add: wpsm_unbeteiligt2_def gesamtbesitz_swap)
 (*>*)
   
-  theorem "kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
-          (Maxime (\<lambda>ich::person. globaler_fortschritt))"
+  theorem \<open>kategorischer_imperativ zahlenwelt_personen_swap (Zahlenwelt besitz)
+          (Maxime (\<lambda>ich::person. globaler_fortschritt))\<close>
     apply(rule globale_maxime_katimp)
        apply(simp add: globaler_fortschritt_kommutiert; fail)
       apply(simp add: globaler_fortschritt_unbeteiligt1; fail)
@@ -486,8 +486,8 @@ subsection\<open>Alice stiehlt 5\<close>
     by eval
 
   text\<open>In kein Welt ist Stehlen \<^const>\<open>moralisch\<close>:\<close>
-  lemma "\<not> moralisch welt maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob))"
-    apply(cases welt)
+  lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob))\<close>
+    apply(cases \<open>welt\<close>)
     by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
   
   text\<open>Auch wenn \<^const>\<open>Alice\<close> von sich selbst stehlen möchte ist dies verboten,
@@ -557,10 +557,10 @@ subsection\<open>Ungültige Maxime\<close>
   Beispielsweise könnten wir \<^const>\<open>individueller_fortschritt\<close> nicht mehr parametrisiert verwenden,
   sondern einfach \<^const>\<open>Alice\<close> reinschreiben:
   \<close>
-  lemma "individueller_fortschritt Alice
-    = (\<lambda>h. case h of Handlung vor nach \<Rightarrow> (meins Alice vor) \<le> (meins Alice nach))"
+  lemma \<open>individueller_fortschritt Alice
+    = (\<lambda>h. case h of Handlung vor nach \<Rightarrow> (meins Alice vor) \<le> (meins Alice nach))\<close>
     apply(simp add: fun_eq_iff)
-    apply(intro allI, rename_tac h, case_tac h)
+    apply(intro allI, rename_tac h, case_tac \<open>h\<close>)
     apply(simp)
     done
   text\<open>Dies würde es erlauben, dass \<^const>\<open>Alice\<close> Leute bestehlen darf:\<close>

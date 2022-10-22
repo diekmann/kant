@@ -97,8 +97,8 @@ text\<open>
 Wir haben mit der goldenen Regel bereits definiert, 
 wann für eine gegebene Welt und eine gegebene maxime, eine Handlungsabsicht moralisch ist:
 
- \<^item> @{term_type \<open>moralisch :: 
-     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>}
+ \<^item> \<^term_type>\<open>moralisch :: 
+     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
 
 Effektiv testet die goldene Regel eine Handlungsabsicht.
 
@@ -194,17 +194,17 @@ text\<open>WOW:
 
 Die Maxime die keine Handlung erlaubt (weil immer False) erfüllt den kategorischen
 Imperativ\<close>
-lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. False))"
+lemma \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. False))\<close>
   by(simp)
 
-lemma "\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h"
+lemma \<open>\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h\<close>
   by(simp add: moralisch_simp)
 
 
-lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. True))"
+lemma \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. True))\<close>
   by(simp add: moralisch_simp)
 
-lemma "moralisch welt (Maxime (\<lambda>ich h. True)) h"
+lemma \<open>moralisch welt (Maxime (\<lambda>ich h. True)) h\<close>
   by(simp add: moralisch_simp)
 
 (*
@@ -230,19 +230,19 @@ Handlung fuer mich okay == m ich (handeln ich welt h)
 *)
 
 
-lemma "kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
+lemma \<open>kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
   maxime_und_handlungsabsicht_generalisieren m h ich \<Longrightarrow>
-  okay m ich (handeln ich welt h) \<Longrightarrow> moralisch welt m h"
+  okay m ich (handeln ich welt h) \<Longrightarrow> moralisch welt m h\<close>
   apply(simp)
   by auto
 
 lemma kategorischer_imperativI:
-  "(\<And>h p1 p2 p. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
+  \<open>(\<And>h p1 p2 p. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
    maxime_und_handlungsabsicht_generalisieren m h p \<Longrightarrow>
    okay m p (handeln p welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
    )
- \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m"
+ \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m\<close>
   by(auto simp add: moralisch_simp)
 
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
@@ -250,15 +250,15 @@ lemma kategorischer_imperativI:
 text\<open>Wenn eine Maxime jede Handlungsabsicht als morlaisch bewertet
 erfüllt diese Maxime den kategorischen Imperativ.
 Da diese Maxime jede Handlung erlaubt, ist es dennoch eine wohl ungeeignete Maxime.\<close>
-lemma "\<forall>h. moralisch welt maxime h \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt maxime"
-  apply(cases maxime, rename_tac m)
+lemma \<open>\<forall>h. moralisch welt maxime h \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt maxime\<close>
+  apply(cases \<open>maxime\<close>, rename_tac m)
   by(simp add: moralisch_simp)
 
 
 text\<open>Eine Maxime die das ich und die Handlung ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
 lemma blinde_maxime_katimp:
-  "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. \<forall>p. m p))"
+  \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. \<forall>p. m p))\<close>
   apply(rule kategorischer_imperativI)
   by(simp add: maxime_und_handlungsabsicht_generalisieren_def)
 
@@ -337,64 +337,64 @@ theorem altruistische_maxime_katimp:
 *)
 
 theorem altruistische_maxime_katimp:
-  fixes P :: "'person \<Rightarrow> 'world handlung \<Rightarrow> bool"
-  assumes kom: "wpsm_kommutiert (Maxime P) welt_personen_swap welt"
-      and unrel1: "wpsm_unbeteiligt1 (Maxime P) welt_personen_swap welt"
-      and unrel2: "wpsm_unbeteiligt2 (Maxime P) welt_personen_swap welt"
+  fixes P :: \<open>'person \<Rightarrow> 'world handlung \<Rightarrow> bool\<close>
+  assumes kom: \<open>wpsm_kommutiert (Maxime P) welt_personen_swap welt\<close>
+      and unrel1: \<open>wpsm_unbeteiligt1 (Maxime P) welt_personen_swap welt\<close>
+      and unrel2: \<open>wpsm_unbeteiligt2 (Maxime P) welt_personen_swap welt\<close>
       and welt_personen_swap_sym:
-        "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
-  shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))"
+        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
+  shows \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))\<close>
 proof(rule kategorischer_imperativI, simp, intro allI)
-  fix ha :: "('person, 'world) handlungF"
-  and p1 p2 p :: 'person
-  assume wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-     and mhg: "maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha p"
-     and okayp: "\<forall>pX. P pX (handeln p welt ha)"
+  fix ha :: \<open>('person, 'world) handlungF\<close>
+  and p1 p2 p :: \<open>'person\<close>
+  assume wfh: \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt ha\<close>
+     and mhg: \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha p\<close>
+     and okayp: \<open>\<forall>pX. P pX (handeln p welt ha)\<close>
 
-  obtain h where h: "ha = HandlungF h"
-    by(cases ha, blast)
+  obtain h where h: \<open>ha = HandlungF h\<close>
+    by(cases \<open>ha\<close>, blast)
 
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
-  have 1: "h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))"
+  have 1: \<open>h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))\<close>
     by simp
   from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
   have 2:
-  "\<forall>pX. P pX (handeln p (welt_personen_swap p2 p welt) ha)"
+  \<open>\<forall>pX. P pX (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(auto simp add: h)
   from okayp[simplified h] 2
   have 4:
-    "P p (handeln p (welt_personen_swap p2 p welt) ha)"
+    \<open>P p (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(simp)
 
-  show "P p1 (handeln p2 welt ha)"
-  proof(cases "p = p2")
+  show \<open>P p1 (handeln p2 welt ha)\<close>
+  proof(cases \<open>p = p2\<close>)
     case True
-    then show ?thesis
+    then show \<open>?thesis\<close>
       using okayp by auto 
   next
     case False
-    assume "p \<noteq> p2"
-    then show ?thesis
-    proof(cases "p1 = p")
+    assume \<open>p \<noteq> p2\<close>
+    then show \<open>?thesis\<close>
+    proof(cases \<open>p1 = p\<close>)
       case True
-      assume "p1 = p"
-      with 4[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] show ?thesis
+      assume \<open>p1 = p\<close>
+      with 4[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] show \<open>?thesis\<close>
         apply(simp add: h 1)
         using 2[simplified handeln.simps h] welt_personen_swap_sym by fastforce
     next
       case False
-      assume "p1 \<noteq> p"
-      show ?thesis
-      proof(cases "p1 = p2")
+      assume \<open>p1 \<noteq> p\<close>
+      show \<open>?thesis\<close>
+      proof(cases \<open>p1 = p2\<close>)
         case True
-        with 4 kom[simplified wpsm_kommutiert_def okay.simps] show ?thesis
+        with 4 kom[simplified wpsm_kommutiert_def okay.simps] show \<open>?thesis\<close>
           apply(simp)
           apply(simp add: h 1)
           using welt_personen_swap_sym by fastforce
       next
         case False
-        assume "p1 \<noteq> p2"
-        with \<open>p \<noteq> p2\<close> \<open>p1 \<noteq> p\<close> show ?thesis
+        assume \<open>p1 \<noteq> p2\<close>
+        with \<open>p \<noteq> p2\<close> \<open>p1 \<noteq> p\<close> show \<open>?thesis\<close>
         using unrel1[simplified wpsm_unbeteiligt1_def]
            unrel2[simplified wpsm_unbeteiligt2_def]
         apply(simp)
@@ -407,44 +407,44 @@ qed
 
 text\<open>Maxime welche das ich ignoriert, also nur die Handlung global betrachtet.\<close>
 theorem globale_maxime_katimp:
-  fixes P :: "'world handlung \<Rightarrow> bool"
-  assumes kom: "wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt"
-      and unrel1: "wpsm_unbeteiligt1 (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt"
-      and unrel2: "wpsm_unbeteiligt2 (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt"
+  fixes P :: \<open>'world handlung \<Rightarrow> bool\<close>
+  assumes kom: \<open>wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
+      and unrel1: \<open>wpsm_unbeteiligt1 (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
+      and unrel2: \<open>wpsm_unbeteiligt2 (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
       and welt_personen_swap_sym:
-        "\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt"
-  shows "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich::'person. P))"
+        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
+  shows \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich::'person. P))\<close>
 proof(rule kategorischer_imperativI, simp)
-  fix ha :: "('person, 'world) handlungF"
-  and p2 p :: 'person
-  assume wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-     and mhg: "maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich. P)) ha p"
-     and okayp: "P (handeln p welt ha)"
+  fix ha :: \<open>('person, 'world) handlungF\<close>
+  and p2 p :: \<open>'person\<close>
+  assume wfh: \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt ha\<close>
+     and mhg: \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich. P)) ha p\<close>
+     and okayp: \<open>P (handeln p welt ha)\<close>
 
-  obtain h where h: "ha = HandlungF h"
-    by(cases ha, blast)
+  obtain h where h: \<open>ha = HandlungF h\<close>
+    by(cases \<open>ha\<close>, blast)
 
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
-  have 1: "h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))"
+  have 1: \<open>h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))\<close>
     by simp
   from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
   have 2:
-  "P (handeln p (welt_personen_swap p2 p welt) ha)"
+  \<open>P (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(auto simp add: h)
   from okayp[simplified h] 2
   have 4:
-    "P (handeln p (welt_personen_swap p2 p welt) ha)"
+    \<open>P (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(simp)
 
-  show "P (handeln p2 welt ha)"
-  proof(cases "p = p2")
+  show \<open>P (handeln p2 welt ha)\<close>
+  proof(cases \<open>p = p2\<close>)
     case True
-    then show ?thesis
+    then show \<open>?thesis\<close>
       using okayp by auto 
   next
     case False
-    assume "p \<noteq> p2"
-    with 1[simplified handeln.simps h] 4[simplified handeln.simps h] show ?thesis
+    assume \<open>p \<noteq> p2\<close>
+    with 1[simplified handeln.simps h] 4[simplified handeln.simps h] show \<open>?thesis\<close>
       apply(simp add: h)
       using kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym by fastforce
   qed

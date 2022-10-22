@@ -23,8 +23,8 @@ lemma \<open>(\<lambda>h::ereal handlung. case h of Handlung vor nach \<Rightarr
 lemma \<open>(\<lambda>h::ereal handlung. case h of Handlung vor nach \<Rightarrow> nach - vor) (Handlung 3 (-\<infinity>)) = -\<infinity>\<close>
   by simp
 
-definition moralisch_richtig :: "'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool" where
-  "moralisch_richtig glueck_messen handlung \<equiv> (glueck_messen handlung) \<ge> 0"
+definition moralisch_richtig :: \<open>'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool\<close> where
+  \<open>moralisch_richtig glueck_messen handlung \<equiv> (glueck_messen handlung) \<ge> 0\<close>
 
 subsection\<open>Goldene Regel und Utilitarismus im Einklang\<close>
 text\<open>
@@ -34,16 +34,16 @@ in die Verantwortungsethik des Utilitarismus übersetzen lässt.
 
 (*TODO: das ist die goldene Regel? Kant braucht \<forall>Maxime.*)
 definition goldene_regel_als_gesinnungsethik
-  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool"
+  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
 where
-  "goldene_regel_als_gesinnungsethik maxime handlungsabsicht \<equiv>
-    \<forall>welt. moralisch welt maxime handlungsabsicht"
+  \<open>goldene_regel_als_gesinnungsethik maxime handlungsabsicht \<equiv>
+    \<forall>welt. moralisch welt maxime handlungsabsicht\<close>
 
 definition utilitarismus_als_verantwortungsethik
-  :: "'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool"
+  :: \<open>'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool\<close>
 where
-  "utilitarismus_als_verantwortungsethik glueck_messen handlung \<equiv>
-    moralisch_richtig glueck_messen handlung"
+  \<open>utilitarismus_als_verantwortungsethik glueck_messen handlung \<equiv>
+    moralisch_richtig glueck_messen handlung\<close>
 
 
 
@@ -57,20 +57,20 @@ fordern wir einfach, dass die Maxime für aller Personen erfüllt sein muss.\<cl
 (*TODO: gegen moralisch beweisen?
 und erklaeren! Warum \<forall>
 Macht eine maxime unabhängig von der person*)
-fun maximeNeutralisieren :: "('person, 'world) maxime \<Rightarrow> ('world handlung \<Rightarrow> bool)" where
-  "maximeNeutralisieren (Maxime m) = (\<lambda>welt. \<forall>p::'person. m p welt)"
+fun maximeNeutralisieren :: \<open>('person, 'world) maxime \<Rightarrow> ('world handlung \<Rightarrow> bool)\<close> where
+  \<open>maximeNeutralisieren (Maxime m) = (\<lambda>welt. \<forall>p::'person. m p welt)\<close>
 
 
 text\<open>
 Nun übersetzen wir eine maxime in die \<^typ>\<open>'world glueck_messen\<close> Funktion des Utilitarismus.
 Der Trick: eine verletzte Maxime wird als unendliches Leid übersetzt.\<close>
 definition maxime_als_nutzenkalkuel
-  :: "('person, 'world) maxime \<Rightarrow> 'world glueck_messen"
+  :: \<open>('person, 'world) maxime \<Rightarrow> 'world glueck_messen\<close>
 where
-  "maxime_als_nutzenkalkuel maxime \<equiv>
+  \<open>maxime_als_nutzenkalkuel maxime \<equiv>
     (\<lambda>welt. case (maximeNeutralisieren maxime) welt
               of True \<Rightarrow> 1     
-               | False \<Rightarrow> - \<infinity>)"
+               | False \<Rightarrow> - \<infinity>)\<close>
 
 (*<*)
 lemma ereal_zero_geq_case:
@@ -81,15 +81,15 @@ lemma ereal_zero_geq_case:
 text\<open>Für diese Übersetzung können wir beweisen,
 dass die Gesinnungsethik der goldenen Regel und die utilitaristische Verantwortungsethik
 konsistent sind:\<close>
-theorem "gesinnungsethik_verantwortungsethik_konsistent
+theorem \<open>gesinnungsethik_verantwortungsethik_konsistent
         (goldene_regel_als_gesinnungsethik maxime)
-        (utilitarismus_als_verantwortungsethik (maxime_als_nutzenkalkuel maxime))"
-  apply(cases maxime, rename_tac m, simp)
+        (utilitarismus_als_verantwortungsethik (maxime_als_nutzenkalkuel maxime))\<close>
+  apply(cases \<open>maxime\<close>, rename_tac m, simp)
   apply(simp add: gesinnungsethik_verantwortungsethik_konsistent_def
                   goldene_regel_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
                   moralisch_richtig_def maxime_als_nutzenkalkuel_def)
   apply(intro allI)
-  apply(case_tac handlungsabsicht, rename_tac h, simp)
+  apply(case_tac \<open>handlungsabsicht\<close>, rename_tac h, simp)
   apply(simp add: moralisch_simp)
   apply(simp add: ereal_zero_geq_case)
   by blast
@@ -108,27 +108,27 @@ dann funktioniert das auch:
 
 
 fun maxime_als_summe_wohlergehen
-  :: "('person, 'world) maxime \<Rightarrow> 'world glueck_messen"
+  :: \<open>('person, 'world) maxime \<Rightarrow> 'world glueck_messen\<close>
 where
-  "maxime_als_summe_wohlergehen (Maxime m) =
+  \<open>maxime_als_summe_wohlergehen (Maxime m) =
     (\<lambda>welt. \<Sum>p\<in>bevoelkerung. (case m p welt
                                  of True \<Rightarrow> 1     
-                                  | False \<Rightarrow> - \<infinity>))"
+                                  | False \<Rightarrow> - \<infinity>))\<close>
 
 (*<*)
 
 lemma sum_wohlergehen_simp:
-  "(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) = (\<Sum>p\<in>B. if f p then 1 else - \<infinity>)"
+  \<open>(\<Sum>p\<in>B. case f p of True \<Rightarrow> 1 | False \<Rightarrow> - \<infinity>) = (\<Sum>p\<in>B. if f p then 1 else - \<infinity>)\<close>
   by (simp add: case_bool_if)
-lemma "(\<Sum>p\<in>B. if f p then 1 else - \<infinity>) < (\<infinity>::ereal)"
+lemma \<open>(\<Sum>p\<in>B. if f p then 1 else - \<infinity>) < (\<infinity>::ereal)\<close>
   by (simp add: sum_Pinfty)
 
 
 lemma helper_finite_wohlergehen_sum_cases:
-  "finite B \<Longrightarrow>
+  \<open>finite B \<Longrightarrow>
     (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) = (- \<infinity>::ereal)
     \<or>
-    ((0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>))"
+    ((0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>))\<close>
   apply(induction rule: finite.induct)
    apply(simp; fail)
   apply(simp add: sum.insert_if)
@@ -139,12 +139,12 @@ lemma helper_finite_wohlergehen_sum_cases:
   done
     
 lemma helper_wohlergehen_sum_IH:
-  "finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>insert b B. if f p then 1 else - \<infinity>)
-    \<Longrightarrow>  (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>)"
-  apply(frule helper_finite_wohlergehen_sum_cases[of _ f])
+  \<open>finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>insert b B. if f p then 1 else - \<infinity>)
+    \<Longrightarrow>  (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>)\<close>
+  apply(frule helper_finite_wohlergehen_sum_cases[of _ \<open>f\<close>])
   apply(elim disjE)
    apply(simp add: sum.insert_if)
-   apply(case_tac "b \<in> B")
+   apply(case_tac \<open>b \<in> B\<close>)
     apply(simp; fail)
    apply(simp)
    apply (metis (full_types) ereal_plus_1(3) not_MInfty_nonneg plus_ereal.simps(6))
@@ -152,27 +152,27 @@ lemma helper_wohlergehen_sum_IH:
   done
 
 lemma helper_wohlergehen_sum_minfty:
-  "(\<Sum>p\<in>B. if f p then 1 else - \<infinity>) = (-\<infinity>::ereal) \<Longrightarrow> \<exists>x\<in>B. \<not> f x"
+  \<open>(\<Sum>p\<in>B. if f p then 1 else - \<infinity>) = (-\<infinity>::ereal) \<Longrightarrow> \<exists>x\<in>B. \<not> f x\<close>
   by (metis (mono_tags, lifting) not_MInfty_nonneg sum_nonneg zero_less_one_ereal)
 
 lemma helper_wohlergehen_sum_pos:
-  "finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) \<Longrightarrow> \<forall>p\<in>B. f p"
-  apply(induction B rule: finite.induct)
+  \<open>finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) \<Longrightarrow> \<forall>p\<in>B. f p\<close>
+  apply(induction \<open>B\<close> rule: finite.induct)
    apply(simp; fail)
   apply(frule(1) helper_wohlergehen_sum_IH)
   apply(simp)
   apply(simp add: sum.insert_if)
-  apply(case_tac "a \<in> A")
+  apply(case_tac \<open>a \<in> A\<close>)
    apply(simp; fail)
   apply(simp)
-  apply(case_tac "f a")
+  apply(case_tac \<open>f a\<close>)
    apply(simp; fail)
   apply(simp)
   by (metis MInfty_neq_PInfty(2) ereal_plus_eq_MInfty ereal_times(1) not_MInfty_nonneg sum_Pinfty)
 
 lemma helper_wohlergehen_sum_iff:
   \<open>finite B \<Longrightarrow> (0::ereal) \<le> (\<Sum>p\<in>B. if f p then 1 else - \<infinity>) \<longleftrightarrow> (\<forall>p\<in>B. f p)\<close>
-  apply(frule helper_finite_wohlergehen_sum_cases[of _ f])
+  apply(frule helper_finite_wohlergehen_sum_cases[of _ \<open>f\<close>])
   apply(elim disjE)
    apply(simp add: helper_wohlergehen_sum_minfty; fail)
   apply(simp)
@@ -191,17 +191,17 @@ lemma helper_wohlergehen_sum_cases_iff:
 
 theorem
   fixes maxime :: \<open>('person, 'world) maxime\<close>
-  assumes "finite (bevoelkerung:: 'person set)"
+  assumes \<open>finite (bevoelkerung:: 'person set)\<close>
   shows 
-    "gesinnungsethik_verantwortungsethik_konsistent
+    \<open>gesinnungsethik_verantwortungsethik_konsistent
       (goldene_regel_als_gesinnungsethik maxime)
-      (utilitarismus_als_verantwortungsethik (maxime_als_summe_wohlergehen maxime))"
-  apply(cases maxime, rename_tac m, simp)
+      (utilitarismus_als_verantwortungsethik (maxime_als_summe_wohlergehen maxime))\<close>
+  apply(cases \<open>maxime\<close>, rename_tac m, simp)
   apply(simp add: gesinnungsethik_verantwortungsethik_konsistent_def
                   goldene_regel_als_gesinnungsethik_def utilitarismus_als_verantwortungsethik_def
                   moralisch_richtig_def)
   apply(intro allI)
-  apply(case_tac handlungsabsicht, rename_tac h, simp)
+  apply(case_tac \<open>handlungsabsicht\<close>, rename_tac h, simp)
   apply(simp add: moralisch_simp)
   apply(subst helper_wohlergehen_sum_cases_iff[OF \<open>finite bevoelkerung\<close>])
   apply(auto simp add: bevoelkerung_def)

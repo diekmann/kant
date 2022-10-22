@@ -8,9 +8,9 @@ wir wollen simulieren was für ein allgemeines Gesetz abgeleitet werden könnte.
 
 
 datatype ('person, 'world, 'a, 'b) simulation_constants = SimConsts
-    'person \<comment> \<open>handelnde Person\<close>
-    "('person, 'world) maxime"
-    "('world, 'a, 'b) allgemeines_gesetz_ableiten"
+    \<open>'person\<close> \<comment> \<open>handelnde Person\<close>
+    \<open>('person, 'world) maxime\<close>
+    \<open>('world, 'a, 'b) allgemeines_gesetz_ableiten\<close>
 
     (*moeglich :: H.Handlung world -> Bool, -- brauch ich das oder geht das mit typen?*)
 
@@ -20,11 +20,11 @@ text\<open>...\<close>
 
 text\<open>Simulate one \<^typ>\<open>('person, 'world) handlungF\<close> once:\<close>
 fun simulate_handlungF
-    :: "('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
+    :: \<open>('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
         ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
-        \<Rightarrow> ('world \<times> (nat, 'a, 'b) gesetz)"
+        \<Rightarrow> ('world \<times> (nat, 'a, 'b) gesetz)\<close>
   where
-    "simulate_handlungF (SimConsts person maxime aga) ha welt g =
+    \<open>simulate_handlungF (SimConsts person maxime aga) ha welt g =
     (let (sollensanordnung, g') = moarlisch_gesetz_ableiten person welt maxime ha aga g in
       let w' = (if sollensanordnung = Erlaubnis
                 then
@@ -33,7 +33,7 @@ fun simulate_handlungF
                   welt
                ) in
       (w', g')
-    )"
+    )\<close>
 
 lemma \<open>simulate_handlungF
        (SimConsts
@@ -56,15 +56,15 @@ Parameter
  \<^item> Initialgesetz
 \<close>
 fun converge
-    :: "('world \<Rightarrow> 'gesetz \<Rightarrow> ('world \<times> 'gesetz)) \<Rightarrow> nat \<Rightarrow> 'world \<Rightarrow> 'gesetz \<Rightarrow> ('world \<times> 'gesetz)"
+    :: \<open>('world \<Rightarrow> 'gesetz \<Rightarrow> ('world \<times> 'gesetz)) \<Rightarrow> nat \<Rightarrow> 'world \<Rightarrow> 'gesetz \<Rightarrow> ('world \<times> 'gesetz)\<close>
   where
-      "converge _ 0         w g = (w, g)"
-    | "converge f (Suc its) w g =
+      \<open>converge _ 0         w g = (w, g)\<close>
+    | \<open>converge f (Suc its) w g =
         (let (w', g') = f w g in
           if w = w' then
             (w, g')
           else
-            converge f its w' g')"
+            converge f its w' g')\<close>
 
 text\<open>Example: Count 32..42,
       where \<^term>\<open>32::int\<close> is the initial world and we do \<^term>\<open>10::nat\<close> iterations.\<close>
@@ -73,13 +73,13 @@ lemma \<open>converge (\<lambda>w g. (w+1, w#g)) 10 (32::int) ([]) =
 
 text\<open>simulate one \<^typ>\<open>('person, 'world) handlungF\<close> a few times\<close>
 definition simulateOne
-    :: "('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
+    :: \<open>('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
         nat \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
-        \<Rightarrow> (nat, 'a, 'b) gesetz"
+        \<Rightarrow> (nat, 'a, 'b) gesetz\<close>
     where
-    "simulateOne simconsts i ha w g \<equiv>
+    \<open>simulateOne simconsts i ha w g \<equiv>
       let (welt, gesetz) = converge (simulate_handlungF simconsts ha) i w g in
-            gesetz"
+            gesetz\<close>
 (*>*)
 text\<open>...
 Die Funktion \<^const>\<open>simulateOne\<close> nimmt
@@ -127,7 +127,7 @@ lemma \<open>\<exists>tb rf.
     (Gesetz {})
   = Gesetz {(\<section> 1, Rechtsnorm (Tatbestand tb) (Rechtsfolge rf))}\<close>
   apply(simp add: simulateOne_def moarlisch_gesetz_ableiten_def)
-  apply(case_tac maxime, simp)
+  apply(case_tac \<open>maxime\<close>, simp)
   apply(simp add: moralisch_unfold max_paragraph_def)
   apply(intro conjI impI)
   by(metis rechtsfolge.exhaust rechtsnorm.exhaust tatbestand.exhaust)+
