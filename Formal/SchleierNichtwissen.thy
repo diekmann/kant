@@ -107,7 +107,7 @@ where
     okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
     \<longleftrightarrow>
     okay m pX (Handlung welt (h p1 welt'))\<close>
-
+  
 
 
 end

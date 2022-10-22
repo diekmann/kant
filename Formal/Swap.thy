@@ -26,8 +26,9 @@ lemma swap_a: \<open>swap a b f a = f b\<close>
 lemma swap_b: \<open>swap a b f b = f a\<close>
   by(simp add: swap_def)
 lemma sum_swap_none: \<open>a \<notin> P \<Longrightarrow> b \<notin> P \<Longrightarrow> sum (swap a b f) P = sum f P\<close>
+  apply(rule sum.cong, simp)
   apply(simp add: swap_def)
-  by (smt (verit, best) fun_upd_other sum.cong)
+  by fastforce
 lemma swap_nothing: \<open>a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a\<close>
   by(simp add: swap_def)
 
