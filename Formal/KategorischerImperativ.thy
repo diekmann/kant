@@ -1,5 +1,5 @@
 theory KategorischerImperativ
-imports Maxime Gesetz
+imports Maxime Gesetz SchleierNichtwissen
 begin
 
 section\<open>Kategorischer Imperativ\<close>
@@ -91,29 +91,6 @@ where
       )\<close>
 
 
-(*TODO: move to Handlung? Gleiched fuer maxime.*)
-(*welt rawls schleier um handlung verallgemeinern. Definition*)
-
-text\<open>Welt-Personen Swap\<close>
-type_synonym ('person, 'world) wp_swap = "'person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world"
-
-definition wohlgeformte_handlungsabsicht
-  :: "('person, 'world) wp_swap \<Rightarrow>
-      'world \<Rightarrow> ('person, 'world) handlungF
-      \<Rightarrow> bool"
-where
-  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
-    \<forall>p1 p2. (handeln p1 welt h) =
-            map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)"
-
-
-definition maxime_und_handlungsabsicht_generalisieren
-  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool"
-where
-  "maxime_und_handlungsabsicht_generalisieren m h p =
-    (\<forall>w1 w2. okay m p (handeln p w1 h) \<longleftrightarrow> okay m p (handeln p w2 h))"
-  
-
 subsection\<open>Kategorischer Imperativ\<close>
 
 text\<open>
@@ -175,7 +152,6 @@ where
           (\<exists>p. maxime_und_handlungsabsicht_generalisieren m h p \<and> okay m p (handeln p welt h))
               \<longrightarrow> moralisch welt m h)\<close>
 
-(* Hat was von dem Urzustand Schleier von Rawls? *)
 
 (*TODO: ist das equivalent einfach \<forall>welt im \<exists>Teil zu fordern?
   kann ich das maxime_und_handlungsabsicht_generalisieren aus dem \<exists> rausziehen?*)
@@ -216,7 +192,7 @@ lemma "(\<forall>h ich. (\<forall>w. m ich (handeln ich welt h)) \<longrightarro
 *)
 text\<open>WOW:
 
-Die Maxime die keine Handlung erlaubt (weil immer False) erfuellt den kategorischen
+Die Maxime die keine Handlung erlaubt (weil immer False) erfüllt den kategorischen
 Imperativ\<close>
 lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. False))"
   by(simp)
@@ -248,6 +224,8 @@ value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<clo
 
   thm goldene_regel
 (*
+TODO: Erkläre
+
 Handlung fuer mich okay == m ich (handeln ich welt h) 
 *)
 
@@ -286,52 +264,6 @@ lemma blinde_maxime_katimp:
 
 
 
-text\<open>wpsm: Welt Person Swap Maxime\<close>
-
-
-definition wpsm_kommutiert
-  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
-where
-  "wpsm_kommutiert m welt_personen_swap welt \<equiv>
-\<forall> p1 p2 h.
-  okay m p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
-  \<longleftrightarrow>
-  okay m p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
-
-lemma "wpsm_kommutiert m welt_personen_swap welt =
-(\<forall> p1 p2 h.
-  okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) (HandlungF h))
-  \<longleftrightarrow>
-  okay m p1 (handeln p1 welt (HandlungF (\<lambda>p w. welt_personen_swap p1 p2 (h p (welt_personen_swap p2 p1 w)))))
-)"
-  by(simp add: wpsm_kommutiert_def)
-
-definition wpsm_unbeteiligt1
-  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
-where
-  "wpsm_unbeteiligt1 m welt_personen_swap welt \<equiv>
-\<forall> p1 p2 pX welt'.
-  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow> 
-    okay m pX (Handlung (welt_personen_swap p2 p1 welt) welt')
-    \<longleftrightarrow>
-    okay m pX (Handlung welt welt')"
-
-definition wpsm_unbeteiligt2
-  :: "('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
-where
-  "wpsm_unbeteiligt2 m welt_personen_swap welt \<equiv>
-\<forall> p1 p2 pX h (welt'::'world).
-  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-    okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
-    \<longleftrightarrow>
-    okay m pX (Handlung welt (h p1 welt'))"
-
-
-
-(*TODO: die 3 Eiggenschaften sind nur ueber die Maxime und die swap funktion.
-evtl muss ich die in den kategorischen imperativ uebernehmen?
-Auf jeden fall sollte ich testen, ob das auch fuer den globalen fortschritt gilt!
-*)
 text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
 (*
@@ -473,8 +405,6 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   qed
 qed
 
-(*TODO: bekomme ich auch die struktur von globaler_fortschritt bewiesen?
-Also eine Maxime die einfach das ich ignoriert, aber kein Allquantor hat*)
 text\<open>Maxime welche das ich ignoriert, also nur die Handlung global betrachtet.\<close>
 theorem globale_maxime_katimp:
   fixes P :: "'world handlung \<Rightarrow> bool"
