@@ -69,7 +69,7 @@ where
     \<forall>p1 p2. (handeln p1 welt h) =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)\<close>
 
-(*TODO: das sollte ein Homomorphismus sein. Biled hier.*)
+(*TODO: das sollte ein Homomorphismus sein.*)
 
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>

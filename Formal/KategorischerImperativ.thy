@@ -159,10 +159,6 @@ lemma
   unfolding kategorischer_imperativ_def
   by(simp)
 
-(*TODO: ist das equivalent einfach \<forall>welt im \<exists>Teil zu fordern?
-  kann ich das maxime_und_handlungsabsicht_generalisieren aus dem \<exists> rausziehen?*)
-
-
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
 lemma
 \<open>kategorischer_imperativ welt_personen_swap welt m \<longleftrightarrow>
@@ -176,7 +172,7 @@ lemma
 text\<open>Für jede Handlungsabsicht:
   wenn ich so handeln würde muss es auch okay sein, wenn zwei beliebige
   personen so handeln, wobei einer Täter und einer Opfer ist.\<close>
-lemma
+lemma kategorischer_imperativ_simp:
   "kategorischer_imperativ welt_personen_swap welt m \<longleftrightarrow>
     (\<forall>h p1 p2 ich.
       wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
@@ -192,64 +188,43 @@ lemma kategorischer_imperativI:
    okay m p (handeln p welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
    )
  \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m\<close>
-  by(auto simp add: kategorischer_imperativ_def moralisch_simp)
+  by(auto simp add: kategorischer_imperativ_simp)
 
-(*
-(*hmmm, interessant, ...*)
-lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
-  (\<forall>h ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))"
-  apply(simp add: moralisch_simp)
-  by auto
 
-lemma "(\<forall>h ich. (\<forall>w. m ich (handeln ich welt h)) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))
-  \<Longrightarrow> kategorischer_imperativ welt (Maxime m)"
-  apply(simp add: moralisch_simp)
-  apply(intro allI impI)
-  apply(elim exE)
-  apply(erule_tac x=h in allE)
-  (*quickcheck found a counterexample*)
-  oops
-
-*)
-text\<open>WOW:
-
+subsection\<open>Triviale Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
+text\<open>
 Die Maxime die keine Handlung erlaubt (weil immer False) erfüllt den kategorischen
-Imperativ\<close>
+Imperativ:\<close>
 lemma \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. False))\<close>
   by(simp add: kategorischer_imperativ_def)
 
+text\<open>Allerdings kann mit so einer Maxime nie etwas moralisch sein.\<close>
 lemma \<open>\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h\<close>
   by(simp add: moralisch_simp)
 
-
+text\<open>Die Maxime die jede Handlung erlaubt (weil immer True) erfüllt den kategorischen
+Imperativ:\<close>
 lemma \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. True))\<close>
-  by(simp add: kategorischer_imperativ_def moralisch_simp)
+  by(simp add: kategorischer_imperativ_simp)
 
+text\<open>Allerdings ist mot so einer Maxime alles moralisch.\<close>
 lemma \<open>moralisch welt (Maxime (\<lambda>ich h. True)) h\<close>
   by(simp add: moralisch_simp)
 
-(*
-lemma "kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich_ignored h. P h))"
-  apply(simp add: moralisch_simp)
-  apply(intro allI impI, elim exE)
-  oops (*hmmm, bekomme ich das mit dem Steuersystem verbunden?*)
-*)
 
-(*Wenn wir wirklich \<forall>handlungsabsichten haben, dann sollte sich das vereinfachen lassen
-zu
-(\<forall>h :: ('person, 'world) handlungF.
-    (\<exists>p::'person. m p (handeln p welt h)) \<longrightarrow> (\<forall>p::'person. m p ()))
 
-value \<open>kat_imperativ (0::nat) (Maxime (\<lambda> ich handlung. True))\<close>
-*)
+subsection\<open>Zusammenhang Goldene Regel\<close>
+text\<open>
+Mit der goldenen Regel konnten wir wie folgt moralische Entscheidungen treffen:
+@{thm goldene_regel}
 
-  thm goldene_regel
-(*
-TODO: Erkläre
+In Worten:
+Wenn eine Handlungsabsicht moralisch ist (nach goldener Regel)
+und es okay ist für mich diese Handlung auszuführen,
+denn ist es auch für mich okay, wenn jeder andere diese Handlung mit mir als Opfer ausführt. 
 
-Handlung fuer mich okay == m ich (handeln ich welt h) 
-*)
-
+Der kategorische Imperativ liftet dies eine Abstraktionsebene:
+\<close>
 
 lemma \<open>kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
@@ -258,10 +233,16 @@ lemma \<open>kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   apply(simp add: kategorischer_imperativ_def)
   by auto
 
+text\<open>
+In Worten:
+Wenn eine Maxime den kategorischen Imperativ erfüllt
+und es für eine beliebige (wohlgeformte) Handlung auszuführen für mich okay ist diese auszuführen,
+dann ist diese Handlung moralisch..
+\<close>
 
-(*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
+subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 
-text\<open>Wenn eine Maxime jede Handlungsabsicht als morlaisch bewertet
+text\<open>Wenn eine Maxime jede Handlungsabsicht als moralisch bewertet,
 erfüllt diese Maxime den kategorischen Imperativ.
 Da diese Maxime jede Handlung erlaubt, ist es dennoch eine wohl ungeeignete Maxime.\<close>
 lemma \<open>\<forall>h. moralisch welt maxime h \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt maxime\<close>
