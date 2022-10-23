@@ -164,22 +164,37 @@ lemma
 
 
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
-
-(*
 lemma
-  "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
-    (\<forall>h ich. m ich (handeln ich welt h) \<longrightarrow> moralisch welt (Maxime m) h)"
-  apply(simp del: kategorischer_imperativ.simps)
-  by(simp)
+\<open>kategorischer_imperativ welt_personen_swap welt m \<longleftrightarrow>
+  (\<forall>h ich.
+      wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
+      maxime_und_handlungsabsicht_generalisieren m h ich \<and>
+      okay m ich (handeln ich welt h) \<longrightarrow> moralisch welt m h)\<close>
+  by(simp add: kategorischer_imperativ_def)
+  
 
 text\<open>Für jede Handlungsabsicht:
   wenn ich so handeln würde muss es auch okay sein, wenn zwei beliebige
-  personen so handeln, wobei iner Täter und einer Opfer ist.\<close>
+  personen so handeln, wobei einer Täter und einer Opfer ist.\<close>
 lemma
-  "kategorischer_imperativ welt (Maxime m) \<longleftrightarrow>
-    (\<forall>h p1 p2 ich. m ich (handeln ich welt h) \<longrightarrow> m p1 (handeln p2 welt h))"
-  by (simp add: moralisch_simp)
+  "kategorischer_imperativ welt_personen_swap welt m \<longleftrightarrow>
+    (\<forall>h p1 p2 ich.
+      wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
+      maxime_und_handlungsabsicht_generalisieren m h ich \<and>
+      okay m ich (handeln ich welt h)
+      \<longrightarrow> okay m p1 (handeln p2 welt h))"
+  by (simp add: kategorischer_imperativ_def moralisch_simp)
 
+
+lemma kategorischer_imperativI:
+  \<open>(\<And>h p1 p2 p. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
+   maxime_und_handlungsabsicht_generalisieren m h p \<Longrightarrow>
+   okay m p (handeln p welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
+   )
+ \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m\<close>
+  by(auto simp add: kategorischer_imperativ_def moralisch_simp)
+
+(*
 (*hmmm, interessant, ...*)
 lemma "kategorischer_imperativ welt (Maxime m) \<Longrightarrow>
   (\<forall>h ich. (\<forall>w. m ich (handeln ich w h)) \<longrightarrow> (\<forall>p. m p (handeln ich welt h)))"
@@ -243,13 +258,6 @@ lemma \<open>kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   apply(simp add: kategorischer_imperativ_def)
   by auto
 
-lemma kategorischer_imperativI:
-  \<open>(\<And>h p1 p2 p. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
-   maxime_und_handlungsabsicht_generalisieren m h p \<Longrightarrow>
-   okay m p (handeln p welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
-   )
- \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m\<close>
-  by(auto simp add: kategorischer_imperativ_def moralisch_simp)
 
 (*Welt in ihrem aktuellen Zustand. TODO: eigentlich sollten wir für jede mögliche Welt testen!*)
 
