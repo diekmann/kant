@@ -45,6 +45,22 @@ text\<open>Für jede Welt muss eine Welt-Personen Swap Funktion bereit gestellt 
 die alle Weltlichen Eigenschaften von 2 Personen vertauscht:\<close>
 type_synonym ('person, 'world) wp_swap = \<open>'person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
 
+text_raw\<open>
+\begin{equation*}
+\begin{tikzcd}[column sep=14em, row sep=huge]
+\textit{welt}
+  \arrow[red, d, "\textit{welt-personen-swap}\ \textit{p1}\ \textit{p2}" near start] 
+  \arrow[blue]{r}[blue]{\textit{handeln}\ \textit{p1}}
+& \textit{welt'} \\
+\textit{alternativ-welt}
+  \arrow[red]{r}{\textit{handeln}\ \textit{p2}}
+& \textit{alternativ-welt'}
+  \arrow[red, u, "\textit{welt-personen-swap}\ \textit{p1}\ \textit{p2}" near start]
+\end{tikzcd}
+\end{equation*}
+\<close>
+
+
 
 definition wohlgeformte_handlungsabsicht
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
