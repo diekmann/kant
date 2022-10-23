@@ -229,7 +229,7 @@ lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt nicht den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen würde.\<close>
   lemma \<open>\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt\<close>
-    apply(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    apply(simp add: kategorischer_imperativ_def maxime_zahlenfortschritt_def moralisch_simp)
     apply(rule_tac x=\<open>HandlungF (stehlen4 1 10)\<close> in exI)
     apply(simp add: wohlgeformte_handlungsabsicht_stehlen4 maxime_und_handlungsabsicht_generalisieren_def)
     apply(intro conjI)
