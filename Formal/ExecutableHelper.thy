@@ -52,9 +52,31 @@ definition show_map :: \<open>('a::enum \<rightharpoonup> 'b) \<Rightarrow> ('a 
 
 lemma \<open>show_map [True \<mapsto> (8::int), False \<mapsto> 12] = [(False, 12), (True, 8)]\<close> by eval
 
+lemma List_map_filter_map_some_cons: "m x = Some y \<Longrightarrow>
+  (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (x # xs)) =
+       (x,y) # (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (xs))"
+  apply(simp add: List.map_filter_def)
+  done
+
+
+lemma List_map_filter_map_of_eq_helper: "x \<notin> set xs
+  \<Longrightarrow>  map_of (List.map_filter (\<lambda>p. map_option (Pair p) ((m(x := None)) p)) xs)
+        = (map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs))"
+  apply(simp add: map_filter_def)
+  apply(rule arg_cong)
+  apply(simp)
+  apply(subgoal_tac "(filter (\<lambda>xa. xa \<noteq> x \<and> (xa \<noteq> x \<longrightarrow> (\<exists>y. m xa = Some y))) xs) =
+        (filter (\<lambda>x. \<exists>y. m x = Some y) xs)")
+   prefer 2
+   apply (rule filter_cong)
+    apply(simp; fail)
+   apply blast
+  apply(simp)
+  done
 
 lemma show_map_induction_helper:
-  \<open>distinct xs \<Longrightarrow> dom m \<subseteq> set xs \<Longrightarrow> map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs) = m\<close>
+  \<open>distinct xs \<Longrightarrow> dom m \<subseteq> set xs \<Longrightarrow>
+    map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs) = m\<close>
 proof(induction \<open>xs\<close> arbitrary: \<open>m\<close>)
   case Nil
   then show \<open>?case\<close> by(simp add: map_filter_def)
@@ -66,19 +88,23 @@ next
     from True obtain y where \<open>m x = Some y\<close> by blast
     let \<open>?m'\<close>=\<open>m(x:=None)\<close>
     have m: \<open>m = ?m'(x \<mapsto> y)\<close> using \<open>m x = Some y\<close> by auto
+    have "x \<notin> set xs" using Cons.prems(1) by auto
     have \<open>dom ?m' \<subseteq> set xs\<close> using Cons.prems by auto
     with Cons.IH[of \<open>?m'\<close>] have IH':
       \<open>map_of (List.map_filter (\<lambda>p. map_option (Pair p) (?m' p)) xs) = ?m'\<close>
       using Cons.prems(1) by fastforce
+    with List_map_filter_map_of_eq_helper[OF \<open>x \<notin> set xs\<close>, of m] have IH'':
+      \<open>map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs) = ?m'\<close>
+      by simp
+    from \<open>m x = Some y\<close> have 1:
+      "List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (x # xs) =
+        (x, y) # List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs"
+      using List_map_filter_map_some_cons[of m x y xs] by simp
     show \<open>?thesis\<close>
-      apply(subst m)
-      by (smt (z3) Cons.prems(1)
-            \<open>m x = Some y\<close> IH' distinct.simps(2)
-            domIff dom_fun_upd filter_cong insertE
-            m map_eq_conv map_filter_def map_filter_simps(1)
-            map_le_def map_of.simps(2) mem_Collect_eq o_apply
-            option.case(2) option.map(2) prod.sel(1) prod.sel(2)
-            set_filter upd_None_map_le)
+      apply(subst 1)
+      apply(simp)
+      apply(subst IH'')
+      using m by auto
   next
     case False
     with Cons show \<open>?thesis\<close>

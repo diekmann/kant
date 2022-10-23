@@ -49,13 +49,13 @@ Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverä
 definition \<open>beispiel_handlungf \<equiv> HandlungF (\<lambda>p n. if n < 9000 then n+1 else n)\<close>
 
 text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungf\<close> so aus:
-@{value \<open>beispiel_handlungf::(nat, int) handlungF\<close>}\<close>
+\<^value>\<open>beispiel_handlungf::(nat, int) handlungF\<close>\<close>
 
 
 (*<*)
-lemma vorher_handeln[simp]: "vorher (handeln p welt h) = welt"
-  by(cases h, simp)
-lemma nachher_handeln: "nachher (handeln p welt (HandlungF h)) = h p welt"
+lemma vorher_handeln[simp]: \<open>vorher (handeln p welt h) = welt\<close>
+  by(cases \<open>h\<close>, simp)
+lemma nachher_handeln: \<open>nachher (handeln p welt (HandlungF h)) = h p welt\<close>
   by(simp)
 (*>*)
 
@@ -98,11 +98,11 @@ als jede mögliche handelnde Person tatsächlich ausführt wird und die Folgen b
 \<close>
 
 definition gesinnungsethik_verantwortungsethik_konsistent
-  :: "(('person, 'world) handlungF \<Rightarrow> bool) \<Rightarrow> ('world handlung \<Rightarrow> bool) \<Rightarrow> bool" where
-"gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
+  :: \<open>(('person, 'world) handlungF \<Rightarrow> bool) \<Rightarrow> ('world handlung \<Rightarrow> bool) \<Rightarrow> bool\<close> where
+\<open>gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
   \<forall>handlungsabsicht.
     gesinnungsethik handlungsabsicht \<longleftrightarrow>
-      (\<forall>person welt. verantwortungsethik (handeln person welt handlungsabsicht))"
+      (\<forall>person welt. verantwortungsethik (handeln person welt handlungsabsicht))\<close>
 
 
 text\<open>Ich habe kein Beispiel für eine Gesinnungsethik

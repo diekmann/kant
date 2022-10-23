@@ -26,8 +26,8 @@ datatype ('person, 'world) maxime = Maxime \<open>'person \<Rightarrow> 'world h
                                  (*          ich    -> Auswirkung      -> gut/schlecht  *)
 
 text\<open>Auswertung einer Maxime:\<close>
-fun okay :: "('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> 'world handlung \<Rightarrow> bool" where
-  "okay (Maxime m) p h = m p h"
+fun okay :: \<open>('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> 'world handlung \<Rightarrow> bool\<close> where
+  \<open>okay (Maxime m) p h = m p h\<close>
 
 
 text\<open>Beispiel\<close>
@@ -121,7 +121,7 @@ lemma moralisch_simp:
   \<open>moralisch welt m handlungsabsicht \<longleftrightarrow>
         (\<forall>p1 p2. okay m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold
-  by (cases m, simp add: bevoelkerung_def moralisch_unfold)
+  by (cases \<open>m\<close>, simp add: bevoelkerung_def moralisch_unfold)
 
 text\<open>
 Wir können die goldene Regel auch umformulieren,
@@ -135,9 +135,9 @@ Formal:
 Genau dies können wir aus unserer Definition von \<^const>\<open>moralisch\<close> ableiten:\<close>
 
 lemma goldene_regel:
-  "moralisch welt m handlungsabsicht \<Longrightarrow>
+  \<open>moralisch welt m handlungsabsicht \<Longrightarrow>
    okay m ich (handeln ich welt handlungsabsicht) \<Longrightarrow>
-   \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)"
+   \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)\<close>
   by (simp add: moralisch_simp)
 
 text\<open>Für das obige lemma brauchen wir die Annahme
@@ -147,8 +147,8 @@ Wenn für eine gegebene \<^term>\<open>Maxime m\<close> eine Handlungsabsicht mo
 dann ist es auch okay, wenn ich von der Handlungsabsicht betroffen bin,
 egal wer sie ausführt.\<close>
 corollary
-  "moralisch welt m handlungsabsicht \<Longrightarrow>
-   \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)"
+  \<open>moralisch welt m handlungsabsicht \<Longrightarrow>
+   \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)\<close>
   by (simp add: moralisch_simp)
 
 text\<open>Die umgekehrte Richtung gilt nicht, weil diese Formulierung nur die Handlungen betrachtet,
@@ -187,14 +187,14 @@ subsection \<open>Making it executable\<close>
 
 text\<open>Hier schlägt das Programmiererherz höher:
 Wenn \<^typ>\<open>'person\<close> aufzählbar ist haben wir ausführbaren Code: @{thm moralisch_exhaust}
-wobei @{const moralisch_exhaust} implementiert ist als @{thm moralisch_exhaust_def}.
+wobei \<^const>\<open>moralisch_exhaust\<close> implementiert ist als @{thm moralisch_exhaust_def}.
 \<close>
 
 subsection\<open>Maximen Debugging\<close>
 text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
 Maxime verletzt ist:\<close>
-datatype 'person opfer = Opfer 'person
-datatype 'person taeter = Taeter 'person
+datatype 'person opfer = Opfer \<open>'person\<close>
+datatype 'person taeter = Taeter \<open>'person\<close>
 datatype ('person, 'world) verletzte_maxime = 
   VerletzteMaxime
     \<open>'person opfer\<close> \<comment>\<open>verletzt für; das Opfer\<close>
@@ -203,21 +203,21 @@ datatype ('person, 'world) verletzte_maxime =
 
 text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
 fun debug_maxime
-  :: "('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
+  :: \<open>('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF
-      \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set"
+      \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set\<close>
 where
-  "debug_maxime print_world welt m handlungsabsicht =
+  \<open>debug_maxime print_world welt m handlungsabsicht =
     {VerletzteMaxime
       (Opfer p1) (Taeter p2)
       (map_handlung print_world (handeln p2 welt handlungsabsicht)) | p1 p2.
-          \<not>okay m p1 (handeln p2 welt handlungsabsicht)}"
+          \<not>okay m p1 (handeln p2 welt handlungsabsicht)}\<close>
 
 
 text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
-lemma "debug_maxime print_world welt maxime handlungsabsicht = {}
-        \<longleftrightarrow> moralisch welt maxime handlungsabsicht"
-  apply(case_tac maxime, rename_tac m, simp)
+lemma \<open>debug_maxime print_world welt maxime handlungsabsicht = {}
+        \<longleftrightarrow> moralisch welt maxime handlungsabsicht\<close>
+  apply(case_tac \<open>maxime\<close>, rename_tac m, simp)
   by(simp add: moralisch_unfold bevoelkerung_def)
 
 (*<*)

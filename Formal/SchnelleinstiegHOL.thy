@@ -6,7 +6,7 @@ section\<open>Schnelleinstieg Isabelle/HOL\<close>
 
 subsection\<open>Typen\<close>
 text\<open>Typen werden per \<^verbatim>\<open>::\<close> annotiert.
-Beispielsweise sagt @{theory_text "3::nat"}, dass \<^term>\<open>3::nat\<close> eine natürliche Zahl (\<^typ>\<open>nat\<close>) ist.\<close>
+Beispielsweise sagt \<^theory_text>\<open>3::nat\<close>, dass \<^term>\<open>3::nat\<close> eine natürliche Zahl (\<^typ>\<open>nat\<close>) ist.\<close>
 
 subsection\<open>Beweise\<close>
 text\<open>Die besondere Fähigkeit im Beweisassistent Isabelle/HOL liegt darin,
@@ -35,11 +35,11 @@ welcher durch jeden anderen Typen instanziiert werden kann.
 Beispielsweise steht \<^typ>\<open>'nat\<close> für einen beliebigen Typen,
 während \<^typ>\<open>nat\<close> der konkrete Typ der natürlichen Zahlen ist.
 
-Wenn wir nun @{theory_text "3::'a"} schreiben handelt es sich nur um das generische Numeral 3.
+Wenn wir nun \<^theory_text>\<open>3::'a\<close> schreiben handelt es sich nur um das generische Numeral 3.
 Das ist so generisch, dass z.B. noch nicht einmal die Plusoperation darauf definiert ist.
-Im Gegensatz dazu ist @{theory_text "3::nat"} die natürliche Zahl 3,
+Im Gegensatz dazu ist \<^theory_text>\<open>3::nat\<close> die natürliche Zahl 3,
 mit allen wohlbekannten Rechenoperationen.
-Im Beweis obigen @{theory_text "lemma\<open>3 = 2+1\<close>"} hat Isabelle die Typen automatisch inferiert.
+Im Beweis obigen \<^theory_text>\<open>lemma\<open>3 = 2+1\<close>\<close> hat Isabelle die Typen automatisch inferiert.
 \<close>
 
 subsection\<open>Funktionen\<close>
@@ -47,8 +47,8 @@ text\<open>Beispiel:
 Eine Funktionen welche eine natürliche Zahl nimmt und
 eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat\<close>):\<close>
 
-fun beispielfunktion :: "nat \<Rightarrow> nat" where
-  "beispielfunktion n = n + 10"
+fun beispielfunktion :: \<open>nat \<Rightarrow> nat\<close> where
+  \<open>beispielfunktion n = n + 10\<close>
 
 
 text\<open>Funktionsaufrufe funktionieren ohne Klammern.\<close>
@@ -57,8 +57,8 @@ lemma \<open>beispielfunktion 32 = 42\<close> by eval
 
 text\<open>Funktionen sind gecurried. Hier ist eine Funktion welche 2 natürliche Zahlen nimmt
 und eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat \<Rightarrow> nat\<close>):\<close>
-fun addieren :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
-  "addieren a b = a + b"
+fun addieren :: \<open>nat \<Rightarrow> nat \<Rightarrow> nat\<close> where
+  \<open>addieren a b = a + b\<close>
 
 
 lemma \<open>addieren 32 10 = 42\<close> by eval
@@ -68,7 +68,7 @@ text\<open>Currying bedeutet auch, wenn wir \<^const>\<open>addieren\<close> nur
 dass wir eine Funktion zurückbekommen, die noch das zweite Argument erwartet,
 bevor sie das Ergebnis zurückgeben kann.
 
-Beispiel: @{term_type "(addieren 10) :: (nat \<Rightarrow> nat)"}
+Beispiel: \<^term_type>\<open>(addieren 10) :: (nat \<Rightarrow> nat)\<close>
 
 Zufälligerweise ist \<^term>\<open>addieren 10\<close> equivalent zu \<^term>\<open>beispielfunktion\<close>:
 \<close>
@@ -79,9 +79,9 @@ lemma \<open>addieren 10 = beispielfunktion\<close>
 text\<open>Zusätzlich lassen sich Funktionen im Lambda Calculus darstellen.
 Beispiel:\<close>
 
-lemma "(\<lambda>n::nat. n+10) 3 = 13" by eval
+lemma \<open>(\<lambda>n::nat. n+10) 3 = 13\<close> by eval
 
-lemma "beispielfunktion = (\<lambda>n. n+10)"
+lemma \<open>beispielfunktion = (\<lambda>n. n+10)\<close>
   by(simp add: fun_eq_iff)
 
 subsection\<open>Mengen\<close>
