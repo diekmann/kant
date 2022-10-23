@@ -62,6 +62,12 @@ definition opfer_eindeutig_nach_besitz_auswaehlen
          | _ \<Rightarrow> None)\<close>
 
 (*<*)
+
+lemma case_filter_empty_some_helper:
+  "(case filter P ps of [] \<Rightarrow> Some a | aa # x \<Rightarrow> Map.empty x) = Some x
+  \<longleftrightarrow> filter P ps = [] \<and> a = x"
+  by (simp add: list.case_eq_if)
+
 lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
   \<open>opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = Some opfer
   \<Longrightarrow> inj_on besitz {p \<in> set ps. besitz p = opfer_nach_besitz}\<close>
@@ -73,6 +79,7 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
   apply(safe)
     apply(simp_all)
+    apply(simp_all add: case_filter_empty_some_helper)
     apply (metis (mono_tags, lifting) filter_empty_conv list.case_eq_if option.distinct(1))
    apply (metis (mono_tags, lifting) empty_filter_conv list.case_eq_if option.distinct(1))
   by (smt (verit, del_insts) filter_empty_conv list.simps(5) neq_Nil_conv option.discI)
