@@ -62,12 +62,34 @@ definition opfer_eindeutig_nach_besitz_auswaehlen
          | _ \<Rightarrow> None)\<close>
 
 (*<*)
-
 lemma case_filter_empty_some_helper:
   "(case filter P ps of [] \<Rightarrow> Some a | aa # x \<Rightarrow> Map.empty x) = Some x
   \<longleftrightarrow> (\<forall>x\<in>set ps. \<not> P x) \<and> a = x"
   apply(simp add: list.case_eq_if)
   using empty_filter_conv by metis
+
+lemma case_filter_empty_some_helper2:
+  "(case if P a then a # filter P ps else filter P ps of
+        [] \<Rightarrow> None | [opfer] \<Rightarrow> Some opfer | opfer # aa # x \<Rightarrow> Map.empty x) =
+       Some x \<longleftrightarrow>
+  (P a \<and> x = a \<and> filter P ps = []) \<or> (\<not>P a \<and> filter P ps = [x])"
+  apply(cases "P a")
+   apply(simp add: case_filter_empty_some_helper)
+   apply (metis empty_filter_conv)
+  apply(simp)
+  apply(cases "filter P ps")
+   apply(simp)
+  apply(simp)
+  by (metis list.case_eq_if option.distinct(1) option.inject)
+
+lemma case_filter_empty_some_helper3:
+  "(case filter P ps of [] \<Rightarrow> None | [opfer] \<Rightarrow> Some opfer
+            | opfer # aa # x \<Rightarrow> Map.empty x) =
+           Some opfer
+    \<longleftrightarrow>
+    filter P ps = [opfer]"
+  apply(simp add: list.case_eq_if)
+  by (metis list.exhaust_sel list.sel(1) list.sel(3))
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
   \<open>opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = Some opfer
@@ -83,7 +105,9 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
     apply(simp add: case_filter_empty_some_helper; fail)
    apply(simp add: case_filter_empty_some_helper)
    apply fastforce
-  by (smt (verit, del_insts) filter_empty_conv list.simps(5) neq_Nil_conv option.discI)
+  apply(simp add: case_filter_empty_some_helper3)
+  apply(simp add: case_filter_empty_some_helper2[of "(\<lambda>p. besitz p = besitz _)"])
+  by (metis (mono_tags) empty_filter_conv)
 (*>*)
 
 definition the_single_elem :: \<open>'a set \<Rightarrow> 'a option\<close> where
