@@ -75,7 +75,7 @@ lemma case_filter_empty_some_helper2:
   (P a \<and> x = a \<and> filter P ps = []) \<or> (\<not>P a \<and> filter P ps = [x])"
   apply(cases "P a")
    apply(simp add: case_filter_empty_some_helper)
-   apply (metis empty_filter_conv)
+   apply(metis empty_filter_conv)
   apply(simp)
   apply(cases "filter P ps")
    apply(simp)
@@ -124,6 +124,13 @@ lemma \<open>the_single_elem {a} = Some a\<close>
 lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
   by(simp add: the_single_elem_def)
 (*>*)
+lemma is_singleton_the_elem_set: "A = {the_elem A} \<longleftrightarrow> is_singleton A"
+  by (simp add: is_singleton_the_elem)
+
+lemma opfer_nach_besitz_induct_step_set_simp: "besitz a \<noteq> opfer_nach_besitz \<Longrightarrow>
+  {p. (p = a \<or> p \<in> set ps) \<and> besitz p = opfer_nach_besitz} =
+    {p \<in> set ps. besitz p = opfer_nach_besitz}"
+  by auto
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
   \<open>distinct ps \<Longrightarrow> 
@@ -136,18 +143,21 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
    apply(simp)
    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
    apply(simp add: is_singleton_the_elem)
-   apply(safe) thm is_singleton_the_elem
-    apply (smt (verit) CollectI empty_filter_conv list.simps(4) singletonD)
-    apply (smt (z3) Collect_cong)
+   apply(simp add: case_filter_empty_some_helper case_filter_empty_some_helper3)
+   apply(safe)
+     apply (metis (mono_tags, lifting) mem_Collect_eq singleton_iff)
+    apply (metis (mono_tags, lifting) mem_Collect_eq singleton_iff)
+   apply(simp add: opfer_nach_besitz_induct_step_set_simp; fail)
 
   apply(induction \<open>ps\<close>)
    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def; fail)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
-   apply(safe)
-  apply (smt (z3) empty_filter_conv empty_set filter_set is_singletonI' list.case_eq_if mem_Collect_eq member_filter)
-  thm card_1_singleton_iff Collect_cong empty_filter_conv list.case_eq_if singleton_conv
-  thm Set.filter_def empty_Collect_eq empty_set filter_set is_singletonI' is_singleton_the_elem list.exhaust list.simps(5) mem_Collect_eq
-  by (smt (z3) Collect_cong)
+  apply(safe)
+   apply(case_tac "\<not> is_singleton {p \<in> set ps. besitz p = besitz a}")
+    apply (smt (z3) empty_iff empty_set is_singletonI' list.case_eq_if mem_Collect_eq set_filter)
+   apply(simp)
+   apply (metis One_nat_def card.empty empty_set is_singleton_altdef list.case_eq_if nat.simps(3) set_filter)
+  by(simp add: opfer_nach_besitz_induct_step_set_simp)
 
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall:
