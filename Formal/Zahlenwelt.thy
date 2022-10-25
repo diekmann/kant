@@ -124,7 +124,10 @@ lemma \<open>the_single_elem {a} = Some a\<close>
 lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
   by(simp add: the_single_elem_def)
 (*>*)
-lemma is_singleton_the_elem_set: "A = {the_elem A} \<longleftrightarrow> is_singleton A"
+
+(*TODO: delete in favor of*)
+thm is_singleton_the_elem[symmetric]
+lemma "A = {the_elem A} \<longleftrightarrow> is_singleton A"
   by (simp add: is_singleton_the_elem)
 
 lemma opfer_nach_besitz_induct_step_set_simp: "besitz a \<noteq> opfer_nach_besitz \<Longrightarrow>
@@ -178,6 +181,7 @@ lemma the_elem_singleton_swap:
     is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow> the_elem {pa \<in> set ps. besitz pa = p} = p1\<close>
   by (smt (verit, del_insts) is_singleton_the_elem mem_Collect_eq singleton_iff swap_b)
 
+lemma "( B) = ( C) \<Longrightarrow> (A \<and> B) = (A \<and> C)" oops
 lemma the_elem_singleton_swap_none:
     \<open>p1 \<in> set ps \<Longrightarrow>
     p2 \<in> set ps \<Longrightarrow>
@@ -186,8 +190,10 @@ lemma the_elem_singleton_swap_none:
     is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow>
     is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p} \<Longrightarrow>
     the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} = the_elem {pa \<in> set ps. besitz pa = p}\<close>
-  by (smt (verit, del_insts) CollectI empty_Collect_eq empty_iff insertI1 is_singleton_the_elem singletonD swap_nothing)
-
+  apply(rule arg_cong[of _ _ the_elem])
+  apply(rule Collect_cong)
+  apply(simp add: is_singleton_the_elem)
+  by (smt (verit) mem_Collect_eq singleton_iff swap_nothing)
 
 lemma is_singleton_swap:
   \<open>p1 \<in> set ps \<Longrightarrow>
