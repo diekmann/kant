@@ -60,14 +60,26 @@ text_raw\<open>
 \end{equation*}
 \<close>
 
+(*TODO: welt_personen_swap rename to wps*)
 
 
 definition wohlgeformte_handlungsabsicht
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
-    \<forall>p1 p2. (handeln p1 welt h) =
+    \<forall>p1 p2. handeln p1 welt h =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)\<close>
+
+definition wohlgeformte_handlungsabsicht_gegenbeispiel
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
+where
+  \<open>wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h taeter opfer \<equiv>
+    handeln taeter welt h \<noteq>
+        map_handlung (welt_personen_swap opfer taeter) (handeln opfer (welt_personen_swap taeter opfer welt) h)\<close>
+
+lemma "wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h p1 p2 \<Longrightarrow>
+        \<not>wohlgeformte_handlungsabsicht welt_personen_swap welt h"
+  by(auto simp add: wohlgeformte_handlungsabsicht_gegenbeispiel_def wohlgeformte_handlungsabsicht_def)
 
 (*TODO: das sollte ein Homomorphismus sein.*)
 
