@@ -6,7 +6,7 @@ browserinfo:
 	mkdir -p output
 	chmod 777 output/
 	# use image makarius/isabelle:Isabelle2021-1 and document=false for a lightweight build without proof document.
-	docker run -v "$(PWD):/home/isabelle/build:rw" makarius/isabelle:Isabelle2022_X11_latex build -v -D /home/isabelle/build -o document=pdf -o browser_info -P /home/isabelle/build/browseroutput -e
+	docker run -v "$(PWD):/home/isabelle/build:rw" makarius/isabelle:Isabelle2022_X11_Latex build -v -D /home/isabelle/build -o document=pdf -o browser_info -P /home/isabelle/build/browseroutput -e
 	# then open browseroutput/Unsorted/Kant/index.html
 
 gh-pages: browserinfo
