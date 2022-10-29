@@ -40,7 +40,7 @@ wird es schwer ein allgemeines Gesetz abzuleiten.
 
 subsection\<open>Implementierung Moralisch ein Allgemeines Gesetz Ableiten\<close>
 (*TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?*)
-text\<open>Und nun werfen wir alles zuammen:
+text\<open>Und nun werfen wir alles zusammen:
 
 \<^emph>\<open>„Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
    dass sie ein allgemeines Gesetz werde.“\<close>
@@ -123,7 +123,7 @@ Ich behaupte, der kategorischer Imperativ lässt sich wie folgt umformulieren:
   \<^item> Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
     dass sie (Handlung+Maxime) moralisch ist.
   \<^item> Wenn es jemanden gibt der nach einer Maxime handeln will,
-    dann muss diese Handlung nach der Maxime moralsich sein.
+    dann muss diese Handlung nach der Maxime moralisch sein.
   \<^item> Für jede Handlungsabsicht muss gelten:
     Wenn jemand in jeder Welt nach der Handlungsabsicht handeln würde,
     dann muss diese Handlung moralisch sein.

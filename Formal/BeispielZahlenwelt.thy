@@ -80,7 +80,7 @@ subsection\<open>Handlungen\<close>
 
   text\<open>Wir versuchen, das Opfer nach Besitz auszuwählen, nicht nach Namen.
   Nach unserer Definition ist der Besitz ein Merkmal, nach dem man diskriminieren darf.
-  Man darf nur nicht nach eigenschaften der \<^typ>\<open>person\<close> diskriminieren, sondern nur
+  Man darf nur nicht nach Eigenschaften der \<^typ>\<open>person\<close> diskriminieren, sondern nur
   nach Eigenschaften der \<^typ>\<open>zahlenwelt\<close>.\<close>
   fun opfer_nach_besitz_auswaehlen :: \<open>int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option\<close> where
     \<open>opfer_nach_besitz_auswaehlen _ _ [] = None\<close>
@@ -154,7 +154,7 @@ subsection\<open>Handlungen\<close>
     \<open>reset ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. 0)\<close>
 
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
-  dennoch ist es eine wohlgeformte Handlung, welche wir betrachten kkönnen:\<close>
+  dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF reset)\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
      by(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)

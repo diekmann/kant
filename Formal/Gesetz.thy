@@ -75,7 +75,7 @@ fun hinzufuegen :: \<open>('a,'b) rechtsnorm \<Rightarrow> (nat,'a,'b) gesetz \<
     (if rn \<in> (snd ` G) then Gesetz G else Gesetz (insert (neuer_paragraph (Gesetz G), rn) G))\<close>
 
 
-text\<open>Moelliert ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss:\<close>
+text\<open>Modelliert ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss:\<close>
 datatype sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
 
 

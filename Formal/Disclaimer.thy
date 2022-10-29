@@ -30,7 +30,7 @@ Dabei sind die Wörter wie folgt zu verstehen
     Dies ist die natürliche Gleichheit in HOL, welche uns erlaubt unser Modell
     bequem zu shallow-embedden.
     Meine extensionale Modellierung prägt diese Theorie stark.
-    Beispielweise sind Handlungen extensional modelliert, 
+    Beispielsweise sind Handlungen extensional modelliert, 
     d.h nur die äußerlich messbaren Ergebnisse werden betrachtet.
     Dies widerspricht vermutlich stark Kants Vorstellung.
   \<^item> \<^emph>\<open>Interpretation\<close> besagt, dass es sic hier um meine persönliche Interpretation handelt.

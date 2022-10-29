@@ -16,13 +16,13 @@ Wir bedienen uns bei der Idee dieses Modells um gültige Handlungsabsichten und 
 zu definieren.
 Handlungsabsichten und Maximen sind nur gültig, wenn darin keine Personen hardgecoded werden.
 
-Beispielweise ist folgende Handlungsabsicht ungültig:
+Beispielsweise ist folgende Handlungsabsicht ungültig:
 \<^term>\<open>\<lambda>ich welt. if ich = Alice then Do_A welt else Do_B welt\<close>
 
 Handlungsabsichten und Maximen müssen immer generisch geschrieben werden,
 so dass die handelnden und betroffenen Personen niemals anhand ihres Namens ausgewählt werden.
 
-unser Modell von Handlungsabsichten und Maximen stellt beispielweise die
+unser Modell von Handlungsabsichten und Maximen stellt beispielsweise die
 handelnde Person als Parameter bereit.
 Folgendes ist also eine gültige Handlung:
 \<^term>\<open>\<lambda>ich welt. ModifiziereWelt welt ich\<close>
@@ -95,7 +95,7 @@ where
 text\<open>Die Maxime und \<^typ>\<open>('person, 'world) wp_swap\<close> müssen einige Eigenschaften erfülem.
 Wir kürzen das ab mit wpsm: Welt Person Swap Maxime.\<close>
 
-text\<open>Die Person für die Maxime ausgewertet wurd und swappen der Personen in der Welt
+text\<open>Die Person für die Maxime ausgewertet wird und swappen der Personen in der Welt
 muss equivalent sein:\<close>
 definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
@@ -114,7 +114,7 @@ lemma \<open>wpsm_kommutiert m welt_personen_swap welt =
 )\<close>
   by(simp add: wpsm_kommutiert_def)
 
-text\<open>Die Auswertung der Maxime für eine bestimme Person muss unabhänging
+text\<open>Die Auswertung der Maxime für eine bestimme Person muss unabhängig
 vom swappen von zwei unbeteiligten Personen sein.\<close>
 definition wpsm_unbeteiligt1
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>

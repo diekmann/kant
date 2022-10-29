@@ -20,6 +20,12 @@ So kann ich handelnde Person und beobachtende Person trennen.
 \<close>
 datatype 'world handlung = Handlung (vorher: \<open>'world\<close>) (nachher: \<open>'world\<close>)
 
+(*<*)
+text\<open>The datatype-generated functions are really cool:\<close>
+lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
+(*>*)
+
+
 text \<open>
 Handlung als Funktion gewrapped.
 Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder Intention.

@@ -9,7 +9,7 @@ Diese Zahl kann zum Beispiel der Besitz oder Wohlstand einer Person sein, oder d
 Wobei Gesamtbesitz und Einkommen über einen kurzen Zeitraum recht unterschiedliche Sachen
 modellieren.
 
-Hier sind einige Hilfsfunktionen um mit \<^typ>\<open>person \<Rightarrow> int\<close> allgmein zu arbeiten.\<close>
+Hier sind einige Hilfsfunktionen um mit \<^typ>\<open>person \<Rightarrow> int\<close> allgemein zu arbeiten.\<close>
 
 text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0::int\<close>:\<close>
 definition DEFAULT :: \<open>person \<Rightarrow> int\<close> where
