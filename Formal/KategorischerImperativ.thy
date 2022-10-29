@@ -17,7 +17,7 @@ Das Ergebnis sagt uns ob diese Handlung gut oder schlecht ist.
 Basierend darauf müssen wir nun ein allgemeines Gesetz ableiten.
 
 Ich habe keine Ahnung wie das genau funktionieren soll, deswegen schreibe ich
-einfach nur in einer Typsignatir auf, was yu tun ist:
+einfach nur in einer Typsignatur auf, was zu tun ist:
 
 Gegeben:
   \<^item> \<^typ>\<open>'world handlung\<close>: Die Handlung
@@ -90,6 +90,7 @@ where
         hinzufuegen (gesetz_ableiten (handeln ich welt handlungsabsicht) soll_handeln) gesetz
       )\<close>
 
+text\<open>Das ganze \<^const>\<open>moarlisch_gesetz_ableiten\<close> dient mehr dem Debugging, ...\<close>
 
 subsection\<open>Kategorischer Imperativ\<close>
 
