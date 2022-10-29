@@ -392,4 +392,6 @@ proof(rule kategorischer_imperativI, simp)
   qed
 qed
 
+(*TODO: HandlungF (jeder_zahlt erfuellt kategorischen imp?*)
+
 end
