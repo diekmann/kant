@@ -20,11 +20,6 @@ So kann ich handelnde Person und beobachtende Person trennen.
 \<close>
 datatype 'world handlung = Handlung (vorher: \<open>'world\<close>) (nachher: \<open>'world\<close>)
 
-(*<*)
-text\<open>The datatype-generated functions are really cool:\<close>
-lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
-(*>*)
-
 text \<open>
 Handlung als Funktion gewrapped.
 Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder Intention.
@@ -46,7 +41,7 @@ text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
 Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
 \<close>
-definition \<open>beispiel_handlungf \<equiv> HandlungF (\<lambda>p n. if n < 9000 then n+1 else n)\<close>
+definition \<open>beispiel_handlungf \<equiv> HandlungF (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
 
 text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungf\<close> so aus:
 \<^value>\<open>beispiel_handlungf::(nat, int) handlungF\<close>\<close>
@@ -68,7 +63,7 @@ Bewertung Gut = \<^const>\<open>True\<close>, Schlecht = \<^const>\<open>False\<
 
 \<^medskip>
 
-Laut \<^url>\<open>https://de.wikipedia.org/wiki/Gesinnungsethik\<close> ist eine Gesinnugsethik
+Laut \<^url>\<open>https://de.wikipedia.org/wiki/Gesinnungsethik\<close> ist eine Gesinnungsethik
 "[..] eine der moralischen Theorien,
  die Handlungen nach der Handlungsabsicht [...]  bewertet,
  und zwar ungeachtet der nach erfolgter Handlung eingetretenen Handlungsfolgen."
@@ -88,7 +83,7 @@ dazu im strikten Gegensatz, da die Verantwortungsethik
 
 Da \<^const>\<open>handeln\<close> eine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungF\<close>
 in eine konkrete Änderung der Welt \<^typ>\<open>'world handlung\<close> überführt,
-können wie die beiden Ethiktypen miteinander in Verbindungs setzen.
+können wie die beiden Ethiktypen miteinander in Verbindung setzen.
 Wir sagen, eine Gesinnungsethik und eine Verantwortungsethik sind konsistent,
 genau dann wenn für jede Handlungsabsicht, die
 Gesinnungsethik die Handlungsabsicht genau so bewertet,

@@ -1,5 +1,5 @@
 theory SchleierNichtwissen
-imports Main BeispielPerson Handlung Maxime
+imports BeispielPerson Handlung Maxime
 begin
 
 section\<open>Schleier des Nichtwissens\<close>
@@ -49,7 +49,7 @@ text_raw\<open>
 \begin{equation*}
 \begin{tikzcd}[column sep=14em, row sep=huge]
 \textit{welt}
-  \arrow[red, d, "\textit{welt-personen-swap}\ \textit{p1}\ \textit{p2}" near start] 
+  \arrow[red, d, "\textit{welt-personen-swap}\ \textit{p1}\ \textit{p2}" near start]
   \arrow[blue]{r}[blue]{\textit{handeln}\ \textit{p1}}
 & \textit{welt'} \\
 \textit{alternativ-welt}
@@ -121,7 +121,7 @@ definition wpsm_unbeteiligt1
 where
   \<open>wpsm_unbeteiligt1 m welt_personen_swap welt \<equiv>
 \<forall> p1 p2 pX welt'.
-  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow> 
+  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
     okay m pX (Handlung (welt_personen_swap p2 p1 welt) welt')
     \<longleftrightarrow>
     okay m pX (Handlung welt welt')\<close>
@@ -135,7 +135,7 @@ where
     okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
     \<longleftrightarrow>
     okay m pX (Handlung welt (h p1 welt'))\<close>
-  
+
 
 
 end

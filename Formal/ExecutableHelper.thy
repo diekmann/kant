@@ -15,13 +15,6 @@ fun the_default :: \<open>'a option \<Rightarrow> 'a \<Rightarrow> 'a\<close> wh
 | \<open>the_default (Some a) _ = a\<close>
 
 
-lemma \<open>{b. \<exists>p. (m p) = Some b} = {b. Some b \<in> range m}\<close>
-  by (metis rangeE range_eqI)
-lemma map_filter_id: \<open>S = set s \<Longrightarrow> {b. Some b \<in> S} = set (List.map_filter id s)\<close>
-  apply(simp add: map_filter_def)
-  apply(simp add: image_def)
-  apply(rule Collect_cong)
-  by auto
 
 lemma set_of_constructor:
   \<open>bij Constr \<Longrightarrow> (\<And>x. deconstruct x = (inv Constr) x) \<Longrightarrow> {p. Constr p \<in> ps} = deconstruct ` ps\<close>
@@ -34,6 +27,8 @@ lemma set_of_constructor:
 (*TODO: why isnt this a library function?*)
 definition map_map :: \<open>('a \<Rightarrow> 'b) \<Rightarrow> ('k \<rightharpoonup> 'a) \<Rightarrow> ('k \<rightharpoonup> 'b)\<close> where
   \<open>map_map f m k \<equiv> case m k of None \<Rightarrow> None | Some a \<Rightarrow> Some (f a)\<close>
+
+term \<open>map_fun id \<circ> map_option\<close>
 
 lemma map_map: \<open>map_map f m = map_comp (\<lambda>a. Some (f a)) m\<close>
   by(simp add: fun_eq_iff map_map_def map_comp_def)

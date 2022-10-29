@@ -2,10 +2,9 @@ theory Helper
 imports Main
 begin
 
-section\<open>Hillfslemmata\<close>
+section\<open>Hilfslemmata\<close>
 
 
-thm sum_list_map_eq_sum_count
 lemma helper_sum_int_if: \<open>a \<notin> set P \<Longrightarrow>
 (\<Sum>x\<in>set P. int (if a = x then A1 x else A2 x) * B x) =
   (\<Sum>x\<in>set P. int (A2 x) * B x)\<close>
@@ -24,7 +23,7 @@ proof(induction \<open>xs\<close>)
   = (\<Sum>xa\<in>set xs - {x}. int (count_list xs xa) * f xa)\<close>
       thm helper_sum_int_if
       apply(rule sum.cong, simp)
-      by auto 
+      by auto
     have \<open>?l = f x + (\<Sum>x\<in>set xs. (int (count_list xs x)) * f x)\<close> by (simp add: Cons.IH)
     also have \<open>set xs = insert x (set xs - {x})\<close> using \<open>x \<in> set xs\<close>by blast
     also have \<open>f x + (\<Sum>x\<in>insert x (set xs - {x}). (int (count_list xs x)) * f x) = ?r\<close>
@@ -37,7 +36,7 @@ proof(induction \<open>xs\<close>)
     thus \<open>?thesis\<close> by (simp add: Cons.IH \<open>x \<notin> set xs\<close>)
   qed
 qed simp
-  
+
 lemma count_list_distinct: \<open>distinct P \<Longrightarrow> x \<in> set P \<Longrightarrow> count_list P x = 1\<close>
   apply(induction \<open>P\<close>)
    apply(simp; fail)
