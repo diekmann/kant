@@ -88,7 +88,7 @@ lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF (\<lambda>ich welt
   Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close> by eval
 
 
-subsection\<open>Beiepiel: Ich zahle 1 Steuer\<close>
+subsection\<open>Beispiel: Ich zahle 1 Steuer\<close>
 text\<open>Das funktioniert nicht:\<close>
 definition \<open>ich_zahle_1_steuer ich welt \<equiv>
   Steuerwelt ((get_einkommen welt)(ich -= 1))\<close>
@@ -146,7 +146,7 @@ lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF jeder_zahle_1_steu
      (Rechtsfolge Erlaubnis))}\<close> by eval
 
 
-subsection\<open>Beiepiel: Vereinfachtes Deutsches Steuersystem\<close>
+subsection\<open>Beispiel: Vereinfachtes Deutsches Steuersystem\<close>
 text\<open>Jetzt kommt die Steuern.thy ins Spiel.\<close>
 
 definition jeder_zahlt :: \<open>(nat \<Rightarrow> nat) \<Rightarrow> 'a \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
@@ -179,7 +179,7 @@ lemma \<open>beispiel_case_law_relativ
 
 
 section\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
-text\<open>Die Anforderungen fuer ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
+text\<open>Die Anforderungen für ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
 lemma steuersystem_imp_maxime:
   \<open>steuersystem steuersystem_impl \<Longrightarrow>
         (\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl)))\<close>

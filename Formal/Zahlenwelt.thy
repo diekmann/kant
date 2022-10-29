@@ -9,7 +9,7 @@ Diese Zahl kann zum Beispiel der Besitz oder Wohlstand einer Person sein, oder d
 Wobei Gesamtbesitz und Einkommen über einen kurzen Zeitraum recht unterschiedliche Sachen
 modellieren.
 
-Hier sind einige Hilfsfunktionen um mit \<^typ>\<open>person \<Rightarrow> int\<close> allgmein zu arbeiten.\<close>
+Hier sind einige Hilfsfunktionen um mit \<^typ>\<open>person \<Rightarrow> int\<close> allgemein zu arbeiten.\<close>
 
 text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0::int\<close>:\<close>
 definition DEFAULT :: \<open>person \<Rightarrow> int\<close> where
@@ -123,6 +123,14 @@ lemma \<open>the_single_elem {a} = Some a\<close>
   by(simp add: the_single_elem_def)
 lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
   by(simp add: the_single_elem_def)
+
+
+thm  option.exhaust_sel
+lemma the_single_elem_exhaust:
+  "(the_single_elem S = None \<Longrightarrow> P None) \<Longrightarrow>
+        (\<And>x. the_single_elem S = Some x \<Longrightarrow> P (Some x)) \<Longrightarrow> P (the_single_elem S)"
+apply(cases "the_single_elem S")
+by(auto)
 (*>*)
 
 (*TODO: delete in favor of*)

@@ -126,7 +126,7 @@ lemma moralisch_simp:
 text\<open>
 Wir können die goldene Regel auch umformulieren,
 nicht als Imperativ, sondern als Beobachtung eines Wunschzustandes:
-Wenn eine Handlung für eine Perosn okay ist, dann muss sie auch Okay sein,
+Wenn eine Handlung für eine Person okay ist, dann muss sie auch Okay sein,
 wenn jemand anderes diese Handlung ausführt.
 
 Formal:
@@ -255,7 +255,7 @@ lemma \<open>moralisch
 text\<open>Beispiel:
 Die Welt ist modelliert als eine Abbildung von Person auf Besitz.
 Die Maxime sagt, dass Leute immer mehr oder gleich viel wollen, aber nie etwas verlieren wollen.
-In einer Welt in der keiner etwas hat, erfuellt die Handlung jemanden 3 zu geben die Maxime.
+In einer Welt in der keiner etwas hat, erfüllt die Handlung jemanden 3 zu geben die Maxime.
 \<close>
 lemma \<open>moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]

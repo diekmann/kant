@@ -1,5 +1,5 @@
 theory Swap
-imports Main Helper
+imports Helper
 begin
 
 section\<open>Swap\<close>

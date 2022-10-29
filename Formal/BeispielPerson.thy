@@ -12,7 +12,7 @@ lemma UNIV_person: \<open>UNIV = {Alice, Bob, Carol, Eve}\<close>
   by(auto intro:person.exhaust UNIV_eq_I)
 
 text\<open>Wir werden unterscheiden:
-  \<^item> \<^typ>\<open>'person\<close>: generischer Typ, erlaub es jedes Modell einer Person und Bevölkerung zu haben.
+  \<^item> \<^typ>\<open>'person\<close>: generischer Typ, erlaubt es jedes Modell einer Person und Bevölkerung zu haben.
   \<^item> \<^typ>\<open>person\<close>: Unser minimaler Beispielstyp, bestehend aus \<^const>\<open>Alice\<close>, \<^const>\<open>Bob\<close>, ...
 \<close>
 

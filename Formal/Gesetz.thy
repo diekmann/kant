@@ -1,12 +1,12 @@
 theory Gesetz
-imports Main ExecutableHelper
+imports ExecutableHelper
 begin
 
 section\<open>Gesetz\<close>
 text\<open>Definiert einen Datentyp um Gesetzestext zu modellieren.\<close>
 
 datatype 'a tatbestand = Tatbestand \<open>'a\<close>
- 
+
 datatype 'a rechtsfolge = Rechtsfolge \<open>'a\<close>
 
 datatype ('a, 'b) rechtsnorm = Rechtsnorm \<open>'a tatbestand\<close> \<open>'b rechtsfolge\<close>
@@ -61,7 +61,7 @@ lemma prg_set_deconstruct: \<open>{p. \<section> p \<in> ps} = (\<lambda>x. case
 lemma [code_unfold]:
   \<open>max_paragraph ps = (if card ps = 0 then 0 else Max ((\<lambda>pa. case pa of \<section> p \<Rightarrow> p) ` ps))\<close>
   by(simp add: max_paragraph_def prg_set_deconstruct)
-  
+
 lemma \<open>max_paragraph {} = 0\<close> by eval
 lemma \<open>max_paragraph {\<section> 1, \<section> 7, \<section> 2} = 7\<close> by eval
 (*>*)
@@ -75,7 +75,7 @@ fun hinzufuegen :: \<open>('a,'b) rechtsnorm \<Rightarrow> (nat,'a,'b) gesetz \<
     (if rn \<in> (snd ` G) then Gesetz G else Gesetz (insert (neuer_paragraph (Gesetz G), rn) G))\<close>
 
 
-text\<open>Moelliert ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss:\<close>
+text\<open>Modelliert ob eine Handlung ausgeführt werden muss, darf, kann, nicht muss:\<close>
 datatype sollensanordnung = Gebot | Verbot | Erlaubnis | Freistellung
 
 

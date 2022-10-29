@@ -22,10 +22,10 @@ instantiation percentage :: \<open>monoid_mult\<close>
 begin
   lift_definition one_percentage :: \<open>percentage\<close> is \<open>1 :: real\<close>
     by auto
-  
+
   lift_definition times_percentage :: \<open>percentage \<Rightarrow> percentage \<Rightarrow> percentage\<close> is \<open>(*) :: real \<Rightarrow> _\<close>
     by (auto simp: mult_le_one)
-  
+
   instance
     by standard (transfer; simp; fail)+
 end
@@ -83,34 +83,27 @@ lemma percentage_percentage_mult_left:
   fixes a p ::\<open>percentage\<close>
   shows \<open>p * a \<le> a\<close>
   by (simp add: mult.commute percentage_percentage_mult_right mult_right_le_one_le percentage_range times_percentage.rep_eq)
+
 lemma percentage_real_pos_mult_right:
-  fixes p::\<open>percentage\<close> and a :: \<open>real\<close>
-  shows \<open>a \<ge> 0 \<Longrightarrow> a * (real_of_percentage p) \<le> a\<close>
+  \<open>a \<ge> 0 \<Longrightarrow> a * real_of_percentage p \<le> a\<close>
   by (simp add: mult_left_le percentage_range)
+
 lemma percentage_real_pos_mult_left:
-  fixes p::\<open>percentage\<close> and a :: \<open>real\<close>
-  shows \<open>a \<ge> 0 \<Longrightarrow> (real_of_percentage p) * a \<le> a\<close>
+  \<open>a \<ge> 0 \<Longrightarrow> real_of_percentage p * a \<le> a\<close>
   by (simp add: mult_left_le_one_le percentage_range)
 
 lemma percentage_mult_right_mono:
-  fixes a b p ::\<open>percentage\<close>
+  fixes a b p :: \<open>percentage\<close>
   shows \<open>a \<le> b \<Longrightarrow> a * p \<le> b * p\<close>
-proof -
-  show \<open>a \<le> b \<Longrightarrow> ?thesis\<close>
-    by (simp add: mult_right_mono real_of_percentage_range(1) times_percentage.rep_eq)
-qed
+  by transfer (simp add: mult_right_mono)
 
 lemma percentage_real_mult_right_mono:
-  fixes p ::\<open>percentage\<close> and a b :: \<open>real\<close>
+  fixes p :: \<open>percentage\<close> and a b :: \<open>real\<close>
   shows \<open>a \<le> b \<Longrightarrow> a * p \<le> b * p\<close>
-proof -
-  show \<open>a \<le> b \<Longrightarrow> ?thesis\<close>
-    by (simp add: mult_right_mono real_of_percentage_range(1) times_percentage.rep_eq)
-qed
+  by transfer (simp add: mult_right_mono)
 
 lemma percentage_real_diff_mult_right_mono:
-  fixes p::\<open>percentage\<close> and a b :: \<open>real\<close>
-  shows \<open>a \<le> b \<Longrightarrow> a - a * (real_of_percentage p) \<le> b - b * (real_of_percentage p)\<close>
+  \<open>a \<le> b \<Longrightarrow> a - a * (real_of_percentage p) \<le> b - b * (real_of_percentage p)\<close>
 proof -
   assume a: \<open>a \<le> b\<close>
   have \<open>0 \<le> b - a\<close> by (simp add: a)
@@ -121,9 +114,8 @@ proof -
 qed
 
 lemma percentage_nat_diff_mult_right_mono: (*warning: coertion*)
-  fixes p::\<open>percentage\<close>
-    and a b :: \<open>nat\<close>
-  shows \<open>a \<le> b \<Longrightarrow> a - a * p \<le> b - b * p\<close>
+  fixes p :: \<open>percentage\<close> and a b :: \<open>nat\<close>
+  shows \<open>(a :: nat) \<le> b \<Longrightarrow> a - a * p \<le> b - b * p\<close>
   by (simp add: percentage_real_diff_mult_right_mono)
 
 end

@@ -52,7 +52,7 @@ Eine Maxime ist immer aus Sicht einer bestimmten Person definiert.
 Wir "neutralisieren" eine Maxime indem wir diese bestimmte Person entfernen
 und die Maxime so allgemeingültiger machen.
 Alle Personen müssen gleich behandelt werden
-Um die maxime unabhängig von einer bestimmten Person zu machen,
+Um die Maxime unabhängig von einer bestimmten Person zu machen,
 fordern wir einfach, dass die Maxime für aller Personen erfüllt sein muss.\<close>
 (*TODO: gegen moralisch beweisen?
 und erklaeren! Warum \<forall>
@@ -62,7 +62,7 @@ fun maximeNeutralisieren :: \<open>('person, 'world) maxime \<Rightarrow> ('worl
 
 
 text\<open>
-Nun übersetzen wir eine maxime in die \<^typ>\<open>'world glueck_messen\<close> Funktion des Utilitarismus.
+Nun übersetzen wir eine Maxime in die \<^typ>\<open>'world glueck_messen\<close> Funktion des Utilitarismus.
 Der Trick: eine verletzte Maxime wird als unendliches Leid übersetzt.\<close>
 definition maxime_als_nutzenkalkuel
   :: \<open>('person, 'world) maxime \<Rightarrow> 'world glueck_messen\<close>
