@@ -240,6 +240,22 @@ und es für eine beliebige (wohlgeformte) Handlung auszuführen für mich okay i
 dann ist diese Handlung moralisch..
 \<close>
 
+text\<open>Für Beispiele wird es einfacher zu zeigen, dass eine Maxime nicht den
+kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
+(*insbesondere weil ich das proof document als outline baue und man den beweis,
+also das Gegenbeispiel, nicht sieht.*)
+definition "kategorischer_imperativ_gegenbeispiel welt_personen_swap welt m h ich p1 p2 \<equiv>
+wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
+      maxime_und_handlungsabsicht_generalisieren m h ich \<and>
+      okay m ich (handeln ich welt h) \<and>
+      \<not> okay m p1 (handeln p2 welt h)"
+
+lemma "kategorischer_imperativ_gegenbeispiel welt_personen_swap welt m h ich p1 p2 \<Longrightarrow>
+  \<not> kategorischer_imperativ welt_personen_swap welt m"
+  apply(simp add: kategorischer_imperativ_simp kategorischer_imperativ_gegenbeispiel_def)
+  apply(rule_tac x=h in exI, simp)
+  by blast
+
 subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 
 text\<open>Wenn eine Maxime jede Handlungsabsicht als moralisch bewertet,

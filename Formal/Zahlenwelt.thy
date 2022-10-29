@@ -123,6 +123,14 @@ lemma \<open>the_single_elem {a} = Some a\<close>
   by(simp add: the_single_elem_def)
 lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
   by(simp add: the_single_elem_def)
+
+
+thm  option.exhaust_sel
+lemma the_single_elem_exhaust:
+  "(the_single_elem S = None \<Longrightarrow> P None) \<Longrightarrow>
+        (\<And>x. the_single_elem S = Some x \<Longrightarrow> P (Some x)) \<Longrightarrow> P (the_single_elem S)"
+apply(cases "the_single_elem S")
+by(auto)
 (*>*)
 
 (*TODO: delete in favor of*)

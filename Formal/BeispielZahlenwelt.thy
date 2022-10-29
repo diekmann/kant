@@ -206,16 +206,7 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
-    apply(case_tac \<open>the_single_elem {p. x p = 10}\<close>, simp)
-     apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
-      apply(simp; fail)
-     apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
-      apply(simp; fail)
-     apply(simp; fail)
-    apply(simp)
-    apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
-     apply(simp; fail)
-    apply(simp; fail)
+    apply(auto intro: the_single_elem_exhaust)
     done
 
   text\<open>In jeder Welt ist die Handlung \<^const>\<open>moralisch\<close>:\<close>
