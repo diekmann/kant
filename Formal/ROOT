@@ -2,7 +2,8 @@ session Cache in "Cache" = HOL +
   options [document = false]
   sessions "HOL-Library"
   theories
-    Cache
+    "HOL-Library.Extended_Real"
+    "HOL-Library.Code_Target_Numeral"
 
 session Kant = Cache +
   (*pass document=pdf via iabelle build command line *)
