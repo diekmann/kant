@@ -201,6 +201,23 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
     done
 
+  lemma mhg_maxime_zahlenfortschritt_stehlen4:
+    \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen4 1 10)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
+    apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+    apply(case_tac \<open>the_single_elem {p. x p = 10}\<close>, simp)
+     apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
+      apply(simp; fail)
+     apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
+      apply(simp; fail)
+     apply(simp; fail)
+    apply(simp)
+    apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
+     apply(simp; fail)
+    apply(simp; fail)
+    done
+
   text\<open>In jeder Welt ist die Handlung \<^const>\<open>moralisch\<close>:\<close>
   lemma \<open>moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))\<close>
     apply(cases \<open>welt\<close>)
@@ -213,24 +230,12 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   lemma \<open>\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt\<close>
     apply(simp add: kategorischer_imperativ_def maxime_zahlenfortschritt_def moralisch_simp)
     apply(rule_tac x=\<open>HandlungF (stehlen4 1 10)\<close> in exI)
-    apply(simp add: wohlgeformte_handlungsabsicht_stehlen4 maxime_und_handlungsabsicht_generalisieren_def)
+    apply(simp add: wohlgeformte_handlungsabsicht_stehlen4)
     apply(intro conjI)
      apply(rule_tac x=\<open>Alice\<close> in exI)
      apply(intro conjI allI)
-      apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
-      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
-    apply(case_tac \<open>the_single_elem {p. x p = 10}\<close>, simp)
-       apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
-    apply(simp; fail)
-       apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
-        apply(simp; fail)
-       apply(simp; fail)
-      apply(simp)
-       apply(case_tac \<open>the_single_elem {p. xa p = 10}\<close>)
-        apply(simp; fail)
-      apply(simp; fail)
-    apply(simp add: initialwelt_def, eval)
-
+    using mhg_maxime_zahlenfortschritt_stehlen4[simplified maxime_zahlenfortschritt_def] apply blast
+     apply(simp add: initialwelt_def, eval)
     apply(rule_tac x=\<open>Bob\<close> in exI)
     apply(rule_tac x=\<open>Alice\<close> in exI)
     apply(simp add: initialwelt_def, eval)
