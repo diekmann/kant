@@ -241,10 +241,20 @@ lemma \<open>wpsm_kommutiert
    apply (metis hlp2 hlp3 zahlenwelt_personen_swap_sym)
   by (metis hlp2 hlp3 zahlenwelt_personen_swap_id zahlenwelt_personen_swap_sym)
 
-  lemma mhg_maxime_zahlenfortschritt_stehlen4:
+lemma
     \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p\<close>
     nitpick (*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH das gilt ja doch nicht*)
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     oops
+
+lemma "wohlgeformte_maxime zahlenwelt_personen_swap
+  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
+  apply(simp add: wohlgeformte_maxime_def, intro allI, rename_tac p1 p2 h)
+  apply(case_tac h, rename_tac vor nach, simp)
+  apply(case_tac vor, case_tac nach, simp)
+  apply(simp add: swap_forall)
+  done
+  
 
 (*AWESOME!*)
   lemma \<open>kategorischer_imperativ zahlenwelt_personen_swap welt

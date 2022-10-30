@@ -85,11 +85,27 @@ lemma "wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h p1 
 
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
+(*TODO: aber
+maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p
+gilt damit nicht! Ich brauche was besseres, weniger strenges*)
 definition maxime_und_handlungsabsicht_generalisieren
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>maxime_und_handlungsabsicht_generalisieren m h p =
     (\<forall>w1 w2. okay m p (handeln p w1 h) \<longleftrightarrow> okay m p (handeln p w2 h))\<close>
+
+
+
+(*neu*)
+definition wohlgeformte_maxime
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+where
+  \<open>wohlgeformte_maxime welt_personen_swap m \<equiv>
+    \<forall>p1 p2 h. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (welt_personen_swap p1 p2) h)\<close>
+
+
+
+
 
 
 text\<open>Die Maxime und \<^typ>\<open>('person, 'world) wp_swap\<close> müssen einige Eigenschaften erfülem.
