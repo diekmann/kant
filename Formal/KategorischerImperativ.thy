@@ -50,7 +50,7 @@ where
   \<open>kategorischer_imperativ welt_personen_swap welt m =
     (\<forall>h.
           wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
-          (\<exists>p. maxime_und_handlungsabsicht_generalisieren m h p \<and> okay m p (handeln p welt h))
+          (\<exists>p. maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<and> okay m p (handeln p welt h))
               \<longrightarrow> moralisch welt m h)\<close>
 
 text\<open>Dabei sind \<^const>\<open>wohlgeformte_handlungsabsicht\<close>
@@ -64,7 +64,7 @@ lemma
   (\<forall>h.
     (\<exists>p.
         wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
-        maxime_und_handlungsabsicht_generalisieren m h p \<and>
+        maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<and>
         okay m p (handeln p welt h))
     \<longrightarrow> moralisch welt m h)\<close>
   unfolding kategorischer_imperativ_def
@@ -75,7 +75,7 @@ lemma
 \<open>kategorischer_imperativ welt_personen_swap welt m \<longleftrightarrow>
   (\<forall>h ich.
       wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
-      maxime_und_handlungsabsicht_generalisieren m h ich \<and>
+      maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<and>
       okay m ich (handeln ich welt h) \<longrightarrow> moralisch welt m h)\<close>
   by(simp add: kategorischer_imperativ_def)
   
@@ -87,7 +87,7 @@ lemma kategorischer_imperativ_simp:
   "kategorischer_imperativ welt_personen_swap welt m \<longleftrightarrow>
     (\<forall>h p1 p2 ich.
       wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
-      maxime_und_handlungsabsicht_generalisieren m h ich \<and>
+      maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<and>
       okay m ich (handeln ich welt h)
       \<longrightarrow> okay m p1 (handeln p2 welt h))"
   by (simp add: kategorischer_imperativ_def moralisch_simp)
@@ -95,7 +95,7 @@ lemma kategorischer_imperativ_simp:
 
 lemma kategorischer_imperativI:
   \<open>(\<And>h p1 p2 p. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
-   maxime_und_handlungsabsicht_generalisieren m h p \<Longrightarrow>
+   maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<Longrightarrow>
    okay m p (handeln p welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
    )
  \<Longrightarrow> kategorischer_imperativ welt_personen_swap welt m\<close>
@@ -139,7 +139,7 @@ Der kategorische Imperativ liftet dies eine Abstraktionsebene:
 
 lemma \<open>kategorischer_imperativ welt_personen_swap welt m \<Longrightarrow>
   wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
-  maxime_und_handlungsabsicht_generalisieren m h ich \<Longrightarrow>
+  maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<Longrightarrow>
   okay m ich (handeln ich welt h) \<Longrightarrow> moralisch welt m h\<close>
   apply(simp add: kategorischer_imperativ_def)
   by auto
@@ -157,7 +157,7 @@ kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
 also das Gegenbeispiel, nicht sieht.*)
 definition "kategorischer_imperativ_gegenbeispiel welt_personen_swap welt m h ich p1 p2 \<equiv>
 wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and> 
-      maxime_und_handlungsabsicht_generalisieren m h ich \<and>
+      maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<and>
       okay m ich (handeln ich welt h) \<and>
       \<not> okay m p1 (handeln p2 welt h)"
 
@@ -200,7 +200,7 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   fix ha :: \<open>('person, 'world) handlungsabsicht\<close>
   and p1 p2 p :: \<open>'person\<close>
   assume wfh: \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt ha\<close>
-     and mhg: \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha p\<close>
+     and mhg: \<open>maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha\<close>
      and okayp: \<open>\<forall>pX. P pX (handeln p welt ha)\<close>
 
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
@@ -209,10 +209,12 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
   have 1: \<open>h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))\<close>
     by simp
-  from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
+  from mhg[simplified maxime_und_handlungsabsicht_generalisieren2_def] okayp[simplified h]
   have 2:
   \<open>\<forall>pX. P pX (handeln p (welt_personen_swap p2 p welt) ha)\<close>
-    by(auto simp add: h)
+    apply(simp)
+    apply(simp add: h)
+    sorry (*keine ahnung ob das was wird :( *)
   from 2
   have 4:
     \<open>P p (handeln p (welt_personen_swap p2 p welt) ha)\<close>
