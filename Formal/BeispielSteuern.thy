@@ -1,5 +1,5 @@
 theory BeispielSteuern
-imports Zahlenwelt Maxime Gesetze Simulation Steuern
+imports Zahlenwelt Maxime Gesetze Simulation Steuern KategorischerImperativ
 begin
 
 
@@ -12,6 +12,12 @@ sondern das Jahreseinkommen. Besitz wird ignoriert.
 \<close>
 datatype steuerwelt = Steuerwelt
         (get_einkommen: \<open>person \<Rightarrow> int\<close>) \<comment> \<open>einkommen jeder Person (im Zweifel 0).\<close>
+
+
+(*TODO: copy from zahlenwelt*)
+fun steuerwelt_personen_swap :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
+  \<open>steuerwelt_personen_swap p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
+
 
 fun steuerlast :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
   \<open>steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)\<close>
@@ -40,6 +46,10 @@ lemma \<open>mehrverdiener Alice
         (Handlung (Steuerwelt \<^url>[Alice:=8, Bob:=12, Eve:=7]) (Steuerwelt \<^url>[Alice:=5]))
        = {Alice, Bob}\<close> by eval
 
+lemma mehrverdiener_betrachtet_nur_ausgangszustand:
+  "mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)"
+  by (metis handlung.collapse mehrverdiener.simps vorher_handeln)
+
 text\<open>Folgende Maxime versucht Steuergerechtigkeit festzuschreiben:\<close>
 (*TODO: eine andere test maxime sollte sein,
 dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
@@ -61,6 +71,23 @@ fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where
 (*>*)
 
 (*TODO: kategorischer Imperativ fuer diese maxime beweisen!*)
+lemma "kategorischer_imperativ steuerwelt_personen_swap welt
+    (Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)))"
+  apply(cases welt, rename_tac eink, simp)
+  apply(rule kategorischer_imperativI)
+  apply(simp)
+  apply(safe)
+  apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=p in allE) back
+  apply(simp)
+  apply(case_tac "p1 = p", simp) (*?*)
+  apply(case_tac "p2 = p", simp)
+  oops text\<open>TODO: finish\<close> (*TODO*)
 
 subsection\<open>Setup für Beispiele\<close>
 
