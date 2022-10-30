@@ -213,7 +213,7 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   have 2:
   \<open>\<forall>pX. P pX (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(auto simp add: h)
-  from okayp[simplified h] 2
+  from 2
   have 4:
     \<open>P p (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(simp)
@@ -284,7 +284,7 @@ proof(rule kategorischer_imperativI, simp)
   have 2:
   \<open>P (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(auto simp add: h)
-  from okayp[simplified h] 2
+  from 2
   have 4:
     \<open>P (handeln p (welt_personen_swap p2 p welt) ha)\<close>
     by(simp)
