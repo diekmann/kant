@@ -1,5 +1,5 @@
-theory Simulation
-imports Gesetz Handlung KategorischerImperativ
+theory Simulation (*TODO: rename, das ist nur fuer AllgemeinesGesetz*)
+imports Gesetz Handlung AllgemeinesGesetz
 begin
 
 section\<open>Simulation\<close>

@@ -1,5 +1,5 @@
 theory Gesetze
-imports Gesetz KategorischerImperativ Aenderung
+imports Gesetz AllgemeinesGesetz Aenderung
 begin
 
 section\<open>Gesetze\<close>

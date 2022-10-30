@@ -60,6 +60,7 @@ fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where
       Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))\<close>
 (*>*)
 
+(*TODO: kategorischer Imperativ fuer diese maxime beweisen!*)
 
 subsection\<open>Setup für Beispiele\<close>
 
