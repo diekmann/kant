@@ -64,14 +64,14 @@ text_raw\<open>
 
 
 definition wohlgeformte_handlungsabsicht
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
     \<forall>p1 p2. handeln p1 welt h =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)\<close>
 
 definition wohlgeformte_handlungsabsicht_gegenbeispiel
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h taeter opfer \<equiv>
     handeln taeter welt h \<noteq>
@@ -86,7 +86,7 @@ lemma "wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h p1 
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
 definition maxime_und_handlungsabsicht_generalisieren
-  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool\<close>
+  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>maxime_und_handlungsabsicht_generalisieren m h p =
     (\<forall>w1 w2. okay m p (handeln p w1 h) \<longleftrightarrow> okay m p (handeln p w2 h))\<close>
@@ -108,9 +108,9 @@ where
 
 lemma \<open>wpsm_kommutiert m welt_personen_swap welt =
 (\<forall> p1 p2 h.
-  okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) (HandlungF h))
+  okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) (Handlungsabsicht h))
   \<longleftrightarrow>
-  okay m p1 (handeln p1 welt (HandlungF (\<lambda>p w. welt_personen_swap p1 p2 (h p (welt_personen_swap p2 p1 w)))))
+  okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. welt_personen_swap p1 p2 (h p (welt_personen_swap p2 p1 w)))))
 )\<close>
   by(simp add: wpsm_kommutiert_def)
 

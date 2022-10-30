@@ -44,7 +44,7 @@ Wenn wir Kants kategorischen Imperativ bauen wollen, dürfen wir also nicht die 
 Handlung betrachten, sondern nur die Absicht dahinter.
 Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'world handlung\<close>, also eine konkrete Handlung,
 die nur durch ihre Folgen gegeben ist.
-Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungF\<close>.
+Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungsabsicht\<close>.
 
 Dies mag nun als Fehler in unserem Modell verstanden werden.
 Doch irgendwo müssen wir praktisch werden.
@@ -85,12 +85,12 @@ jedoch wird sie von Täter und Opfer grundverschieden wahrgenommen.
 \<close>
 definition bevoelkerung :: \<open>'person set\<close> where \<open>bevoelkerung \<equiv> UNIV\<close>
 definition wenn_jeder_so_handelt
-    :: \<open>'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> ('world handlung) set\<close>
+    :: \<open>'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> ('world handlung) set\<close>
   where
     \<open>wenn_jeder_so_handelt welt handlungsabsicht \<equiv>
       (\<lambda>handelnde_person. handeln handelnde_person welt handlungsabsicht) ` bevoelkerung\<close>
 fun was_wenn_jeder_so_handelt_aus_sicht_von
-    :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'person \<Rightarrow> bool\<close>
+    :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
     \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt m handlungsabsicht betroffene_person =
         (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. okay m betroffene_person h)\<close>
@@ -100,7 +100,7 @@ text\<open>Für eine gegebene Welt und eine gegebene Maxime nennen wir eine Hand
 genau dann moralisch, wenn die Handlung auch die eigene Maxime erfüllt,
 wenn die Handlung von anderen durchgeführt würde.\<close>
 definition moralisch ::
-  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close> where
+  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close> where
 \<open>moralisch welt handlungsabsicht maxime \<equiv>
   \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht maxime p\<close>
 
@@ -204,7 +204,7 @@ datatype ('person, 'world) verletzte_maxime =
 text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
 fun debug_maxime
   :: \<open>('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
-      ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF
+      ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht
       \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set\<close>
 where
   \<open>debug_maxime print_world welt m handlungsabsicht =
@@ -250,7 +250,7 @@ Die Mir-ist-alles-Recht Maxime ist hier erfüllt:\<close>
 lemma \<open>moralisch
             (42::nat)
              maxime_mir_ist_alles_recht
-            (HandlungF (\<lambda>(person::person) welt. welt + 1))\<close> by eval
+            (Handlungsabsicht (\<lambda>(person::person) welt. welt + 1))\<close> by eval
 
 text\<open>Beispiel:
 Die Welt ist modelliert als eine Abbildung von Person auf Besitz.
@@ -261,13 +261,13 @@ lemma \<open>moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
+            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
   by eval
 lemma \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))
   = {}\<close>
   by eval
 
@@ -278,13 +278,13 @@ lemma \<open>\<not> moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
+            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
   by eval
 lemma \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (HandlungF (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))
   = {VerletzteMaxime (Opfer Bob) (Taeter Bob)
      (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
                [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>

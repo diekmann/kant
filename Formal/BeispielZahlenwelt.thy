@@ -63,7 +63,7 @@ subsection\<open>Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (erschaffen n))\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (Handlungsabsicht (erschaffen n))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     apply(intro allI, case_tac \<open>welt\<close>, simp)
     apply(simp add: swap_def)
@@ -74,7 +74,7 @@ subsection\<open>Handlungen\<close>
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
   lemma "wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwelt_personen_swap
-      (Zahlenwelt (\<lambda>x. 0)) (HandlungF (stehlen 5 Bob))
+      (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen 5 Bob))
       Alice Bob"
     by(eval)
 
@@ -98,16 +98,16 @@ subsection\<open>Handlungen\<close>
   dann bestimmt die Reihenfolge in \<^term>\<open>Enum.enum\<close> wer bestohlen wird.
   Diese Reihenfolge ist wieder eine Eigenschaft von \<^typ>\<open>person\<close> und nicht \<^typ>\<open>zahlenwelt\<close>.\<close>
   lemma\<open>handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
-                (HandlungF (stehlen2 5 10))
+                (Handlungsabsicht (stehlen2 5 10))
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
                (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])\<close> by eval
   lemma\<open>handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
-              (HandlungF (stehlen2 5 10))
+              (Handlungsabsicht (stehlen2 5 10))
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
              (Zahlenwelt \<^url>[Alice := 5, Bob := 15, Carol := - 3])\<close> by eval
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel
       zahlenwelt_personen_swap
-      (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (HandlungF (stehlen2 5 10))
+      (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (Handlungsabsicht (stehlen2 5 10))
       Alice Bob\<close>
     by(eval)
 
@@ -124,7 +124,7 @@ subsection\<open>Handlungen\<close>
 
 
   lemma wohlgeformte_handlungsabsicht_stehlen4:
-    \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF (stehlen4 n p))\<close>
+    \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (Handlungsabsicht (stehlen4 n p))\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
       apply(intro allI, case_tac \<open>welt\<close>, simp)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
@@ -155,7 +155,7 @@ subsection\<open>Handlungen\<close>
 
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
   dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (HandlungF reset)\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (Handlungsabsicht reset)\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
      by(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
@@ -191,18 +191,18 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     \<open>maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)\<close>
 
 
-  lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (erschaffen 5)) p\<close>
+  lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
     done
   
-  lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) p\<close>
+  lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
     done
 
   lemma mhg_maxime_zahlenfortschritt_stehlen4:
-    \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (HandlungF (stehlen4 1 10)) p\<close>
+    \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
@@ -210,7 +210,7 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     done
 
   text\<open>In jeder Welt ist die Handlung \<^const>\<open>moralisch\<close>:\<close>
-  lemma \<open>moralisch welt maxime_zahlenfortschritt (HandlungF (erschaffen 5))\<close>
+  lemma \<open>moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5))\<close>
     apply(cases \<open>welt\<close>)
     by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
@@ -220,7 +220,7 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen würde.\<close>
   lemma \<open>\<not> kategorischer_imperativ zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt\<close>
     apply(simp add: kategorischer_imperativ_def maxime_zahlenfortschritt_def moralisch_simp)
-    apply(rule_tac x=\<open>HandlungF (stehlen4 1 10)\<close> in exI)
+    apply(rule_tac x=\<open>Handlungsabsicht (stehlen4 1 10)\<close> in exI)
     apply(simp add: wohlgeformte_handlungsabsicht_stehlen4)
     apply(intro conjI)
      apply(rule_tac x=\<open>Alice\<close> in exI)
@@ -273,7 +273,7 @@ lemma \<open>wpsm_kommutiert
   text\<open>Alice kann beliebig oft 5 Wohlstand für sich selbst erschaffen.
   Das entstehende Gesetz ist nicht sehr gut, da es einfach jedes Mal einen
   Snapshot der Welt aufschreibt und nicht sehr generisch ist.\<close>
-  lemma \<open>beispiel_case_law_absolut maxime_zahlenfortschritt (HandlungF (erschaffen 5))
+  lemma \<open>beispiel_case_law_absolut maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5))
   =
   Gesetz
   {(\<section> 5,
@@ -300,14 +300,14 @@ lemma \<open>wpsm_kommutiert
   
   
   text\<open>Die gleiche Handlung, wir schreiben aber nur die Änderung der Welt ins Gesetz:\<close>
-  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (erschaffen 5)) =
+  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5)) =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
   (*TODO: Beispiele mit der guten maxime!*)
   lemma \<open>beispiel_case_law_relativ
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (HandlungF (erschaffen 5)) =
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (erschaffen 5)) =
   Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
   by eval
 
@@ -323,13 +323,13 @@ subsection\<open>Kleine Änderung in der Maxime\<close>
   text\<open>Nun ist es \<^const>\<open>Alice\<close> verboten Wohlstand für sich selbst zu erzeugen.\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich))
-          (HandlungF (erschaffen 5)) =
+          (Handlungsabsicht (erschaffen 5)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Verbot))}\<close>
     by eval
     
   text\<open>In keiner Welt ist die Handlung nun \<^const>\<open>moralisch\<close>:\<close>
 lemma \<open>\<not> moralisch welt
-          (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5))\<close>
+          (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (Handlungsabsicht (erschaffen 5))\<close>
     apply(cases \<open>welt\<close>)
     by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
 
@@ -345,7 +345,7 @@ lemma \<open>\<not> moralisch welt
   lemma\<open>VerletzteMaxime (Opfer Bob) (Taeter Alice)
           (Handlung [(Alice, 5), (Bob, 10), (Carol, -3)] [(Alice, 10), (Bob, 10), (Carol, -3)])
           \<in> debug_maxime show_zahlenwelt initialwelt
-            (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (HandlungF (erschaffen 5)) \<close>
+            (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (Handlungsabsicht (erschaffen 5)) \<close>
     by eval
 
 
@@ -361,13 +361,13 @@ subsection\<open>Maxime für Globales Optimum\<close>
   da sich dadurch auch der Gesamtwohlstand erhöht:\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt))
-          (HandlungF (erschaffen 5)) =
+          (Handlungsabsicht (erschaffen 5)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5]) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
 
   lemma \<open>moralisch initialwelt
-          (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (HandlungF (erschaffen 5))\<close>
+          (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (Handlungsabsicht (erschaffen 5))\<close>
   by(eval)
     
     
@@ -375,7 +375,7 @@ subsection\<open>Maxime für Globales Optimum\<close>
   text\<open>Allerdings ist auch diese Maxime auch sehr grausam, da sie Untätigkeit verbietet:\<close>
   lemma \<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt))
-          (HandlungF (erschaffen 0)) =
+          (Handlungsabsicht (erschaffen 0)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
     by eval
 
@@ -383,7 +383,7 @@ subsection\<open>Maxime für Globales Optimum\<close>
   text\<open>Unsere initiale einfache \<^const>\<open>maxime_zahlenfortschritt\<close> würde Untätigkeit hier erlauben:\<close>
   lemma \<open>beispiel_case_law_relativ
           maxime_zahlenfortschritt
-          (HandlungF (erschaffen 0)) =
+          (Handlungsabsicht (erschaffen 0)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
@@ -394,7 +394,7 @@ subsection\<open>Maxime für Globales Optimum\<close>
   text\<open>Untätigkeit ist nun auch hier erlaubt:\<close>
   lemma\<open>beispiel_case_law_relativ
             (Maxime (\<lambda>ich. globaler_fortschritt))
-            (HandlungF (erschaffen 0))
+            (Handlungsabsicht (erschaffen 0))
     =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
@@ -403,19 +403,19 @@ subsection\<open>Maxime für Globales Optimum\<close>
  hardzucoden ist illegal!
 
 eine Person also Opfer hardzucoden muss aber gehen.
-HandlungF (stehlen 5 Bob)
+Handlungsabsicht (stehlen 5 Bob)
 sollte eine wohlgeformte Handlungsabsicht sein.
 *)
 lemma \<open>\<not>wohlgeformte_handlungsabsicht
   zahlenwelt_personen_swap initialwelt
-  (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
+  (Handlungsabsicht (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
   apply(simp add: initialwelt_def wohlgeformte_handlungsabsicht_def swap_def)
   apply(eval)
   done
 
 
 lemma \<open>\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt
-        (HandlungF (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))) Carol\<close>
+        (Handlungsabsicht (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0))) Carol\<close>
   apply(simp add: maxime_zahlenfortschritt_def maxime_und_handlungsabsicht_generalisieren_def)
   apply(rule_tac x=\<open>Zahlenwelt (\<lambda>_. -1)\<close> in exI, simp)
   apply(rule_tac x=\<open>Zahlenwelt (\<lambda>_. 1)\<close> in exI, simp)
@@ -448,7 +448,7 @@ lemma \<open>\<not> maxime_und_handlungsabsicht_generalisieren maxime_zahlenfort
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
   lemma\<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_fortschritt))
-          (HandlungF (stehlen 5 Bob))
+          (Handlungsabsicht (stehlen 5 Bob))
     =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Erlaubnis))}\<close>
@@ -458,26 +458,26 @@ subsection\<open>Alice stiehlt 5\<close>
   text\<open>Zurück zur einfachen \<^const>\<open>maxime_zahlenfortschritt\<close>.\<close>
   
   text\<open>Stehlen ist verboten:\<close>
-  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob)) =
+  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob)) =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Verbot))}\<close>
     by eval
 
   text\<open>In kein Welt ist Stehlen \<^const>\<open>moralisch\<close>:\<close>
-  lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (HandlungF (stehlen 5 Bob))\<close>
+  lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob))\<close>
     apply(cases \<open>welt\<close>)
     by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
   
   text\<open>Auch wenn \<^const>\<open>Alice\<close> von sich selbst stehlen möchte ist dies verboten,
   obwohl hier keiner etwas verliert:\<close>
-  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (stehlen 5 Alice)) =
+  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Alice)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
     by eval
   
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> die abstrakte Handlung "Alice wird bestohlen" gar nicht gut
   fände, wenn sie jemand anderes ausführt:\<close>
   lemma \<open>debug_maxime show_zahlenwelt initialwelt
-          maxime_zahlenfortschritt (HandlungF (stehlen 5 Alice)) =
+          maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Alice)) =
    {VerletzteMaxime (Opfer Alice) (Taeter Bob)
      (Handlung [(Alice, 5), (Bob, 10), (Carol, - 3)] [(Bob, 15), (Carol, - 3)]),
     VerletzteMaxime (Opfer Alice) (Taeter Carol)
@@ -499,8 +499,8 @@ subsection\<open>Alice stiehlt 5\<close>
         Alice
         maxime_zahlenfortschritt
         (case_law_ableiten_relativ delta_zahlenwelt))
-      20 (HandlungF (stehlen 5 Alice)) initialwelt
-      (beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (erschaffen 0)))
+      20 (Handlungsabsicht (stehlen 5 Alice)) initialwelt
+      (beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 0)))
     =
     Gesetz
   {(\<section> 2, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot)),
@@ -511,7 +511,7 @@ subsection\<open>Alice stiehlt 5\<close>
 
 subsection\<open>Schenken\<close>
   text\<open>Es ist \<^const>\<open>Alice\<close> verboten, etwas zu verschenken:\<close>
-  lemma\<open>beispiel_case_law_relativ maxime_zahlenfortschritt (HandlungF (schenken 5 Bob))
+  lemma\<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (schenken 5 Bob))
     =
     Gesetz
       {(\<section> 1,
@@ -525,7 +525,7 @@ subsection\<open>Schenken\<close>
   dass \<^const>\<open>stehlen\<close> und \<^const>\<open>schenken\<close> nicht unterscheidbar sind.\<close>
 
 (*TODO: kategorischen Imperativ aendern, so dass allgemeines gesetz ableiten eine
-handlungF anstatt einer handlung nimmt.
+handlungsabsicht anstatt einer handlung nimmt.
 Evtl in neue Datei, damit sich dieses Beipsiel noch gut liesst.*)
 
 subsection\<open>Ungültige Maxime\<close>
@@ -544,7 +544,7 @@ subsection\<open>Ungültige Maxime\<close>
   text\<open>Dies würde es erlauben, dass \<^const>\<open>Alice\<close> Leute bestehlen darf:\<close>
   lemma\<open>beispiel_case_law_relativ
             (Maxime (\<lambda>ich. individueller_fortschritt Alice))
-            (HandlungF (stehlen 5 Bob))
+            (Handlungsabsicht (stehlen 5 Bob))
     =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Erlaubnis))}\<close>

@@ -11,7 +11,7 @@ text\<open>Wir wollen implementieren:
    dass sie ein \<^bold>\<open>allgemeines Gesetz\<close> werde.“\<close>
 
 Für eine gebene Welt haben wir schon eine Handlung nach einer Maxime untersucht:
-\<^term>\<open>moralisch::'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
+\<^term>\<open>moralisch::'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 
 Das Ergebnis sagt uns ob diese Handlung gut oder schlecht ist.
 Basierend darauf müssen wir nun ein allgemeines Gesetz ableiten.
@@ -36,7 +36,7 @@ Nur aus einer von außen betrachteten Handlung
 und einer Entscheidung ob diese Handlung ausgeführt werden soll
 wird es schwer ein allgemeines Gesetz abzuleiten.
 \<close>
-(*TODO: waere hier ('person, 'world) handlungF anstatt 'world handlung besser?*)
+(*TODO: waere hier ('person, 'world) handlungsabsicht anstatt 'world handlung besser?*)
 
 subsection\<open>Implementierung Moralisch ein Allgemeines Gesetz Ableiten\<close>
 (*TODO: unterstütze viele Maximen, wobei manche nicht zutreffen können?*)
@@ -49,7 +49,7 @@ text\<open>Und nun werfen wir alles zusammen:
 Eingabe:
  \<^item> \<^typ>\<open>'person\<close>: handelnde Person
  \<^item> \<^typ>\<open>'world\<close>: Die Welt in ihrem aktuellen Zustand
- \<^item> \<^typ>\<open>('person, 'world) handlungF\<close>: Eine mögliche Handlung,
+ \<^item> \<^typ>\<open>('person, 'world) handlungsabsicht\<close>: Eine mögliche Handlung,
     über die wir entscheiden wollen ob wir sie ausführen sollten.
  \<^item> \<^typ>\<open>('person, 'world) maxime\<close>: Persönliche Ethik.
  \<^item> \<^typ>\<open>('world, 'a, 'b) allgemeines_gesetz_ableiten\<close>:
@@ -74,7 +74,7 @@ definition moarlisch_gesetz_ableiten ::
   \<open>'person \<Rightarrow>
    'world \<Rightarrow>
    ('person, 'world) maxime \<Rightarrow>
-   ('person, 'world) handlungF \<Rightarrow>
+   ('person, 'world) handlungsabsicht \<Rightarrow>
    ('world, 'a, 'b) allgemeines_gesetz_ableiten \<Rightarrow>
    (nat, 'a, 'b) gesetz
   \<Rightarrow> (sollensanordnung \<times> (nat, 'a, 'b) gesetz)\<close>
@@ -99,7 +99,7 @@ Wir haben mit der goldenen Regel bereits definiert,
 wann für eine gegebene Welt und eine gegebene maxime, eine Handlungsabsicht moralisch ist:
 
  \<^item> \<^term_type>\<open>moralisch :: 
-     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
+     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 
 Effektiv testet die goldene Regel eine Handlungsabsicht.
 
@@ -287,13 +287,13 @@ theorem altruistische_maxime_katimp:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
   shows \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. (\<forall>pX. P pX h)))\<close>
 proof(rule kategorischer_imperativI, simp, intro allI)
-  fix ha :: \<open>('person, 'world) handlungF\<close>
+  fix ha :: \<open>('person, 'world) handlungsabsicht\<close>
   and p1 p2 p :: \<open>'person\<close>
   assume wfh: \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt ha\<close>
      and mhg: \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich h. \<forall>pX. P pX h)) ha p\<close>
      and okayp: \<open>\<forall>pX. P pX (handeln p welt ha)\<close>
 
-  obtain h where h: \<open>ha = HandlungF h\<close>
+  obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
@@ -358,13 +358,13 @@ theorem globale_maxime_katimp:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
   shows \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich::'person. P))\<close>
 proof(rule kategorischer_imperativI, simp)
-  fix ha :: \<open>('person, 'world) handlungF\<close>
+  fix ha :: \<open>('person, 'world) handlungsabsicht\<close>
   and p2 p :: \<open>'person\<close>
   assume wfh: \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt ha\<close>
      and mhg: \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich. P)) ha p\<close>
      and okayp: \<open>P (handeln p welt ha)\<close>
 
-  obtain h where h: \<open>ha = HandlungF h\<close>
+  obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
@@ -393,6 +393,6 @@ proof(rule kategorischer_imperativI, simp)
   qed
 qed
 
-(*TODO: HandlungF (jeder_zahlt erfuellt kategorischen imp?*)
+(*TODO: Handlungsabsicht (jeder_zahlt erfuellt kategorischen imp?*)
 
 end

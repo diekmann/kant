@@ -30,33 +30,33 @@ text \<open>
 Handlung als Funktion gewrapped.
 Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder Intention.
 \<close>
-datatype ('person, 'world) handlungF = HandlungF \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
+datatype ('person, 'world) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
 
 text \<open>
 Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
 Die Absicht die sich in einer Funktion verstecken kann ist schwer zu erkennen.
 Dies deckt sich ganz gut damit, dass Isabelle standardmäßig Funktionen nicht printet.
-Eine \<^typ>\<open>('person, 'world) handlungF\<close> kann nicht geprinted werden!
+Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprinted werden!
 \<close>
 
 
-fun handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'world handlung\<close> where
-\<open>handeln handelnde_person welt (HandlungF h) = Handlung welt (h handelnde_person welt)\<close>
+fun handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close> where
+\<open>handeln handelnde_person welt (Handlungsabsicht h) = Handlung welt (h handelnde_person welt)\<close>
 
 text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
 Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
 \<close>
-definition \<open>beispiel_handlungf \<equiv> HandlungF (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
+definition \<open>beispiel_handlungf \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
 
 text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungf\<close> so aus:
-\<^value>\<open>beispiel_handlungf::(nat, int) handlungF\<close>\<close>
+\<^value>\<open>beispiel_handlungf::(nat, int) handlungsabsicht\<close>\<close>
 
 
 (*<*)
 lemma vorher_handeln[simp]: \<open>vorher (handeln p welt h) = welt\<close>
   by(cases \<open>h\<close>, simp)
-lemma nachher_handeln: \<open>nachher (handeln p welt (HandlungF h)) = h p welt\<close>
+lemma nachher_handeln: \<open>nachher (handeln p welt (Handlungsabsicht h)) = h p welt\<close>
   by(simp)
 (*>*)
 
@@ -74,7 +74,7 @@ Laut \<^url>\<open>https://de.wikipedia.org/wiki/Gesinnungsethik\<close> ist ein
  die Handlungen nach der Handlungsabsicht [...]  bewertet,
  und zwar ungeachtet der nach erfolgter Handlung eingetretenen Handlungsfolgen."
 
-  \<^item> Demnach ist eine Gesinnungsethik: \<^typ>\<open>('person, 'world) handlungF \<Rightarrow> bool\<close>.
+  \<^item> Demnach ist eine Gesinnungsethik: \<^typ>\<open>('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>.
 
 \<^smallskip>
 
@@ -87,7 +87,7 @@ dazu im strikten Gegensatz, da die Verantwortungsethik
 
 \<^medskip>
 
-Da \<^const>\<open>handeln\<close> eine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungF\<close>
+Da \<^const>\<open>handeln\<close> eine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungsabsicht\<close>
 in eine konkrete Änderung der Welt \<^typ>\<open>'world handlung\<close> überführt,
 können wie die beiden Ethiktypen miteinander in Verbindung setzen.
 Wir sagen, eine Gesinnungsethik und eine Verantwortungsethik sind konsistent,
@@ -99,7 +99,7 @@ als jede mögliche handelnde Person tatsächlich ausführt wird und die Folgen b
 \<close>
 
 definition gesinnungsethik_verantwortungsethik_konsistent
-  :: \<open>(('person, 'world) handlungF \<Rightarrow> bool) \<Rightarrow> ('world handlung \<Rightarrow> bool) \<Rightarrow> bool\<close> where
+  :: \<open>(('person, 'world) handlungsabsicht \<Rightarrow> bool) \<Rightarrow> ('world handlung \<Rightarrow> bool) \<Rightarrow> bool\<close> where
 \<open>gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
   \<forall>handlungsabsicht.
     gesinnungsethik handlungsabsicht \<longleftrightarrow>
