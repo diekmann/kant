@@ -399,13 +399,7 @@ subsection\<open>Maxime für Globales Optimum\<close>
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close>
     by eval
 
-(*TODO: eine Person als handelnde Person in eine Handlungsabsicht
- hardzucoden ist illegal!
 
-eine Person also Opfer hardzucoden muss aber gehen.
-Handlungsabsicht (stehlen 5 Bob)
-sollte eine wohlgeformte Handlungsabsicht sein.
-*)
 lemma \<open>\<not>wohlgeformte_handlungsabsicht
   zahlenwelt_personen_swap initialwelt
   (Handlungsabsicht (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
