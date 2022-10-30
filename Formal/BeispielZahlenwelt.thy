@@ -243,8 +243,19 @@ lemma \<open>wpsm_kommutiert
 
 lemma
     \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p\<close>
-    nitpick (*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH das gilt ja doch nicht*)
-    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
+  nitpick (*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH das gilt ja doch nicht*)
+(*
+Nitpick found a counterexample:
+  Free variable:
+    p = Carol
+  Skolem constants:
+    ??.maxime_und_handlungsabsicht_generalisieren.w1 =
+      Zahlenwelt ((\<lambda>x. _)(Bob := 8, Eve := 10, Alice := 8, Carol := 8))
+    ??.maxime_und_handlungsabsicht_generalisieren.w2 =
+      Zahlenwelt ((\<lambda>x. _)(Bob := 8, Eve := 9, Alice := 9, Carol := 8))
+im einen fall wird halt nix gestohlen effektiv
+*)
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     oops
 
 lemma "wohlgeformte_maxime zahlenwelt_personen_swap
@@ -254,7 +265,20 @@ lemma "wohlgeformte_maxime zahlenwelt_personen_swap
   apply(case_tac vor, case_tac nach, simp)
   apply(simp add: swap_forall)
   done
-  
+
+lemma
+  \<open>maxime_und_handlungsabsicht_generalisieren2 zahlenwelt_personen_swap
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren2_def maxime_zahlenfortschritt_def, intro allI)
+  apply(case_tac \<open>w\<close>, simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp split: option.split)
+  apply(safe, simp_all)
+  using the_single_elem_None_swap apply fastforce
+  using the_single_elem_Some_Some_swap apply fast
+  using the_single_elem_Some_ex_swap apply fast
+  by (metis swap2 the_single_elem_Some_Some_swap)
+  (*Gehts oder gehts nicht? ? ? ? hierran arbeite ich gerade*)
 
 (*AWESOME!*)
   lemma \<open>kategorischer_imperativ zahlenwelt_personen_swap welt

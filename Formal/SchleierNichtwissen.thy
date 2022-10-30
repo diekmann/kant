@@ -96,13 +96,19 @@ where
 
 
 
+(*TODO: experimental. Ist das ne gute Idee?*)
+definition maxime_und_handlungsabsicht_generalisieren2
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
+where
+  \<open>maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h =
+    (\<forall>w p1 p2. okay m p1 (handeln p1 w h) \<longleftrightarrow> okay m p2 (handeln p2 (welt_personen_swap p1 p2 w) h))\<close>
+
 (*neu*)
 definition wohlgeformte_maxime
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_maxime welt_personen_swap m \<equiv>
     \<forall>p1 p2 h. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (welt_personen_swap p1 p2) h)\<close>
-
 
 
 
