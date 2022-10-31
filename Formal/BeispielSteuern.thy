@@ -63,6 +63,15 @@ definition maxime_steuern :: \<open>(person, steuerwelt) maxime\<close> where
           )\<close>
   (*do we also need: \<and> steuerlast ich handlung \<le> brutto ich handlung*)
 
+(*Ist das uberhaupt eine gute Maxime?
+Angenommen ich bin der Spitzenverdiener.
+Dann ist die Handlungsabsicht "ich zahle 10 Steuer" gueltig nach der maxime, da "mehrverdiener ich handlung={}".
+Diese Handlung kann ich aber nicht auf andere projezieren, da 
+  * einerseits waere es unmoralisch so viel steuer von geringverdienern zu fordern
+  * andererseits erfuelt die handlung die maxime nicht fuer jeden der nicht spitzenverdiener ist.
+    Die Handlung die die maxime erfuellen wuerde waere "JEDER zahle 10 Steuer".
+*)
+
 
 (*<*)
 fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where

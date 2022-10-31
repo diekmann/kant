@@ -83,6 +83,12 @@ lemma "wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h p1 
 
 (*TODO: das sollte ein Homomorphismus sein.*)
 
+lemma wohlgeformte_handlungsabsicht_imp_swpaid:
+  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
+    welt_personen_swap p1 p2 (welt_personen_swap p2 p1 welt) = welt"
+  by(cases h, simp add: wohlgeformte_handlungsabsicht_def)
+  
+
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
 (*TODO: aber
@@ -96,12 +102,26 @@ where
 
 
 
-(*TODO: experimental. Ist das ne gute Idee?*)
+(*TODO: experimental. Ist das ne gute Idee? Vermutlich, aber das sollte schon aus der
+  wohlgeformten Handlung folgen? Ich brauche etwas, was betroffene Person und handelnde Person
+auseinander reisst.*)
 definition maxime_und_handlungsabsicht_generalisieren2
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
 where
   \<open>maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h =
     (\<forall>w p1 p2. okay m p1 (handeln p1 w h) \<longleftrightarrow> okay m p2 (handeln p2 (welt_personen_swap p1 p2 w) h))\<close>
+
+(*TODO: gut? warum ist da fuer alle welt drinnen?
+Auf jeden fall scheint die zahlenwelt das zu moegen.*)
+definition maxime_und_handlungsabsicht_generalisieren3
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
+where
+  \<open>maxime_und_handlungsabsicht_generalisieren3 welt_personen_swap m h =
+    (\<forall>ich p2 welt. okay m ich (handeln ich welt h)
+      \<longleftrightarrow> okay m p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt h))))\<close>
+
+
+
 
 (*neu*)
 definition wohlgeformte_maxime
@@ -119,6 +139,7 @@ Wir kürzen das ab mit wpsm: Welt Person Swap Maxime.\<close>
 
 text\<open>Die Person für die Maxime ausgewertet wird und swappen der Personen in der Welt
 muss equivalent sein:\<close>
+(*TODO: stimmt das ueberhaupt so? Gilt fas fuer viele maximen? Okay, anscheinend schon, ...*)
 definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where

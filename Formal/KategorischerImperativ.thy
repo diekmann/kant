@@ -185,6 +185,75 @@ lemma blinde_maxime_katimp:
   by(simp add: maxime_und_handlungsabsicht_generalisieren_def)
 
 
+theorem altruistische_maxime_katimp:
+  assumes kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
+      and unrel1: \<open>wpsm_unbeteiligt1 M welt_personen_swap welt\<close>
+      and unrel2: \<open>wpsm_unbeteiligt2 M welt_personen_swap welt\<close>
+      and welt_personen_swap_sym:
+        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
+  shows \<open>kategorischer_imperativ welt_personen_swap welt M\<close>
+proof(rule kategorischer_imperativI)
+  fix ha ich p1 p2
+  assume wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+    and  "maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap M ha"
+    and  okich: "okay M ich (handeln ich welt ha)"
+
+  from kom have komHOL:
+    "\<And> p1 p2 h.
+   okay M p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt))) =
+   okay M p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
+    by(simp add: wpsm_kommutiert_def)
+
+  have mhg3: "\<forall>p2. okay M ich (handeln ich welt ha)
+      \<longleftrightarrow> okay M p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha)))"
+    sorry (*will ich das als assm?*)
+  thm maxime_und_handlungsabsicht_generalisieren3_def
+    
+
+  obtain h where h: \<open>ha = Handlungsabsicht h\<close>
+    by(cases \<open>ha\<close>, blast)
+
+  from wfh wohlgeformte_handlungsabsicht_imp_swpaid
+  have swapid: "welt_personen_swap p2 ich (welt_personen_swap ich p2 welt) = welt"
+    by fastforce
+
+
+  have map_handlung_id:
+    "\<And>h p1 p2. (map_handlung (welt_personen_swap p1 p2) (map_handlung (welt_personen_swap p1 p2) h)) = h"
+    apply(case_tac h, simp)
+    sorry (*das sollte gelten! Und ein upstream thm sein!*)
+
+  from okich mhg3
+  have "okay M p1 (map_handlung (welt_personen_swap p1 ich) (handeln ich welt ha))"
+    by simp
+  with wfh[simplified wohlgeformte_handlungsabsicht_def]
+  have "okay M p1
+    (map_handlung (welt_personen_swap p1 ich)
+      (map_handlung (welt_personen_swap p1 ich) (handeln p1 (welt_personen_swap ich p1 welt) ha)))"
+    by simp
+  with map_handlung_id have "okay M p1 (handeln p1 (welt_personen_swap ich p1 welt) ha)"
+    by(simp)
+    
+
+  from wfh[simplified wohlgeformte_handlungsabsicht_def] okich
+  have "okay M ich
+    (map_handlung (welt_personen_swap p2 ich) (handeln p2 (welt_personen_swap ich p2 welt) ha))"
+    by simp
+  hence "okay M ich
+    (Handlung (welt_personen_swap p2 ich (welt_personen_swap ich p2 welt))
+                (welt_personen_swap p2 ich (nachher (handeln p2 (welt_personen_swap ich p2 welt) ha))))"
+    by(cases ha, simp)
+  hence "okay M ich
+    (Handlung welt
+                (welt_personen_swap p2 ich (nachher (handeln p2 (welt_personen_swap ich p2 welt) ha))))"
+    by(simp add: swapid)
+
+  thm komHOL[of p1 ich h]
+
+
+  show "okay M p1 (handeln p2 welt ha)"
+
+oops
 
 text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
@@ -209,6 +278,21 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
   have 1: \<open>h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))\<close>
     by simp
+
+  from wfh[simplified wohlgeformte_handlungsabsicht_def h] okayp
+  have WTF: "\<forall>pX. P pX (Handlung welt (welt_personen_swap p p2 (h p2 (welt_personen_swap p p2 welt))))"
+      (*WTF? ?*)
+      by (metis h handeln.simps handlung.map_sel(2) nachher_handeln  welt_personen_swap_sym)
+
+
+  from mhg[simplified maxime_und_handlungsabsicht_generalisieren2_def h, simplified] okayp[simplified h, simplified]
+    have XXX: "\<forall>pX. P pX (Handlung (welt_personen_swap p p2 welt) (h p2 (welt_personen_swap p p2 welt)))"
+      by simp (*uffff, das hat mir metis oben schon auch ohne mhg gebaut*)
+  hence "(\<forall>pX. P pX (handeln p2 (welt_personen_swap p p2 welt) ha))"
+    by(simp add: h)
+  thm XXX kom[simplified wpsm_kommutiert_def okay.simps]
+  
+  
   from mhg[simplified maxime_und_handlungsabsicht_generalisieren2_def] okayp[simplified h]
   have 2:
   \<open>\<forall>pX. P pX (handeln p (welt_personen_swap p2 p welt) ha)\<close>
