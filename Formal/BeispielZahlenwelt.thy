@@ -299,7 +299,8 @@ lemma
   apply(simp split: option.split)
   apply(safe, simp_all)
   by (smt (verit, del_insts) fun_upd_apply swap_b swap_nothing)
-  (*Gehts oder gehts nicht? ? ? ? hierran arbeite ich gerade*)
+  (* hierran arbeite ich gerade*)
+
 
 (*AWESOME!*)
   lemma \<open>kategorischer_imperativ zahlenwelt_personen_swap welt

@@ -194,6 +194,7 @@ theorem altruistische_maxime_katimp:
       and welt_personen_swap_id:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
       and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
+      and wfm: "wohlgeformte_maxime welt_personen_swap M" (*unused?*)
   shows \<open>kategorischer_imperativ welt_personen_swap welt M\<close>
 proof(rule kategorischer_imperativI)
   fix ha ich p1 p2
@@ -229,11 +230,13 @@ proof(rule kategorischer_imperativI)
     by(case_tac h, simp)
 
 
-  have mhg3: "\<forall>p2. okay M ich (handeln ich welt ha)
-      \<longleftrightarrow> okay M p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha)))"
-    sorry (*will ich das als assm?*)
+
   thm maxime_und_handlungsabsicht_generalisieren3_def
-  from okich mhg3
+  have mhg3: "\<And>ich p2 welt. okay M ich (handeln ich welt ha)
+      \<longleftrightarrow> okay M p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha)))"
+    sorry (*will ich das als assm? Also dank maxime_ignoriert_ich sollte das aus wfh folgen!*)
+  thm maxime_und_handlungsabsicht_generalisieren3_def
+  from okich mhg3[of ich welt p2]
   have "okay M p2 (map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha))"
     by simp
   with wfh[simplified wohlgeformte_handlungsabsicht_def]
@@ -243,20 +246,17 @@ proof(rule kategorischer_imperativI)
     by simp
   with map_handlung_id have "okay M p2 (handeln p2 (welt_personen_swap ich p2 welt) ha)"
     by(simp)
-    
+  with mhg3[of p2 "(welt_personen_swap ich p2 welt)" ich]
+  have "okay M ich (map_handlung (welt_personen_swap ich p2) (handeln p2 (welt_personen_swap ich p2 welt) ha))"
+    ..
+  (*also irgendwie haette ich das auch nur aus wfh haben koennen?*)
 
-  from wfh[simplified wohlgeformte_handlungsabsicht_def] okich
+
+  from wfh[simplified wohlgeformte_handlungsabsicht_simp] okich
   have "okay M ich
-    (map_handlung (welt_personen_swap p2 ich) (handeln p2 (welt_personen_swap ich p2 welt) ha))"
-    by simp
-  hence "okay M ich
-    (Handlung (welt_personen_swap p2 ich (welt_personen_swap ich p2 welt))
-                (welt_personen_swap p2 ich (nachher (handeln p2 (welt_personen_swap ich p2 welt) ha))))"
-    by(cases ha, simp)
-  hence "okay M ich
     (Handlung welt
                 (welt_personen_swap p2 ich (nachher (handeln p2 (welt_personen_swap ich p2 welt) ha))))"
-    by(simp add: swapid)
+    by(simp)
   hence "okay M ich
     (Handlung welt (welt_personen_swap p2 ich (h p2 (welt_personen_swap ich p2 welt))))"
     by(simp add: h)
@@ -265,6 +265,9 @@ proof(rule kategorischer_imperativI)
     by blast
   hence "okay M ich (handeln p2 (welt_personen_swap p2 ich welt) ha)"
     by(simp add: h)
+  thm wfm[simplified wohlgeformte_maxime_def] (*liefert das gleiche wie komHOL?*)
+
+  (*IDEE: das kom nochmal anschauen: ich braeuchte da evtl was, was die handelnde Person austauscht?*)
 
 
   have 4:

@@ -129,6 +129,14 @@ where
     (\<forall>ich p2 welt. okay m ich (handeln ich welt h)
       \<longleftrightarrow> okay m p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt h))))\<close>
 
+(* gilt NICHT fuer generalisierte individueller fortschritt und stehlen4:
+definition maxime_und_handlungsabsicht_generalisieren4
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
+where
+  \<open>maxime_und_handlungsabsicht_generalisieren4 welt_personen_swap m h =
+    (\<forall>ich p2 welt. okay m ich (handeln ich welt h)
+      \<longleftrightarrow> okay m ich ((map_handlung (welt_personen_swap p2 ich) (handeln p2 welt h))))\<close>
+*)
 
 
 
@@ -148,7 +156,9 @@ Wir kürzen das ab mit wpsm: Welt Person Swap Maxime.\<close>
 
 text\<open>Die Person für die Maxime ausgewertet wird und swappen der Personen in der Welt
 muss equivalent sein:\<close>
-(*TODO: stimmt das ueberhaupt so? Gilt fas fuer viele maximen? Okay, anscheinend schon, ...*)
+(*TODO: stimmt das ueberhaupt so? Gilt fas fuer viele maximen? Okay, anscheinend schon, ...
+Aber vermutlich nur weil die Maximen das ich ignorieren? ? <------------------------------------------ das okay p1 p2 darf nicht vertauscht werden?
+*)
 definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
@@ -165,6 +175,7 @@ lemma \<open>wpsm_kommutiert m welt_personen_swap welt =
   okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. welt_personen_swap p1 p2 (h p (welt_personen_swap p2 p1 w)))))
 )\<close>
   by(simp add: wpsm_kommutiert_def)
+
 
 text\<open>Die Auswertung der Maxime für eine bestimme Person muss unabhängig
 vom swappen von zwei unbeteiligten Personen sein.\<close>
