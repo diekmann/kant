@@ -70,6 +70,16 @@ where
     \<forall>p1 p2. handeln p1 welt h =
             map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)\<close>
 
+text\<open>Folgende Equivalenz erklärt die Definition vermutlich besser:\<close>
+lemma wohlgeformte_handlungsabsicht_simp:
+  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<longleftrightarrow>
+    (\<forall>p1 p2. welt_personen_swap p2 p1 (welt_personen_swap p1 p2 welt) = welt) \<and>
+    (\<forall>p1 p2. handeln p1 welt h =
+                Handlung welt
+                        (welt_personen_swap p2 p1 (nachher (handeln p2 (welt_personen_swap p1 p2 welt) h))))"
+  apply(cases h, simp add: wohlgeformte_handlungsabsicht_def)
+  by fastforce
+
 definition wohlgeformte_handlungsabsicht_gegenbeispiel
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
@@ -86,8 +96,7 @@ lemma "wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h p1 
 lemma wohlgeformte_handlungsabsicht_imp_swpaid:
   "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
     welt_personen_swap p1 p2 (welt_personen_swap p2 p1 welt) = welt"
-  by(cases h, simp add: wohlgeformte_handlungsabsicht_def)
-  
+  by(simp add: wohlgeformte_handlungsabsicht_simp)
 
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>

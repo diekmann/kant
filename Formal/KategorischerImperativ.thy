@@ -191,6 +191,9 @@ theorem altruistische_maxime_katimp:
       and unrel2: \<open>wpsm_unbeteiligt2 M welt_personen_swap welt\<close>
       and welt_personen_swap_sym:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
+      and welt_personen_swap_id:
+        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
+      and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
   shows \<open>kategorischer_imperativ welt_personen_swap welt M\<close>
 proof(rule kategorischer_imperativI)
   fix ha ich p1 p2
@@ -198,40 +201,47 @@ proof(rule kategorischer_imperativI)
     and  "maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap M ha"
     and  okich: "okay M ich (handeln ich welt ha)"
 
+  from maxime_ignoriert_ich have M': "M = Maxime (\<lambda>ich h. M' h)"
+    by(simp add: fun_eq_iff)
+  hence okay_ignoriert_person: "okay M p1 h \<longleftrightarrow> okay M p2 h" for p1 p2 h
+    by(simp)
+
   from kom have komHOL:
     "\<And> p1 p2 h.
    okay M p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt))) =
    okay M p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))"
     by(simp add: wpsm_kommutiert_def)
 
-  have mhg3: "\<forall>p2. okay M ich (handeln ich welt ha)
-      \<longleftrightarrow> okay M p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha)))"
-    sorry (*will ich das als assm?*)
-  thm maxime_und_handlungsabsicht_generalisieren3_def
-    
-
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
+
+  from wfh[simplified wohlgeformte_handlungsabsicht_def h]
+  have 1: \<open>h p2 welt = welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))\<close>
+    by simp
 
   from wfh wohlgeformte_handlungsabsicht_imp_swpaid
   have swapid: "welt_personen_swap p2 ich (welt_personen_swap ich p2 welt) = welt"
     by fastforce
 
 
-  have map_handlung_id:
+  from welt_personen_swap_id have map_handlung_id:
     "\<And>h p1 p2. (map_handlung (welt_personen_swap p1 p2) (map_handlung (welt_personen_swap p1 p2) h)) = h"
-    apply(case_tac h, simp)
-    sorry (*das sollte gelten! Und ein upstream thm sein!*)
+    by(case_tac h, simp)
 
+
+  have mhg3: "\<forall>p2. okay M ich (handeln ich welt ha)
+      \<longleftrightarrow> okay M p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha)))"
+    sorry (*will ich das als assm?*)
+  thm maxime_und_handlungsabsicht_generalisieren3_def
   from okich mhg3
-  have "okay M p1 (map_handlung (welt_personen_swap p1 ich) (handeln ich welt ha))"
+  have "okay M p2 (map_handlung (welt_personen_swap p2 ich) (handeln ich welt ha))"
     by simp
   with wfh[simplified wohlgeformte_handlungsabsicht_def]
-  have "okay M p1
-    (map_handlung (welt_personen_swap p1 ich)
-      (map_handlung (welt_personen_swap p1 ich) (handeln p1 (welt_personen_swap ich p1 welt) ha)))"
+  have "okay M p2
+    (map_handlung (welt_personen_swap p2 ich)
+      (map_handlung (welt_personen_swap p2 ich) (handeln p2 (welt_personen_swap ich p2 welt) ha)))"
     by simp
-  with map_handlung_id have "okay M p1 (handeln p1 (welt_personen_swap ich p1 welt) ha)"
+  with map_handlung_id have "okay M p2 (handeln p2 (welt_personen_swap ich p2 welt) ha)"
     by(simp)
     
 
@@ -247,11 +257,34 @@ proof(rule kategorischer_imperativI)
     (Handlung welt
                 (welt_personen_swap p2 ich (nachher (handeln p2 (welt_personen_swap ich p2 welt) ha))))"
     by(simp add: swapid)
+  hence "okay M ich
+    (Handlung welt (welt_personen_swap p2 ich (h p2 (welt_personen_swap ich p2 welt))))"
+    by(simp add: h)
+  with komHOL[of ich p2 h] okay_ignoriert_person
+  have "okay M ich (Handlung (welt_personen_swap p2 ich welt) (h p2 (welt_personen_swap p2 ich welt)))"
+    by blast
+  hence "okay M ich (handeln p2 (welt_personen_swap p2 ich welt) ha)"
+    by(simp add: h)
 
-  thm komHOL[of p1 ich h]
+
+  have 4:
+    \<open>okay M ich (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
+    sorry
 
 
   show "okay M p1 (handeln p2 welt ha)"
+  proof(cases \<open>ich = p2\<close>)
+    case True
+    then show \<open>?thesis\<close>
+      using okich okay_ignoriert_person by auto
+  next
+    case False
+    assume \<open>ich \<noteq> p2\<close>
+    with 1[simplified handeln.simps h] 4[simplified handeln.simps h] show \<open>?thesis\<close>
+      apply(simp add: h)
+      using kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym
+      using okay_ignoriert_person by fastforce 
+  qed
 
 oops
 
