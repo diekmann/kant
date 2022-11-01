@@ -258,6 +258,63 @@ im einen fall wird halt nix gestohlen effektiv
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
     oops
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fun handeln_partial :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person \<Rightarrow> 'world \<Rightarrow> 'world option) \<Rightarrow> 'world handlung\<close> where
+\<open>handeln_partial handelnde_person welt h = 
+ (case h handelnde_person welt of None \<Rightarrow> Handlung welt welt
+                             | Some welt' \<Rightarrow> Handlung welt welt')\<close>
+
+fun stehlen4_partial :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>stehlen4_partial beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+      (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
+         of None \<Rightarrow> None
+          | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
+      )\<close>
+
+definition maxime_und_handlungsabsicht_generalisieren_partial
+  :: \<open>('person, 'world) maxime \<Rightarrow> ('person \<Rightarrow> 'world \<Rightarrow> 'world option) \<Rightarrow> 'person \<Rightarrow> bool\<close>
+where
+  \<open>maxime_und_handlungsabsicht_generalisieren_partial m h p =
+    (\<forall>w1 w2. h p w1 \<noteq> None \<and> h p w2 \<noteq> None \<longrightarrow> okay m p (handeln_partial p w1 h) = okay m p (handeln_partial p w2 h))\<close>
+
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren_partial
+  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+  ((stehlen4_partial 1 10)) p\<close>
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_partial_def maxime_zahlenfortschritt_def, intro allI)
+  nitpick
+(*
+Nitpick found a counterexample:
+  Free variable:
+    p = Carol
+  Skolem constants:
+    w1 = Zahlenwelt ((\<lambda>x. _)(Bob := 1, Eve := 10, Alice := 43, Carol := 42))
+    w2 = Zahlenwelt ((\<lambda>x. _)(Bob := 43, Eve := 33, Alice := 9, Carol := 10))
+    y = Zahlenwelt ((\<lambda>x. _)(Bob := 1, Eve := 9, Alice := 43, Carol := 43))
+    y = Zahlenwelt ((\<lambda>x. _)(Bob := 43, Eve := 33, Alice := 9, Carol := 10))
+*)
+    oops
+
+
+
+
+
+
+
 lemma "wohlgeformte_maxime zahlenwelt_personen_swap
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
   apply(simp add: wohlgeformte_maxime_def, intro allI, rename_tac p1 p2 h)
