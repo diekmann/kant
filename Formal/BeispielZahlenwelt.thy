@@ -326,6 +326,31 @@ lemma
   apply(simp split: option.split_asm if_split_asm)
   done
 
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop
+  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+  (Handlungsabsicht reset) p\<close>
+  nitpick
+(*
+    w1 = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := - 1, p\<^sub>3 := - 2, p\<^sub>4 := 2))  <-- reset ist schlecht fuer p1
+    w2 = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0))    <--- reset ist okay fuer alle
+*)
+  oops
+
+lemma
+    \<open>\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt h \<Longrightarrow>
+  maxime_und_handlungsabsicht_generalisieren_aussernoop
+  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+  h p\<close>
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_aussernoop_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(elim conjE)
+  apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+  apply(case_tac h, simp)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  oops (*kann ich eine welt in eine andere durch swappen umbauen, so dass das gilt?
+    Vermutlich nicht, Leute koennen ja ganz beliebig besitz haben*)
+  
+
 
 
 lemma "wohlgeformte_maxime zahlenwelt_personen_swap
