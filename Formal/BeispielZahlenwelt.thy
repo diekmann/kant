@@ -307,6 +307,24 @@ lemma
 
 
 
+(*Muss ich partielle handlungen bauen oder kann ich hier einfach no-ops ausschliessen?*)
+definition maxime_und_handlungsabsicht_generalisieren_aussernoop
+  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
+where
+  \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop m h p =
+    (\<forall>w1 w2. (handeln p w1 h) \<noteq> (Handlung w1 w1) \<and> (handeln p w2 h) \<noteq> (Handlung w2 w2)
+      \<longrightarrow> okay m p (handeln p w1 h) = okay m p (handeln p w2 h))\<close>
+
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop
+  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+  (Handlungsabsicht (stehlen4 1 10)) p\<close>
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_aussernoop_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(elim conjE)
+  apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp split: option.split_asm if_split_asm)
+  done
 
 
 
