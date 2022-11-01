@@ -330,8 +330,8 @@ lemma
     \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
   (Handlungsabsicht reset) p\<close>
-  nitpick
 (*
+nitpick:
     w1 = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := - 1, p\<^sub>3 := - 2, p\<^sub>4 := 2))  <-- reset ist schlecht fuer p1
     w2 = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0))    <--- reset ist okay fuer alle
 *)

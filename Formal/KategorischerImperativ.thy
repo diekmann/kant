@@ -53,6 +53,14 @@ where
           (\<exists>p. maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h \<and> okay m p (handeln p welt h))
               \<longrightarrow> moralisch welt m h)\<close>
 
+(*Was waere mit der folgenden Definition:
+\<forall>h ich p2. wohlgeformte_handlungsabsicht welt_personen_swap welt h \<and>
+    okay m ich (handeln ich welt h)) \<longrightarrow> okay m p2 (handeln ich welt h))
+*)
+lemma "moralisch welt m h \<Longrightarrow> (\<forall>ich p2. okay m ich (handeln ich welt h) \<longrightarrow> okay m p2 (handeln ich welt h))"
+  apply(simp add: moralisch_simp)
+  done (*andere richtung gilt nicht, wir sind alse schwaecher als moralisch, das ist doof.*)
+
 text\<open>Dabei sind \<^const>\<open>wohlgeformte_handlungsabsicht\<close>
 und \<^const>\<open>maxime_und_handlungsabsicht_generalisieren\<close>
 ein technisch notwendiges Implementierungsdetail um nicht-wohlgeformte Handlungen
@@ -177,10 +185,9 @@ lemma \<open>\<forall>h. moralisch welt maxime h \<Longrightarrow> kategorischer
   by(simp add: kategorischer_imperativ_def moralisch_simp)
 
 
-text\<open>Eine Maxime die das ich und die Handlung ignoriert und etwas für alle fordert erfüllt den
-kategorischen Imperativ.\<close>
+text\<open>Eine Maxime die das ich und die Handlung ignoriert erfüllt den kategorischen Imperativ.\<close>
 lemma blinde_maxime_katimp:
-  \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. \<forall>p. m p))\<close>
+  \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich h. m))\<close>
   apply(rule kategorischer_imperativI)
   by(simp add: maxime_und_handlungsabsicht_generalisieren_def)
 

@@ -116,7 +116,6 @@ lemma \<open>moralisch welt (Maxime m) handlungsabsicht \<longleftrightarrow>
         (\<forall>(p1,p2)\<in>bevoelkerung\<times>bevoelkerung. m p1 (handeln p2 welt handlungsabsicht))\<close>
   unfolding moralisch_unfold by simp
 
-(*TODO: use okay here?*)
 lemma moralisch_simp:
   \<open>moralisch welt m handlungsabsicht \<longleftrightarrow>
         (\<forall>p1 p2. okay m p1 (handeln p2 welt handlungsabsicht))\<close>
