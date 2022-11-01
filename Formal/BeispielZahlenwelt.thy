@@ -282,7 +282,9 @@ fun stehlen4_partial :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Righ
     \<open>stehlen4_partial beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
       (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
          of None \<Rightarrow> None
-          | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
+          | Some opfer \<Rightarrow> if opfer = dieb
+                          then None
+                          else Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
       )\<close>
 
 definition maxime_und_handlungsabsicht_generalisieren_partial
@@ -295,20 +297,13 @@ lemma
     \<open>maxime_und_handlungsabsicht_generalisieren_partial
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
   ((stehlen4_partial 1 10)) p\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_partial_def maxime_zahlenfortschritt_def, intro allI)
-  nitpick
-(*
-Nitpick found a counterexample:
-  Free variable:
-    p = Carol
-  Skolem constants:
-    w1 = Zahlenwelt ((\<lambda>x. _)(Bob := 1, Eve := 10, Alice := 43, Carol := 42))
-    w2 = Zahlenwelt ((\<lambda>x. _)(Bob := 43, Eve := 33, Alice := 9, Carol := 10))
-    y = Zahlenwelt ((\<lambda>x. _)(Bob := 1, Eve := 9, Alice := 43, Carol := 43))
-    y = Zahlenwelt ((\<lambda>x. _)(Bob := 43, Eve := 33, Alice := 9, Carol := 10))
-*)
-    oops
-
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_partial_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(elim exE conjE)
+  apply(simp)
+  apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp split: option.split_asm if_split_asm)
+  by force
 
 
 
