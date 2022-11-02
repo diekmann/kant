@@ -158,6 +158,19 @@ subsection\<open>Handlungen\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
      by(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
+   term Inf
+  fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Inf (besitz ` UNIV))\<close>
+
+lemma "Inf {0::int, 5, 10, - 3} = - 3"
+  oops
+
+(*TODO: make executable*)
+lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+  = (Zahlenwelt \<^url>[Alice := -3, Bob := -3, Carol := -3, Eve := -3])\<close>
+  apply(simp add: DEFAULT_def UNIV_person fun_eq_iff)
+  oops
+  
 
 subsection\<open>Setup\<close> (*TODO: inline*)
   text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
@@ -174,23 +187,45 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     \<open>maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)\<close>
 
 
-  lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5)) p\<close>
-    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
-    apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+    apply(case_tac \<open>welt\<close>, simp)
     done
   
-  lemma \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob)) p\<close>
-    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
-    apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+    apply(case_tac \<open>welt\<close>, simp)
     done
 
   lemma mhg_maxime_zahlenfortschritt_stehlen4:
-    \<open>maxime_und_handlungsabsicht_generalisieren maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
-    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
-    apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+    apply(case_tac \<open>welt\<close>, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
     apply(auto intro: the_single_elem_exhaust)
     done
+
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+maxime_zahlenfortschritt (Handlungsabsicht (reset)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(case_tac \<open>welt\<close>, simp)
+  nitpick
+(*
+Nitpick found a counterexample:
+  Free variables:
+    p = p\<^sub>1
+    welt = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))
+  Skolem constants:
+    p1 = p\<^sub>3
+    p2 = p\<^sub>1
+    x = (\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)
+*)
+    oops
+
 
   text\<open>In jeder Welt ist die \<^term>\<open>Handlungsabsicht (erschaffen n)\<close> \<^const>\<open>moralisch\<close>:\<close>
   lemma \<open>moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (erschaffen n))\<close>
@@ -242,21 +277,22 @@ lemma \<open>wpsm_kommutiert
   by (metis hlp2 hlp3 zahlenwelt_personen_swap_id zahlenwelt_personen_swap_sym)
 
 lemma
-    \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p\<close>
-  nitpick (*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH das gilt ja doch nicht*)
-(*
-Nitpick found a counterexample:
-  Free variable:
-    p = Carol
-  Skolem constants:
-    ??.maxime_und_handlungsabsicht_generalisieren.w1 =
-      Zahlenwelt ((\<lambda>x. _)(Bob := 8, Eve := 10, Alice := 8, Carol := 8))
-    ??.maxime_und_handlungsabsicht_generalisieren.w2 =
-      Zahlenwelt ((\<lambda>x. _)(Bob := 8, Eve := 9, Alice := 9, Carol := 8))
-im einen fall wird halt nix gestohlen effektiv
-*)
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI)
-    oops
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+    apply(case_tac \<open>welt\<close>, simp)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+    apply(auto split: option.split option.split_asm)
+  done
+
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
+    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (reset)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(case_tac \<open>welt\<close>, simp)
+    apply(auto simp add: swap_def split: option.split option.split_asm)
+  done
+
 
 
 

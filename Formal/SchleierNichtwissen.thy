@@ -98,16 +98,32 @@ lemma wohlgeformte_handlungsabsicht_imp_swpaid:
     welt_personen_swap p1 p2 (welt_personen_swap p2 p1 welt) = welt"
   by(simp add: wohlgeformte_handlungsabsicht_simp)
 
+
+
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
 (*TODO: aber
 maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p
-gilt damit nicht! Ich brauche was besseres, weniger strenges*)
+gilt damit nicht! Ich brauche was besseres, weniger strenges
+
 definition maxime_und_handlungsabsicht_generalisieren
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
-where
+ where
   \<open>maxime_und_handlungsabsicht_generalisieren m h p =
     (\<forall>w1 w2. okay m p (handeln p w1 h) \<longleftrightarrow> okay m p (handeln p w2 h))\<close>
+*)
+(*Die neue variante geht mit der (\<forall>pX. Maxime.
+Aber mit der individueller_fortschritt Maxime geht der reset nichtmehr.
+
+*)
+definition maxime_und_handlungsabsicht_generalisieren
+  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> 
+      ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
+where
+  \<open>maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt m h p =
+    (\<forall>p1 p2. handeln p welt h \<noteq> Handlung welt welt
+           \<and> handeln p (welt_personen_swap p1 p2 welt) h \<noteq> Handlung (welt_personen_swap p1 p2 welt) (welt_personen_swap p1 p2 welt)
+              \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (welt_personen_swap p1 p2 welt) h))\<close>
 
 
 
