@@ -244,8 +244,7 @@ lemma ist_noop_welt_personen_swap:
       and welt_personen_swap_sym:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
   shows "\<forall>welt. wohlgeformte_handlungsabsicht welt_personen_swap welt ha \<Longrightarrow>
-    ist_noop (handeln ich welt ha) \<longleftrightarrow>
-       ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
+    ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
   apply(cases ha, rename_tac h, simp)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
   apply(erule_tac x="welt_personen_swap ich p2 welt" in allE)
@@ -257,7 +256,7 @@ lemma ist_noop_welt_personen_swap:
    apply(simp add: welt_personen_swap_id welt_personen_swap_sym; fail)
   apply(simp)
   apply(subst ist_noop_map_handlung[OF welt_personen_swap_id, of ich p2, symmetric])
-  apply(simp)
+  apply(simp add: welt_personen_swap_id)
   done
 
 

@@ -74,7 +74,7 @@ lemma zahlenwelt_ist_noop_swap:
   "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
        ist_noop (handeln p2 (zahlenwelt_personen_swap ich p2 welt) ha)
         \<longleftrightarrow> ist_noop (handeln ich welt ha)"
-  apply(rule ist_noop_welt_personen_swap[symmetric])
+  apply(rule ist_noop_welt_personen_swap)
   using zahlenwelt_personen_swap_twice(1) apply auto[1]
   apply (simp add: zahlenwelt_personen_swap_sym)
   by simp
