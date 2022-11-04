@@ -100,6 +100,11 @@ lemma wohlgeformte_handlungsabsicht_imp_swpaid:
 
 
 
+
+
+
+
+
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
 (*TODO: aber
@@ -115,14 +120,16 @@ definition maxime_und_handlungsabsicht_generalisieren
 (*Die neue variante geht mit der (\<forall>pX. Maxime.
 Aber mit der individueller_fortschritt Maxime geht der reset nichtmehr.
 
+Sonderfall noops: (bsp von sich selbst stehlen)
+Beide handlungen sind noops oder keine
+TODO: Ich glaube das \<longleftrightarrow> sollte wieder ein \<and> werden.
 *)
 definition maxime_und_handlungsabsicht_generalisieren
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> 
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt m h p =
-    (\<forall>p1 p2. handeln p welt h \<noteq> Handlung welt welt
-           \<and> handeln p (welt_personen_swap p1 p2 welt) h \<noteq> Handlung (welt_personen_swap p1 p2 welt) (welt_personen_swap p1 p2 welt)
+    (\<forall>p1 p2. (ist_noop (handeln p welt h) \<longleftrightarrow> ist_noop (handeln p (welt_personen_swap p1 p2 welt) h))
               \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (welt_personen_swap p1 p2 welt) h))\<close>
 
 
@@ -153,6 +160,11 @@ where
     (\<forall>ich p2 welt. okay m ich (handeln ich welt h)
       \<longleftrightarrow> okay m ich ((map_handlung (welt_personen_swap p2 ich) (handeln p2 welt h))))\<close>
 *)
+
+
+
+
+
 
 
 

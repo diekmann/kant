@@ -26,6 +26,12 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 (*>*)
 
 
+definition ist_noop :: "'world handlung \<Rightarrow> bool" where
+  "ist_noop h \<equiv> vorher h = nachher h"
+
+
+
+
 text \<open>
 Handlung als Funktion gewrapped.
 Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder Intention.

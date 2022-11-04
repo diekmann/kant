@@ -51,6 +51,48 @@ section\<open>Beispiel: Zahlenwelt\<close>
   lemma zahlenwelt_personen_swap_id: \<open>zahlenwelt_personen_swap p p w = w\<close>
     by(cases \<open>w\<close>, simp)
 
+lemma zahlenwelt_personen_swap_twice:
+  "zahlenwelt_personen_swap p1 p2 (zahlenwelt_personen_swap p1 p2 welt) = welt"
+  "zahlenwelt_personen_swap p1 p2 (zahlenwelt_personen_swap p2 p1 welt) = welt"
+  by(cases welt, simp)+
+
+
+
+
+
+
+
+
+(*gute noop lemmata. Ob die generalisieren?*)
+
+lemma ist_noop_map_handlung:
+  "ist_noop (map_handlung (zahlenwelt_personen_swap p1 p2) h) = ist_noop h"
+  apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
+  apply(case_tac vor, case_tac nach, simp)
+  by (metis swap2)
+
+lemma "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
+ist_noop (handeln ich welt ha) \<longleftrightarrow>
+       ist_noop (handeln p2 (zahlenwelt_personen_swap ich p2 welt) ha)"
+  apply(cases ha, rename_tac h, simp)
+  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(erule_tac x="zahlenwelt_personen_swap ich p2 welt" in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=ich in allE)
+  apply(simp)
+  apply(simp add: zahlenwelt_personen_swap_twice)
+  apply(subst ist_noop_map_handlung[of ich p2, symmetric])
+  apply(simp)
+  done
+
+
+
+
+
+
+
+
+
   lemma gesamtbesitz_swap:
     \<open>gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt\<close>
     apply(cases \<open>welt\<close>, simp)
@@ -279,11 +321,13 @@ lemma \<open>wpsm_kommutiert
 lemma
     \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p\<close>
-    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
-    apply(case_tac \<open>welt\<close>, simp)
-    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
-    apply(auto split: option.split option.split_asm)
-  done
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(case_tac "ist_noop (Handlung welt (stehlen4 1 10 p welt))")
+   apply(simp add: ist_noop_def; fail)
+  apply(case_tac \<open>welt\<close>, simp)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: ist_noop_def split: option.split option.split_asm)
+  by fastforce
 
 lemma
     \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
@@ -308,7 +352,7 @@ lemma
 
 
 
-
+(*TODO: das ganze in eine Fail.thy*)
 fun handeln_partial :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person \<Rightarrow> 'world \<Rightarrow> 'world option) \<Rightarrow> 'world handlung\<close> where
 \<open>handeln_partial handelnde_person welt h = 
  (case h handelnde_person welt of None \<Rightarrow> Handlung welt welt
@@ -431,6 +475,10 @@ lemma
   apply(safe, simp_all)
   by (smt (verit, del_insts) fun_upd_apply swap_b swap_nothing)
   (* hierran arbeite ich gerade*)
+
+  
+  
+
 
 
 (*AWESOME!*)
