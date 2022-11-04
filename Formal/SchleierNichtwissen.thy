@@ -229,4 +229,31 @@ where
 
 
 
+
+subsection\<open>Generische Lemmata\<close>
+
+
+lemma ist_noop_map_handlung:
+  assumes welt_personen_swap_id:
+        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
+  shows "ist_noop (map_handlung (welt_personen_swap p1 p2) h) = ist_noop h"
+  apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
+  using welt_personen_swap_id by metis
+
+lemma ist_noop_welt_personen_swap_weak:
+  assumes wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+    and swap_noop: "\<forall>p1 p2 h. ist_noop (map_handlung (welt_personen_swap p1 p2) h) = ist_noop h"
+  shows "ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)"
+  by (metis swap_noop wfh wohlgeformte_handlungsabsicht_def)
+
+lemma ist_noop_welt_personen_swap:
+  assumes wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+  and welt_personen_swap_id:
+       \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
+  shows "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
+  apply(rule ist_noop_welt_personen_swap_weak)
+   apply(simp add: wfh; fail)
+  using ist_noop_map_handlung[OF welt_personen_swap_id] by simp
+
+
 end

@@ -246,71 +246,18 @@ lemma blinde_maxime_katimp:
   by(simp)
 
 
-(*TODO move*)
-lemma ist_noop_map_handlung:
-  assumes welt_personen_swap_id:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-  shows "ist_noop (map_handlung (welt_personen_swap p1 p2) h) = ist_noop h"
-  apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
-  using welt_personen_swap_id by metis
 
-(*TODO: umdrehen*)
-lemma ist_noop_welt_personen_swap:
-  assumes welt_personen_swap_id:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-      and welt_personen_swap_sym:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
-  shows "\<forall>welt. wohlgeformte_handlungsabsicht welt_personen_swap welt ha \<Longrightarrow>
-    ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
-  apply(cases ha, rename_tac h, simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
-  apply(erule_tac x="welt_personen_swap ich p2 welt" in allE)
-  apply(erule_tac x=p2 in allE)
-  apply(erule_tac x=ich in allE)
-  apply(simp)
-  apply(subgoal_tac "\<forall>p1 p2 welt. welt_personen_swap p2 p1 (welt_personen_swap p1 p2 welt) = welt")
-  prefer 2
-   apply(simp add: welt_personen_swap_id welt_personen_swap_sym; fail)
-  apply(simp)
-  apply(subst ist_noop_map_handlung[OF welt_personen_swap_id, of ich p2, symmetric])
-  apply(simp add: welt_personen_swap_id)
-  done
-
-
-(*Das ist ist_noop_swap mit schwaecherer assms. Waere cool die assms noch schwacher zu haben.*)
-lemma ist_noop_welt_personen_swap_TODOASSMS:
-  assumes welt_personen_swap_id:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-      and welt_personen_swap_sym:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
-  shows "wohlgeformte_handlungsabsicht welt_personen_swap (welt_personen_swap ich p2 welt) ha \<Longrightarrow>
-    ist_noop (handeln ich welt ha) \<longleftrightarrow>
-       ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
-  apply(cases ha, rename_tac h, simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
-  apply(erule_tac x=p2 in allE)
-  apply(erule_tac x=ich in allE)
-  apply(simp)
-  apply(subgoal_tac "\<forall>p1 p2 welt. welt_personen_swap p2 p1 (welt_personen_swap p1 p2 welt) = welt")
-  prefer 2
-   apply(simp add: welt_personen_swap_id welt_personen_swap_sym; fail)
-  apply(simp)
-  apply(subst ist_noop_map_handlung[OF welt_personen_swap_id, of ich p2, symmetric])
-  apply(simp)
-  done
 
 
 (*Koennen da assms raus?*)
 theorem altruistische_maxime_katimp:
-  assumes kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close> (*unused?*)
-      (*and unrel1: \<open>wpsm_unbeteiligt1 M welt_personen_swap welt\<close>
-      and unrel2: \<open>wpsm_unbeteiligt2 M welt_personen_swap welt\<close>*)
+  assumes kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
       and welt_personen_swap_sym:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
       and welt_personen_swap_id:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
       and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
-      and wfh: "\<forall>welt. wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+      and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
       and mgh: "\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt M ha p" (*achtung, nicht jede Handlung erfuellt das*)
       and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
   shows \<open>kategorischer_imperativ_auf ha welt M\<close>
@@ -378,27 +325,6 @@ proof(rule kategorischer_imperativ_aufI)
       case True
       assume "ist_noop (handeln p2 welt ha)"
 
-(*
-      (*ungenutzt aber spannend*)
-      assume swap_noop: "\<forall>p1 p2 ha. ist_noop (map_handlung (welt_personen_swap p1 p2) ha) = ist_noop ha"
-
-      with wfh[simplified wohlgeformte_handlungsabsicht_def]
-      have "ist_noop (map_handlung (welt_personen_swap ich p2) (handeln ich (welt_personen_swap p2 ich welt) ha))"
-        by simp
-      with swap_noop have "ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)" by simp
-*)
-      (*problem: ich bestehle mich selbst: noop
-        wenn ich jetzt in der welt personen swappe, ....
-
-
-      Das sollte einfach nicht gelten
-      wenn handeln fuer mich noop ist
-      dann kann ich nicht schliessen, dass eine dann beliebige handlung fuer andere okay ist
-
-      diese definition vom kategorischen Imperativ wird nicht funktionieren, ...
-
-*)
-
       from maxime_erlaubt_untaetigkeit \<open>ist_noop (handeln p2 welt ha)\<close> okay_ignoriert_person
       show ?thesis by blast
       
@@ -409,7 +335,7 @@ proof(rule kategorischer_imperativ_aufI)
       proof(cases "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)")
         case True
         assume "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
-        with ist_noop_welt_personen_swap[OF welt_personen_swap_id welt_personen_swap_sym wfh]
+        with ist_noop_welt_personen_swap[OF wfh welt_personen_swap_id]
         have "ist_noop (handeln ich welt ha)" by simp
         with noopich have False by simp
         thm wpsm_kommutiert_simp
