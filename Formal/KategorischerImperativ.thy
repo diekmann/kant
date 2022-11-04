@@ -252,14 +252,14 @@ lemma blinde_maxime_katimp:
 (*Koennen da assms raus?*)
 theorem altruistische_maxime_katimp:
   assumes mgh: "\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt M ha p" (*achtung, nicht jede Handlung erfuellt das*)
-      and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
-     and kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
-      and welt_personen_swap_sym:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
-      and welt_personen_swap_id:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-      and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-       and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
+    and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
+    and kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
+    and welt_personen_swap_sym:
+      \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
+    and welt_personen_swap_id:
+      \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
+    and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+    and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
   shows \<open>kategorischer_imperativ_auf ha welt M\<close>
 proof(rule kategorischer_imperativ_aufI)
   fix ich p1 p2
@@ -280,17 +280,12 @@ proof(rule kategorischer_imperativ_aufI)
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
-  text\<open>Von p2 handeln auf ich handeln:\<close>
+  text\<open>Von p2 handeln auf ich handeln:\<close> (*warum ist das unused?*)
   from wfh[simplified wohlgeformte_handlungsabsicht_def h]
   have 1: \<open>h p2 welt = welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))\<close>
     by simp
 
-  from wfh wohlgeformte_handlungsabsicht_imp_swpaid
-  have swapid: "welt_personen_swap p2 ich (welt_personen_swap ich p2 welt) = welt"
-    by fastforce
 
-
-(*Was sagt der alte beweis? geht das auch ohne?*)
   from wfh[simplified wohlgeformte_handlungsabsicht_simp] okich
   have "okay M ich
       (Handlung welt
@@ -307,46 +302,35 @@ proof(rule kategorischer_imperativ_aufI)
 
 
   show "okay M p1 (handeln p2 welt ha)"
-  proof(cases \<open>ich = p2\<close>)
+  proof(cases "ist_noop (handeln p2 welt ha)")
     case True
-    then show \<open>?thesis\<close>
-      using okich okay_ignoriert_person by auto
+    assume "ist_noop (handeln p2 welt ha)"
+
+    from maxime_erlaubt_untaetigkeit \<open>ist_noop (handeln p2 welt ha)\<close> okay_ignoriert_person
+    show ?thesis by blast
   next
     case False
-    assume \<open>ich \<noteq> p2\<close>
-
-    show \<open>?thesis\<close>
-    proof(cases "ist_noop (handeln p2 welt ha)")
+    assume nonoopp2: \<open>\<not> ist_noop (handeln p2 welt ha)\<close>
+    show ?thesis
+    proof(cases "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)")
       case True
-      assume "ist_noop (handeln p2 welt ha)"
-
-      from maxime_erlaubt_untaetigkeit \<open>ist_noop (handeln p2 welt ha)\<close> okay_ignoriert_person
-      show ?thesis by blast
-      
+      assume "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
+      with ist_noop_welt_personen_swap[OF wfh welt_personen_swap_id]
+      have "ist_noop (handeln ich welt ha)" by simp
+      with noopich have False by simp
+      thm wpsm_kommutiert_simp
+      thus ?thesis by simp
     next
       case False
-      assume nonoopp2: \<open>\<not> ist_noop (handeln p2 welt ha)\<close>
-      show ?thesis
-      proof(cases "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)")
-        case True
-        assume "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
-        with ist_noop_welt_personen_swap[OF wfh welt_personen_swap_id]
-        have "ist_noop (handeln ich welt ha)" by simp
-        with noopich have False by simp
-        thm wpsm_kommutiert_simp
-        thus ?thesis by simp
-      next
-        case False
-        assume "\<not> ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
-        with nonoopp2 mgh[simplified maxime_und_handlungsabsicht_generalisieren_def]
-        have "okay M p2 (handeln p2 (welt_personen_swap ich p2 welt) ha) = okay M p2 (handeln p2 welt ha)"
-          by simp
-        with okay_handeln_p2 okay_ignoriert_person have 4:
-          \<open>okay M p2 (handeln p2 welt ha)\<close>
-          using welt_personen_swap_sym by auto
-        from this show \<open>?thesis\<close>
-          using okay_ignoriert_person by fastforce
-      qed
+      assume "\<not> ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
+      with nonoopp2 mgh[simplified maxime_und_handlungsabsicht_generalisieren_def]
+      have "okay M p2 (handeln p2 (welt_personen_swap ich p2 welt) ha) = okay M p2 (handeln p2 welt ha)"
+        by simp
+      with okay_handeln_p2 okay_ignoriert_person have 4:
+        \<open>okay M p2 (handeln p2 welt ha)\<close>
+        using welt_personen_swap_sym by auto
+      from this show \<open>?thesis\<close>
+        using okay_ignoriert_person by fastforce
     qed
   qed
 qed
@@ -440,53 +424,66 @@ proof(rule kategorischer_imperativI, simp, intro allI)
   qed
 qed
 
+*)
+
+
+(*TODO: das ist eigentlich das gleiche wie altruistische_maxime_katimp
+
+aber andere assms?
+
+nicht wirklich, aber der proof ist schoener und das thm ist schoener formuliert.
+*)
 text\<open>Auch eine Maxime welche das ich ignoriert,
 also nur die Handlung global betrachtet, erfüllt den kategorischen Imperativ.\<close>
 theorem globale_maxime_katimp:
   fixes P :: \<open>'world handlung \<Rightarrow> bool\<close>
-  assumes kom: \<open>wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
-      and unrel1: \<open>wpsm_unbeteiligt1 (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
-      and unrel2: \<open>wpsm_unbeteiligt2 (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
+  assumes mhg: \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt (Maxime (\<lambda>ich::'person. P)) ha p\<close>
+      and kom: \<open>wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
       and welt_personen_swap_sym:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
-  shows \<open>kategorischer_imperativ welt_personen_swap welt (Maxime (\<lambda>ich::'person. P))\<close>
-proof(rule kategorischer_imperativI, simp)
-  fix ha :: \<open>('person, 'world) handlungsabsicht\<close>
-  and p2 p :: \<open>'person\<close>
-  assume wfh: \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt ha\<close>
-     and mhg: \<open>maxime_und_handlungsabsicht_generalisieren (Maxime (\<lambda>ich. P)) ha p\<close>
-     and okayp: \<open>P (handeln p welt ha)\<close>
+    and welt_personen_swap_id:
+      \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
+    and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+      shows \<open>kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::'person. P))\<close>
+(*  apply(rule altruistische_maxime_katimp[OF mhg, where m="\<lambda>ich::'person. P"])
+       apply(simp; fail)
+      apply(simp add: kom; fail)
+     apply(simp add: welt_personen_swap_sym; fail)*)
+
+proof(rule kategorischer_imperativ_aufI, simp)
+  fix ich p2 :: \<open>'person\<close>
+  assume noopich: "\<not> ist_noop (handeln ich welt ha)"
+     and okayp: \<open>P (handeln ich welt ha)\<close>
 
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
-  from wfh[simplified wohlgeformte_handlungsabsicht_def h]
-  have 1: \<open>h p2 welt = welt_personen_swap p p2 (h p (welt_personen_swap p2 p welt))\<close>
+  thm noopich
+  (*hierran arbeite ich gerade*)
+  have "\<not> ist_noop (handeln p2 welt ha)" sorry (*mit einer fallunterscheidung und wenn maxime untaetigkeit erlaubt sollte das gehen*)
+  with ist_noop_welt_personen_swap[OF wfh welt_personen_swap_id] have mhg_pre:
+    "\<not> ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)"
     by simp
-  from mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
+
+
+  from wfh[simplified wohlgeformte_handlungsabsicht_def h]
+  have 1: \<open>h p2 welt = welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))\<close>
+    by simp
+  from noopich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
   have 2:
-  \<open>P (handeln p (welt_personen_swap p2 p welt) ha)\<close>
+  \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
     by(auto simp add: h)
   from 2
   have 4:
-    \<open>P (handeln p (welt_personen_swap p2 p welt) ha)\<close>
+    \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
     by(simp)
+  from this[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym
+  have "P (Handlung welt (welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))))"
+    by simp
 
-  show \<open>P (handeln p2 welt ha)\<close>
-  proof(cases \<open>p = p2\<close>)
-    case True
-    then show \<open>?thesis\<close>
-      using okayp by auto 
-  next
-    case False
-    assume \<open>p \<noteq> p2\<close>
-    with 1[simplified handeln.simps h] 4[simplified handeln.simps h] show \<open>?thesis\<close>
-      apply(simp add: h)
-      using kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym by fastforce
-  qed
-qed
-
-*)
+  with 1[simplified handeln.simps h] show \<open>P (handeln p2 welt ha)\<close>
+    by(simp add: h)
+  oops
 
 
 (*TODO: Handlungsabsicht (jeder_zahlt erfuellt kategorischen imp?*)

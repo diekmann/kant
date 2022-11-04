@@ -481,7 +481,7 @@ lemma \<open>
   kategorischer_imperativ_auf ha welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))\<close>
   thm altruistische_maxime_katimp[]
-  apply(erule altruistische_maxime_katimp[of _ _ _ _ "\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)"])
+  apply(erule altruistische_maxime_katimp[where m="\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)"])
        apply(simp; fail)
       apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
      apply (simp add: zahlenwelt_personen_swap_sym; fail)
