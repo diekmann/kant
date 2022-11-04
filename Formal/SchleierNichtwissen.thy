@@ -129,7 +129,7 @@ definition maxime_und_handlungsabsicht_generalisieren
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt m h p =
-    (\<forall>p1 p2. (ist_noop (handeln p welt h) \<longleftrightarrow> ist_noop (handeln p (welt_personen_swap p1 p2 welt) h))
+    (\<forall>p1 p2. (\<not>ist_noop (handeln p welt h) \<and> \<not>ist_noop (handeln p (welt_personen_swap p1 p2 welt) h))
               \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (welt_personen_swap p1 p2 welt) h))\<close>
 
 
@@ -196,7 +196,7 @@ where
   \<longleftrightarrow>
   okay m p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))\<close>
 
-lemma \<open>wpsm_kommutiert m welt_personen_swap welt =
+lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m welt_personen_swap welt =
 (\<forall> p1 p2 h.
   okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) (Handlungsabsicht h))
   \<longleftrightarrow>
