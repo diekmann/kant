@@ -234,6 +234,7 @@ theorem altruistische_maxime_katimp:
       and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
       and mgh: "\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt M ha p" (*achtung, nicht jede Handlung erfuellt das*)
       and swap_noop: "\<forall>p1 p2 ha. ist_noop (map_handlung (welt_personen_swap p1 p2) ha) = ist_noop ha"
+      and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
   shows \<open>kategorischer_imperativ_auf ha welt M\<close>
 proof(rule kategorischer_imperativ_aufI)
   fix ich p1 p2
@@ -268,7 +269,6 @@ proof(rule kategorischer_imperativ_aufI)
     by(case_tac h, simp)
 
 
-(*
   from wfh[simplified wohlgeformte_handlungsabsicht_simp] okich
   have "okay M ich
       (Handlung welt
@@ -282,7 +282,6 @@ proof(rule kategorischer_imperativ_aufI)
     by blast
   hence okay_handeln_p2: "okay M ich (handeln p2 (welt_personen_swap p2 ich welt) ha)"
     by(simp add: h)
-*)
 
 
   show "okay M p1 (handeln p2 welt ha)"
@@ -295,13 +294,15 @@ proof(rule kategorischer_imperativ_aufI)
     assume \<open>ich \<noteq> p2\<close>
 
     show \<open>?thesis\<close>
-    proof(cases "ist_noop (handeln ich welt ha)")
+    proof(cases "ist_noop (handeln p2 welt ha)")
       case True
-      assume "ist_noop (handeln ich welt ha)"
+      assume "ist_noop (handeln p2 welt ha)"
+
+      (*ungenutzt aber spannend*)
       with wfh[simplified wohlgeformte_handlungsabsicht_def]
-      have "ist_noop (map_handlung (welt_personen_swap p2 ich) (handeln p2 (welt_personen_swap ich p2 welt) ha))"
+      have "ist_noop (map_handlung (welt_personen_swap ich p2) (handeln ich (welt_personen_swap p2 ich welt) ha))"
         by simp
-      with swap_noop have "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)" by simp
+      with swap_noop have "ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)" by simp
 
       (*problem: ich bestehle mich selbst: noop
         wenn ich jetzt in der welt personen swappe, ....
@@ -315,27 +316,30 @@ proof(rule kategorischer_imperativ_aufI)
 
 *)
 
-      show ?thesis sorry
+      from maxime_erlaubt_untaetigkeit \<open>ist_noop (handeln p2 welt ha)\<close> okay_ignoriert_person
+      show ?thesis by blast
       
     next
       case False
-      assume nonoop: \<open>\<not> ist_noop (handeln ich welt ha)\<close>
-      have "\<not>ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)" sorry
-
-      with nonoop mgh[simplified maxime_und_handlungsabsicht_generalisieren_def]
-      have "okay M ich (handeln ich welt ha) = okay M ich (handeln ich (welt_personen_swap p2 ich welt) ha)"
-        by simp
-      with okich have 4:
-        \<open>okay M ich (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
-        by simp
-      with kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym
-      have "okay M ich (Handlung welt (welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))))"
-        apply(simp add: h)
-        using okay_ignoriert_person by blast (*TODO: das wpsm_kommutiert sollte so sein, dass ich hier kein okay_ignoriert_person brauche!*)
-        
-      with 1 show \<open>?thesis\<close>
-        apply(simp add: h)
-        using okay_ignoriert_person by fastforce
+      assume nonoop: \<open>\<not> ist_noop (handeln p2 welt ha)\<close>
+      show ?thesis
+      proof(cases "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)")
+        case True
+        assume "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
+        have "ist_noop (handeln ich welt ha)" sorry (*gilt wenn \<forall>welt wfh in zahlenwelt*)
+        (*wenn ich im kategorischen imperativ diesen Fall ausschliesse, dann sollte der Beweis durchgehen.*)
+        show ?thesis sorry
+      next
+        case False
+        assume "\<not> ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"with nonoop mgh[simplified maxime_und_handlungsabsicht_generalisieren_def]
+        have "okay M p2 (handeln p2 (welt_personen_swap ich p2 welt) ha) = okay M p2 (handeln p2 welt ha)"
+          by simp
+        with okay_handeln_p2 okay_ignoriert_person have 4:
+          \<open>okay M p2 (handeln p2 welt ha)\<close>
+          using welt_personen_swap_sym by auto
+        from this show \<open>?thesis\<close>
+          using okay_ignoriert_person by fastforce
+      qed
     qed
 
 

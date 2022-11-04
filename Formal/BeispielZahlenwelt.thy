@@ -65,14 +65,15 @@ lemma zahlenwelt_personen_swap_twice:
 
 (*gute noop lemmata. Ob die generalisieren?*)
 
-lemma ist_noop_map_handlung:
+lemma zahlenwelt_ist_noop_map_handlung:
   "ist_noop (map_handlung (zahlenwelt_personen_swap p1 p2) h) = ist_noop h"
   apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
   apply(case_tac vor, case_tac nach, simp)
   by (metis swap2)
 
-lemma "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
-ist_noop (handeln ich welt ha) \<longleftrightarrow>
+lemma zahlenwelt_ist_noop_swap:
+  "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
+    ist_noop (handeln ich welt ha) \<longleftrightarrow>
        ist_noop (handeln p2 (zahlenwelt_personen_swap ich p2 welt) ha)"
   apply(cases ha, rename_tac h, simp)
   apply(simp add: wohlgeformte_handlungsabsicht_def)
@@ -81,12 +82,11 @@ ist_noop (handeln ich welt ha) \<longleftrightarrow>
   apply(erule_tac x=ich in allE)
   apply(simp)
   apply(simp add: zahlenwelt_personen_swap_twice)
-  apply(subst ist_noop_map_handlung[of ich p2, symmetric])
+  apply(subst zahlenwelt_ist_noop_map_handlung[of ich p2, symmetric])
   apply(simp)
   done
 
-
-
+lemma "ist_noop (handeln p welt ha) = ist_noop (handeln p (zahlenwelt_personen_swap p1 p2 welt) ha)"
 
 
 
