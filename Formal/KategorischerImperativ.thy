@@ -69,6 +69,23 @@ TODO: Leider fehlen mir Beispiele von Maximen welche den kategorischen Imperativ
 auf allen Handlungsabsichten erfüllen.
 \<close>
 
+text\<open>Diese \<^term>\<open>\<not>ist_noop (handeln ich welt h)\<close> gefällt mir gar nicht.
+Wir brauchen es aber, damit die Beispiele funktionieren.
+Das ist nötig, um pathologische Grenzfälle auszuschließen.
+Beispielsweise ist von-sich-selbst stehlen eine no-op.
+No-ops sind normalerweise nicht böse.
+Stehlen ist schon böse.
+Dieser Grenzfall in dem Stehlen zur no-op wird versteckt also den Charakter der
+Handlungsabsicht und muss daher ausgeschlossen werden.
+Ganz glücklich bin ich mit der Rechtfertigung aber nicht.
+Eventuell wäre es schöner, Handlungen partiell zu machen,
+also dass Handlungsabsichten auch mal \<^const>\<open>None\<close> zurückgeben dürfen.
+Das könnte einiges rechtfertigen.
+Beispielsweise ist Stehlen: jemand anderen etwas wegnehmen.
+Nicht von sich selbst.
+Allerdings machen partielle Handlungen alles komplizierter.
+\<close>
+
 
 text\<open>In der Definition is \<^const>\<open>wohlgeformte_handlungsabsicht\<close>
 ein technisch notwendiges Implementierungsdetail um nicht-wohlgeformte Handlungen
