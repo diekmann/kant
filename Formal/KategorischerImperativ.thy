@@ -237,6 +237,7 @@ lemma ist_noop_map_handlung:
   apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
   using welt_personen_swap_id by metis
 
+(*TODO: umdrehen*)
 lemma ist_noop_welt_personen_swap:
   assumes welt_personen_swap_id:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
@@ -283,18 +284,18 @@ lemma ist_noop_welt_personen_swap_TODOASSMS:
   done
 
 
+(*Koennen da assms raus?*)
 theorem altruistische_maxime_katimp:
-  assumes kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
-      and unrel1: \<open>wpsm_unbeteiligt1 M welt_personen_swap welt\<close>
-      and unrel2: \<open>wpsm_unbeteiligt2 M welt_personen_swap welt\<close>
+  assumes kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close> (*unused?*)
+      (*and unrel1: \<open>wpsm_unbeteiligt1 M welt_personen_swap welt\<close>
+      and unrel2: \<open>wpsm_unbeteiligt2 M welt_personen_swap welt\<close>*)
       and welt_personen_swap_sym:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
       and welt_personen_swap_id:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
       and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
-      and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
+      and wfh: "\<forall>welt. wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
       and mgh: "\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt M ha p" (*achtung, nicht jede Handlung erfuellt das*)
-      and swap_noop: "\<forall>p1 p2 ha. ist_noop (map_handlung (welt_personen_swap p1 p2) ha) = ist_noop ha"
       and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
   shows \<open>kategorischer_imperativ_auf ha welt M\<close>
 proof(rule kategorischer_imperativ_aufI)
@@ -331,6 +332,7 @@ proof(rule kategorischer_imperativ_aufI)
     by(case_tac h, simp)
 
 
+(*Was sagt der alte beweis? geht das auch ohne?*)
   from wfh[simplified wohlgeformte_handlungsabsicht_simp] okich
   have "okay M ich
       (Handlung welt
@@ -360,12 +362,15 @@ proof(rule kategorischer_imperativ_aufI)
       case True
       assume "ist_noop (handeln p2 welt ha)"
 
+(*
       (*ungenutzt aber spannend*)
+      assume swap_noop: "\<forall>p1 p2 ha. ist_noop (map_handlung (welt_personen_swap p1 p2) ha) = ist_noop ha"
+
       with wfh[simplified wohlgeformte_handlungsabsicht_def]
       have "ist_noop (map_handlung (welt_personen_swap ich p2) (handeln ich (welt_personen_swap p2 ich welt) ha))"
         by simp
       with swap_noop have "ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)" by simp
-
+*)
       (*problem: ich bestehle mich selbst: noop
         wenn ich jetzt in der welt personen swappe, ....
 
@@ -388,9 +393,8 @@ proof(rule kategorischer_imperativ_aufI)
       proof(cases "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)")
         case True
         assume "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha)"
-        thm okay_handeln_p2
-        from ist_noop_welt_personen_swap
-        have "ist_noop (handeln ich welt ha)" sorry (*gilt wenn \<forall>welt wfh in zahlenwelt*)
+        with ist_noop_welt_personen_swap[OF welt_personen_swap_id welt_personen_swap_sym wfh]
+        have "ist_noop (handeln ich welt ha)" by simp
         with noopich have False by simp
         thm wpsm_kommutiert_simp
         thus ?thesis by simp
@@ -407,10 +411,10 @@ proof(rule kategorischer_imperativ_aufI)
           using okay_ignoriert_person by fastforce
       qed
     qed
+  qed
+qed
 
-
-oops
-
+(*
 text\<open>Eine Maxime die das ich ignoriert und etwas für alle fordert erfüllt den
 kategorischen Imperativ.\<close>
 theorem altruistische_maxime_katimp:
@@ -544,6 +548,9 @@ proof(rule kategorischer_imperativI, simp)
       using kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym by fastforce
   qed
 qed
+
+*)
+
 
 (*TODO: Handlungsabsicht (jeder_zahlt erfuellt kategorischen imp?*)
 

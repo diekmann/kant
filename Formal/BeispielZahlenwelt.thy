@@ -72,9 +72,9 @@ lemma zahlenwelt_ist_noop_map_handlung:
 
 lemma zahlenwelt_ist_noop_swap:
   "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
-    ist_noop (handeln ich welt ha) \<longleftrightarrow>
-       ist_noop (handeln p2 (zahlenwelt_personen_swap ich p2 welt) ha)"
-  apply(rule ist_noop_welt_personen_swap)
+       ist_noop (handeln p2 (zahlenwelt_personen_swap ich p2 welt) ha)
+        \<longleftrightarrow> ist_noop (handeln ich welt ha)"
+  apply(rule ist_noop_welt_personen_swap[symmetric])
   using zahlenwelt_personen_swap_twice(1) apply auto[1]
   apply (simp add: zahlenwelt_personen_swap_sym)
   by simp
@@ -299,7 +299,8 @@ lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwelt_perso
 text\<open>Allerdings können wir die Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
 für jeden fordern. Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
 (*TODO: Diese Maxime braucht einen Namen!*)
-lemma \<open>wpsm_kommutiert
+lemma wpsm_kommutiert_altruistischer_fortschritt:
+  \<open>wpsm_kommutiert
          (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
          zahlenwelt_personen_swap welt\<close>
   apply(simp add: wpsm_kommutiert_def)
@@ -475,13 +476,26 @@ lemma
 
 
 (*AWESOME!*)
-  lemma \<open>kategorischer_imperativ zahlenwelt_personen_swap welt
+lemma \<open>
+  \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) ha p \<Longrightarrow>
+  \<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))\<close>
-    apply(rule altruistische_maxime_katimp)
-       apply (simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym; fail)
-      apply (simp add: wpsm_unbeteiligt1_def hlp3; fail)
-     apply (simp add: wpsm_unbeteiligt2_def hlp3; fail)
-    by (simp add: zahlenwelt_personen_swap_sym)
+  thm altruistische_maxime_katimp[of "Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))"]
+  apply(rule altruistische_maxime_katimp[of
+        "Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))"
+        zahlenwelt_personen_swap
+        welt
+        "\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)"
+        ])
+        apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
+       apply (simp add: zahlenwelt_personen_swap_sym; fail)
+      apply (simp add: zahlenwelt_personen_swap_twice; fail)
+     apply(simp; fail)
+    apply(simp; fail)
+   apply(simp; fail)
+  apply(simp)
+  by(cases ha, simp add: ist_noop_def)
 
 
 
