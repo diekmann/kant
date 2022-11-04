@@ -477,21 +477,15 @@ lemma
 (*AWESOME!*)
 lemma \<open>
   \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) ha p \<Longrightarrow>
-  \<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
+  wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))\<close>
-  thm altruistische_maxime_katimp[of "Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))"]
-  apply(rule altruistische_maxime_katimp[of
-        "Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))"
-        zahlenwelt_personen_swap
-        welt
-        "\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)"
-        ])
-        apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
-       apply (simp add: zahlenwelt_personen_swap_sym; fail)
-      apply (simp add: zahlenwelt_personen_swap_twice; fail)
-     apply(simp; fail)
-    apply(simp; fail)
+  thm altruistische_maxime_katimp[]
+  apply(erule altruistische_maxime_katimp[of _ _ _ _ "\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)"])
+       apply(simp; fail)
+      apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
+     apply (simp add: zahlenwelt_personen_swap_sym; fail)
+    apply (simp add: zahlenwelt_personen_swap_twice; fail)
    apply(simp; fail)
   apply(simp)
   by(cases ha, simp add: ist_noop_def)

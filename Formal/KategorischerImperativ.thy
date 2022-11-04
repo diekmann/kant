@@ -251,15 +251,15 @@ lemma blinde_maxime_katimp:
 
 (*Koennen da assms raus?*)
 theorem altruistische_maxime_katimp:
-  assumes kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
+  assumes mgh: "\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt M ha p" (*achtung, nicht jede Handlung erfuellt das*)
+      and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
+     and kom: \<open>wpsm_kommutiert M welt_personen_swap welt\<close>
       and welt_personen_swap_sym:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
       and welt_personen_swap_id:
         \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-      and maxime_ignoriert_ich: "M = Maxime m \<and> (\<forall>ich. m ich = M')"
       and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-      and mgh: "\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt M ha p" (*achtung, nicht jede Handlung erfuellt das*)
-      and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
+       and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay M p (handeln p welt ha)"
   shows \<open>kategorischer_imperativ_auf ha welt M\<close>
 proof(rule kategorischer_imperativ_aufI)
   fix ich p1 p2
@@ -288,11 +288,6 @@ proof(rule kategorischer_imperativ_aufI)
   from wfh wohlgeformte_handlungsabsicht_imp_swpaid
   have swapid: "welt_personen_swap p2 ich (welt_personen_swap ich p2 welt) = welt"
     by fastforce
-
-
-  from welt_personen_swap_id have map_handlung_id:
-    "\<And>h p1 p2. (map_handlung (welt_personen_swap p1 p2) (map_handlung (welt_personen_swap p1 p2) h)) = h"
-    by(case_tac h, simp)
 
 
 (*Was sagt der alte beweis? geht das auch ohne?*)
