@@ -497,7 +497,8 @@ lemma \<open>
   apply(simp)
   by(cases ha, simp add: ist_noop_def)
 
-
+(*Ich sollte einen wrapper machen, der eine Liste von ha nimmt, und testet ob die maxime den kat imp erfuellt
+und dann den ha jeweils moralisch und nicht moralisch zuordnet.*)
 
 subsection\<open>Kleine Änderung in der Maxime\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
