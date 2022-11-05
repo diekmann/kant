@@ -438,52 +438,53 @@ also nur die Handlung global betrachtet, erfüllt den kategorischen Imperativ.\<
 theorem globale_maxime_katimp:
   fixes P :: \<open>'world handlung \<Rightarrow> bool\<close>
   assumes mhg: \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt (Maxime (\<lambda>ich::'person. P)) ha p\<close>
-      and kom: \<open>wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
-      and welt_personen_swap_sym:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
+    and maxime_erlaubt_untaetigkeit: "\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay (Maxime (\<lambda>ich::'person. P)) p (handeln p welt ha)"
+    and kom: \<open>wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) welt_personen_swap welt\<close>
+    and welt_personen_swap_sym:
+    \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 welt = welt_personen_swap p2 p1 welt\<close>
     and welt_personen_swap_id:
-      \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
+    \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
     and wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-      shows \<open>kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::'person. P))\<close>
-(*  apply(rule altruistische_maxime_katimp[OF mhg, where m="\<lambda>ich::'person. P"])
-       apply(simp; fail)
-      apply(simp add: kom; fail)
-     apply(simp add: welt_personen_swap_sym; fail)*)
-
+  shows \<open>kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::'person. P))\<close>
 proof(rule kategorischer_imperativ_aufI, simp)
   fix ich p2 :: \<open>'person\<close>
   assume noopich: "\<not> ist_noop (handeln ich welt ha)"
-     and okayp: \<open>P (handeln ich welt ha)\<close>
+    and okayp: \<open>P (handeln ich welt ha)\<close>
 
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
-  thm noopich
-  (*hierran arbeite ich gerade*)
-  have "\<not> ist_noop (handeln p2 welt ha)" sorry (*mit einer fallunterscheidung und wenn maxime untaetigkeit erlaubt sollte das gehen*)
-  with ist_noop_welt_personen_swap[OF wfh welt_personen_swap_id] have mhg_pre:
-    "\<not> ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)"
-    by simp
+  show \<open>P (handeln p2 welt ha)\<close>
+  proof(cases "ist_noop (handeln p2 welt ha)")
+    case True
+    assume "ist_noop (handeln p2 welt ha)"
+    with maxime_erlaubt_untaetigkeit show "P (handeln p2 welt ha)" by simp
+  next
+    case False
+    assume "\<not> ist_noop (handeln p2 welt ha)"
+    with ist_noop_welt_personen_swap[OF wfh welt_personen_swap_id]
+    have mhg_pre: "\<not> ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha)"
+      by simp
 
+    from wfh[simplified wohlgeformte_handlungsabsicht_def h]
+    have 1: \<open>h p2 welt = welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))\<close>
+      by simp
+    from noopich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
+    have 2:
+      \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
+      by(auto simp add: h)
+    from 2
+    have 4:
+      \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
+      by(simp)
+    from this[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym
+    have "P (Handlung welt (welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))))"
+      by simp
 
-  from wfh[simplified wohlgeformte_handlungsabsicht_def h]
-  have 1: \<open>h p2 welt = welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))\<close>
-    by simp
-  from noopich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
-  have 2:
-  \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
-    by(auto simp add: h)
-  from 2
-  have 4:
-    \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
-    by(simp)
-  from this[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym
-  have "P (Handlung welt (welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))))"
-    by simp
-
-  with 1[simplified handeln.simps h] show \<open>P (handeln p2 welt ha)\<close>
-    by(simp add: h)
-  oops
+    with 1[simplified handeln.simps h] show \<open>P (handeln p2 welt ha)\<close>
+      by(simp add: h)
+  qed
+qed
 
 
 (*TODO: Handlungsabsicht (jeder_zahlt erfuellt kategorischen imp?*)

@@ -377,7 +377,19 @@ lemma
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split_asm if_split_asm)
   by force
-
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren_partial
+  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+  (\<lambda>p w. Some (reset p w)) p\<close>
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_partial_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
+(*Nitpick found a counterexample:
+  Skolem constants:
+    w1 = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 3, p\<^sub>3 := 1, p\<^sub>4 := 0))
+    w2 = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 1, p\<^sub>3 := - 2, p\<^sub>4 := 0))
+    x = (\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 3, p\<^sub>3 := 1, p\<^sub>4 := 0)
+    xa = (\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 1, p\<^sub>3 := - 2, p\<^sub>4 := 0)*)
+  oops
 
 
 (*Muss ich partielle handlungen bauen oder kann ich hier einfach no-ops ausschliessen?*)
