@@ -80,7 +80,7 @@ fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where
 (*>*)
 
 (*TODO: kategorischer Imperativ fuer diese maxime beweisen!*)
-thm altruistische_maxime_katimp (*generalisiert das?*)
+thm globale_maxime_katimp (*generalisiert das?*)
 
 (*(Maxime 
       (\<lambda>ich handlung.
@@ -90,39 +90,20 @@ thm altruistische_maxime_katimp (*generalisiert das?*)
 
 thm mehrverdiener_betrachtet_nur_ausgangszustand
 (*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
-lemma "kategorischer_imperativ steuerwelt_personen_swap welt
+(*steuerwelt_personen_swap*)
+lemma "kategorischer_imperativ_auf ha  welt
     (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
                 steuerlast ich handlung \<le> steuerlast p handlung)))"
+  thm globale_maxime_katimp
   apply(cases welt, rename_tac eink, simp)
-  apply(rule kategorischer_imperativI, rename_tac eink h p1 p2 p)
-  apply(case_tac h, rename_tac ha, simp)
-  apply(thin_tac "h = _", simp)
-
-
+  apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
+  apply(case_tac ha, rename_tac h, simp)
+  apply(thin_tac "ha = _")
 
   (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
 
-
-  apply(erule_tac x=p2 in allE)
-  apply(erule_tac x=p in allE) back
-  apply(simp)
-
-
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def)
-
-
-  apply(erule_tac x="steuerwelt_personen_swap p p2 (welt)" in allE, simp)
-  apply(erule_tac x="(welt)" in allE, simp)
-
-  apply(case_tac "p2 = p", simp)
-   apply(case_tac "p1 = p")
-    apply(simp; fail)
-
-
-  apply(case_tac "p2 = p", simp) (*?*)
   oops text\<open>TODO: finish\<close> (*TODO*)
 
 

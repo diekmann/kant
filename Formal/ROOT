@@ -28,6 +28,8 @@ session Kant = Cache +
     AllgemeinesGesetz
     BeispielZahlenweltGesetz
     BeispielSteuern
+  theories [document = false]
+    FailDraft
   document_files
     "420px-Kant.png"
     "root.tex"
