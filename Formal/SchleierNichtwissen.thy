@@ -184,9 +184,6 @@ Wir kürzen das ab mit wpsm: Welt Person Swap Maxime.\<close>
 
 text\<open>Die Person für die Maxime ausgewertet wird und swappen der Personen in der Welt
 muss equivalent sein:\<close>
-(*TODO: stimmt das ueberhaupt so? Gilt fas fuer viele maximen? Okay, anscheinend schon, ...
-Aber vermutlich nur weil die Maximen das ich ignorieren? ? <------------------------------------------ das okay p1 p2 darf nicht vertauscht werden?
-*)
 definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
