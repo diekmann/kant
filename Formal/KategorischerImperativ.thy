@@ -449,7 +449,7 @@ theorem globale_maxime_katimp:
 proof(rule kategorischer_imperativ_aufI, simp)
   fix ich p2 :: \<open>'person\<close>
   assume noopich: "\<not> ist_noop (handeln ich welt ha)"
-    and okayp: \<open>P (handeln ich welt ha)\<close>
+    and okayich: \<open>P (handeln ich welt ha)\<close>
 
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
@@ -469,15 +469,15 @@ proof(rule kategorischer_imperativ_aufI, simp)
     from wfh[simplified wohlgeformte_handlungsabsicht_def h]
     have 1: \<open>h p2 welt = welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))\<close>
       by simp
-    from noopich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayp[simplified h]
-    have 2:
+
+    from noopich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayich[simplified h]
+    have
       \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
       by(auto simp add: h)
-    from 2
-    have 4:
-      \<open>P (handeln ich (welt_personen_swap p2 ich welt) ha)\<close>
+    with welt_personen_swap_sym have
+      \<open>P (handeln ich (welt_personen_swap ich p2 welt) ha)\<close>
       by(simp)
-    from this[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps] welt_personen_swap_sym
+    from this[simplified handeln.simps h] kom[simplified wpsm_kommutiert_def okay.simps]
     have "P (Handlung welt (welt_personen_swap ich p2 (h ich (welt_personen_swap p2 ich welt))))"
       by simp
 
