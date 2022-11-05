@@ -176,10 +176,23 @@ Nitpick found a counterexample:
     p = p\<^sub>3
     p1 = p\<^sub>2
 *)
-
   (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
-
   oops text\<open>TODO: finish, gilt aber nicht\<close> (*TODO*)
+
+  text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr
+eingeschraenken kat imp zeigen.\<close>
+lemma "
+  (\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
+  ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt
+    (Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)))"
+  apply(cases welt, rename_tac eink, simp)
+  apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
+  apply(case_tac ha, rename_tac h, simp)
+  done
 
 
 
