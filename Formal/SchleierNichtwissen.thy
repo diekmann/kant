@@ -202,6 +202,16 @@ lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m welt_personen_swap welt =
   by(simp add: wpsm_kommutiert_def)
 
 
+lemma wfh_wpsm_kommutiert_simp:
+  "wohlgeformte_handlungsabsicht welt_personen_swap welt ha \<Longrightarrow>
+  wpsm_kommutiert m welt_personen_swap welt \<Longrightarrow>
+    okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) ha)
+    \<longleftrightarrow>
+    okay m p1 (handeln p2 welt ha)"
+  apply(cases ha, simp)
+  by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
+
+
 text\<open>Die Auswertung der Maxime für eine bestimme Person muss unabhängig
 vom swappen von zwei unbeteiligten Personen sein.\<close>
 definition wpsm_unbeteiligt1
@@ -241,15 +251,16 @@ lemma ist_noop_welt_personen_swap_weak:
   assumes wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
     and swap_noop: "\<forall>p1 p2 h. ist_noop (map_handlung (welt_personen_swap p1 p2) h) = ist_noop h"
   shows "ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)"
-  by (metis swap_noop wfh wohlgeformte_handlungsabsicht_def)
+  apply(subst wfh[simplified wohlgeformte_handlungsabsicht_def])
+  apply(simp add: swap_noop)
+  done
 
 lemma ist_noop_welt_personen_swap:
   assumes wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
   and welt_personen_swap_id:
        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
   shows "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
-  apply(rule ist_noop_welt_personen_swap_weak)
-   apply(simp add: wfh; fail)
+  apply(rule ist_noop_welt_personen_swap_weak[OF wfh])
   using ist_noop_map_handlung[OF welt_personen_swap_id] by simp
 
 
