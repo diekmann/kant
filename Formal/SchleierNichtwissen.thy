@@ -179,7 +179,7 @@ lemma wfh_wpsm_kommutiert_simp:
     okay m p1 (handeln p2 welt ha)"
   apply(cases ha, simp)
   by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
-
+(*TODO: wann gilt rueckrichtung?*)
 
 
 subsection\<open>Wohlgeformte Maxime\<close>

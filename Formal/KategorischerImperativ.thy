@@ -383,7 +383,4 @@ qed
 *)
 
 
-
-(*TODO: Handlungsabsicht (jeder_zahlt erfuellt kategorischen imp?*)
-
 end
