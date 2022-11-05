@@ -139,12 +139,22 @@ Nitpick found a counterexample:
     ??.wpsm_kommutiert.p2 = p\<^sub>3
 *)
   oops
+
+lemma wfh_steuerberechnung_jeder_zahlt_int:
+  "ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))
+    \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwelt_personen_swap welt ha"
+  apply(cases welt, rename_tac eink, simp)
+  apply(simp add: wohlgeformte_handlungsabsicht_def comp_def fun_eq_iff)
+  apply(safe)
+  by (smt (verit, best) swap_a swap_b swap_nothing)
   
+  
+  
+
 thm mehrverdiener_betrachtet_nur_ausgangszustand
 (*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
 (*steuerwelt_personen_swap*)
-lemma "wohlgeformte_handlungsabsicht steuerwelt_personen_swap welt ha \<Longrightarrow>
-  ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> nat \<circ> (get_einkommen w))) \<Longrightarrow>
+lemma "ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime 
       (\<lambda>ich handlung.
@@ -154,23 +164,22 @@ lemma "wohlgeformte_handlungsabsicht steuerwelt_personen_swap welt ha \<Longrigh
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
   apply(case_tac ha, rename_tac h, simp)
   apply(thin_tac "ha = _")
-  nitpick (*does this leak minisat?*)
-  (*
-Quickcheck found a counterexample:
-  welt = Steuerwelt (\<lambda>x. - 2)
-  eink__ = _
-  h__ = \<lambda>x xa. Steuerwelt ((\<lambda>x. - 2)(Alice := - 1))
-  ich__ = Alice
-  p1__ = Bob
-  p = Alice
-  p2__ = Alice
-
-ist ja auch keine wfh.
+  apply(safe)
+(*
+Nitpick found a counterexample:
+  Free variables:
+    steuerberechnung = (\<lambda>x. _)(- 1 := 0, 0 := - 1, 1 := - 1, 2 := - 1)
+    welt = Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := - 1, p\<^sub>3 := 0, p\<^sub>4 := 0))
+  Skolem constants:
+    eink = (\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := - 1, p\<^sub>3 := 0, p\<^sub>4 := 0)
+    ich = p\<^sub>4
+    p = p\<^sub>3
+    p1 = p\<^sub>2
 *)
 
   (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
 
-  oops text\<open>TODO: finish\<close> (*TODO*)
+  oops text\<open>TODO: finish, gilt aber nicht\<close> (*TODO*)
 
 
 
