@@ -88,19 +88,85 @@ thm globale_maxime_katimp (*generalisiert das?*)
                 steuerlast ich handlung \<le> steuerlast p handlung)))*)
 
 
+lemma "wpsm_kommutiert (Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung))) steuerwelt_personen_swap welt"
+(*
+Nitpick found a counterexample:
+  Free variable:
+    welt = Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2))
+  Skolem constants:
+    ??.wpsm_kommutiert.h =
+      (\<lambda>x. _)
+      (p\<^sub>1 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2))),
+       p\<^sub>2 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))),
+       p\<^sub>3 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2))),
+       p\<^sub>4 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))))
+    ??.wpsm_kommutiert.p1 = p\<^sub>4
+    ??.wpsm_kommutiert.p2 = p\<^sub>3
+*)
+  oops
+  
 thm mehrverdiener_betrachtet_nur_ausgangszustand
 (*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
 (*steuerwelt_personen_swap*)
-lemma "kategorischer_imperativ_auf ha  welt
+lemma "wohlgeformte_handlungsabsicht steuerwelt_personen_swap welt ha \<Longrightarrow>
+  ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> nat \<circ> (get_einkommen w))) \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt
     (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
                 steuerlast ich handlung \<le> steuerlast p handlung)))"
-  thm globale_maxime_katimp
   apply(cases welt, rename_tac eink, simp)
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
   apply(case_tac ha, rename_tac h, simp)
   apply(thin_tac "ha = _")
+  nitpick (*does this leak minisat?*)
+  (*
+Quickcheck found a counterexample:
+  welt = Steuerwelt (\<lambda>x. - 2)
+  eink__ = _
+  h__ = \<lambda>x xa. Steuerwelt ((\<lambda>x. - 2)(Alice := - 1))
+  ich__ = Alice
+  p1__ = Bob
+  p = Alice
+  p2__ = Alice
+
+ist ja auch keine wfh.
+*)
 
   (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
 
