@@ -492,15 +492,12 @@ lemma \<open>
   wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))\<close>
-  thm altruistische_maxime_katimp[]
-  apply(erule altruistische_maxime_katimp[where m="\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)"])
-       apply(simp; fail)
-      apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
-     apply (simp add: zahlenwelt_personen_swap_sym; fail)
-    apply (simp add: zahlenwelt_personen_swap_twice; fail)
-   apply(simp; fail)
-  apply(simp)
-  by(cases ha, simp add: ist_noop_def)
+  apply(erule globale_maxime_katimp)
+      apply(cases ha, simp add: ist_noop_def; fail)
+     apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
+    apply (simp add: zahlenwelt_personen_swap_sym; fail)
+   apply (simp add: zahlenwelt_personen_swap_twice; fail)
+  by(simp; fail)
 
 (*Ich sollte einen wrapper machen, der eine Liste von ha nimmt, und testet ob die maxime den kat imp erfuellt
 und dann den ha jeweils moralisch und nicht moralisch zuordnet.*)
