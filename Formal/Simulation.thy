@@ -1,5 +1,5 @@
-theory Simulation
-imports Gesetz Handlung KategorischerImperativ
+theory Simulation (*TODO: rename, das ist nur fuer AllgemeinesGesetz*)
+imports Gesetz Handlung AllgemeinesGesetz
 begin
 
 section\<open>Simulation\<close>
@@ -18,13 +18,13 @@ datatype ('person, 'world, 'a, 'b) simulation_constants = SimConsts
 text\<open>...\<close>
 (*<*)
 
-text\<open>Simulate one \<^typ>\<open>('person, 'world) handlungF\<close> once:\<close>
-fun simulate_handlungF
+text\<open>Simulate one \<^typ>\<open>('person, 'world) handlungsabsicht\<close> once:\<close>
+fun simulate_handlungsabsicht
     :: \<open>('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
-        ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
+        ('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
         \<Rightarrow> ('world \<times> (nat, 'a, 'b) gesetz)\<close>
   where
-    \<open>simulate_handlungF (SimConsts person maxime aga) ha welt g =
+    \<open>simulate_handlungsabsicht (SimConsts person maxime aga) ha welt g =
     (let (sollensanordnung, g') = moarlisch_gesetz_ableiten person welt maxime ha aga g in
       let w' = (if sollensanordnung = Erlaubnis
                 then
@@ -35,12 +35,12 @@ fun simulate_handlungF
       (w', g')
     )\<close>
 
-lemma \<open>simulate_handlungF
+lemma \<open>simulate_handlungsabsicht
        (SimConsts
           ()
           (Maxime (\<lambda>_ _. True))
           (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-       (HandlungF (\<lambda>p w. w+1))
+       (Handlungsabsicht (\<lambda>p w. w+1))
        (32::int)
        (Gesetz {})= 
   (33,
@@ -71,14 +71,14 @@ text\<open>Example: Count 32..42,
 lemma \<open>converge (\<lambda>w g. (w+1, w#g)) 10 (32::int) ([]) =
         (42, [41, 40, 39, 38, 37, 36, 35, 34, 33, 32])\<close> by eval
 
-text\<open>simulate one \<^typ>\<open>('person, 'world) handlungF\<close> a few times\<close>
+text\<open>simulate one \<^typ>\<open>('person, 'world) handlungsabsicht\<close> a few times\<close>
 definition simulateOne
     :: \<open>('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
-        nat \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
+        nat \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
         \<Rightarrow> (nat, 'a, 'b) gesetz\<close>
     where
     \<open>simulateOne simconsts i ha w g \<equiv>
-      let (welt, gesetz) = converge (simulate_handlungF simconsts ha) i w g in
+      let (welt, gesetz) = converge (simulate_handlungsabsicht simconsts ha) i w g in
             gesetz\<close>
 (*>*)
 text\<open>...
@@ -101,7 +101,7 @@ Die Handlung ist es diese Zahl um Eins zu erhöhen,
 Das Ergebnis der Simulation ist dann, dass wir einfach von \<^term>\<open>32\<close> bis \<^term>\<open>42\<close> zählen.\<close>
 lemma \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-        10 (HandlungF (\<lambda>p n. Suc n))
+        10 (Handlungsabsicht (\<lambda>p n. Suc n))
         32
         (Gesetz {}) =
   Gesetz

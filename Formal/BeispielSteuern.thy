@@ -1,5 +1,5 @@
 theory BeispielSteuern
-imports Zahlenwelt Maxime Gesetze Simulation Steuern
+imports Zahlenwelt Maxime Gesetze Simulation Steuern KategorischerImperativ
 begin
 
 
@@ -12,6 +12,12 @@ sondern das Jahreseinkommen. Besitz wird ignoriert.
 \<close>
 datatype steuerwelt = Steuerwelt
         (get_einkommen: \<open>person \<Rightarrow> int\<close>) \<comment> \<open>einkommen jeder Person (im Zweifel 0).\<close>
+
+
+(*TODO: copy from zahlenwelt*)
+fun steuerwelt_personen_swap :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
+  \<open>steuerwelt_personen_swap p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
+
 
 fun steuerlast :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
   \<open>steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)\<close>
@@ -40,6 +46,10 @@ lemma \<open>mehrverdiener Alice
         (Handlung (Steuerwelt \<^url>[Alice:=8, Bob:=12, Eve:=7]) (Steuerwelt \<^url>[Alice:=5]))
        = {Alice, Bob}\<close> by eval
 
+lemma mehrverdiener_betrachtet_nur_ausgangszustand:
+  "mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)"
+  by (metis handlung.collapse mehrverdiener.simps vorher_handeln)
+
 text\<open>Folgende Maxime versucht Steuergerechtigkeit festzuschreiben:\<close>
 (*TODO: eine andere test maxime sollte sein,
 dass ich mehr steuern zu zahlen hab als geringerverdiener.*)
@@ -53,12 +63,50 @@ definition maxime_steuern :: \<open>(person, steuerwelt) maxime\<close> where
           )\<close>
   (*do we also need: \<and> steuerlast ich handlung \<le> brutto ich handlung*)
 
+(*Ist das uberhaupt eine gute Maxime?
+Angenommen ich bin der Spitzenverdiener.
+Dann ist die Handlungsabsicht "ich zahle 10 Steuer" gueltig nach der maxime, da "mehrverdiener ich handlung={}".
+Diese Handlung kann ich aber nicht auf andere projezieren, da 
+  * einerseits waere es unmoralisch so viel steuer von geringverdienern zu fordern
+  * andererseits erfuelt die handlung die maxime nicht fuer jeden der nicht spitzenverdiener ist.
+    Die Handlung die die maxime erfuellen wuerde waere "JEDER zahle 10 Steuer".
+*)
+
 
 (*<*)
 fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where
   \<open>delta_steuerwelt (Handlung vor nach) =
       Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))\<close>
 (*>*)
+
+(*TODO: kategorischer Imperativ fuer diese maxime beweisen!*)
+thm globale_maxime_katimp (*generalisiert das?*)
+
+(*(Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)))*)
+
+
+thm mehrverdiener_betrachtet_nur_ausgangszustand
+(*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
+(*steuerwelt_personen_swap*)
+lemma "kategorischer_imperativ_auf ha  welt
+    (Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)))"
+  thm globale_maxime_katimp
+  apply(cases welt, rename_tac eink, simp)
+  apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
+  apply(case_tac ha, rename_tac h, simp)
+  apply(thin_tac "ha = _")
+
+  (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
+
+  oops text\<open>TODO: finish\<close> (*TODO*)
+
+
 
 
 subsection\<open>Setup für Beispiele\<close>
@@ -84,7 +132,7 @@ definition \<open>beispiel_case_law_relativ welt steuerfun \<equiv>
 subsection\<open>Beispiel: Keiner Zahlt Steuern\<close>
 
 text\<open>Die Maxime ist erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
-lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF (\<lambda>ich welt. welt)) =
+lemma \<open>beispiel_case_law_relativ initialwelt (Handlungsabsicht (\<lambda>ich welt. welt)) =
   Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close> by eval
 
 
@@ -92,7 +140,7 @@ subsection\<open>Beispiel: Ich zahle 1 Steuer\<close>
 text\<open>Das funktioniert nicht:\<close>
 definition \<open>ich_zahle_1_steuer ich welt \<equiv>
   Steuerwelt ((get_einkommen welt)(ich -= 1))\<close>
-lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF ich_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_absolut initialwelt (Handlungsabsicht ich_zahle_1_steuer) =
   Gesetz
   {(\<section> 1,
     Rechtsnorm
@@ -100,7 +148,7 @@ lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF ich_zahle_1_steuer
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 3), (Carol, 0), (Eve, 5)]))
      (Rechtsfolge Verbot))}\<close> by eval
-lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF ich_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_relativ initialwelt (Handlungsabsicht ich_zahle_1_steuer) =
   Gesetz
   {(\<section> 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
                             (Rechtsfolge Verbot))}\<close> by eval
@@ -118,7 +166,7 @@ text\<open>Jeder muss steuern zahlen:
 Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
 definition \<open>jeder_zahle_1_steuer ich welt \<equiv>
   Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt))\<close>
-lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF jeder_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_absolut initialwelt (Handlungsabsicht jeder_zahle_1_steuer) =
 Gesetz
   {(\<section> 3,
     Rechtsnorm
@@ -138,7 +186,7 @@ Gesetz
        ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
         [(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)]))
      (Rechtsfolge Erlaubnis))}\<close> by eval
-lemma \<open>beispiel_case_law_relativ initialwelt (HandlungF jeder_zahle_1_steuer) =
+lemma \<open>beispiel_case_law_relativ initialwelt (Handlungsabsicht jeder_zahle_1_steuer) =
   Gesetz
   {(\<section> 1,
     Rechtsnorm
@@ -157,7 +205,7 @@ definition \<open>jeder_zahlt_einkommenssteuer \<equiv> jeder_zahlt einkommensst
 
 
 text\<open>Bei dem geringen Einkommen der \<^const>\<open>initialwelt\<close> zahlt keiner Steuern.\<close>
-lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF jeder_zahlt_einkommenssteuer ) = 
+lemma \<open>beispiel_case_law_absolut initialwelt (Handlungsabsicht jeder_zahlt_einkommenssteuer ) = 
   Gesetz
   {(\<section> 1,
     Rechtsnorm
@@ -170,7 +218,7 @@ lemma \<open>beispiel_case_law_absolut initialwelt (HandlungF jeder_zahlt_einkom
 text\<open>Für höhere Einkommen erhalten wir plausible Werte und niemand rutscht ins negative:\<close>
 lemma \<open>beispiel_case_law_relativ
   (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
-  (HandlungF jeder_zahlt_einkommenssteuer)
+  (Handlungsabsicht jeder_zahlt_einkommenssteuer)
   =
   Gesetz
   {(\<section> 1,
@@ -182,7 +230,7 @@ section\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
 text\<open>Die Anforderungen für ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
 lemma steuersystem_imp_maxime:
   \<open>steuersystem steuersystem_impl \<Longrightarrow>
-        (\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl)))\<close>
+        (\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (jeder_zahlt steuersystem_impl)))\<close>
    apply(simp add: maxime_steuern_def moralisch_unfold)
    apply(simp add: jeder_zahlt_def bevoelkerung_def)
    apply(intro allI impI conjI)
@@ -214,11 +262,11 @@ lemma steuern_kleiner_einkommen_nat:
 lemma maxime_imp_steuersystem:
     \<open>(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
        (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
-        \<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl))
+        \<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (jeder_zahlt steuersystem_impl))
         \<Longrightarrow> steuersystem steuersystem_impl\<close>
 proof
   fix einkommen_b einkommen_a :: \<open>nat\<close>
-  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl))\<close>
+  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (jeder_zahlt steuersystem_impl))\<close>
      and a: \<open>einkommen_b \<le> einkommen_a\<close>
      and bezahlbar: \<open>\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen\<close>
   from m have m':
@@ -240,7 +288,7 @@ proof
     by simp
 next
   fix einkommen_b einkommen_a :: \<open>nat\<close>
-  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl))\<close>
+  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (jeder_zahlt steuersystem_impl))\<close>
      and a: \<open>einkommen_b \<le> einkommen_a\<close>
   from m have m':
     \<open>get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
@@ -275,7 +323,7 @@ theorem
   assumes steuer_kleiner_einkommen: \<open>\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen\<close>
       and existenzminimum: \<open>\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0\<close>
     shows
-   \<open>(\<forall>welt. moralisch welt maxime_steuern (HandlungF (jeder_zahlt steuersystem_impl)))
+   \<open>(\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (jeder_zahlt steuersystem_impl)))
         \<longleftrightarrow> steuersystem steuersystem_impl\<close>
   using steuersystem_imp_maxime maxime_imp_steuersystem
   using assms by blast 

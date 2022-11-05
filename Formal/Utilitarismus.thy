@@ -34,7 +34,7 @@ in die Verantwortungsethik des Utilitarismus übersetzen lässt.
 
 (*TODO: das ist die goldene Regel? Kant braucht \<forall>Maxime.*)
 definition goldene_regel_als_gesinnungsethik
-  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungF \<Rightarrow> bool\<close>
+  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 where
   \<open>goldene_regel_als_gesinnungsethik maxime handlungsabsicht \<equiv>
     \<forall>welt. moralisch welt maxime handlungsabsicht\<close>

@@ -189,7 +189,6 @@ lemma the_elem_singleton_swap:
     is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow> the_elem {pa \<in> set ps. besitz pa = p} = p1\<close>
   by (smt (verit, del_insts) is_singleton_the_elem mem_Collect_eq singleton_iff swap_b)
 
-lemma "( B) = ( C) \<Longrightarrow> (A \<and> B) = (A \<and> C)" oops
 lemma the_elem_singleton_swap_none:
     \<open>p1 \<in> set ps \<Longrightarrow>
     p2 \<in> set ps \<Longrightarrow>
@@ -261,6 +260,32 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
     (opfer_eindeutig_nach_besitz_auswaehlen p besitz enum_class.enum)\<close>
   apply(rule opfer_eindeutig_nach_besitz_auswaehlen_swap_alt)
   using enum_class.in_enum enum_class.enum_distinct by auto
+
+
+
+
+lemma the_single_elem_None_swap:
+  "the_single_elem {p. x p = a} = None \<Longrightarrow>
+       the_single_elem {p. swap p1 p2 x p = a} = None"
+  apply(simp add: the_single_elem)
+  by (smt (verit) empty_iff is_singletonI' is_singleton_the_elem mem_Collect_eq option.simps(3) singleton_iff swap_a swap_b swap_nothing)
+
+  lemma the_single_elem_Some_Some_swap:
+    "the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
+        the_single_elem {p. swap s1 p2 x p = a} = Some s2 \<Longrightarrow> p2 = s2"
+    by (metis (no_types, lifting) is_singleton_the_elem mem_Collect_eq option.inject option.simps(3) singleton_iff swap_b the_single_elem)
+  lemma the_single_elem_Some_ex_swap:
+    "the_single_elem {p. x p = a} = Some x2 \<Longrightarrow> \<exists>y. the_single_elem {p. swap p1 p2 x p = a} = Some y"
+    apply(case_tac "the_single_elem {p. swap p1 p2 x p = a}")
+     apply(simp)
+    using the_single_elem_None_swap apply (metis option.distinct(1) swap2)
+    by simp
+
+lemma the_single_elem_Some_swap:
+  "the_single_elem {p. x p = a} = Some s \<Longrightarrow>
+      the_single_elem {p. swap s p2 x p = a} = Some p2"
+  using the_single_elem_Some_ex_swap the_single_elem_Some_Some_swap by fastforce
+
 (*>*)
 
 end

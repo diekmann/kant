@@ -32,6 +32,8 @@ lemma sum_swap_none: \<open>a \<notin> P \<Longrightarrow> b \<notin> P \<Longri
 lemma swap_nothing: \<open>a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a\<close>
   by(simp add: swap_def)
 
+lemma swap_forall: \<open>(\<forall>p. P (swap p1 p2 a p) (swap p1 p2 b p)) \<longleftrightarrow> (\<forall>p. P (a p) (b p))\<close>
+  by (metis swap_a swap_b swap_nothing)
 
 thm sum.remove
 lemma sum_swap_a: \<open>finite P \<Longrightarrow> a \<notin> P \<Longrightarrow> b \<in> P \<Longrightarrow> sum (swap a b f) P = f a + sum f (P - {b})\<close>
