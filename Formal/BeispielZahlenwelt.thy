@@ -294,12 +294,16 @@ lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwelt_perso
 
 text\<open>Allerdings können wir die Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
 für jeden fordern. Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
-(*TODO: Diese Maxime braucht einen Namen!*)
+
+definition maxime_altruistischer_fortschritt :: "(person, zahlenwelt) maxime" where
+  "maxime_altruistischer_fortschritt \<equiv>
+    Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)"
+
 lemma wpsm_kommutiert_altruistischer_fortschritt:
   \<open>wpsm_kommutiert
-         (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
+         maxime_altruistischer_fortschritt
          zahlenwelt_personen_swap welt\<close>
-  apply(simp add: wpsm_kommutiert_def)
+  apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def)
   apply(safe)
    apply(case_tac \<open>p1 = p2\<close>)
     apply(simp add: zahlenwelt_personen_swap_id; fail)
@@ -309,20 +313,20 @@ lemma wpsm_kommutiert_altruistischer_fortschritt:
    apply (metis hlp2 hlp3 zahlenwelt_personen_swap_sym)
   by (metis hlp2 hlp3 zahlenwelt_personen_swap_id zahlenwelt_personen_swap_sym)
 
-lemma
+lemma mhg_maxime_altruistischer_fortschritt_stehlen4:
     \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10)) p\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+    maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
+  apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(simp add: ist_noop_def)
   apply(case_tac \<open>welt\<close>, simp)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp add: ist_noop_def split: option.split option.split_asm)
   by fastforce
 
-lemma
+lemma maxime_altruistischer_fortschritt_reset:
     \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (reset)) p\<close>
-    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+    maxime_altruistischer_fortschritt (Handlungsabsicht (reset)) p\<close>
+    apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
     apply(auto simp add: swap_def split: option.split option.split_asm)
   done
@@ -330,22 +334,9 @@ lemma
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-lemma "wohlgeformte_maxime zahlenwelt_personen_swap
-  (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))"
-  apply(simp add: wohlgeformte_maxime_def, intro allI, rename_tac p1 p2 h)
+lemma wfm_maxime_altruistischer_fortschritt:
+  "wohlgeformte_maxime zahlenwelt_personen_swap maxime_altruistischer_fortschritt"
+  apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def, intro allI, rename_tac p1 p2 h)
   apply(case_tac h, rename_tac vor nach, simp)
   apply(case_tac vor, case_tac nach, simp)
   apply(simp add: swap_forall)
@@ -353,13 +344,13 @@ lemma "wohlgeformte_maxime zahlenwelt_personen_swap
 
 
 theorem \<open>
-  \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) ha p \<Longrightarrow>
+  \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
   wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt
-    (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))\<close>
+  kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
+  unfolding maxime_altruistischer_fortschritt_def
   apply(erule globale_maxime_katimp)
       apply(cases ha, simp add: ist_noop_def; fail)
-     apply(simp add: wpsm_kommutiert_altruistischer_fortschritt; fail)
+     apply(simp add: wpsm_kommutiert_altruistischer_fortschritt[simplified maxime_altruistischer_fortschritt_def]; fail)
     apply (simp add: zahlenwelt_personen_swap_sym; fail)
    apply (simp add: zahlenwelt_personen_swap_twice; fail)
   by(simp; fail)
