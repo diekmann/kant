@@ -382,5 +382,49 @@ qed
 
 *)
 
+section\<open>Experimental: Beispiel\<close>
+(*das wird technisch um da executable code zu bekommen, ...*)
+
+value\<open>[(x,y). x \<leftarrow> xs, y \<leftarrow> ys, x \<noteq> y]\<close>
+
+
+definition alle_moeglichen_handlungen
+  :: "'world \<Rightarrow> ('person::enum, 'world) handlungsabsicht list \<Rightarrow> 'world handlung list"
+where
+  "alle_moeglichen_handlungen welt has \<equiv> [handeln p welt ha. ha \<leftarrow> has, p \<leftarrow> (Enum.enum::'person list)]"
+
+lemma set_alle_moeglichen_handlungen:
+  "set (alle_moeglichen_handlungen welt has) = {handeln p welt ha | ha p. ha\<in>set has}"
+  apply(simp add: alle_moeglichen_handlungen_def)
+  apply(simp add: enum_class.enum_UNIV)
+  by blast
+
+(*Um den Namespace nicht zu verschmutzen prefixe ich alles mit bsp_*)
+record ('person, 'world) beipiel =
+  bsp_welt :: 'world
+  bsp_erfuellte_maxime :: "('person, 'world) maxime option"
+  bsp_erlaubte_handlungen :: "('person, 'world) handlungsabsicht list"
+  bsp_verbotene_handlungen :: "('person, 'world) handlungsabsicht list"
+
+
+definition erzeuge_beispiel
+  :: "('person::enum, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow>
+      ('person, 'world) handlungsabsicht list \<Rightarrow> ('person, 'world) maxime
+      \<Rightarrow> ('person, 'world) beipiel option"
+  where
+"erzeuge_beispiel wps welt has m \<equiv>
+  if (\<exists>h\<in>set (alle_moeglichen_handlungen welt has). \<not>wohlgeformte_maxime_auf h wps m)
+     \<or> (\<exists>ha\<in>set has. \<not> wohlgeformte_handlungsabsicht wps welt ha)
+  then None
+  else Some
+   \<lparr> bsp_welt = welt,
+     bsp_erfuellte_maxime = if \<forall>ha\<in>set has. kategorischer_imperativ_auf ha welt m then Some m else None,
+     bsp_erlaubte_handlungen = [ha\<leftarrow>has. moralisch welt m ha],
+     bsp_verbotene_handlungen = [ha\<leftarrow>has. \<not> moralisch welt m ha]
+   \<rparr>"
+
+value\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [ds] (Maxime (\<lambda>ich w. True))\<close>
+
+
 
 end

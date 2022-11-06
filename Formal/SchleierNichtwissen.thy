@@ -184,17 +184,26 @@ lemma wfh_wpsm_kommutiert_simp:
 
 subsection\<open>Wohlgeformte Maxime\<close>
 
+(*Eigentlich sollte das fuer alle Handlungen gelten, aber wenn ich ausfuehrbaren code will
+habe ich ein Problem, dass Handlungen nicht enumerable sind.*)
+definition wohlgeformte_maxime_auf
+  :: \<open>'world handlung \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+where
+  \<open>wohlgeformte_maxime_auf h welt_personen_swap m \<equiv>
+    \<forall>p1 p2. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (welt_personen_swap p1 p2) h)\<close>
+
 definition wohlgeformte_maxime
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_maxime welt_personen_swap m \<equiv>
-    \<forall>p1 p2 h. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (welt_personen_swap p1 p2) h)\<close>
+    \<forall>h. wohlgeformte_maxime_auf h welt_personen_swap m\<close>
 
 
 text\<open>Beispiel:\<close>
 lemma "wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<le> (nachher h) ich))"
-  apply(simp add: wohlgeformte_maxime_def)
-  by (metis handlung.map_sel(1) handlung.map_sel(2) swap_a swap_symmetric)
+  apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def)
+  apply(intro allI, case_tac h, simp)
+  by (metis swap_a swap_symmetric)
   
 
 (*<*)

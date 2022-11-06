@@ -336,7 +336,7 @@ lemma maxime_altruistischer_fortschritt_reset:
 
 lemma wfm_maxime_altruistischer_fortschritt:
   "wohlgeformte_maxime zahlenwelt_personen_swap maxime_altruistischer_fortschritt"
-  apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def, intro allI, rename_tac p1 p2 h)
+  apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def wohlgeformte_maxime_auf_def, intro allI, rename_tac h p1 p2)
   apply(case_tac h, rename_tac vor nach, simp)
   apply(case_tac vor, case_tac nach, simp)
   apply(simp add: swap_forall)
@@ -357,6 +357,25 @@ theorem \<open>
 
 (*Ich sollte einen wrapper machen, der eine Liste von ha nimmt, und testet ob die maxime den kat imp erfuellt
 und dann den ha jeweils moralisch und nicht moralisch zuordnet.*)
+
+(*TODO: bekommen wir das executable?*)
+(*Das printet leider nicht. wieso sind records mit functions nicht equal? weil functions nicht equal*)
+value[simp]\<open>erzeuge_beispiel
+  zahlenwelt_personen_swap initialwelt
+  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
+  maxime_altruistischer_fortschritt\<close>
+
+lemma \<open>erzeuge_beispiel
+  zahlenwelt_personen_swap initialwelt
+  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
+  maxime_altruistischer_fortschritt =
+Some
+  \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
+   bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
+   bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
+   bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
+  apply(simp add: erzeuge_beispiel_def )
+  oops
 
 subsection\<open>Kleine Änderung in der Maxime\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
