@@ -377,6 +377,12 @@ Some
   apply(simp add: erzeuge_beispiel_def )
   oops
 
+(*bsp_erfuellte_maxime = None. Aber gleiche handlungen erlaubt und verboten*)
+value[simp]\<open>erzeuge_beispiel
+  zahlenwelt_personen_swap initialwelt
+  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
+  (Maxime individueller_fortschritt)\<close>
+
 subsection\<open>Kleine Änderung in der Maxime\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
    \<^term>\<open>(meins p nach) \<ge> (meins p vor)\<close>.
