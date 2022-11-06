@@ -179,7 +179,21 @@ lemma wfh_wpsm_kommutiert_simp:
     okay m p1 (handeln p2 welt ha)"
   apply(cases ha, simp)
   by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
-(*TODO: wann gilt rueckrichtung?*)
+
+text\<open>Die Rückrichtung gilt auch,
+aber da wir das für alle Handlungsabsichten in der Annahme brauchen,
+ist das eher weniger hilfreich.\<close>
+lemma wfh_kommutiert_wpsm:
+  "\<forall>ha. wohlgeformte_handlungsabsicht welt_personen_swap welt ha \<and>
+       (\<forall>p1 p2. okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) ha)
+           \<longleftrightarrow>
+           okay m p1 (handeln p2 welt ha)) \<Longrightarrow>
+wpsm_kommutiert m welt_personen_swap welt"
+  apply(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
+  apply(intro allI, rename_tac p1 p2 h)
+  by (metis handeln.simps handlung.map_sel(2) nachher_handeln)
+  
+  
 
 
 subsection\<open>Wohlgeformte Maxime\<close>
