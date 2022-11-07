@@ -262,6 +262,14 @@ Nitpick found a counterexample:
 *)
     oops
 
+text\<open>Aber das gilt:\<close>
+lemma
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
+maxime_zahlenfortschritt (Handlungsabsicht (alles_kaputt_machen)) p\<close>
+    apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(case_tac \<open>welt\<close>, simp)
+  by auto
+
 
   text\<open>In jeder Welt ist die \<^term>\<open>Handlungsabsicht (erschaffen n)\<close> \<^const>\<open>moralisch\<close>:\<close>
   lemma \<open>moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (erschaffen n))\<close>
@@ -365,18 +373,18 @@ und dann den ha jeweils moralisch und nicht moralisch zuordnet.*)
 (*Das printet leider nicht. wieso sind records mit functions nicht equal? weil functions nicht equal*)
 value[simp]\<open>erzeuge_beispiel
   zahlenwps initialwelt
-  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
+  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]
   maxime_altruistischer_fortschritt\<close>
 
 lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
-  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
+  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]
   maxime_altruistischer_fortschritt =
 Some
   \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
    bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
    bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
-   bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
+   bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
   apply(simp add: erzeuge_beispiel_def )
   oops
 
