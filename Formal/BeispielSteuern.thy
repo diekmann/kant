@@ -15,8 +15,8 @@ datatype steuerwelt = Steuerwelt
 
 
 (*TODO: copy from zahlenwelt*)
-fun steuerwelt_personen_swap :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
-  \<open>steuerwelt_personen_swap p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
+fun steuerwps :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
+  \<open>steuerwps p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
 
 
 fun steuerlast :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
@@ -91,7 +91,7 @@ thm globale_maxime_katimp (*generalisiert das?*)
 lemma "wpsm_kommutiert (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung))) steuerwelt_personen_swap welt"
+                steuerlast ich handlung \<le> steuerlast p handlung))) steuerwps welt"
 (*
 Nitpick found a counterexample:
   Free variable:
@@ -142,7 +142,7 @@ Nitpick found a counterexample:
 
 lemma wfh_steuerberechnung_jeder_zahlt_int:
   "ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))
-    \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwelt_personen_swap welt ha"
+    \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha"
   apply(cases welt, rename_tac eink, simp)
   apply(simp add: wohlgeformte_handlungsabsicht_def comp_def fun_eq_iff)
   apply(safe)
@@ -153,7 +153,7 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
 
 thm mehrverdiener_betrachtet_nur_ausgangszustand
 (*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
-(*steuerwelt_personen_swap*)
+(*steuerwps*)
 lemma "ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime 

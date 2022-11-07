@@ -35,25 +35,25 @@ section\<open>Beispiel: Zahlenwelt\<close>
 
   
   text\<open>Um den @{file SchleierNichtwissen.thy} zu implementieren:\<close>
-  fun zahlenwelt_personen_swap :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>zahlenwelt_personen_swap p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)\<close>
+  fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>zahlenwps p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)\<close>
   
   text\<open>Beispiel:\<close>
-  lemma \<open>zahlenwelt_personen_swap Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
+  lemma \<open>zahlenwps Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
     = (Zahlenwelt \<^url>[Alice := 8, Bob := 6, Carol := 4])\<close>
     by eval
 
   (*<*)
-  lemma zahlenwelt_personen_swap_sym:
-    \<open>zahlenwelt_personen_swap p1 p2 welt = zahlenwelt_personen_swap p2 p1 welt\<close>
+  lemma zahlenwps_sym:
+    \<open>zahlenwps p1 p2 welt = zahlenwps p2 p1 welt\<close>
     by(cases \<open>welt\<close>, simp add: swap_symmetric)
 
-  lemma zahlenwelt_personen_swap_id: \<open>zahlenwelt_personen_swap p p w = w\<close>
+  lemma zahlenwps_id: \<open>zahlenwps p p w = w\<close>
     by(cases \<open>w\<close>, simp)
 
-lemma zahlenwelt_personen_swap_twice:
-  "zahlenwelt_personen_swap p1 p2 (zahlenwelt_personen_swap p1 p2 welt) = welt"
-  "zahlenwelt_personen_swap p1 p2 (zahlenwelt_personen_swap p2 p1 welt) = welt"
+lemma zahlenwps_twice:
+  "zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt"
+  "zahlenwps p1 p2 (zahlenwps p2 p1 welt) = welt"
   by(cases welt, simp)+
 
 
@@ -65,17 +65,17 @@ lemma zahlenwelt_personen_swap_twice:
 
 (*gute noop lemmata.*)
 lemma zahlenwelt_ist_noop_map_handlung:
-  "ist_noop (map_handlung (zahlenwelt_personen_swap p1 p2) h) = ist_noop h"
+  "ist_noop (map_handlung (zahlenwps p1 p2) h) = ist_noop h"
   apply(rule ist_noop_map_handlung)
   apply(safe, case_tac welt, simp)
   done
 
 lemma zahlenwelt_ist_noop_swap:
-  "wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
-       ist_noop (handeln p2 (zahlenwelt_personen_swap ich p2 welt) ha)
+  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+       ist_noop (handeln p2 (zahlenwps ich p2 welt) ha)
         \<longleftrightarrow> ist_noop (handeln ich welt ha)"
-  apply(erule ist_noop_welt_personen_swap)
-  using zahlenwelt_personen_swap_twice(1) apply auto[1]
+  apply(erule ist_noop_wps)
+  using zahlenwps_twice(1) apply auto[1]
   done
 
 
@@ -84,7 +84,7 @@ lemma zahlenwelt_ist_noop_swap:
 
 
   lemma gesamtbesitz_swap:
-    \<open>gesamtbesitz (zahlenwelt_personen_swap p1 p2 welt) = gesamtbesitz welt\<close>
+    \<open>gesamtbesitz (zahlenwps p1 p2 welt) = gesamtbesitz welt\<close>
     apply(cases \<open>welt\<close>, simp)
     apply(rule sum_list_swap)
     using enum_class.in_enum enum_class.enum_distinct by auto
@@ -94,7 +94,7 @@ subsection\<open>Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (Handlungsabsicht (erschaffen n))\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def)
     apply(intro allI, case_tac \<open>welt\<close>, simp)
     apply(simp add: swap_def)
@@ -104,7 +104,7 @@ subsection\<open>Handlungen\<close>
     \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
-  lemma "wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwelt_personen_swap
+  lemma "wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
       (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen 5 Bob))
       Alice Bob"
     by(eval)
@@ -137,7 +137,7 @@ subsection\<open>Handlungen\<close>
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
              (Zahlenwelt \<^url>[Alice := 5, Bob := 15, Carol := - 3])\<close> by eval
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel
-      zahlenwelt_personen_swap
+      zahlenwps
       (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (Handlungsabsicht (stehlen2 5 10))
       Alice Bob\<close>
     by(eval)
@@ -155,7 +155,7 @@ subsection\<open>Handlungen\<close>
 
 
   lemma wohlgeformte_handlungsabsicht_stehlen4:
-    \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (Handlungsabsicht (stehlen4 n p))\<close>
+    \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
       apply(intro allI, case_tac \<open>welt\<close>, simp)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
@@ -186,7 +186,7 @@ subsection\<open>Handlungen\<close>
 
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
   dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt (Handlungsabsicht reset)\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
      by(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
@@ -220,20 +220,20 @@ subsection\<open>Alice erzeugt 5 Wohlstand für sich.\<close>
     \<open>maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)\<close>
 
 
-lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
 maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 5)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
     apply(case_tac \<open>welt\<close>, simp)
     done
   
-lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
 maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
     apply(case_tac \<open>welt\<close>, simp)
     done
 
   lemma mhg_maxime_zahlenfortschritt_stehlen4:
-    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
 maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
     apply(case_tac \<open>welt\<close>, simp)
@@ -243,7 +243,7 @@ maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
 
 text\<open>Gilt nicht:\<close>
 lemma
-    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
 maxime_zahlenfortschritt (Handlungsabsicht (reset)) p\<close>
     apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
@@ -269,7 +269,7 @@ Nitpick found a counterexample:
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt \<^bold>\<open>nicht\<close> den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
   lemma "kategorischer_imperativ_gegenbeispiel
-  zahlenwelt_personen_swap initialwelt maxime_zahlenfortschritt
+  zahlenwps initialwelt maxime_zahlenfortschritt
   (Handlungsabsicht (stehlen4 1 10))
   Alice
   Bob
@@ -279,17 +279,17 @@ Nitpick found a counterexample:
     by(eval)
 
 (*<*)
-lemma hlp1: \<open>meins p1 (zahlenwelt_personen_swap p1 p2 welt) = meins p2 welt\<close>
+lemma hlp1: \<open>meins p1 (zahlenwps p1 p2 welt) = meins p2 welt\<close>
   by(cases \<open>welt\<close>, simp add: swap_def)
-lemma hlp2: \<open>meins p2 (zahlenwelt_personen_swap p1 p2 welt) = meins p1 welt\<close>
+lemma hlp2: \<open>meins p2 (zahlenwps p1 p2 welt) = meins p1 welt\<close>
   by(cases \<open>welt\<close>, simp add: swap_def)
 
 lemma hlp3: \<open>p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
-       meins p (zahlenwelt_personen_swap p1 p2 welt) = meins p welt\<close>
+       meins p (zahlenwps p1 p2 welt) = meins p welt\<close>
   by(cases \<open>welt\<close>, simp add: swap_def)
 
-lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwelt_personen_swap welt\<close>
-  by(simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwelt_personen_swap_sym)
+lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwps welt\<close>
+  by(simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwps_sym)
 (*>*)
 
 text\<open>Allerdings können wir die Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
@@ -302,19 +302,19 @@ definition maxime_altruistischer_fortschritt :: "(person, zahlenwelt) maxime" wh
 lemma wpsm_kommutiert_altruistischer_fortschritt:
   \<open>wpsm_kommutiert
          maxime_altruistischer_fortschritt
-         zahlenwelt_personen_swap welt\<close>
+         zahlenwps welt\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def)
   apply(safe)
    apply(case_tac \<open>p1 = p2\<close>)
-    apply(simp add: zahlenwelt_personen_swap_id; fail)
+    apply(simp add: zahlenwps_id; fail)
    apply(case_tac \<open>pX = p1\<close>)
     apply(simp)
-    apply (metis hlp1 zahlenwelt_personen_swap_sym)
-   apply (metis hlp2 hlp3 zahlenwelt_personen_swap_sym)
-  by (metis hlp2 hlp3 zahlenwelt_personen_swap_id zahlenwelt_personen_swap_sym)
+    apply (metis hlp1 zahlenwps_sym)
+   apply (metis hlp2 hlp3 zahlenwps_sym)
+  by (metis hlp2 hlp3 zahlenwps_id zahlenwps_sym)
 
 lemma mhg_maxime_altruistischer_fortschritt_stehlen4:
-    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
     maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(simp add: ist_noop_def)
@@ -324,7 +324,7 @@ lemma mhg_maxime_altruistischer_fortschritt_stehlen4:
   by fastforce
 
 lemma maxime_altruistischer_fortschritt_reset:
-    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt 
+    \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
     maxime_altruistischer_fortschritt (Handlungsabsicht (reset)) p\<close>
     apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
@@ -335,7 +335,7 @@ lemma maxime_altruistischer_fortschritt_reset:
 
 
 lemma wfm_maxime_altruistischer_fortschritt:
-  "wohlgeformte_maxime zahlenwelt_personen_swap maxime_altruistischer_fortschritt"
+  "wohlgeformte_maxime zahlenwps maxime_altruistischer_fortschritt"
   apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def wohlgeformte_maxime_auf_def, intro allI, rename_tac h p1 p2)
   apply(case_tac h, rename_tac vor nach, simp)
   apply(case_tac vor, case_tac nach, simp)
@@ -344,15 +344,15 @@ lemma wfm_maxime_altruistischer_fortschritt:
 
 
 theorem \<open>
-  \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
-  wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
+  \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
+  wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
   unfolding maxime_altruistischer_fortschritt_def
   apply(erule globale_maxime_katimp)
       apply(cases ha, simp add: ist_noop_def; fail)
      apply(simp add: wpsm_kommutiert_altruistischer_fortschritt[simplified maxime_altruistischer_fortschritt_def]; fail)
-    apply (simp add: zahlenwelt_personen_swap_sym; fail)
-   apply (simp add: zahlenwelt_personen_swap_twice; fail)
+    apply (simp add: zahlenwps_sym; fail)
+   apply (simp add: zahlenwps_twice; fail)
   by(simp; fail)
 
 (*Ich sollte einen wrapper machen, der eine Liste von ha nimmt, und testet ob die maxime den kat imp erfuellt
@@ -361,12 +361,12 @@ und dann den ha jeweils moralisch und nicht moralisch zuordnet.*)
 (*TODO: bekommen wir das executable?*)
 (*Das printet leider nicht. wieso sind records mit functions nicht equal? weil functions nicht equal*)
 value[simp]\<open>erzeuge_beispiel
-  zahlenwelt_personen_swap initialwelt
+  zahlenwps initialwelt
   [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
   maxime_altruistischer_fortschritt\<close>
 
 lemma \<open>erzeuge_beispiel
-  zahlenwelt_personen_swap initialwelt
+  zahlenwps initialwelt
   [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
   maxime_altruistischer_fortschritt =
 Some
@@ -379,7 +379,7 @@ Some
 
 (*bsp_erfuellte_maxime = None. Aber gleiche handlungen erlaubt und verboten*)
 value[simp]\<open>erzeuge_beispiel
-  zahlenwelt_personen_swap initialwelt
+  zahlenwps initialwelt
   [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]
   (Maxime individueller_fortschritt)\<close>
 
@@ -455,26 +455,26 @@ subsection\<open>Maxime für Globales Optimum\<close>
 
 (*<*)
   lemma globaler_fortschritt_kommutiert:
-    \<open>wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt\<close>
-    by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwelt_personen_swap_sym)
+    \<open>wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
+    by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwps_sym)
   lemma globaler_fortschritt_unbeteiligt1:
-    \<open>wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt\<close>
+    \<open>wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
     by(simp add: wpsm_unbeteiligt1_def gesamtbesitz_swap)
   lemma globaler_fortschritt_unbeteiligt2:
-    \<open>wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwelt_personen_swap welt\<close>
+    \<open>wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
     by(simp add: wpsm_unbeteiligt2_def gesamtbesitz_swap)
 (*>*)
   
 theorem 
-\<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwelt_personen_swap welt
+\<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt
      (Maxime (\<lambda>ich. globaler_fortschritt)) ha p \<Longrightarrow>
- wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt ha \<Longrightarrow>
+ wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::person. globaler_fortschritt))\<close>
   apply(erule globale_maxime_katimp)
       apply(cases welt, cases ha, simp add: ist_noop_def; fail)
      apply(simp add: globaler_fortschritt_kommutiert; fail)
-    apply(simp add: zahlenwelt_personen_swap_sym)
-   apply (simp add: zahlenwelt_personen_swap_twice; fail)
+    apply(simp add: zahlenwps_sym)
+   apply (simp add: zahlenwps_twice; fail)
   by(simp; fail)
 
 
@@ -519,7 +519,7 @@ text\<open>Sobald ich eine konkrete Person in einer Handlungsabsicht hardcode,
 ist diese nicht mehr wohlgeformt.\<close>
 
   lemma \<open>\<not>wohlgeformte_handlungsabsicht
-    zahlenwelt_personen_swap initialwelt
+    zahlenwps initialwelt
     (Handlungsabsicht (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
     apply(simp add: initialwelt_def wohlgeformte_handlungsabsicht_def swap_def)
     apply(eval)

@@ -21,25 +21,25 @@ auseinander reisst.*)
 definition maxime_und_handlungsabsicht_generalisieren2
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
 where
-  \<open>maxime_und_handlungsabsicht_generalisieren2 welt_personen_swap m h =
-    (\<forall>w p1 p2. okay m p1 (handeln p1 w h) \<longleftrightarrow> okay m p2 (handeln p2 (welt_personen_swap p1 p2 w) h))\<close>
+  \<open>maxime_und_handlungsabsicht_generalisieren2 wps m h =
+    (\<forall>w p1 p2. okay m p1 (handeln p1 w h) \<longleftrightarrow> okay m p2 (handeln p2 (wps p1 p2 w) h))\<close>
 
 (*TODO: gut? warum ist da fuer alle welt drinnen?
 Auf jeden fall scheint die zahlenwelt das zu moegen.*)
 definition maxime_und_handlungsabsicht_generalisieren3
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
 where
-  \<open>maxime_und_handlungsabsicht_generalisieren3 welt_personen_swap m h =
+  \<open>maxime_und_handlungsabsicht_generalisieren3 wps m h =
     (\<forall>ich p2 welt. okay m ich (handeln ich welt h)
-      \<longleftrightarrow> okay m p2 ((map_handlung (welt_personen_swap p2 ich) (handeln ich welt h))))\<close>
+      \<longleftrightarrow> okay m p2 ((map_handlung (wps p2 ich) (handeln ich welt h))))\<close>
 
 (* gilt NICHT fuer generalisierte individueller fortschritt und stehlen4:
 definition maxime_und_handlungsabsicht_generalisieren4
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow>  bool\<close>
 where
-  \<open>maxime_und_handlungsabsicht_generalisieren4 welt_personen_swap m h =
+  \<open>maxime_und_handlungsabsicht_generalisieren4 wps m h =
     (\<forall>ich p2 welt. okay m ich (handeln ich welt h)
-      \<longleftrightarrow> okay m ich ((map_handlung (welt_personen_swap p2 ich) (handeln p2 welt h))))\<close>
+      \<longleftrightarrow> okay m ich ((map_handlung (wps p2 ich) (handeln p2 welt h))))\<close>
 *)
 
 
@@ -126,7 +126,7 @@ nitpick:
   oops
 
 lemma
-    \<open>\<forall>welt. wohlgeformte_handlungsabsicht zahlenwelt_personen_swap welt h \<Longrightarrow>
+    \<open>\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt h \<Longrightarrow>
   maxime_und_handlungsabsicht_generalisieren_aussernoop
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
   h p\<close>
@@ -142,7 +142,7 @@ lemma
 
 
 lemma
-  \<open>maxime_und_handlungsabsicht_generalisieren2 zahlenwelt_personen_swap
+  \<open>maxime_und_handlungsabsicht_generalisieren2 zahlenwps
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren2_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>w\<close>, simp)
@@ -155,7 +155,7 @@ lemma
   by (metis swap2 the_single_elem_Some_Some_swap)
 
 lemma
-  \<open>maxime_und_handlungsabsicht_generalisieren3 zahlenwelt_personen_swap
+  \<open>maxime_und_handlungsabsicht_generalisieren3 zahlenwps
     (Maxime (\<lambda>ich h. individueller_fortschritt ich h)) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>welt\<close>, simp)
@@ -166,7 +166,7 @@ lemma
   
 
 lemma
-  \<open>maxime_und_handlungsabsicht_generalisieren3 zahlenwelt_personen_swap
+  \<open>maxime_und_handlungsabsicht_generalisieren3 zahlenwps
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>welt\<close>, simp)

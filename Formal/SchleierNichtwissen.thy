@@ -41,7 +41,7 @@ Anders ausgedrückt: Wohlgeformte Handlungsabsichten und Maximen sind solche,
 bei denen bei der Definition noch nicht feststeht, auf we sie später zutreffen.
 \<close>
 
-text\<open>Für jede Welt muss eine Welt-Personen Swap Funktion bereit gestellt werden,
+text\<open>Für jede Welt muss eine Welt-Personen Swap (wps) Funktion bereit gestellt werden,
 die alle Weltlichen Eigenschaften von 2 Personen vertauscht:\<close>
 type_synonym ('person, 'world) wp_swap = \<open>'person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
 
@@ -60,44 +60,42 @@ text_raw\<open>
 \end{equation*}
 \<close>
 
-(*TODO: welt_personen_swap rename to wps*)
-
 subsection\<open>Wohlgeformte Handlungsabsicht\<close>
 
 
 definition wohlgeformte_handlungsabsicht
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 where
-  \<open>wohlgeformte_handlungsabsicht welt_personen_swap welt h \<equiv>
+  \<open>wohlgeformte_handlungsabsicht wps welt h \<equiv>
     \<forall>p1 p2. handeln p1 welt h =
-            map_handlung (welt_personen_swap p2 p1) (handeln p2 (welt_personen_swap p1 p2 welt) h)\<close>
+            map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) h)\<close>
 
 text\<open>Folgende Equivalenz erklärt die Definition vermutlich besser:\<close>
 lemma wohlgeformte_handlungsabsicht_simp:
-  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<longleftrightarrow>
-    (\<forall>p1 p2. welt_personen_swap p2 p1 (welt_personen_swap p1 p2 welt) = welt) \<and>
+  "wohlgeformte_handlungsabsicht wps welt h \<longleftrightarrow>
+    (\<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt) \<and>
     (\<forall>p1 p2. handeln p1 welt h =
                 Handlung welt
-                        (welt_personen_swap p2 p1 (nachher (handeln p2 (welt_personen_swap p1 p2 welt) h))))"
+                        (wps p2 p1 (nachher (handeln p2 (wps p1 p2 welt) h))))"
   apply(cases h, simp add: wohlgeformte_handlungsabsicht_def)
   by fastforce
 
 definition wohlgeformte_handlungsabsicht_gegenbeispiel
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
-  \<open>wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h taeter opfer \<equiv>
+  \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt h taeter opfer \<equiv>
     handeln taeter welt h \<noteq>
-        map_handlung (welt_personen_swap opfer taeter) (handeln opfer (welt_personen_swap taeter opfer welt) h)\<close>
+        map_handlung (wps opfer taeter) (handeln opfer (wps taeter opfer welt) h)\<close>
 
-lemma "wohlgeformte_handlungsabsicht_gegenbeispiel welt_personen_swap welt h p1 p2 \<Longrightarrow>
-        \<not>wohlgeformte_handlungsabsicht welt_personen_swap welt h"
+lemma "wohlgeformte_handlungsabsicht_gegenbeispiel wps welt h p1 p2 \<Longrightarrow>
+        \<not>wohlgeformte_handlungsabsicht wps welt h"
   by(auto simp add: wohlgeformte_handlungsabsicht_gegenbeispiel_def wohlgeformte_handlungsabsicht_def)
 
 (*TODO: das sollte ein Homomorphismus sein.*)
 
 lemma wohlgeformte_handlungsabsicht_imp_swpaid:
-  "wohlgeformte_handlungsabsicht welt_personen_swap welt h \<Longrightarrow>
-    welt_personen_swap p1 p2 (welt_personen_swap p2 p1 welt) = welt"
+  "wohlgeformte_handlungsabsicht wps welt h \<Longrightarrow>
+    wps p1 p2 (wps p2 p1 welt) = welt"
   by(simp add: wohlgeformte_handlungsabsicht_simp)
 
 
@@ -110,15 +108,15 @@ lemma wohlgeformte_handlungsabsicht_imp_swpaid:
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
 dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
 (*
-Warum die Vorbedingung: Sonderfall noops: (bsp von sich selbst stehlen). Ohne das geht z.B. steheln nicht.
+Warum die Vorbedingung: Sonderfall noops: (bsp von sich selbst stehlen). Ohne das geht z.B. stehlen nicht.
 *)
 definition maxime_und_handlungsabsicht_generalisieren
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> 
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
-  \<open>maxime_und_handlungsabsicht_generalisieren welt_personen_swap welt m h p =
-    (\<forall>p1 p2. (\<not>ist_noop (handeln p welt h) \<and> \<not>ist_noop (handeln p (welt_personen_swap p1 p2 welt) h))
-              \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (welt_personen_swap p1 p2 welt) h))\<close>
+  \<open>maxime_und_handlungsabsicht_generalisieren wps welt m h p =
+    (\<forall>p1 p2. (\<not>ist_noop (handeln p welt h) \<and> \<not>ist_noop (handeln p (wps p1 p2 welt) h))
+              \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (wps p1 p2 welt) h))\<close>
 
 
 text\<open>Für eine gegebene Maxime schließt die Forderung
@@ -152,17 +150,17 @@ muss equivalent sein:\<close>
 definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
-  \<open>wpsm_kommutiert m welt_personen_swap welt \<equiv>
+  \<open>wpsm_kommutiert m wps welt \<equiv>
 \<forall> p1 p2 h.
-  okay m p2 (Handlung (welt_personen_swap p1 p2 welt) (h p1 (welt_personen_swap p1 p2 welt)))
+  okay m p2 (Handlung (wps p1 p2 welt) (h p1 (wps p1 p2 welt)))
   \<longleftrightarrow>
-  okay m p1 (Handlung welt (welt_personen_swap p1 p2 (h p1 (welt_personen_swap p2 p1 welt))))\<close>
+  okay m p1 (Handlung welt (wps p1 p2 (h p1 (wps p2 p1 welt))))\<close>
 
-lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m welt_personen_swap welt =
+lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m wps welt =
 (\<forall> p1 p2 h.
-  okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) (Handlungsabsicht h))
+  okay m p2 (handeln p1 (wps p1 p2 welt) (Handlungsabsicht h))
   \<longleftrightarrow>
-  okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. welt_personen_swap p1 p2 (h p (welt_personen_swap p2 p1 w)))))
+  okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. wps p1 p2 (h p (wps p2 p1 w)))))
 )\<close>
   by(simp add: wpsm_kommutiert_def)
 
@@ -172,9 +170,9 @@ dann erhalten wir ein sehr intuitives Ergebnis,
 welches besagt, dass ich handelnde Person und Person für die die Maxime gelten soll
 vertauschen kann.\<close>
 lemma wfh_wpsm_kommutiert_simp:
-  "wohlgeformte_handlungsabsicht welt_personen_swap welt ha \<Longrightarrow>
-  wpsm_kommutiert m welt_personen_swap welt \<Longrightarrow>
-    okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) ha)
+  "wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
+  wpsm_kommutiert m wps welt \<Longrightarrow>
+    okay m p2 (handeln p1 (wps p1 p2 welt) ha)
     \<longleftrightarrow>
     okay m p1 (handeln p2 welt ha)"
   apply(cases ha, simp)
@@ -184,15 +182,14 @@ text\<open>Die Rückrichtung gilt auch,
 aber da wir das für alle Handlungsabsichten in der Annahme brauchen,
 ist das eher weniger hilfreich.\<close>
 lemma wfh_kommutiert_wpsm:
-  "\<forall>ha. wohlgeformte_handlungsabsicht welt_personen_swap welt ha \<and>
-       (\<forall>p1 p2. okay m p2 (handeln p1 (welt_personen_swap p1 p2 welt) ha)
+  "\<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<and>
+       (\<forall>p1 p2. okay m p2 (handeln p1 (wps p1 p2 welt) ha)
            \<longleftrightarrow>
            okay m p1 (handeln p2 welt ha)) \<Longrightarrow>
-wpsm_kommutiert m welt_personen_swap welt"
+wpsm_kommutiert m wps welt"
   apply(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
   apply(intro allI, rename_tac p1 p2 h)
   by (metis handeln.simps handlung.map_sel(2) nachher_handeln)
-  
   
 
 
@@ -203,14 +200,14 @@ habe ich ein Problem, dass Handlungen nicht enumerable sind.*)
 definition wohlgeformte_maxime_auf
   :: \<open>'world handlung \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
-  \<open>wohlgeformte_maxime_auf h welt_personen_swap m \<equiv>
-    \<forall>p1 p2. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (welt_personen_swap p1 p2) h)\<close>
+  \<open>wohlgeformte_maxime_auf h wps m \<equiv>
+    \<forall>p1 p2. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (wps p1 p2) h)\<close>
 
 definition wohlgeformte_maxime
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
-  \<open>wohlgeformte_maxime welt_personen_swap m \<equiv>
-    \<forall>h. wohlgeformte_maxime_auf h welt_personen_swap m\<close>
+  \<open>wohlgeformte_maxime wps m \<equiv>
+    \<forall>h. wohlgeformte_maxime_auf h wps m\<close>
 
 
 text\<open>Beispiel:\<close>
@@ -225,27 +222,27 @@ subsection\<open>Generische Lemmata\<close>
 
 
 lemma ist_noop_map_handlung:
-  assumes welt_personen_swap_id:
-        \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-  shows "ist_noop (map_handlung (welt_personen_swap p1 p2) h) = ist_noop h"
+  assumes wps_id:
+        \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
+  shows "ist_noop (map_handlung (wps p1 p2) h) = ist_noop h"
   apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
-  using welt_personen_swap_id by metis
+  using wps_id by metis
 
-lemma ist_noop_welt_personen_swap_weak:
-  assumes wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-    and swap_noop: "\<forall>p1 p2 h. ist_noop (map_handlung (welt_personen_swap p1 p2) h) = ist_noop h"
-  shows "ist_noop (handeln ich (welt_personen_swap p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)"
+lemma ist_noop_wps_weak:
+  assumes wfh: "wohlgeformte_handlungsabsicht wps welt ha"
+    and swap_noop: "\<forall>p1 p2 h. ist_noop (map_handlung (wps p1 p2) h) = ist_noop h"
+  shows "ist_noop (handeln ich (wps p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)"
   apply(subst wfh[simplified wohlgeformte_handlungsabsicht_def])
   apply(simp add: swap_noop)
   done
 
-lemma ist_noop_welt_personen_swap:
-  assumes wfh: "wohlgeformte_handlungsabsicht welt_personen_swap welt ha"
-  and welt_personen_swap_id:
-       \<open>\<forall>p1 p2 welt. welt_personen_swap p1 p2 (welt_personen_swap p1 p2 welt) = welt\<close>
-  shows "ist_noop (handeln p2 (welt_personen_swap ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
-  apply(rule ist_noop_welt_personen_swap_weak[OF wfh])
-  using ist_noop_map_handlung[OF welt_personen_swap_id] by simp
+lemma ist_noop_wps:
+  assumes wfh: "wohlgeformte_handlungsabsicht wps welt ha"
+  and wps_id:
+       \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
+  shows "ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
+  apply(rule ist_noop_wps_weak[OF wfh])
+  using ist_noop_map_handlung[OF wps_id] by simp
 
 
 text\<open>Die Auswertung der Maxime für eine bestimme Person muss unabhängig
@@ -253,20 +250,20 @@ vom swappen von zwei unbeteiligten Personen sein.\<close>
 definition wpsm_unbeteiligt1
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
-  \<open>wpsm_unbeteiligt1 m welt_personen_swap welt \<equiv>
+  \<open>wpsm_unbeteiligt1 m wps welt \<equiv>
 \<forall> p1 p2 pX welt'.
   p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-    okay m pX (Handlung (welt_personen_swap p2 p1 welt) welt')
+    okay m pX (Handlung (wps p2 p1 welt) welt')
     \<longleftrightarrow>
     okay m pX (Handlung welt welt')\<close>
 
 definition wpsm_unbeteiligt2
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
-  \<open>wpsm_unbeteiligt2 m welt_personen_swap welt \<equiv>
+  \<open>wpsm_unbeteiligt2 m wps welt \<equiv>
 \<forall> p1 p2 pX h (welt'::'world).
   p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-    okay m pX (Handlung welt (welt_personen_swap p1 p2 (h p1 welt')))
+    okay m pX (Handlung welt (wps p1 p2 (h p1 welt')))
     \<longleftrightarrow>
     okay m pX (Handlung welt (h p1 welt'))\<close>
 (*>*)
