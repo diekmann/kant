@@ -34,7 +34,7 @@ section\<open>Beispiel: Zahlenwelt\<close>
   lemma \<open>meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4\<close> by eval
 
   
-  text\<open>Um den @{file SchleierNichtwissen.thy} zu implementieren:\<close>
+  text\<open>Um den \<^file>\<open>SchleierNichtwissen.thy\<close> zu implementieren:\<close>
   fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>zahlenwps p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)\<close>
   
@@ -52,9 +52,9 @@ section\<open>Beispiel: Zahlenwelt\<close>
     by(cases \<open>w\<close>, simp)
 
 lemma zahlenwps_twice:
-  "zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt"
-  "zahlenwps p1 p2 (zahlenwps p2 p1 welt) = welt"
-  by(cases welt, simp)+
+  \<open>zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt\<close>
+  \<open>zahlenwps p1 p2 (zahlenwps p2 p1 welt) = welt\<close>
+  by(cases \<open>welt\<close>, simp)+
 
 
 
@@ -65,15 +65,15 @@ lemma zahlenwps_twice:
 
 (*gute noop lemmata.*)
 lemma zahlenwelt_ist_noop_map_handlung:
-  "ist_noop (map_handlung (zahlenwps p1 p2) h) = ist_noop h"
+  \<open>ist_noop (map_handlung (zahlenwps p1 p2) h) = ist_noop h\<close>
   apply(rule ist_noop_map_handlung)
-  apply(safe, case_tac welt, simp)
+  apply(safe, case_tac \<open>welt\<close>, simp)
   done
 
 lemma zahlenwelt_ist_noop_swap:
-  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
        ist_noop (handeln p2 (zahlenwps ich p2 welt) ha)
-        \<longleftrightarrow> ist_noop (handeln ich welt ha)"
+        \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
   apply(erule ist_noop_wps)
   using zahlenwps_twice(1) apply auto[1]
   done
@@ -104,9 +104,9 @@ subsection\<open>Handlungen\<close>
     \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
-  lemma "wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
+  lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
       (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen 5 Bob))
-      Alice Bob"
+      Alice Bob\<close>
     by(eval)
 
   text\<open>Wir versuchen, das Opfer nach Besitz auszuwählen, nicht nach Namen.
@@ -194,9 +194,9 @@ subsection\<open>Handlungen\<close>
     \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1)\<close>
 
 lemma alles_kaputt_machen_code[code]:
-  "alles_kaputt_machen ich welt =
-   (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))"
-  apply(cases welt, simp)
+  \<open>alles_kaputt_machen ich welt =
+   (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))\<close>
+  apply(cases \<open>welt\<close>, simp)
   apply(subst min_list_Min)
    apply(simp add: enum_person_def; fail)
   apply(simp)
@@ -279,12 +279,12 @@ maxime_zahlenfortschritt (Handlungsabsicht (alles_kaputt_machen)) p\<close>
 
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt \<^bold>\<open>nicht\<close> den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
-  lemma "kategorischer_imperativ_gegenbeispiel
+  lemma \<open>kategorischer_imperativ_gegenbeispiel
   zahlenwps initialwelt maxime_zahlenfortschritt
   (Handlungsabsicht (stehlen4 1 10))
   Alice
   Bob
-  Alice"
+  Alice\<close>
     apply(simp add: kategorischer_imperativ_gegenbeispiel_def
         wohlgeformte_handlungsabsicht_stehlen4 mhg_maxime_zahlenfortschritt_stehlen4)
     by(eval)
@@ -306,9 +306,9 @@ lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwps welt\<
 text\<open>Allerdings können wir die Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
 für jeden fordern. Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
 
-definition maxime_altruistischer_fortschritt :: "(person, zahlenwelt) maxime" where
-  "maxime_altruistischer_fortschritt \<equiv>
-    Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)"
+definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
+  \<open>maxime_altruistischer_fortschritt \<equiv>
+    Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
 
 lemma wpsm_kommutiert_altruistischer_fortschritt:
   \<open>wpsm_kommutiert
@@ -346,10 +346,10 @@ lemma maxime_altruistischer_fortschritt_reset:
 
 
 lemma wfm_maxime_altruistischer_fortschritt:
-  "wohlgeformte_maxime zahlenwps maxime_altruistischer_fortschritt"
+  \<open>wohlgeformte_maxime zahlenwps maxime_altruistischer_fortschritt\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def wohlgeformte_maxime_auf_def, intro allI, rename_tac h p1 p2)
-  apply(case_tac h, rename_tac vor nach, simp)
-  apply(case_tac vor, case_tac nach, simp)
+  apply(case_tac \<open>h\<close>, rename_tac vor nach, simp)
+  apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
   apply(simp add: swap_forall)
   done
 
@@ -360,7 +360,7 @@ theorem \<open>
   kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
   unfolding maxime_altruistischer_fortschritt_def
   apply(erule globale_maxime_katimp)
-      apply(cases ha, simp add: ist_noop_def; fail)
+      apply(cases \<open>ha\<close>, simp add: ist_noop_def; fail)
      apply(simp add: wpsm_kommutiert_altruistischer_fortschritt[simplified maxime_altruistischer_fortschritt_def]; fail)
     apply (simp add: zahlenwps_sym; fail)
    apply (simp add: zahlenwps_twice; fail)
@@ -482,7 +482,7 @@ theorem
  wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::person. globaler_fortschritt))\<close>
   apply(erule globale_maxime_katimp)
-      apply(cases welt, cases ha, simp add: ist_noop_def; fail)
+      apply(cases \<open>welt\<close>, cases \<open>ha\<close>, simp add: ist_noop_def; fail)
      apply(simp add: globaler_fortschritt_kommutiert; fail)
     apply(simp add: zahlenwps_sym)
    apply (simp add: zahlenwps_twice; fail)

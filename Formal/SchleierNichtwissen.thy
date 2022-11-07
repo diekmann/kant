@@ -72,12 +72,12 @@ where
 
 text\<open>Folgende Equivalenz erklärt die Definition vermutlich besser:\<close>
 lemma wohlgeformte_handlungsabsicht_simp:
-  "wohlgeformte_handlungsabsicht wps welt h \<longleftrightarrow>
+  \<open>wohlgeformte_handlungsabsicht wps welt h \<longleftrightarrow>
     (\<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt) \<and>
     (\<forall>p1 p2. handeln p1 welt h =
                 Handlung welt
-                        (wps p2 p1 (nachher (handeln p2 (wps p1 p2 welt) h))))"
-  apply(cases h, simp add: wohlgeformte_handlungsabsicht_def)
+                        (wps p2 p1 (nachher (handeln p2 (wps p1 p2 welt) h))))\<close>
+  apply(cases \<open>h\<close>, simp add: wohlgeformte_handlungsabsicht_def)
   by fastforce
 
 definition wohlgeformte_handlungsabsicht_gegenbeispiel
@@ -87,15 +87,15 @@ where
     handeln taeter welt h \<noteq>
         map_handlung (wps opfer taeter) (handeln opfer (wps taeter opfer welt) h)\<close>
 
-lemma "wohlgeformte_handlungsabsicht_gegenbeispiel wps welt h p1 p2 \<Longrightarrow>
-        \<not>wohlgeformte_handlungsabsicht wps welt h"
+lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt h p1 p2 \<Longrightarrow>
+        \<not>wohlgeformte_handlungsabsicht wps welt h\<close>
   by(auto simp add: wohlgeformte_handlungsabsicht_gegenbeispiel_def wohlgeformte_handlungsabsicht_def)
 
 (*TODO: das sollte ein Homomorphismus sein.*)
 
 lemma wohlgeformte_handlungsabsicht_imp_swpaid:
-  "wohlgeformte_handlungsabsicht wps welt h \<Longrightarrow>
-    wps p1 p2 (wps p2 p1 welt) = welt"
+  \<open>wohlgeformte_handlungsabsicht wps welt h \<Longrightarrow>
+    wps p1 p2 (wps p2 p1 welt) = welt\<close>
   by(simp add: wohlgeformte_handlungsabsicht_simp)
 
 
@@ -170,23 +170,23 @@ dann erhalten wir ein sehr intuitives Ergebnis,
 welches besagt, dass ich handelnde Person und Person für die die Maxime gelten soll
 vertauschen kann.\<close>
 lemma wfh_wpsm_kommutiert_simp:
-  "wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
+  \<open>wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
   wpsm_kommutiert m wps welt \<Longrightarrow>
     okay m p2 (handeln p1 (wps p1 p2 welt) ha)
     \<longleftrightarrow>
-    okay m p1 (handeln p2 welt ha)"
-  apply(cases ha, simp)
+    okay m p1 (handeln p2 welt ha)\<close>
+  apply(cases \<open>ha\<close>, simp)
   by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
 
 text\<open>Die Rückrichtung gilt auch,
 aber da wir das für alle Handlungsabsichten in der Annahme brauchen,
 ist das eher weniger hilfreich.\<close>
 lemma wfh_kommutiert_wpsm:
-  "\<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<and>
+  \<open>\<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<and>
        (\<forall>p1 p2. okay m p2 (handeln p1 (wps p1 p2 welt) ha)
            \<longleftrightarrow>
            okay m p1 (handeln p2 welt ha)) \<Longrightarrow>
-wpsm_kommutiert m wps welt"
+wpsm_kommutiert m wps welt\<close>
   apply(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
   apply(intro allI, rename_tac p1 p2 h)
   by (metis handeln.simps handlung.map_sel(2) nachher_handeln)
@@ -211,9 +211,9 @@ where
 
 
 text\<open>Beispiel:\<close>
-lemma "wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<le> (nachher h) ich))"
+lemma \<open>wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<le> (nachher h) ich))\<close>
   apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def)
-  apply(intro allI, case_tac h, simp)
+  apply(intro allI, case_tac \<open>h\<close>, simp)
   by (metis swap_a swap_symmetric)
   
 
@@ -224,23 +224,23 @@ subsection\<open>Generische Lemmata\<close>
 lemma ist_noop_map_handlung:
   assumes wps_id:
         \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
-  shows "ist_noop (map_handlung (wps p1 p2) h) = ist_noop h"
-  apply(cases h, rename_tac vor nach, simp add: ist_noop_def)
+  shows \<open>ist_noop (map_handlung (wps p1 p2) h) = ist_noop h\<close>
+  apply(cases \<open>h\<close>, rename_tac vor nach, simp add: ist_noop_def)
   using wps_id by metis
 
 lemma ist_noop_wps_weak:
-  assumes wfh: "wohlgeformte_handlungsabsicht wps welt ha"
-    and swap_noop: "\<forall>p1 p2 h. ist_noop (map_handlung (wps p1 p2) h) = ist_noop h"
-  shows "ist_noop (handeln ich (wps p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)"
+  assumes wfh: \<open>wohlgeformte_handlungsabsicht wps welt ha\<close>
+    and swap_noop: \<open>\<forall>p1 p2 h. ist_noop (map_handlung (wps p1 p2) h) = ist_noop h\<close>
+  shows \<open>ist_noop (handeln ich (wps p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)\<close>
   apply(subst wfh[simplified wohlgeformte_handlungsabsicht_def])
   apply(simp add: swap_noop)
   done
 
 lemma ist_noop_wps:
-  assumes wfh: "wohlgeformte_handlungsabsicht wps welt ha"
+  assumes wfh: \<open>wohlgeformte_handlungsabsicht wps welt ha\<close>
   and wps_id:
        \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
-  shows "ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)"
+  shows \<open>ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
   apply(rule ist_noop_wps_weak[OF wfh])
   using ist_noop_map_handlung[OF wps_id] by simp
 

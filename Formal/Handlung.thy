@@ -26,8 +26,8 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 (*>*)
 
 
-definition ist_noop :: "'world handlung \<Rightarrow> bool" where
-  "ist_noop h \<equiv> vorher h = nachher h"
+definition ist_noop :: \<open>'world handlung \<Rightarrow> bool\<close> where
+  \<open>ist_noop h \<equiv> vorher h = nachher h\<close>
 
 
 

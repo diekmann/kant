@@ -47,7 +47,7 @@ lemma \<open>mehrverdiener Alice
        = {Alice, Bob}\<close> by eval
 
 lemma mehrverdiener_betrachtet_nur_ausgangszustand:
-  "mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)"
+  \<open>mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)\<close>
   by (metis handlung.collapse mehrverdiener.simps vorher_handeln)
 
 text\<open>Folgende Maxime versucht Steuergerechtigkeit festzuschreiben:\<close>
@@ -88,10 +88,10 @@ thm globale_maxime_katimp (*generalisiert das?*)
                 steuerlast ich handlung \<le> steuerlast p handlung)))*)
 
 
-lemma "wpsm_kommutiert (Maxime 
+lemma \<open>wpsm_kommutiert (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung))) steuerwps welt"
+                steuerlast ich handlung \<le> steuerlast p handlung))) steuerwps welt\<close>
 (*
 Nitpick found a counterexample:
   Free variable:
@@ -141,9 +141,9 @@ Nitpick found a counterexample:
   oops
 
 lemma wfh_steuerberechnung_jeder_zahlt_int:
-  "ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))
-    \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha"
-  apply(cases welt, rename_tac eink, simp)
+  \<open>ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))
+    \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha\<close>
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
   apply(simp add: wohlgeformte_handlungsabsicht_def comp_def fun_eq_iff)
   apply(safe)
   by (smt (verit, best) swap_a swap_b swap_nothing)
@@ -154,16 +154,16 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
 thm mehrverdiener_betrachtet_nur_ausgangszustand
 (*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
 (*steuerwps*)
-lemma "ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
+lemma \<open>ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung)))"
-  apply(cases welt, rename_tac eink, simp)
+                steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
-  apply(case_tac ha, rename_tac h, simp)
-  apply(thin_tac "ha = _")
+  apply(case_tac \<open>ha\<close>, rename_tac h, simp)
+  apply(thin_tac \<open>ha = _\<close>)
   apply(safe)
 (*
 Nitpick found a counterexample:
@@ -181,17 +181,17 @@ Nitpick found a counterexample:
 
   text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr
 eingeschraenken kat imp zeigen.\<close>
-lemma "
+lemma \<open>
   (\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
   ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung)))"
-  apply(cases welt, rename_tac eink, simp)
+                steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
-  apply(case_tac ha, rename_tac h, simp)
+  apply(case_tac \<open>ha\<close>, rename_tac h, simp)
   done
 
 
