@@ -190,19 +190,22 @@ subsection\<open>Handlungen\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_def)
      by(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
-(*TODO*)
-   term Inf
   fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Inf (besitz ` UNIV))\<close>
+    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1)\<close>
 
-lemma "Inf {0::int, 5, 10, - 3} = - 3"
-  oops
+lemma alles_kaputt_machen_code[code]:
+  "alles_kaputt_machen ich welt =
+   (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))"
+  apply(cases welt, simp)
+  apply(subst min_list_Min)
+   apply(simp add: enum_person_def; fail)
+  apply(simp)
+  apply(simp add: enum_UNIV)
+  done
 
-(*TODO: make executable*)
 lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-  = (Zahlenwelt \<^url>[Alice := -3, Bob := -3, Carol := -3, Eve := -3])\<close>
-  apply(simp add: DEFAULT_def UNIV_person fun_eq_iff)
-  oops
+  = (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
+  by(code_simp)
   
 
 subsection\<open>Setup\<close> (*TODO: inline*)
