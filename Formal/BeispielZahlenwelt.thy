@@ -366,10 +366,6 @@ theorem \<open>
    apply (simp add: zahlenwps_twice; fail)
   by(simp; fail)
 
-(*Ich sollte einen wrapper machen, der eine Liste von ha nimmt, und testet ob die maxime den kat imp erfuellt
-und dann den ha jeweils moralisch und nicht moralisch zuordnet.*)
-
-(*TODO: bekommen wir das executable?*)
 (*Das printet leider nicht. wieso sind records mit functions nicht equal? weil functions nicht equal*)
 value[simp]\<open>erzeuge_beispiel
   zahlenwps initialwelt
@@ -468,12 +464,6 @@ subsection\<open>Maxime für Globales Optimum\<close>
   lemma globaler_fortschritt_kommutiert:
     \<open>wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
     by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwps_sym)
-  lemma globaler_fortschritt_unbeteiligt1:
-    \<open>wpsm_unbeteiligt1 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
-    by(simp add: wpsm_unbeteiligt1_def gesamtbesitz_swap)
-  lemma globaler_fortschritt_unbeteiligt2:
-    \<open>wpsm_unbeteiligt2 (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
-    by(simp add: wpsm_unbeteiligt2_def gesamtbesitz_swap)
 (*>*)
   
 theorem 

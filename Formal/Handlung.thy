@@ -53,10 +53,10 @@ text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
 Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
 \<close>
-definition \<open>beispiel_handlungf \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
+definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
 
-text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungf\<close> so aus:
-\<^value>\<open>beispiel_handlungf::(nat, int) handlungsabsicht\<close>\<close>
+text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungsabsicht\<close> so aus:
+\<^value>\<open>beispiel_handlungsabsicht::(nat, int) handlungsabsicht\<close>\<close>
 
 
 (*<*)

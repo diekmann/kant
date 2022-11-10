@@ -243,29 +243,6 @@ lemma ist_noop_wps:
   shows \<open>ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
   apply(rule ist_noop_wps_weak[OF wfh])
   using ist_noop_map_handlung[OF wps_id] by simp
-
-
-text\<open>Die Auswertung der Maxime für eine bestimme Person muss unabhängig
-vom swappen von zwei unbeteiligten Personen sein.\<close>
-definition wpsm_unbeteiligt1
-  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
-where
-  \<open>wpsm_unbeteiligt1 m wps welt \<equiv>
-\<forall> p1 p2 pX welt'.
-  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-    okay m pX (Handlung (wps p2 p1 welt) welt')
-    \<longleftrightarrow>
-    okay m pX (Handlung welt welt')\<close>
-
-definition wpsm_unbeteiligt2
-  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
-where
-  \<open>wpsm_unbeteiligt2 m wps welt \<equiv>
-\<forall> p1 p2 pX h (welt'::'world).
-  p1 \<noteq> p2 \<longrightarrow> pX \<noteq> p1 \<longrightarrow> pX \<noteq> p2 \<longrightarrow>
-    okay m pX (Handlung welt (wps p1 p2 (h p1 welt')))
-    \<longleftrightarrow>
-    okay m pX (Handlung welt (h p1 welt'))\<close>
 (*>*)
 
 end

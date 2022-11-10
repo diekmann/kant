@@ -91,8 +91,6 @@ text\<open>In der Definition is \<^const>\<open>wohlgeformte_handlungsabsicht\<c
 ein technisch notwendiges Implementierungsdetail um nicht-wohlgeformte Handlungen
 auszuschließen.\<close>
 
-(*TODO: nicht wohlgeformte Maximen ausschliessen!*)
-
 
 text\<open>Minimal andere Formulierung:\<close>
 lemma
@@ -121,18 +119,16 @@ text\<open>Vergleich zu \<^const>\<open>moralisch\<close>.
 Wenn eine Handlung moralisch ist, dann impliziert diese Handlung die Kernforderung des
 \<^const>\<open>kategorischer_imperativ\<close>.
 Wenn die Handlungsabsicht für mich okaz ist, ist sie auch für alle anderen okay.\<close>
-(*TODO: kategorischer_imperativ_auf definition hier reinfolden*)
-lemma \<open>moralisch welt m h \<Longrightarrow>
-        \<forall>ich p1 p2. okay m ich (handeln ich welt h) \<longrightarrow> okay m p1 (handeln p2 welt h)\<close>
-  by(simp add: moralisch_simp)
+lemma \<open>moralisch welt m ha \<Longrightarrow>
+        kategorischer_imperativ_auf ha welt m\<close>
+  by(simp add: moralisch_simp kategorischer_imperativ_auf_def)
 
 text\<open>Die andere Richtung gilt nicht,
 z.B. ist die Maxime die immer False zurückgibt ein Gegenbeispiel.\<close>
 lemma \<open>m = Maxime (\<lambda>_ _. False) \<Longrightarrow>
-        (\<forall>ich p1 p2. okay m ich (handeln ich welt h) \<longrightarrow> okay m p1 (handeln p2 welt h))
-                   \<longrightarrow> moralisch welt m h
+        kategorischer_imperativ_auf ha welt m \<longrightarrow> moralisch welt m ha
           \<Longrightarrow> False\<close>
-  by(simp add: moralisch_simp)
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
 
 text\<open>Für jede Handlungsabsicht:
@@ -140,19 +136,19 @@ text\<open>Für jede Handlungsabsicht:
   Personen so handeln, wobei einer Täter und einer Opfer ist.\<close>
 lemma kategorischer_imperativ_simp:
   \<open>kategorischer_imperativ wps welt m \<longleftrightarrow>
-    (\<forall>h p1 p2 ich.
-      wohlgeformte_handlungsabsicht wps welt h \<and> \<not>ist_noop (handeln ich welt h) \<and>
-      okay m ich (handeln ich welt h)
-      \<longrightarrow> okay m p1 (handeln p2 welt h))\<close>
+    (\<forall>ha p1 p2 ich.
+      wohlgeformte_handlungsabsicht wps welt ha \<and> \<not>ist_noop (handeln ich welt ha) \<and>
+      okay m ich (handeln ich welt ha)
+      \<longrightarrow> okay m p1 (handeln p2 welt ha))\<close>
   apply(simp add: kategorischer_imperativ_def kategorischer_imperativ_auf_def moralisch_simp)
   by blast
 
 
 text\<open>Introduction rules\<close>
 lemma kategorischer_imperativI:
-  \<open>(\<And>h ich p1 p2. wohlgeformte_handlungsabsicht wps welt h \<Longrightarrow>
-                 \<not>ist_noop (handeln ich welt h) \<Longrightarrow>
-                okay m ich (handeln ich welt h) \<Longrightarrow> okay m p1 (handeln p2 welt h)
+  \<open>(\<And>ha ich p1 p2. wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
+                 \<not>ist_noop (handeln ich welt ha) \<Longrightarrow>
+                okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha)
                 )
       \<Longrightarrow> kategorischer_imperativ wps welt m\<close>
   by(auto simp add: kategorischer_imperativ_simp)
@@ -160,7 +156,8 @@ lemma kategorischer_imperativI:
 (**TODO: handlungsabsicht ha und h konsitent verwenden**)
 
 lemma kategorischer_imperativ_aufI:
-  \<open>(\<And>ich p1 p2.  \<not>ist_noop (handeln ich welt ha) \<Longrightarrow> okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha))
+  \<open>(\<And>ich p1 p2. \<not>ist_noop (handeln ich welt ha)
+      \<Longrightarrow> okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha))
       \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
@@ -201,9 +198,9 @@ Der kategorische Imperativ liftet dies eine Abstraktionsebene:
 \<close>
 
 lemma \<open>kategorischer_imperativ wps welt m \<Longrightarrow>
-  wohlgeformte_handlungsabsicht wps welt h \<Longrightarrow>
-   \<not>ist_noop (handeln ich welt h) \<Longrightarrow>
-  okay m ich (handeln ich welt h) \<Longrightarrow> moralisch welt m h\<close>
+  wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
+   \<not>ist_noop (handeln ich welt ha) \<Longrightarrow>
+  okay m ich (handeln ich welt ha) \<Longrightarrow> moralisch welt m ha\<close>
   by(auto simp add: kategorischer_imperativ_simp moralisch_simp)
   
 
@@ -218,15 +215,15 @@ text\<open>Für Beispiele wird es einfacher zu zeigen, dass eine Maxime nicht de
 kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
 (*insbesondere weil ich das proof document als outline baue und man den beweis,
 also das Gegenbeispiel, nicht sieht.*)
-definition \<open>kategorischer_imperativ_gegenbeispiel wps welt m h ich p1 p2 \<equiv>
-wohlgeformte_handlungsabsicht wps welt h \<and> 
-       \<not>ist_noop (handeln ich welt h) \<and> okay m ich (handeln ich welt h) \<and>
-      \<not> okay m p1 (handeln p2 welt h)\<close>
+definition \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<equiv>
+wohlgeformte_handlungsabsicht wps welt ha \<and> 
+       \<not>ist_noop (handeln ich welt ha) \<and> okay m ich (handeln ich welt ha) \<and>
+      \<not> okay m p1 (handeln p2 welt ha)\<close>
 
-lemma \<open>kategorischer_imperativ_gegenbeispiel wps welt m h ich p1 p2 \<Longrightarrow>
+lemma \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<Longrightarrow>
   \<not> kategorischer_imperativ wps welt m\<close>
   apply(simp add: kategorischer_imperativ_simp kategorischer_imperativ_gegenbeispiel_def)
-  apply(rule_tac x=\<open>h\<close> in exI, simp)
+  apply(rule_tac x=\<open>ha\<close> in exI, simp)
   by blast
 
 subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
@@ -234,7 +231,7 @@ subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 text\<open>Wenn eine Maxime jede Handlungsabsicht als moralisch bewertet,
 erfüllt diese Maxime den kategorischen Imperativ.
 Da diese Maxime jede Handlung erlaubt, ist es dennoch eine wohl ungeeignete Maxime.\<close>
-lemma \<open>\<forall>h. moralisch welt maxime h \<Longrightarrow> kategorischer_imperativ wps welt maxime\<close>
+lemma \<open>\<forall>ha. moralisch welt maxime ha \<Longrightarrow> kategorischer_imperativ wps welt maxime\<close>
   apply(cases \<open>maxime\<close>, rename_tac m)
   by(simp add: kategorischer_imperativ_simp moralisch_simp)
 
