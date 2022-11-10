@@ -47,21 +47,21 @@ definition show_map :: \<open>('a::enum \<rightharpoonup> 'b) \<Rightarrow> ('a 
 
 lemma \<open>show_map [True \<mapsto> (8::int), False \<mapsto> 12] = [(False, 12), (True, 8)]\<close> by eval
 
-lemma List_map_filter_map_some_cons: "m x = Some y \<Longrightarrow>
+lemma List_map_filter_map_some_cons: \<open>m x = Some y \<Longrightarrow>
   (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (x # xs)) =
-       (x,y) # (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (xs))"
+       (x,y) # (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (xs))\<close>
   apply(simp add: List.map_filter_def)
   done
 
 
-lemma List_map_filter_map_of_eq_helper: "x \<notin> set xs
+lemma List_map_filter_map_of_eq_helper: \<open>x \<notin> set xs
   \<Longrightarrow>  map_of (List.map_filter (\<lambda>p. map_option (Pair p) ((m(x := None)) p)) xs)
-        = (map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs))"
+        = (map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs))\<close>
   apply(simp add: map_filter_def)
   apply(rule arg_cong)
   apply(simp)
-  apply(subgoal_tac "(filter (\<lambda>xa. xa \<noteq> x \<and> (xa \<noteq> x \<longrightarrow> (\<exists>y. m xa = Some y))) xs) =
-        (filter (\<lambda>x. \<exists>y. m x = Some y) xs)")
+  apply(subgoal_tac \<open>(filter (\<lambda>xa. xa \<noteq> x \<and> (xa \<noteq> x \<longrightarrow> (\<exists>y. m xa = Some y))) xs) =
+        (filter (\<lambda>x. \<exists>y. m x = Some y) xs)\<close>)
    prefer 2
    apply (rule filter_cong)
     apply(simp; fail)
@@ -83,18 +83,18 @@ next
     from True obtain y where \<open>m x = Some y\<close> by blast
     let \<open>?m'\<close>=\<open>m(x:=None)\<close>
     have m: \<open>m = ?m'(x \<mapsto> y)\<close> using \<open>m x = Some y\<close> by auto
-    have "x \<notin> set xs" using Cons.prems(1) by auto
+    have \<open>x \<notin> set xs\<close> using Cons.prems(1) by auto
     have \<open>dom ?m' \<subseteq> set xs\<close> using Cons.prems by auto
     with Cons.IH[of \<open>?m'\<close>] have IH':
       \<open>map_of (List.map_filter (\<lambda>p. map_option (Pair p) (?m' p)) xs) = ?m'\<close>
       using Cons.prems(1) by fastforce
-    with List_map_filter_map_of_eq_helper[OF \<open>x \<notin> set xs\<close>, of m] have IH'':
+    with List_map_filter_map_of_eq_helper[OF \<open>x \<notin> set xs\<close>, of \<open>m\<close>] have IH'':
       \<open>map_of (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs) = ?m'\<close>
       by simp
     from \<open>m x = Some y\<close> have 1:
-      "List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (x # xs) =
-        (x, y) # List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs"
-      using List_map_filter_map_some_cons[of m x y xs] by simp
+      \<open>List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (x # xs) =
+        (x, y) # List.map_filter (\<lambda>p. map_option (Pair p) (m p)) xs\<close>
+      using List_map_filter_map_some_cons[of \<open>m\<close> \<open>x\<close> \<open>y\<close> \<open>xs\<close>] by simp
     show \<open>?thesis\<close>
       apply(subst 1)
       apply(simp)

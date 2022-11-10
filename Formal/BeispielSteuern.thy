@@ -15,8 +15,8 @@ datatype steuerwelt = Steuerwelt
 
 
 (*TODO: copy from zahlenwelt*)
-fun steuerwelt_personen_swap :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
-  \<open>steuerwelt_personen_swap p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
+fun steuerwps :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
+  \<open>steuerwps p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
 
 
 fun steuerlast :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
@@ -47,7 +47,7 @@ lemma \<open>mehrverdiener Alice
        = {Alice, Bob}\<close> by eval
 
 lemma mehrverdiener_betrachtet_nur_ausgangszustand:
-  "mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)"
+  \<open>mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)\<close>
   by (metis handlung.collapse mehrverdiener.simps vorher_handeln)
 
 text\<open>Folgende Maxime versucht Steuergerechtigkeit festzuschreiben:\<close>
@@ -88,23 +88,111 @@ thm globale_maxime_katimp (*generalisiert das?*)
                 steuerlast ich handlung \<le> steuerlast p handlung)))*)
 
 
+lemma \<open>wpsm_kommutiert (Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung))) steuerwps welt\<close>
+(*
+Nitpick found a counterexample:
+  Free variable:
+    welt = Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2))
+  Skolem constants:
+    ??.wpsm_kommutiert.h =
+      (\<lambda>x. _)
+      (p\<^sub>1 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2))),
+       p\<^sub>2 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))),
+       p\<^sub>3 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2))),
+       p\<^sub>4 := (\<lambda>x. _)
+         (Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := - 1)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 1, p\<^sub>2 := 1, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+          Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 1, p\<^sub>4 := 0)) :=
+            Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))))
+    ??.wpsm_kommutiert.p1 = p\<^sub>4
+    ??.wpsm_kommutiert.p2 = p\<^sub>3
+*)
+  oops
+
+lemma wfh_steuerberechnung_jeder_zahlt_int:
+  \<open>ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))
+    \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha\<close>
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
+  apply(simp add: wohlgeformte_handlungsabsicht_def comp_def fun_eq_iff)
+  apply(safe)
+  by (smt (verit, best) swap_a swap_b swap_nothing)
+  
+  
+  
+
 thm mehrverdiener_betrachtet_nur_ausgangszustand
 (*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
-(*steuerwelt_personen_swap*)
-lemma "kategorischer_imperativ_auf ha  welt
+(*steuerwps*)
+lemma \<open>ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt
     (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung)))"
-  thm globale_maxime_katimp
-  apply(cases welt, rename_tac eink, simp)
+                steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
-  apply(case_tac ha, rename_tac h, simp)
-  apply(thin_tac "ha = _")
-
+  apply(case_tac \<open>ha\<close>, rename_tac h, simp)
+  apply(thin_tac \<open>ha = _\<close>)
+  apply(safe)
+(*
+Nitpick found a counterexample:
+  Free variables:
+    steuerberechnung = (\<lambda>x. _)(- 1 := 0, 0 := - 1, 1 := - 1, 2 := - 1)
+    welt = Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := - 1, p\<^sub>3 := 0, p\<^sub>4 := 0))
+  Skolem constants:
+    eink = (\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := - 1, p\<^sub>3 := 0, p\<^sub>4 := 0)
+    ich = p\<^sub>4
+    p = p\<^sub>3
+    p1 = p\<^sub>2
+*)
   (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
+  oops text\<open>TODO: finish, gilt aber nicht\<close> (*TODO*)
 
-  oops text\<open>TODO: finish\<close> (*TODO*)
+  text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr
+eingeschraenken kat imp zeigen.\<close>
+lemma \<open>
+  (\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
+  ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))) \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt
+    (Maxime 
+      (\<lambda>ich handlung.
+           (\<forall>p\<in>mehrverdiener ich handlung.
+                steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
+  apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
+  apply(case_tac \<open>ha\<close>, rename_tac h, simp)
+  done
 
 
 

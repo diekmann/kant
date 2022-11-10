@@ -63,31 +63,31 @@ definition opfer_eindeutig_nach_besitz_auswaehlen
 
 (*<*)
 lemma case_filter_empty_some_helper:
-  "(case filter P ps of [] \<Rightarrow> Some a | aa # x \<Rightarrow> Map.empty x) = Some x
-  \<longleftrightarrow> (\<forall>x\<in>set ps. \<not> P x) \<and> a = x"
+  \<open>(case filter P ps of [] \<Rightarrow> Some a | aa # x \<Rightarrow> Map.empty x) = Some x
+  \<longleftrightarrow> (\<forall>x\<in>set ps. \<not> P x) \<and> a = x\<close>
   apply(simp add: list.case_eq_if)
   using empty_filter_conv by metis
 
 lemma case_filter_empty_some_helper2:
-  "(case if P a then a # filter P ps else filter P ps of
+  \<open>(case if P a then a # filter P ps else filter P ps of
         [] \<Rightarrow> None | [opfer] \<Rightarrow> Some opfer | opfer # aa # x \<Rightarrow> Map.empty x) =
        Some x \<longleftrightarrow>
-  (P a \<and> x = a \<and> filter P ps = []) \<or> (\<not>P a \<and> filter P ps = [x])"
-  apply(cases "P a")
+  (P a \<and> x = a \<and> filter P ps = []) \<or> (\<not>P a \<and> filter P ps = [x])\<close>
+  apply(cases \<open>P a\<close>)
    apply(simp add: case_filter_empty_some_helper)
    apply(metis empty_filter_conv)
   apply(simp)
-  apply(cases "filter P ps")
+  apply(cases \<open>filter P ps\<close>)
    apply(simp)
   apply(simp)
   by (metis list.case_eq_if option.distinct(1) option.inject)
 
 lemma case_filter_empty_some_helper3:
-  "(case filter P ps of [] \<Rightarrow> None | [opfer] \<Rightarrow> Some opfer
+  \<open>(case filter P ps of [] \<Rightarrow> None | [opfer] \<Rightarrow> Some opfer
             | opfer # aa # x \<Rightarrow> Map.empty x) =
            Some opfer
     \<longleftrightarrow>
-    filter P ps = [opfer]"
+    filter P ps = [opfer]\<close>
   apply(simp add: list.case_eq_if)
   by (metis list.exhaust_sel list.sel(1) list.sel(3))
 
@@ -106,7 +106,7 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
    apply(simp add: case_filter_empty_some_helper)
    apply fastforce
   apply(simp add: case_filter_empty_some_helper3)
-  apply(simp add: case_filter_empty_some_helper2[of "(\<lambda>p. besitz p = besitz _)"])
+  apply(simp add: case_filter_empty_some_helper2[of \<open>(\<lambda>p. besitz p = besitz _)\<close>])
   by (metis (mono_tags) empty_filter_conv)
 (*>*)
 
@@ -127,20 +127,20 @@ lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
 
 thm  option.exhaust_sel
 lemma the_single_elem_exhaust:
-  "(the_single_elem S = None \<Longrightarrow> P None) \<Longrightarrow>
-        (\<And>x. the_single_elem S = Some x \<Longrightarrow> P (Some x)) \<Longrightarrow> P (the_single_elem S)"
-apply(cases "the_single_elem S")
+  \<open>(the_single_elem S = None \<Longrightarrow> P None) \<Longrightarrow>
+        (\<And>x. the_single_elem S = Some x \<Longrightarrow> P (Some x)) \<Longrightarrow> P (the_single_elem S)\<close>
+apply(cases \<open>the_single_elem S\<close>)
 by(auto)
 (*>*)
 
 (*TODO: delete in favor of*)
 thm is_singleton_the_elem[symmetric]
-lemma "A = {the_elem A} \<longleftrightarrow> is_singleton A"
+lemma \<open>A = {the_elem A} \<longleftrightarrow> is_singleton A\<close>
   by (simp add: is_singleton_the_elem)
 
-lemma opfer_nach_besitz_induct_step_set_simp: "besitz a \<noteq> opfer_nach_besitz \<Longrightarrow>
+lemma opfer_nach_besitz_induct_step_set_simp: \<open>besitz a \<noteq> opfer_nach_besitz \<Longrightarrow>
   {p. (p = a \<or> p \<in> set ps) \<and> besitz p = opfer_nach_besitz} =
-    {p \<in> set ps. besitz p = opfer_nach_besitz}"
+    {p \<in> set ps. besitz p = opfer_nach_besitz}\<close>
   by auto
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
@@ -164,7 +164,7 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def; fail)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
   apply(safe)
-   apply(case_tac "\<not> is_singleton {p \<in> set ps. besitz p = besitz a}")
+   apply(case_tac \<open>\<not> is_singleton {p \<in> set ps. besitz p = besitz a}\<close>)
     apply (smt (z3) empty_iff empty_set is_singletonI' list.case_eq_if mem_Collect_eq set_filter)
    apply(simp)
    apply (metis One_nat_def card.empty empty_set is_singleton_altdef list.case_eq_if nat.simps(3) set_filter)
@@ -197,7 +197,7 @@ lemma the_elem_singleton_swap_none:
     is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow>
     is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p} \<Longrightarrow>
     the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} = the_elem {pa \<in> set ps. besitz pa = p}\<close>
-  apply(rule arg_cong[of _ _ the_elem])
+  apply(rule arg_cong[of _ _ \<open>the_elem\<close>])
   apply(rule Collect_cong)
   apply(simp add: is_singleton_the_elem)
   by (smt (verit) mem_Collect_eq singleton_iff swap_nothing)
@@ -265,27 +265,46 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
 
 
 lemma the_single_elem_None_swap:
-  "the_single_elem {p. x p = a} = None \<Longrightarrow>
-       the_single_elem {p. swap p1 p2 x p = a} = None"
+  \<open>the_single_elem {p. x p = a} = None \<Longrightarrow>
+       the_single_elem {p. swap p1 p2 x p = a} = None\<close>
   apply(simp add: the_single_elem)
   by (smt (verit) empty_iff is_singletonI' is_singleton_the_elem mem_Collect_eq option.simps(3) singleton_iff swap_a swap_b swap_nothing)
 
   lemma the_single_elem_Some_Some_swap:
-    "the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
-        the_single_elem {p. swap s1 p2 x p = a} = Some s2 \<Longrightarrow> p2 = s2"
+    \<open>the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
+        the_single_elem {p. swap s1 p2 x p = a} = Some s2 \<Longrightarrow> p2 = s2\<close>
     by (metis (no_types, lifting) is_singleton_the_elem mem_Collect_eq option.inject option.simps(3) singleton_iff swap_b the_single_elem)
   lemma the_single_elem_Some_ex_swap:
-    "the_single_elem {p. x p = a} = Some x2 \<Longrightarrow> \<exists>y. the_single_elem {p. swap p1 p2 x p = a} = Some y"
-    apply(case_tac "the_single_elem {p. swap p1 p2 x p = a}")
+    \<open>the_single_elem {p. x p = a} = Some x2 \<Longrightarrow> \<exists>y. the_single_elem {p. swap p1 p2 x p = a} = Some y\<close>
+    apply(case_tac \<open>the_single_elem {p. swap p1 p2 x p = a}\<close>)
      apply(simp)
     using the_single_elem_None_swap apply (metis option.distinct(1) swap2)
     by simp
 
 lemma the_single_elem_Some_swap:
-  "the_single_elem {p. x p = a} = Some s \<Longrightarrow>
-      the_single_elem {p. swap s p2 x p = a} = Some p2"
+  \<open>the_single_elem {p. x p = a} = Some s \<Longrightarrow>
+      the_single_elem {p. swap s p2 x p = a} = Some p2\<close>
   using the_single_elem_Some_ex_swap the_single_elem_Some_Some_swap by fastforce
 
 (*>*)
+
+
+
+
+
+definition aufsummieren :: \<open>('person::enum \<Rightarrow> int) \<Rightarrow> int\<close> where
+  \<open>aufsummieren besitz = sum_list (map besitz Enum.enum)\<close>
+
+lemma \<open>aufsummieren (besitz :: person\<Rightarrow>int) = (\<Sum>p\<leftarrow>[Alice,Bob,Carol,Eve]. besitz p)\<close>
+  by(simp add: aufsummieren_def enum_person_def)
+
+lemma \<open>aufsummieren \<^url>[Alice := 4, Carol := 8] = 12\<close> by eval
+lemma \<open>aufsummieren \<^url>[Alice := 4, Carol := 4] = 8\<close> by eval
+
+lemma aufsummieren_swap:
+  \<open>aufsummieren (swap p1 p2 welt) = aufsummieren welt\<close>
+  apply(simp add: aufsummieren_def)
+  apply(rule sum_list_swap)
+  using enum_class.in_enum enum_class.enum_distinct by auto
 
 end

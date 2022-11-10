@@ -26,8 +26,8 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 (*>*)
 
 
-definition ist_noop :: "'world handlung \<Rightarrow> bool" where
-  "ist_noop h \<equiv> vorher h = nachher h"
+definition ist_noop :: \<open>'world handlung \<Rightarrow> bool\<close> where
+  \<open>ist_noop h \<equiv> vorher h = nachher h\<close>
 
 
 
@@ -53,10 +53,10 @@ text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
 Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
 \<close>
-definition \<open>beispiel_handlungf \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
+definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
 
-text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungf\<close> so aus:
-\<^value>\<open>beispiel_handlungf::(nat, int) handlungsabsicht\<close>\<close>
+text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungsabsicht\<close> so aus:
+\<^value>\<open>beispiel_handlungsabsicht::(nat, int) handlungsabsicht\<close>\<close>
 
 
 (*<*)

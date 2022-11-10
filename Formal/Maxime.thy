@@ -57,13 +57,6 @@ Dennoch, betrachten wir den kategorischen Imperativ als eine Verallgemeinerung
 der goldenen Regel.
 \<close>
 
-(*
-TODO: in einer Maxime darf keine konkrete Person hardcoded sein.
- Verboten: Maxime (\ich _ -> if ich == "konkrete Person" then ...)
-
-das muss formalisiert werden!
-Maximen duerfen nicht _diskriminierend_ sein.
-*)
 
 subsection\<open>Die Goldene Regel\<close>
 text\<open>Die Goldene Regel nach \<^url>\<open>https://de.wikipedia.org/wiki/Goldene_Regel\<close> sagt:
