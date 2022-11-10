@@ -420,7 +420,28 @@ definition erzeuge_beispiel
      bsp_verbotene_handlungen = [ha\<leftarrow>has. \<not> moralisch welt m ha]
    \<rparr>\<close>
 
-value\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [ds] (Maxime (\<lambda>ich w. True))\<close>
+
+(*thx lars: https://stackoverflow.com/questions/74337244/turning-a-valuesimp-example-into-a-lemma-with-functions-in-them/74394525#74394525*)
+ML\<open>
+fun beispiel_conv ctxt =
+  Conv.arg_conv (Conv.arg1_conv (Code_Simp.dynamic_conv ctxt) then_conv Conv.arg_conv (Code_Simp.dynamic_conv ctxt))
+
+fun beispiel_tac ctxt =
+  HEADGOAL (CONVERSION (beispiel_conv ctxt) THEN_ALL_NEW (resolve_tac ctxt @{thms refl}))
+\<close>
+
+method_setup beispiel = \<open>Scan.succeed (SIMPLE_METHOD o beispiel_tac)\<close>
+
+
+lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. w)] (Maxime (\<lambda>ich w. True))
+  =
+  Some
+  \<lparr>bsp_welt = (\<lambda>p::person. 0::int),
+   bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich w. True)),
+   bsp_erlaubte_handlungen = [Handlungsabsicht (\<lambda>p w. w)],
+   bsp_verbotene_handlungen = []
+  \<rparr>\<close>
+  by beispiel
 
 
 

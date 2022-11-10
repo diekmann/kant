@@ -356,11 +356,6 @@ theorem \<open>
    apply (simp add: zahlenwps_twice; fail)
   by(simp; fail)
 
-(*Das printet leider nicht. wieso sind records mit functions nicht equal? weil functions nicht equal*)
-value[simp]\<open>erzeuge_beispiel
-  zahlenwps initialwelt
-  [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]
-  maxime_altruistischer_fortschritt\<close>
 
 lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
@@ -371,8 +366,8 @@ Some
    bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
    bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
    bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
-  apply(simp add: erzeuge_beispiel_def )
-  oops
+  by beispiel
+
 
 (*bsp_erfuellte_maxime = None. Aber gleiche handlungen erlaubt und verboten*)
 value[simp]\<open>erzeuge_beispiel
