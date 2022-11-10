@@ -16,11 +16,7 @@ section\<open>Beispiel: Zahlenwelt\<close>
   (*>*)
   
   fun gesamtbesitz :: \<open>zahlenwelt \<Rightarrow> int\<close> where
-    \<open>gesamtbesitz (Zahlenwelt besitz) = sum_list (map besitz Enum.enum)\<close>
-
-  lemma \<open>gesamtbesitz (Zahlenwelt besitz) = (\<Sum>p\<leftarrow>[Alice,Bob,Carol,Eve]. besitz p)\<close>
-    by(simp add: enum_person_def)
-  
+    \<open>gesamtbesitz (Zahlenwelt besitz) = aufsummieren besitz\<close>
 
   text\<open>Beispiel:\<close>
   lemma \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12\<close> by eval
@@ -51,10 +47,10 @@ section\<open>Beispiel: Zahlenwelt\<close>
   lemma zahlenwps_id: \<open>zahlenwps p p w = w\<close>
     by(cases \<open>w\<close>, simp)
 
-lemma zahlenwps_twice:
-  \<open>zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt\<close>
-  \<open>zahlenwps p1 p2 (zahlenwps p2 p1 welt) = welt\<close>
-  by(cases \<open>welt\<close>, simp)+
+  lemma zahlenwps_twice:
+    \<open>zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt\<close>
+    \<open>zahlenwps p1 p2 (zahlenwps p2 p1 welt) = welt\<close>
+    by(cases \<open>welt\<close>, simp)+
 
 
 
@@ -79,15 +75,9 @@ lemma zahlenwelt_ist_noop_swap:
   done
 
 
-
-
-
-
   lemma gesamtbesitz_swap:
     \<open>gesamtbesitz (zahlenwps p1 p2 welt) = gesamtbesitz welt\<close>
-    apply(cases \<open>welt\<close>, simp)
-    apply(rule sum_list_swap)
-    using enum_class.in_enum enum_class.enum_distinct by auto
+    by(cases \<open>welt\<close>, simp add: aufsummieren_swap)
   (*>*)
 
 subsection\<open>Handlungen\<close>

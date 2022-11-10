@@ -288,4 +288,23 @@ lemma the_single_elem_Some_swap:
 
 (*>*)
 
+
+
+
+
+definition aufsummieren :: \<open>('person::enum \<Rightarrow> int) \<Rightarrow> int\<close> where
+  \<open>aufsummieren besitz = sum_list (map besitz Enum.enum)\<close>
+
+lemma \<open>aufsummieren (besitz :: person\<Rightarrow>int) = (\<Sum>p\<leftarrow>[Alice,Bob,Carol,Eve]. besitz p)\<close>
+  by(simp add: aufsummieren_def enum_person_def)
+
+lemma \<open>aufsummieren \<^url>[Alice := 4, Carol := 8] = 12\<close> by eval
+lemma \<open>aufsummieren \<^url>[Alice := 4, Carol := 4] = 8\<close> by eval
+
+lemma aufsummieren_swap:
+  \<open>aufsummieren (swap p1 p2 welt) = aufsummieren welt\<close>
+  apply(simp add: aufsummieren_def)
+  apply(rule sum_list_swap)
+  using enum_class.in_enum enum_class.enum_distinct by auto
+
 end
