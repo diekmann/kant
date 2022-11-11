@@ -57,17 +57,8 @@ section\<open>Beispiel: Zahlenwelt\<close>
     by(cases \<open>welt\<close>, simp add: aufsummieren_swap)
   (*>*)
 
-subsection\<open>Handlungen\<close>
-  text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
-  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI, case_tac \<open>welt\<close>, simp)
-    apply(simp add: swap_def)
-    done
 
-(*TODO: move somewhere else*)
+subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
@@ -110,31 +101,7 @@ subsection\<open>Handlungen\<close>
       Alice Bob\<close>
     by(eval)
 
-
-
-  text\<open>Wenn wir das Opfer allerdings eindeutig auswählen, ist die Handlung wohlgeformt.
-  Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
-  fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-      \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
-        (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
-           of None \<Rightarrow> (Zahlenwelt besitz)
-            | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
-        )\<close>
-
-
-  lemma wohlgeformte_handlungsabsicht_stehlen4:
-    \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
-      apply(simp add: wohlgeformte_handlungsabsicht_def)
-      apply(intro allI, case_tac \<open>welt\<close>, simp)
-      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
-      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
-      apply(simp add: the_single_elem)
-      apply(safe)
-       apply (simp add: swap_def; fail)
-      by (simp add: fun_upd_twist swap_def)
-
-
-  fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+ fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>schenken betrag empfaenger schenker (Zahlenwelt besitz) =
         Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag))\<close>
   
@@ -147,6 +114,38 @@ subsection\<open>Handlungen\<close>
   
   text\<open>Das Modell ist nicht ganz perfekt, .... Aber passt schon um damit zu spielen.\<close>
 
+
+subsection\<open>Wohlgeformte Handlungen\<close>
+  text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
+  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+    \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(intro allI, case_tac \<open>welt\<close>, simp)
+    apply(simp add: swap_def)
+    done
+
+  text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlung wohlgeformt.
+  Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
+  fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+      \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+        (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
+           of None \<Rightarrow> (Zahlenwelt besitz)
+            | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+        )\<close>
+
+(*<*)
+  lemma wohlgeformte_handlungsabsicht_stehlen4:
+    \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
+      apply(simp add: wohlgeformte_handlungsabsicht_def)
+      apply(intro allI, case_tac \<open>welt\<close>, simp)
+      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+      apply(simp add: the_single_elem)
+      apply(safe)
+       apply (simp add: swap_def; fail)
+      by (simp add: fun_upd_twist swap_def)
+(*>*)
 
   text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
   fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
