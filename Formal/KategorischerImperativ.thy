@@ -420,6 +420,12 @@ definition erzeuge_beispiel
      bsp_verbotene_handlungen = [ha\<leftarrow>has. \<not> moralisch welt m ha]
    \<rparr>\<close>
 
+text\<open>\<^const>\<open>erzeuge_beispiel\<close> erzeugt nur ein Beiespiel wenn alles wohlgeformt ist.\<close>
+lemma "erzeuge_beispiel wps welt has m = Some bsp \<Longrightarrow>
+  (\<forall> ha \<in> set has. wohlgeformte_handlungsabsicht wps welt ha) \<and>
+  (\<forall> h \<in> set (alle_moeglichen_handlungen welt has). wohlgeformte_maxime_auf h wps m)"
+  by(simp add: erzeuge_beispiel_def split: if_split_asm)
+  
 
 (*thx lars: https://stackoverflow.com/questions/74337244/turning-a-valuesimp-example-into-a-lemma-with-functions-in-them/74394525#74394525*)
 ML\<open>

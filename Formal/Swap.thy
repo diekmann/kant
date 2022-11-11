@@ -55,4 +55,21 @@ lemma sum_list_swap: \<open>p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Lo
   apply(rule swap_nothing)
   by auto
 
+
+lemma min_list_swap_int:
+  fixes f::"'person \<Rightarrow> int"
+  shows "p1 \<in> set ps \<Longrightarrow> p2 \<in> set ps \<Longrightarrow> min_list (map (swap p1 p2 f) ps) = min_list (map f ps)"
+  apply(cases "ps = []")
+   apply(simp; fail)
+  apply(simp add: min_list_Min)
+  apply(cases "p1 = p2")
+   apply(simp)
+  by (smt (verit, best) List.finite_set Min_in Min_le arg_min_list_in f_arg_min_list_f finite_imageI imageE image_eqI image_is_empty swap2 swap_a swap_b swap_nothing)
+
+lemma min_list_swap_int_enum:
+  fixes f::"'person::enum \<Rightarrow> int"
+  shows "min_list (map (swap p1 p2 f) enum_class.enum) = min_list (map f enum_class.enum)"
+  apply(subst min_list_swap_int)
+  by(simp_all add: enum_class.enum_UNIV)
+
 end

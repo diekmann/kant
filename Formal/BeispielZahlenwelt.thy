@@ -52,29 +52,6 @@ section\<open>Beispiel: Zahlenwelt\<close>
     \<open>zahlenwps p1 p2 (zahlenwps p2 p1 welt) = welt\<close>
     by(cases \<open>welt\<close>, simp)+
 
-
-
-
-
-
-
-
-(*gute noop lemmata.*)
-lemma zahlenwelt_ist_noop_map_handlung:
-  \<open>ist_noop (map_handlung (zahlenwps p1 p2) h) = ist_noop h\<close>
-  apply(rule ist_noop_map_handlung)
-  apply(safe, case_tac \<open>welt\<close>, simp)
-  done
-
-lemma zahlenwelt_ist_noop_swap:
-  \<open>wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-       ist_noop (handeln p2 (zahlenwps ich p2 welt) ha)
-        \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
-  apply(erule ist_noop_wps)
-  using zahlenwps_twice(1) apply auto[1]
-  done
-
-
   lemma gesamtbesitz_swap:
     \<open>gesamtbesitz (zahlenwps p1 p2 welt) = gesamtbesitz welt\<close>
     by(cases \<open>welt\<close>, simp add: aufsummieren_swap)
@@ -89,7 +66,8 @@ subsection\<open>Handlungen\<close>
     apply(intro allI, case_tac \<open>welt\<close>, simp)
     apply(simp add: swap_def)
     done
-  
+
+(*TODO: move somewhere else*)
   fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
         Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
@@ -183,20 +161,49 @@ subsection\<open>Handlungen\<close>
   fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
     \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1)\<close>
 
-lemma alles_kaputt_machen_code[code]:
-  \<open>alles_kaputt_machen ich welt =
-   (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))\<close>
-  apply(cases \<open>welt\<close>, simp)
-  apply(subst min_list_Min)
-   apply(simp add: enum_person_def; fail)
-  apply(simp)
-  apply(simp add: enum_UNIV)
-  done
+(*<*)
+  lemma alles_kaputt_machen_code[code]:
+    \<open>alles_kaputt_machen ich welt =
+     (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))\<close>
+    apply(cases \<open>welt\<close>, simp)
+    apply(subst min_list_Min)
+     apply(simp add: enum_person_def; fail)
+    apply(simp)
+    apply(simp add: enum_UNIV)
+    done
+
+  lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht alles_kaputt_machen)\<close>
+    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(simp add: alles_kaputt_machen_code)
+    apply(intro allI, case_tac \<open>welt\<close>, simp add: fun_eq_iff)
+    apply(simp add: min_list_swap_int_enum)
+    by (simp add: swap_def)
+
+(*>*)
+
 
 lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
   = (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
   by(code_simp)
-  
+
+
+text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
+definition "handlungsabsichten \<equiv> [
+  Handlungsabsicht (erschaffen 5),
+  Handlungsabsicht (stehlen4 5 10),
+  Handlungsabsicht reset,
+  Handlungsabsicht alles_kaputt_machen
+]"
+
+lemma \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
+  apply(simp add: handlungsabsichten_def wohlgeformte_handlungsabsicht_stehlen4)
+  apply(safe)
+  apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4 wohlgeformte_handlungsabsicht_alles_kaputt_machen)
+  apply(simp_all add: wohlgeformte_handlungsabsicht_def)
+    apply(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+  done
+
 
 subsection\<open>Setup\<close> (*TODO: inline*)
   text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
