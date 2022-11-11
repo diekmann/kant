@@ -214,6 +214,7 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
   = (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
   by(code_simp)
 
+  (*TODO: handling alles_besser_machen.*)
 
 text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
 definition "handlungsabsichten \<equiv> [
@@ -345,7 +346,6 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
 
 
 subsection\<open>Maxime für allgemeinen Fortschritt\<close>
-
   text\<open>Allerdings können wir die Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
   für jeden fordern. Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
   
@@ -428,6 +428,17 @@ subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
   fun individueller_strikter_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
     \<open>individueller_strikter_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) < (meins p nach)\<close>
 
+  text\<open>TODO: erklaeren. Erfuellt nicht kategorischen imperativ und alles ist verboten\<close>
+  lemma \<open>erzeuge_beispiel
+    zahlenwps initialwelt
+    handlungsabsichten
+    (Maxime individueller_strikter_fortschritt) =
+  Some
+    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
+     bsp_erfuellte_maxime = None,
+     bsp_erlaubte_handlungen = [],
+     bsp_verbotene_handlungen = handlungsabsichten\<rparr>\<close>
+    by beispiel
 
   text\<open>In keiner Welt ist die Handlung \<^const>\<open>erschaffen\<close> nun \<^const>\<open>moralisch\<close>:\<close>
   lemma \<open>\<not> moralisch welt
@@ -477,6 +488,21 @@ subsection\<open>Maxime für globales striktes Optimum\<close>
     by(eval)
 
 
+  text\<open>TODO: erklaeren.\<close>
+  lemma \<open>erzeuge_beispiel
+    zahlenwps initialwelt
+    handlungsabsichten
+    (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) =
+  Some
+    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
+     bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich. globaler_strikter_fortschritt)),
+     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
+     bsp_verbotene_handlungen = [
+      Handlungsabsicht (stehlen4 5 10),
+      Handlungsabsicht reset,
+      Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+    by beispiel
+
 
 
 subsection\<open>Maxime für globales Optimum\<close>
@@ -516,6 +542,20 @@ theorem
   lemma \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen4 5 10))\<close>
     by(eval)
+
+  text\<open>TODO: erklaeren.\<close>
+  lemma \<open>erzeuge_beispiel
+    zahlenwps initialwelt
+    handlungsabsichten
+    (Maxime (\<lambda>ich. globaler_fortschritt)) =
+  Some
+    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
+     bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich. globaler_fortschritt)),
+     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10)],
+     bsp_verbotene_handlungen = [
+      Handlungsabsicht reset,
+      Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+    by beispiel
 
 subsection\<open>Ungültige Maxime\<close>
   text\<open>Es ist verboten, in einer Maxime eine spezielle Person hardzucoden.
