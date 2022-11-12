@@ -570,7 +570,19 @@ subsection\<open>Ungültige Maxime\<close>
     apply(intro allI, rename_tac h, case_tac \<open>h\<close>)
     apply(simp)
     done
-  (*TODO: hier fehlt der beweis, dass das nicht wohlgeformt ist!*)
-
+  lemma "\<not>wohlgeformte_maxime_auf
+    (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
+    (Maxime (\<lambda>ich. individueller_fortschritt Alice))"
+    apply(simp add: wohlgeformte_maxime_auf_def)
+    apply(rule_tac x=Alice in exI)
+    apply(rule_tac x=Bob in exI)
+    apply(code_simp)
+    done
+  lemma "wohlgeformte_maxime_auf
+    (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
+    (Maxime (\<lambda>ich. individueller_fortschritt ich))"
+    apply(simp add: wohlgeformte_maxime_auf_def)
+    apply(code_simp)
+    done
 
 end
