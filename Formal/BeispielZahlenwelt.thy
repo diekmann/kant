@@ -350,9 +350,29 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   für jeden fordern. Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
   
   definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
-    \<open>maxime_altruistischer_fortschritt \<equiv>
-      Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
-  
+    \<open>maxime_altruistischer_fortschritt \<equiv> Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
+
+  text\<open>Folgendes Beispiel zeigt, dass die \<^const>\<open>maxime_altruistischer_fortschritt\<close>
+  den kategorischen Imperativ (für diese \<^const>\<open>initialwelt\<close> und \<^const>\<open>handlungsabsichten\<close>)
+  erfüllt; zu sehen an dem \<^const>\<open>Some\<close> Term im \<^const>\<open>bsp_erfuellte_maxime\<close>.
+
+  Die Handlungsabsichten werden eingeordnet wie erwartet:
+   \<^const>\<open>erschaffen\<close> ist gut,
+   \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist  schlecht.
+  \<close>
+  lemma \<open>erzeuge_beispiel
+    zahlenwps initialwelt
+    handlungsabsichten
+    maxime_altruistischer_fortschritt =
+  Some
+    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
+     bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
+     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
+     bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+    by beispiel
+  text\<open>Das ist ein sehr schönes Beispiel.\<close>
+
+(*<*)
   lemma wpsm_kommutiert_altruistischer_fortschritt:
     \<open>wpsm_kommutiert
            maxime_altruistischer_fortschritt
@@ -393,8 +413,13 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
     apply(simp add: swap_forall)
     done
+(*>*)
+
   
-  
+  text\<open>Die Aussage, dass die \<^const>\<open>maxime_altruistischer_fortschritt\<close> den kategorischen Imperativ
+  für bestimmte Handlungsabsichten und Welten erfüllt generalisiert noch weiter.
+  Für alle Welten und alle wohlgeformten Handlungsabsichten welche mit der Maxime generalisieren
+  erfüllt die Maxime den kategorischen Imperativ.\<close>
   theorem \<open>
     \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
     wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
@@ -406,18 +431,9 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
       apply (simp add: zahlenwps_sym; fail)
      apply (simp add: zahlenwps_twice; fail)
     by(simp; fail)
-  
-  
-  lemma \<open>erzeuge_beispiel
-    zahlenwps initialwelt
-    [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]
-    maxime_altruistischer_fortschritt =
-  Some
-    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
-     bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
-     bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
-    by beispiel
+
+  text\<open>Allgemein scheint dies eine sehr gute Maxime zu sein
+  (für dieses sehr beschränkte Weltenmodell).\<close>
 
 subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
