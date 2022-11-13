@@ -48,8 +48,8 @@ dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen
 definition kategorischer_imperativ_auf
   :: \<open>('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
-  \<open>kategorischer_imperativ_auf h welt m \<equiv>
-     (\<exists>ich. \<not>ist_noop (handeln ich welt h) \<and> okay m ich (handeln ich welt h)) \<longrightarrow> moralisch welt m h\<close>
+  \<open>kategorischer_imperativ_auf ha welt m \<equiv>
+     (\<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)) \<longrightarrow> moralisch welt m ha\<close>
 
 text\<open>
 Für alle möglichen (wohlgeformten) Handlungsabsichten muss dies nun gelten:
@@ -98,7 +98,7 @@ lemma
   (\<forall>ha.
     (\<exists>p.
         wohlgeformte_handlungsabsicht wps welt ha \<and>
-        \<not>ist_noop (handeln p welt ha) \<and>
+        ausfuehrbar p welt ha \<and>
         okay m p (handeln p welt ha))
     \<longrightarrow> moralisch welt m ha)\<close>
   unfolding kategorischer_imperativ_def kategorischer_imperativ_auf_def
@@ -109,7 +109,7 @@ text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:
 lemma
 \<open>kategorischer_imperativ wps welt m \<longleftrightarrow>
   (\<forall>ha ich.
-      wohlgeformte_handlungsabsicht wps welt ha \<and> \<not>ist_noop (handeln ich welt ha) \<and>
+      wohlgeformte_handlungsabsicht wps welt ha \<and> ausfuehrbar ich welt ha \<and>
       okay m ich (handeln ich welt ha) \<longrightarrow> moralisch welt m ha)\<close>
   apply(simp add: kategorischer_imperativ_def kategorischer_imperativ_auf_def)
   by blast
@@ -137,7 +137,7 @@ text\<open>Für jede Handlungsabsicht:
 lemma kategorischer_imperativ_simp:
   \<open>kategorischer_imperativ wps welt m \<longleftrightarrow>
     (\<forall>ha p1 p2 ich.
-      wohlgeformte_handlungsabsicht wps welt ha \<and> \<not>ist_noop (handeln ich welt ha) \<and>
+      wohlgeformte_handlungsabsicht wps welt ha \<and> ausfuehrbar ich welt ha \<and>
       okay m ich (handeln ich welt ha)
       \<longrightarrow> okay m p1 (handeln p2 welt ha))\<close>
   apply(simp add: kategorischer_imperativ_def kategorischer_imperativ_auf_def moralisch_simp)
@@ -147,8 +147,8 @@ lemma kategorischer_imperativ_simp:
 text\<open>Introduction rules\<close>
 lemma kategorischer_imperativI:
   \<open>(\<And>ha ich p1 p2. wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
-                 \<not>ist_noop (handeln ich welt ha) \<Longrightarrow>
-                okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha)
+                   ausfuehrbar ich welt ha \<Longrightarrow>
+                   okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha)
                 )
       \<Longrightarrow> kategorischer_imperativ wps welt m\<close>
   by(auto simp add: kategorischer_imperativ_simp)
@@ -156,7 +156,7 @@ lemma kategorischer_imperativI:
 (**TODO: handlungsabsicht ha und h konsitent verwenden**)
 
 lemma kategorischer_imperativ_aufI:
-  \<open>(\<And>ich p1 p2. \<not>ist_noop (handeln ich welt ha)
+  \<open>(\<And>ich p1 p2. ausfuehrbar ich welt ha
       \<Longrightarrow> okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha))
       \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
@@ -199,7 +199,7 @@ Der kategorische Imperativ liftet dies eine Abstraktionsebene:
 
 lemma \<open>kategorischer_imperativ wps welt m \<Longrightarrow>
   wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
-   \<not>ist_noop (handeln ich welt ha) \<Longrightarrow>
+   ausfuehrbar ich welt ha \<Longrightarrow>
   okay m ich (handeln ich welt ha) \<Longrightarrow> moralisch welt m ha\<close>
   by(auto simp add: kategorischer_imperativ_simp moralisch_simp)
   
@@ -217,7 +217,7 @@ kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
 also das Gegenbeispiel, nicht sieht.*)
 definition \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<equiv>
 wohlgeformte_handlungsabsicht wps welt ha \<and> 
-       \<not>ist_noop (handeln ich welt ha) \<and> okay m ich (handeln ich welt ha) \<and>
+       ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha) \<and>
       \<not> okay m p1 (handeln p2 welt ha)\<close>
 
 lemma \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<Longrightarrow>
@@ -258,25 +258,26 @@ theorem globale_maxime_katimp:
   shows \<open>kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::'person. P))\<close>
 proof(rule kategorischer_imperativ_aufI, simp)
   fix ich p2 :: \<open>'person\<close>
-  assume noopich: \<open>\<not> ist_noop (handeln ich welt ha)\<close>
+  assume ausfuehrbarich: \<open>ausfuehrbar ich welt ha\<close>
     and okayich: \<open>P (handeln ich welt ha)\<close>
 
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
   show \<open>P (handeln p2 welt ha)\<close>
-  proof(cases \<open>ist_noop (handeln p2 welt ha)\<close>)
+  proof(cases \<open>\<not> ausfuehrbar p2 welt ha\<close>)
     case True
-    assume \<open>ist_noop (handeln p2 welt ha)\<close>
+    assume \<open>\<not> ausfuehrbar p2 welt ha\<close>
+    hence "ist_noop (handeln p2 welt ha)" using nicht_ausfuehrbar_ist_noop by fast
     with maxime_erlaubt_untaetigkeit show \<open>P (handeln p2 welt ha)\<close> by simp
   next
     case False
-    assume \<open>\<not> ist_noop (handeln p2 welt ha)\<close>
+    assume \<open>\<not> \<not> ausfuehrbar p2 welt ha\<close>
     with ist_noop_wps[OF wfh wps_id]
     have mhg_pre: \<open>\<not> ist_noop (handeln ich (wps p2 ich welt) ha)\<close>
       by simp
 
-    from noopich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayich[simplified h]
+    from ausfuehrbarich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayich[simplified h]
     have
       \<open>P (handeln ich (wps p2 ich welt) ha)\<close>
       by(auto simp add: h)

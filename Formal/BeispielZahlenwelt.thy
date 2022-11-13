@@ -158,7 +158,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
       \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
            of None \<Rightarrow> None
-            | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
+            | Some opfer \<Rightarrow> if opfer = dieb then None else Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
         )\<close>
 (*todo: ich \<noteq> opfer*)
 

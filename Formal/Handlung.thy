@@ -84,6 +84,30 @@ lemma nachher_handeln_raw: \<open>nachher (handeln p welt (Handlungsabsicht h)) 
 declare nachher_handeln.simps[simp del]
 (*>*)
 
+(**TODO*: erklaeren, warum Handlungen partiell.*)
+
+
+fun ausfuehrbar :: "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool"
+where
+  "ausfuehrbar p welt (Handlungsabsicht h) = (h p welt \<noteq> None)"
+
+(*<*)
+declare ausfuehrbar.simps[simp del]
+(*>*)
+
+lemma nicht_ausfuehrbar_ist_noop:
+  \<open>\<not>ausfuehrbar p welt ha \<Longrightarrow> ist_noop (handeln p welt ha)\<close>
+  apply(cases ha)
+  by(simp add: ausfuehrbar.simps ist_noop_def handeln_def nachher_handeln.simps)
+
+lemma ausfuehrbar_nachher_handeln:
+  \<open>ausfuehrbar p welt (Handlungsabsicht h) \<Longrightarrow>
+  nachher_handeln p welt (Handlungsabsicht h) = the (h p welt)\<close>
+  apply(simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
+  by fastforce
+
+
+
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
 text\<open>
 Sei eine Ethik eine Funktion, welche einem beliebigen \<^typ>\<open>'\<alpha>\<close> eine

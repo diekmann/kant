@@ -262,6 +262,22 @@ lemma ist_noop_wps:
   shows \<open>ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
   apply(rule ist_noop_wps_weak[OF wfh])
   using ist_noop_map_handlung[OF wps_id] by simp
+
+
+
+
+lemma ausfuehrbar_wps:
+  assumes wfh: \<open>wohlgeformte_handlungsabsicht wps welt ha\<close>
+  and wps_id:
+       \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
+     shows \<open>ausfuehrbar p2 (wps ich p2 welt) ha \<longleftrightarrow> ausfuehrbar ich welt ha\<close>
+  apply -
+  apply(insert wfh[simplified wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps])
+  apply(cases ha, simp add: ausfuehrbar.simps)
+  apply(simp add: nachher_handeln.simps)
+(*TODO: bei der wohlgeformten Handlungsabsicht muss dass ausfuehrbar propagieren!*)
+  
+  
 (*>*)
 
 end
