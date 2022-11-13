@@ -261,6 +261,9 @@ proof(rule kategorischer_imperativ_aufI, simp)
   assume ausfuehrbarich: \<open>ausfuehrbar ich welt ha\<close>
     and okayich: \<open>P (handeln ich welt ha)\<close>
 
+  from wps_id wps_sym have wpsid_swapped: "wps_id wps welt"
+    by(simp add: wps_id_def)
+
   obtain h where h: \<open>ha = Handlungsabsicht h\<close>
     by(cases \<open>ha\<close>, blast)
 
@@ -273,9 +276,8 @@ proof(rule kategorischer_imperativ_aufI, simp)
   next
     case False
     assume \<open>\<not> \<not> ausfuehrbar p2 welt ha\<close>
-    with ist_noop_wps[OF wfh wps_id]
-    have mhg_pre: \<open>\<not> ist_noop (handeln ich (wps p2 ich welt) ha)\<close>
-      by simp
+    with wohlgeformte_handlungsabsicht_ausfuehrbar[OF wfh]
+    have mhg_pre: "ausfuehrbar ich (wps p2 ich welt) (Handlungsabsicht h)" using h by blast
 
     from ausfuehrbarich mhg_pre[simplified h] mhg[simplified maxime_und_handlungsabsicht_generalisieren_def h] okayich[simplified h]
     have
@@ -284,7 +286,7 @@ proof(rule kategorischer_imperativ_aufI, simp)
     with wps_sym have
       \<open>P (handeln ich (wps ich p2 welt) ha)\<close>
       by(simp)
-    with wfh_wpsm_kommutiert_simp[OF wfh kom] show \<open>P (handeln p2 welt ha)\<close>
+    with wfh_wpsm_kommutiert_simp[OF wpsid_swapped wfh kom] show \<open>P (handeln p2 welt ha)\<close>
       by(simp add: h)
   qed
 qed

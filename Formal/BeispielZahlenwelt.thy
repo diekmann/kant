@@ -81,7 +81,7 @@ subsection\<open>Ungültige Handlung\<close>
   lemma \<open>\<not>wohlgeformte_handlungsabsicht
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     (Handlungsabsicht (\<lambda>ich w. if ich = Alice then Some w else Some (Zahlenwelt (\<lambda>_. 0))))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_def swap_def)
+    apply(simp add: wohlgeformte_handlungsabsicht.simps swap_def)
     apply(eval)
     done
 
@@ -147,7 +147,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt (besitz(p += int i)))\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
     apply(case_tac \<open>welt\<close>, simp)
     apply(simp add: swap_def)
     done
@@ -165,7 +165,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
     \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
-      apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
+      apply(simp add: wohlgeformte_handlungsabsicht.simps)
       apply(case_tac \<open>welt\<close>, simp)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
@@ -182,7 +182,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
   dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
-      apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
+      apply(simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
      by(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
   fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
@@ -201,7 +201,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 
   lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht alles_kaputt_machen)\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
     apply(simp add: alles_kaputt_machen_code)
     apply(case_tac \<open>welt\<close>, simp add: fun_eq_iff)
     apply(simp add: min_list_swap_int_enum)
@@ -228,7 +228,7 @@ lemma \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_hand
   apply(simp add: handlungsabsichten_def)
   apply(safe)
   apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4 wohlgeformte_handlungsabsicht_alles_kaputt_machen)
-  apply(simp_all add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
+  apply(simp_all add: wohlgeformte_handlungsabsicht.simps)
     apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
   done
 
@@ -391,7 +391,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
       \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
       maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
     apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
-    apply(simp add: ist_noop_def)
+    apply(simp add: ausfuehrbar.simps)
     apply(case_tac \<open>welt\<close>, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
     apply(simp add: ist_noop_def split: option.split option.split_asm)

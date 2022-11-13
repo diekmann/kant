@@ -144,7 +144,7 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
   \<open>ha = Handlungsabsicht (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))))
     \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha\<close>
   apply(cases \<open>welt\<close>, rename_tac eink, simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps comp_def fun_eq_iff)
+  apply(simp add: wohlgeformte_handlungsabsicht.simps comp_def fun_eq_iff)
   apply(safe)
   by (smt (verit, best) swap_a swap_b swap_nothing)
   

@@ -135,7 +135,7 @@ lemma
   apply(elim conjE)
   apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
   apply(case_tac \<open>h\<close>, simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
   oops (*kann ich eine welt in eine andere durch swappen umbauen, so dass das gilt?
     Vermutlich nicht, Leute koennen ja ganz beliebig besitz haben*)
   
