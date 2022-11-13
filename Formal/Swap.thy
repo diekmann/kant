@@ -11,6 +11,10 @@ lemma swap1[simp]: \<open>swap a b (swap a b f) = f\<close>
   by(simp add: swap_def)
 lemma swap2[simp]: \<open>swap b a (swap a b f) = f\<close>
   by(simp add: swap_def)
+lemma swap3: "(swap p1 p2 swap) p1 p2 x = x" (*wow, types*)
+  by(simp add: swap_def)
+lemma swap4: "(swap p2 p1 swap) p1 p2 x = x" (*wow, types*)
+  by(simp add: swap_def)
 lemma swap_id[simp]: \<open>swap a a f = f\<close>
   by(simp add: swap_def)
 lemma \<open>f_swapped = (swap a b f) \<Longrightarrow> f_swapped a = f b \<and> f_swapped b = f a\<close>

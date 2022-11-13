@@ -144,7 +144,7 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
   \<open>ha = Handlungsabsicht (\<lambda>ich w. Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))
     \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha\<close>
   apply(cases \<open>welt\<close>, rename_tac eink, simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def comp_def fun_eq_iff)
+  apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps comp_def fun_eq_iff)
   apply(safe)
   by (smt (verit, best) swap_a swap_b swap_nothing)
   
@@ -189,9 +189,10 @@ lemma \<open>
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
                 steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
-  apply(cases \<open>welt\<close>, rename_tac eink, simp)
+  apply(cases \<open>welt\<close>, rename_tac eink, simp add:)
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
   apply(case_tac \<open>ha\<close>, rename_tac h, simp)
+  apply(simp add: handeln_def nachher_handeln.simps)
   done
 
 
@@ -319,7 +320,7 @@ text\<open>Die Anforderungen für ein \<^locale>\<open>steuersystem\<close> und 
 lemma steuersystem_imp_maxime:
   \<open>steuersystem steuersystem_impl \<Longrightarrow>
         (\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (jeder_zahlt steuersystem_impl)))\<close>
-   apply(simp add: maxime_steuern_def moralisch_unfold)
+   apply(simp add: maxime_steuern_def moralisch_unfold handeln_def nachher_handeln.simps)
    apply(simp add: jeder_zahlt_def bevoelkerung_def)
    apply(intro allI impI conjI)
    apply(rename_tac welt p1 p2)
@@ -364,7 +365,7 @@ proof
              \<le> get_einkommen welt pB -
                 int (nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB)))\<close>
     for welt :: \<open>steuerwelt\<close> and pA pB :: \<open>person\<close>
-    by(simp add: maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
+    by(simp add: handeln_def nachher_handeln.simps maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
   from m'[where welt=\<open>Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)\<close>
                 and pA=\<open>Bob\<close> and pB=\<open>Alice\<close>] a
   have almost:
@@ -383,7 +384,7 @@ next
        nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA))
        \<le> nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB))\<close>
     for welt :: \<open>steuerwelt\<close> and pA pB :: \<open>person\<close>
-    by(simp add: maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
+    by(simp add: handeln_def nachher_handeln.simps maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
   from m'[where welt=\<open>Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)\<close>
                 and pA=\<open>Bob\<close> and pB=\<open>Alice\<close>] a
   have \<open>einkommen_b - steuersystem_impl einkommen_b \<le> einkommen_a - steuersystem_impl einkommen_a\<close>

@@ -70,14 +70,15 @@ where
     \<forall>p1 p2. handeln p1 welt h =
             map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) h)\<close>
 
+(*TODO: jeden beweis der wohlgeformte_handlungsabsicht_def verwendet durch wohlgeformte_handlungsabsicht_simp ersetzen*)
 text\<open>Folgende Equivalenz erklärt die Definition vermutlich besser:\<close>
 lemma wohlgeformte_handlungsabsicht_simp:
-  \<open>wohlgeformte_handlungsabsicht wps welt h \<longleftrightarrow>
+  \<open>wohlgeformte_handlungsabsicht wps welt ha \<longleftrightarrow>
     (\<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt) \<and>
-    (\<forall>p1 p2. handeln p1 welt h =
+    (\<forall>p1 p2. handeln p1 welt ha =
                 Handlung welt
-                        (wps p2 p1 (nachher (handeln p2 (wps p1 p2 welt) h))))\<close>
-  apply(cases \<open>h\<close>, simp add: wohlgeformte_handlungsabsicht_def)
+                        (wps p2 p1 (nachher_handeln p2 (wps p1 p2 welt) ha)))\<close>
+  apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht_def handeln_def)
   by fastforce
 
 definition wohlgeformte_handlungsabsicht_gegenbeispiel
@@ -136,7 +137,7 @@ lemma
       (Handlungsabsicht (\<lambda>ich w. (\<lambda>_. 0)))
       Eve\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def )
-  apply(simp add: ist_noop_def fun_eq_iff)
+  apply(simp add: ist_noop_def fun_eq_iff handeln_def nachher_handeln.simps)
   by (metis (full_types) fun_upd_other fun_upd_same not_numeral_le_zero person.simps(6) swap_a swap_b zero_neq_neg_one)
   
   
@@ -151,39 +152,38 @@ definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
   \<open>wpsm_kommutiert m wps welt \<equiv>
-\<forall> p1 p2 h.
-  okay m p2 (Handlung (wps p1 p2 welt) (h p1 (wps p1 p2 welt)))
-  \<longleftrightarrow>
-  okay m p1 (Handlung welt (wps p1 p2 (h p1 (wps p2 p1 welt))))\<close>
+  \<forall> p1 p2 ha.
+    okay m p2 (handeln p1 (wps p1 p2 welt) ha)
+    \<longleftrightarrow>
+    okay m p1 (Handlung welt (wps p1 p2 (nachher_handeln p1 (wps p2 p1 welt) ha)))\<close>
 
-(*TODO: Die definition durch dieses Lemma ersetzen
-Ich will keine rohen `h` Funktionen mehr haben, ich will `handeln` haben
-um die Handlungen spaeter leichter partiell zu machen*)
-lemma wpsm_kommutiert_handlung:
+lemma wpsm_kommutiert_handlung_raw:
   \<open>wpsm_kommutiert m wps welt =
-(\<forall> p1 p2 ha.
-  okay m p2 (handeln p1 (wps p1 p2 welt) ha)
-  \<longleftrightarrow>
-  okay m p1 (Handlung welt (wps p1 p2 (nachher (handeln p1 (wps p2 p1 welt) ha)))))\<close>
+  (\<forall> p1 p2 h.
+    okay m p2 (Handlung (wps p1 p2 welt) (h p1 (wps p1 p2 welt)))
+    \<longleftrightarrow>
+    okay m p1 (Handlung welt (wps p1 p2 (h p1 (wps p2 p1 welt)))))\<close>
   apply(simp add: wpsm_kommutiert_def)
   apply(rule iffI)
    apply(intro allI)
-   apply(case_tac ha)
-   apply(simp; fail)
+   apply(erule_tac x=p1 in allE)
+   apply(erule_tac x=p2 in allE)
+   apply(erule_tac x="Handlungsabsicht h" in allE)
+   apply(simp add: nachher_handeln.simps handeln_def)
   apply(intro allI)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
-  apply(erule_tac x="Handlungsabsicht h" in allE)
-  apply(simp)
+  apply(case_tac ha)
+  apply(simp add: nachher_handeln.simps handeln_def; fail)
   done
 
-lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m wps welt =
-(\<forall> p1 p2 h.
-  okay m p2 (handeln p1 (wps p1 p2 welt) (Handlungsabsicht h))
-  \<longleftrightarrow>
-  okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. wps p1 p2 (h p (wps p2 p1 w)))))
-)\<close>
-  by(simp add: wpsm_kommutiert_def)
+lemma wpsm_kommutiert_unfold_handlungsabsicht:
+  \<open>wpsm_kommutiert m wps welt =
+  (\<forall> p1 p2 h.
+    okay m p2 (handeln p1 (wps p1 p2 welt) (Handlungsabsicht h))
+    \<longleftrightarrow>
+    okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. wps p1 p2 (h p (wps p2 p1 w)))))
+  )\<close>
+  apply(simp add: wpsm_kommutiert_handlung_raw)
+  by (simp add: handeln_def nachher_handeln.simps)
 
 text\<open>Wenn sowohl \<^const>\<open>wohlgeformte_handlungsabsicht\<close> als auch \<^const>\<open>wpsm_kommutiert\<close>,
 dann erhalten wir ein sehr intuitives Ergebnis,
@@ -196,7 +196,7 @@ lemma wfh_wpsm_kommutiert_simp:
     \<longleftrightarrow>
     okay m p1 (handeln p2 welt ha)\<close>
   apply(cases \<open>ha\<close>, simp)
-  by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
+  by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_simp)
 
 text\<open>Die Rückrichtung gilt auch,
 aber da wir das für alle Handlungsabsichten in der Annahme brauchen,
@@ -207,9 +207,7 @@ lemma wfh_kommutiert_wpsm:
            \<longleftrightarrow>
            okay m p1 (handeln p2 welt ha)) \<Longrightarrow>
 wpsm_kommutiert m wps welt\<close>
-  apply(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_def)
-  apply(intro allI, rename_tac p1 p2 h)
-  by (metis handeln.simps handlung.map_sel(2) nachher_handeln)
+  by(simp add: wpsm_kommutiert_def wohlgeformte_handlungsabsicht_simp)
   
 
 

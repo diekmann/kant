@@ -58,8 +58,8 @@ definition kategorischer_imperativ
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
   \<open>kategorischer_imperativ wps welt m \<equiv>
-    \<forall>h. wohlgeformte_handlungsabsicht wps welt h \<longrightarrow>
-          kategorischer_imperativ_auf h welt m\<close>
+    \<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<longrightarrow>
+          kategorischer_imperativ_auf ha welt m\<close>
 
 text\<open>Wir führen die interne Hilfsdefinition \<^const>\<open>kategorischer_imperativ_auf\<close> ein
 um den kategorischen Imperativ nur für eine Teilmenge aller Handlungen besser
@@ -95,12 +95,12 @@ auszuschließen.\<close>
 text\<open>Minimal andere Formulierung:\<close>
 lemma
 \<open>kategorischer_imperativ wps welt m \<longleftrightarrow>
-  (\<forall>h.
+  (\<forall>ha.
     (\<exists>p.
-        wohlgeformte_handlungsabsicht wps welt h \<and>
-        \<not>ist_noop (handeln p welt h) \<and>
-        okay m p (handeln p welt h))
-    \<longrightarrow> moralisch welt m h)\<close>
+        wohlgeformte_handlungsabsicht wps welt ha \<and>
+        \<not>ist_noop (handeln p welt ha) \<and>
+        okay m p (handeln p welt ha))
+    \<longrightarrow> moralisch welt m ha)\<close>
   unfolding kategorischer_imperativ_def kategorischer_imperativ_auf_def
   apply(simp)
   by blast
@@ -108,9 +108,9 @@ lemma
 text\<open>Der Existenzquantor lässt sich auch in einen Allquantor umschreiben:\<close>
 lemma
 \<open>kategorischer_imperativ wps welt m \<longleftrightarrow>
-  (\<forall>h ich.
-      wohlgeformte_handlungsabsicht wps welt h \<and> \<not>ist_noop (handeln ich welt h) \<and>
-      okay m ich (handeln ich welt h) \<longrightarrow> moralisch welt m h)\<close>
+  (\<forall>ha ich.
+      wohlgeformte_handlungsabsicht wps welt ha \<and> \<not>ist_noop (handeln ich welt ha) \<and>
+      okay m ich (handeln ich welt ha) \<longrightarrow> moralisch welt m ha)\<close>
   apply(simp add: kategorischer_imperativ_def kategorischer_imperativ_auf_def)
   by blast
 

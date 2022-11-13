@@ -107,7 +107,7 @@ lemma
     \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
   (Handlungsabsicht (stehlen4 1 10)) p\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_aussernoop_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_aussernoop_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(elim conjE)
   apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
@@ -146,7 +146,7 @@ lemma
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren2_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>w\<close>, simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split)
   apply(safe, simp_all)
   using the_single_elem_None_swap apply fastforce
@@ -157,7 +157,7 @@ lemma
 lemma
   \<open>maxime_und_handlungsabsicht_generalisieren3 zahlenwps
     (Maxime (\<lambda>ich h. individueller_fortschritt ich h)) (Handlungsabsicht (stehlen4 1 10))\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
+  apply(simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>welt\<close>, simp)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split)
@@ -170,7 +170,7 @@ lemma
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>welt\<close>, simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split)
   apply(safe, simp_all)
   by (smt (verit, del_insts) fun_upd_apply swap_b swap_nothing)

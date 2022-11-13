@@ -46,8 +46,13 @@ Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprint
 \<close>
 
 
-fun handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close> where
-\<open>handeln handelnde_person welt (Handlungsabsicht h) = Handlung welt (h handelnde_person welt)\<close>
+fun nachher_handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
+where
+  \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = (h handelnde_person welt)\<close>
+
+definition handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
+where
+  \<open>handeln handelnde_person welt ha \<equiv> Handlung welt (nachher_handeln handelnde_person welt ha)\<close>
 
 text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
@@ -61,9 +66,12 @@ text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>b
 
 (*<*)
 lemma vorher_handeln[simp]: \<open>vorher (handeln p welt h) = welt\<close>
-  by(cases \<open>h\<close>, simp)
-lemma nachher_handeln: \<open>nachher (handeln p welt (Handlungsabsicht h)) = h p welt\<close>
-  by(simp)
+  by(cases \<open>h\<close>, simp add: handeln_def)
+lemma nachher_handeln_raw: \<open>nachher (handeln p welt (Handlungsabsicht h)) = h p welt\<close>
+  by(simp add: handeln_def)
+
+(*I don't want to expand this definition by default, but keep the handeln function around*)
+declare nachher_handeln.simps[simp del]
 (*>*)
 
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
