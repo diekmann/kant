@@ -156,6 +156,27 @@ where
   \<longleftrightarrow>
   okay m p1 (Handlung welt (wps p1 p2 (h p1 (wps p2 p1 welt))))\<close>
 
+(*TODO: Die definition durch dieses Lemma ersetzen
+Ich will keine rohen `h` Funktionen mehr haben, ich will `handeln` haben
+um die Handlungen spaeter leichter partiell zu machen*)
+lemma wpsm_kommutiert_handlung:
+  \<open>wpsm_kommutiert m wps welt =
+(\<forall> p1 p2 ha.
+  okay m p2 (handeln p1 (wps p1 p2 welt) ha)
+  \<longleftrightarrow>
+  okay m p1 (Handlung welt (wps p1 p2 (nachher (handeln p1 (wps p2 p1 welt) ha)))))\<close>
+  apply(simp add: wpsm_kommutiert_def)
+  apply(rule iffI)
+   apply(intro allI)
+   apply(case_tac ha)
+   apply(simp; fail)
+  apply(intro allI)
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x="Handlungsabsicht h" in allE)
+  apply(simp)
+  done
+
 lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m wps welt =
 (\<forall> p1 p2 h.
   okay m p2 (handeln p1 (wps p1 p2 welt) (Handlungsabsicht h))
@@ -163,7 +184,6 @@ lemma wpsm_kommutiert_simp: \<open>wpsm_kommutiert m wps welt =
   okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. wps p1 p2 (h p (wps p2 p1 w)))))
 )\<close>
   by(simp add: wpsm_kommutiert_def)
-
 
 text\<open>Wenn sowohl \<^const>\<open>wohlgeformte_handlungsabsicht\<close> als auch \<^const>\<open>wpsm_kommutiert\<close>,
 dann erhalten wir ein sehr intuitives Ergebnis,
