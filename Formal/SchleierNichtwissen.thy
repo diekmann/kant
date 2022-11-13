@@ -134,7 +134,7 @@ lemma
       swap
       ((\<lambda>x. 0)(Alice := (2::int), Eve := - 1))
       (Maxime (\<lambda>ich h. (vorher h) ich \<le> (nachher h) ich))
-      (Handlungsabsicht (\<lambda>ich w. (\<lambda>_. 0)))
+      (Handlungsabsicht (\<lambda>ich w. Some (\<lambda>_. 0)))
       Eve\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def )
   apply(simp add: ist_noop_def fun_eq_iff handeln_def nachher_handeln.simps)
@@ -159,28 +159,29 @@ where
 
 lemma wpsm_kommutiert_handlung_raw:
   \<open>wpsm_kommutiert m wps welt =
-  (\<forall> p1 p2 h.
-    okay m p2 (Handlung (wps p1 p2 welt) (h p1 (wps p1 p2 welt)))
+  (\<forall> p1 p2 ha.
+    okay m p2 (Handlung (wps p1 p2 welt) (nachher_handeln p1 (wps p1 p2 welt) ha))
     \<longleftrightarrow>
-    okay m p1 (Handlung welt (wps p1 p2 (h p1 (wps p2 p1 welt)))))\<close>
+    okay m p1 (Handlung welt (wps p1 p2 (nachher_handeln p1 (wps p2 p1 welt) ha))))\<close>
   apply(simp add: wpsm_kommutiert_def)
   apply(rule iffI)
    apply(intro allI)
    apply(erule_tac x=p1 in allE)
    apply(erule_tac x=p2 in allE)
-   apply(erule_tac x="Handlungsabsicht h" in allE)
-   apply(simp add: nachher_handeln.simps handeln_def)
+   apply(erule_tac x="ha" in allE)
+   apply(simp add: nachher_handeln.simps handeln_def; fail)
   apply(intro allI)
   apply(case_tac ha)
-  apply(simp add: nachher_handeln.simps handeln_def; fail)
+  apply(simp add: handeln_def)
   done
+
 
 lemma wpsm_kommutiert_unfold_handlungsabsicht:
   \<open>wpsm_kommutiert m wps welt =
-  (\<forall> p1 p2 h.
-    okay m p2 (handeln p1 (wps p1 p2 welt) (Handlungsabsicht h))
+  (\<forall> p1 p2 ha.
+    okay m p2 (handeln p1 (wps p1 p2 welt) ha)
     \<longleftrightarrow>
-    okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. wps p1 p2 (h p (wps p2 p1 w)))))
+    okay m p1 (handeln p1 welt (Handlungsabsicht (\<lambda>p w. Some (wps p1 p2 (nachher_handeln p (wps p2 p1 w) ha)))))
   )\<close>
   apply(simp add: wpsm_kommutiert_handlung_raw)
   by (simp add: handeln_def nachher_handeln.simps)

@@ -80,16 +80,15 @@ subsection\<open>Ungültige Handlung\<close>
 
   lemma \<open>\<not>wohlgeformte_handlungsabsicht
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-    (Handlungsabsicht (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
+    (Handlungsabsicht (\<lambda>ich w. if ich = Alice then Some w else Some (Zahlenwelt (\<lambda>_. 0))))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_def swap_def)
     apply(eval)
     done
 
-
 subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
-  fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
-        Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
+        Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
       (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen 5 Bob))
@@ -105,11 +104,11 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   | \<open>opfer_nach_besitz_auswaehlen b besitz (p#ps) = 
       (if besitz p = b then Some p else opfer_nach_besitz_auswaehlen b besitz ps)\<close>
   
-  fun stehlen2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  fun stehlen2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>stehlen2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
-           of None \<Rightarrow> (Zahlenwelt besitz)
-            | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+           of None \<Rightarrow> None
+            | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
         )\<close>
   text\<open>Leider ist diese Funktion auch diskriminierend:
   Wenn es mehrere potenzielle Opfer mit dem gleichen Besitz gibt,
@@ -129,9 +128,9 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
       Alice Bob\<close>
     by(eval)
 
- fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+ fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>schenken betrag empfaenger schenker (Zahlenwelt besitz) =
-        Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag))\<close>
+        Some (Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag)))\<close>
   
   text\<open>Da wir ganze Zahlen verwenden und der Besitz auch beliebig negativ werden kann,
   ist Stehlen äquivalent dazu einen negativen Betrag zu verschenken:\<close>
@@ -145,8 +144,8 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
 
 subsection\<open>Wohlgeformte Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
-  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
+  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt (besitz(p += int i)))\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
     apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
     apply(case_tac \<open>welt\<close>, simp)
@@ -155,12 +154,13 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 
   text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlung wohlgeformt.
   Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
-  fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
-           of None \<Rightarrow> (Zahlenwelt besitz)
-            | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+           of None \<Rightarrow> None
+            | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
         )\<close>
+(*todo: ich \<noteq> opfer*)
 
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
@@ -176,8 +176,8 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 (*>*)
 
   text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
-  fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>reset ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. 0)\<close>
+  fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>reset ich (Zahlenwelt besitz) = Some (Zahlenwelt (\<lambda> _. 0))\<close>
 
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
   dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
@@ -185,13 +185,13 @@ subsection\<open>Wohlgeformte Handlungen\<close>
       apply(simp add: wohlgeformte_handlungsabsicht_simp handeln_def nachher_handeln.simps)
      by(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
-  fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1)\<close>
+  fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Some (Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1))\<close>
 
 (*<*)
   lemma alles_kaputt_machen_code[code]:
     \<open>alles_kaputt_machen ich welt =
-     (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))\<close>
+     (case welt of Zahlenwelt besitz \<Rightarrow> Some (Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1)))\<close>
     apply(cases \<open>welt\<close>, simp)
     apply(subst min_list_Min)
      apply(simp add: enum_person_def; fail)
@@ -211,7 +211,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 
 
 lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-  = (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
+  = Some (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
   by(code_simp)
 
   (*TODO: Handlung alles_besser_machen.*)

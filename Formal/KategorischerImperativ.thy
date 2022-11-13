@@ -439,12 +439,12 @@ fun beispiel_tac ctxt =
 method_setup beispiel = \<open>Scan.succeed (SIMPLE_METHOD o beispiel_tac)\<close>
 
 
-lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. w)] (Maxime (\<lambda>ich w. True))
+lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. Some w)] (Maxime (\<lambda>ich w. True))
   =
   Some
   \<lparr>bsp_welt = (\<lambda>p::person. 0::int),
    bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich w. True)),
-   bsp_erlaubte_handlungen = [Handlungsabsicht (\<lambda>p w. w)],
+   bsp_erlaubte_handlungen = [Handlungsabsicht (\<lambda>p w. Some w)],
    bsp_verbotene_handlungen = []
   \<rparr>\<close>
   by beispiel
