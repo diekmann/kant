@@ -48,11 +48,16 @@ Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprint
 
 fun nachher_handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
 where
-  \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = (h handelnde_person welt)\<close>
+  \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = h handelnde_person welt\<close>
 
 definition handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
 where
   \<open>handeln handelnde_person welt ha \<equiv> Handlung welt (nachher_handeln handelnde_person welt ha)\<close>
+
+
+text\<open>Die Funktion \<^const>\<open>nachher_handeln\<close> liefert die Welt nach der Handlung.
+Die Funktion \<^const>\<open>handeln\<close> liefert eine \<^typ>\<open>'world handlung\<close>,
+welche die Welt vor und nach der Handlung darstellt.\<close>
 
 text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
