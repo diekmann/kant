@@ -242,7 +242,7 @@ Die Mir-ist-alles-Recht Maxime ist hier erfüllt:\<close>
 lemma \<open>moralisch
             (42::nat)
              maxime_mir_ist_alles_recht
-            (Handlungsabsicht (\<lambda>(person::person) welt. welt + 1))\<close> by eval
+            (Handlungsabsicht (\<lambda>(person::person) welt. Some (welt + 1)))\<close> by eval
 
 text\<open>Beispiel:
 Die Welt ist modelliert als eine Abbildung von Person auf Besitz.
@@ -253,13 +253,13 @@ lemma \<open>moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
+            (Handlungsabsicht (\<lambda>person welt. Some (welt(person \<mapsto> 3))))\<close>
   by eval
 lemma \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Handlungsabsicht (\<lambda>person welt. Some(welt(person \<mapsto> 3))))
   = {}\<close>
   by eval
 
@@ -270,13 +270,13 @@ lemma \<open>\<not> moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))\<close>
+            (Handlungsabsicht (\<lambda>person welt. Some (welt(person \<mapsto> 3))))\<close>
   by eval
 lemma \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
-            (Handlungsabsicht (\<lambda>person welt. welt(person \<mapsto> 3)))
+            (Handlungsabsicht (\<lambda>person welt. Some (welt(person \<mapsto> 3))))
   = {VerletzteMaxime (Opfer Bob) (Taeter Bob)
      (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
                [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>

@@ -80,16 +80,15 @@ subsection\<open>Ungültige Handlung\<close>
 
   lemma \<open>\<not>wohlgeformte_handlungsabsicht
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-    (Handlungsabsicht (\<lambda>ich w. if ich = Alice then w else Zahlenwelt (\<lambda>_. 0)))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_def swap_def)
+    (Handlungsabsicht (\<lambda>ich w. if ich = Alice then Some w else Some (Zahlenwelt (\<lambda>_. 0))))\<close>
+    apply(simp add: wohlgeformte_handlungsabsicht.simps swap_def)
     apply(eval)
     done
 
-
 subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
-  fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
-        Zahlenwelt (besitz(opfer -= beute)(dieb += beute))\<close>
+        Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
       (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen 5 Bob))
@@ -105,11 +104,11 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   | \<open>opfer_nach_besitz_auswaehlen b besitz (p#ps) = 
       (if besitz p = b then Some p else opfer_nach_besitz_auswaehlen b besitz ps)\<close>
   
-  fun stehlen2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  fun stehlen2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>stehlen2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
-           of None \<Rightarrow> (Zahlenwelt besitz)
-            | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+           of None \<Rightarrow> None
+            | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
         )\<close>
   text\<open>Leider ist diese Funktion auch diskriminierend:
   Wenn es mehrere potenzielle Opfer mit dem gleichen Besitz gibt,
@@ -129,9 +128,9 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
       Alice Bob\<close>
     by(eval)
 
- fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+ fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>schenken betrag empfaenger schenker (Zahlenwelt besitz) =
-        Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag))\<close>
+        Some (Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag)))\<close>
   
   text\<open>Da wir ganze Zahlen verwenden und der Besitz auch beliebig negativ werden kann,
   ist Stehlen äquivalent dazu einen negativen Betrag zu verschenken:\<close>
@@ -145,28 +144,29 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
 
 subsection\<open>Wohlgeformte Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
-  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>erschaffen i p (Zahlenwelt besitz) = Zahlenwelt (besitz(p += int i))\<close>
+  fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt (besitz(p += int i)))\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI, case_tac \<open>welt\<close>, simp)
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
+    apply(case_tac \<open>welt\<close>, simp)
     apply(simp add: swap_def)
     done
 
   text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlung wohlgeformt.
   Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
-  fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
-           of None \<Rightarrow> (Zahlenwelt besitz)
-            | Some opfer \<Rightarrow> Zahlenwelt (besitz(opfer -= beute)(dieb += beute))
+           of None \<Rightarrow> None
+            | Some opfer \<Rightarrow> if opfer = dieb then None else Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
         )\<close>
+(*todo: ich \<noteq> opfer*)
 
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
     \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
-      apply(simp add: wohlgeformte_handlungsabsicht_def)
-      apply(intro allI, case_tac \<open>welt\<close>, simp)
+      apply(simp add: wohlgeformte_handlungsabsicht.simps)
+      apply(case_tac \<open>welt\<close>, simp)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
       apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
       apply(simp add: the_single_elem)
@@ -176,22 +176,22 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 (*>*)
 
   text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
-  fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>reset ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. 0)\<close>
+  fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>reset ich (Zahlenwelt besitz) = Some (Zahlenwelt (\<lambda> _. 0))\<close>
 
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
   dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
-      apply(simp add: wohlgeformte_handlungsabsicht_def)
-     by(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
+      apply(simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
+     by(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
-  fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1)\<close>
+  fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>alles_kaputt_machen ich (Zahlenwelt besitz) = Some (Zahlenwelt (\<lambda> _. Min (besitz ` UNIV) - 1))\<close>
 
 (*<*)
   lemma alles_kaputt_machen_code[code]:
     \<open>alles_kaputt_machen ich welt =
-     (case welt of Zahlenwelt besitz \<Rightarrow> Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1))\<close>
+     (case welt of Zahlenwelt besitz \<Rightarrow> Some (Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1)))\<close>
     apply(cases \<open>welt\<close>, simp)
     apply(subst min_list_Min)
      apply(simp add: enum_person_def; fail)
@@ -201,9 +201,9 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 
   lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht alles_kaputt_machen)\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht_def)
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
     apply(simp add: alles_kaputt_machen_code)
-    apply(intro allI, case_tac \<open>welt\<close>, simp add: fun_eq_iff)
+    apply(case_tac \<open>welt\<close>, simp add: fun_eq_iff)
     apply(simp add: min_list_swap_int_enum)
     by (simp add: swap_def)
 
@@ -211,10 +211,10 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 
 
 lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-  = (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
+  = Some (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
   by(code_simp)
 
-  (*TODO: handling alles_besser_machen.*)
+  (*TODO: Handlung alles_besser_machen.*)
 
 text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
 definition "handlungsabsichten \<equiv> [
@@ -225,11 +225,11 @@ definition "handlungsabsichten \<equiv> [
 ]"
 
 lemma \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
-  apply(simp add: handlungsabsichten_def wohlgeformte_handlungsabsicht_stehlen4)
+  apply(simp add: handlungsabsichten_def)
   apply(safe)
   apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4 wohlgeformte_handlungsabsicht_alles_kaputt_machen)
-  apply(simp_all add: wohlgeformte_handlungsabsicht_def)
-    apply(intro allI, case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+  apply(simp_all add: wohlgeformte_handlungsabsicht.simps)
+    apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
   done
 
 
@@ -249,7 +249,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 5 10)) p\<close>
       apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
       apply(case_tac \<open>welt\<close>, simp)
-      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+      apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
       apply(auto intro: the_single_elem_exhaust)
       done
   (*>*)
@@ -262,11 +262,11 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
   } \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt ha p"
     apply(simp)
     apply(safe)
-       apply(case_tac \<open>welt\<close>, simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
-      apply(case_tac \<open>welt\<close>, simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
+       apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
+      apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
     subgoal using mhg_maxime_zahlenfortschritt_stehlen4 by simp
     subgoal
-      by(case_tac \<open>welt\<close>, simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, auto)
+      by(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, auto)
     done
 
   text\<open>Gilt nicht:\<close>
@@ -301,7 +301,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
 
   (*<*)
   lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwps welt\<close>
-    by(simp add: wpsm_kommutiert_def hlp1 hlp2 zahlenwps_sym)
+    by(simp add: handeln_def nachher_handeln.simps wpsm_kommutiert_def hlp1 hlp2 zahlenwps_sym)
   (*>*)
 
 
@@ -309,11 +309,11 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
     text\<open>In jeder Welt ist die \<^term>\<open>Handlungsabsicht (erschaffen n)\<close> \<^const>\<open>moralisch\<close>:\<close>
     lemma \<open>moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (erschaffen n))\<close>
       apply(cases \<open>welt\<close>)
-      by(simp add: maxime_zahlenfortschritt_def moralisch_simp)
+      by(simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
   
     text\<open>In kein Welt ist Stehlen \<^const>\<open>moralisch\<close>:\<close>
     lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob))\<close>
-      by(cases \<open>welt\<close>, auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
+      by(cases \<open>welt\<close>, auto simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
   
     text\<open>In unserer \<^const>\<open>initialwelt\<close> in der \<^const>\<open>Bob\<close> als Opfer anhand seines Besitzes
     als Opfer eines Diebstahls ausgewählt würde, ist stehlen dennoch nicht \<^const>\<open>moralisch\<close>,
@@ -323,7 +323,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
 
     text\<open>Da Schenken und Stehlen in dieser Welt equivalent ist, ist Schenken auch unmoralisch:\<close>  
     lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (schenken 5 Bob))\<close>
-      by(cases \<open>welt\<close>, auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
+      by(cases \<open>welt\<close>, auto simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
 
 
 
@@ -377,7 +377,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     \<open>wpsm_kommutiert
            maxime_altruistischer_fortschritt
            zahlenwps welt\<close>
-    apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def)
+    apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def handeln_def nachher_handeln.simps)
     apply(safe)
      apply(case_tac \<open>p1 = p2\<close>)
       apply(simp add: zahlenwps_id; fail)
@@ -390,8 +390,8 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   lemma mhg_maxime_altruistischer_fortschritt_stehlen4:
       \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
       maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
-    apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
-    apply(simp add: ist_noop_def)
+    apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
+    apply(simp add: ausfuehrbar.simps)
     apply(case_tac \<open>welt\<close>, simp)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
     apply(simp add: ist_noop_def split: option.split option.split_asm)
@@ -400,7 +400,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   lemma maxime_altruistischer_fortschritt_reset:
       \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
       maxime_altruistischer_fortschritt (Handlungsabsicht (reset)) p\<close>
-      apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+      apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
     apply(case_tac \<open>welt\<close>, simp)
       apply(auto simp add: swap_def split: option.split option.split_asm)
     done
@@ -408,7 +408,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   
   lemma wfm_maxime_altruistischer_fortschritt:
     \<open>wohlgeformte_maxime zahlenwps maxime_altruistischer_fortschritt\<close>
-    apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def wohlgeformte_maxime_auf_def, intro allI, rename_tac h p1 p2)
+    apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def wohlgeformte_maxime_auf_def handeln_def nachher_handeln.simps, intro allI, rename_tac h p1 p2)
     apply(case_tac \<open>h\<close>, rename_tac vor nach, simp)
     apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
     apply(simp add: swap_forall)
@@ -426,7 +426,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
     unfolding maxime_altruistischer_fortschritt_def
     apply(erule globale_maxime_katimp)
-        apply(cases \<open>ha\<close>, simp add: ist_noop_def; fail)
+        apply(cases \<open>ha\<close>, simp add: ist_noop_def handeln_def nachher_handeln.simps; fail)
        apply(simp add: wpsm_kommutiert_altruistischer_fortschritt[simplified maxime_altruistischer_fortschritt_def]; fail)
       apply (simp add: zahlenwps_sym; fail)
      apply (simp add: zahlenwps_twice; fail)
@@ -460,7 +460,7 @@ subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
   lemma \<open>\<not> moralisch welt
             (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (Handlungsabsicht (erschaffen 5))\<close>
     apply(cases \<open>welt\<close>)
-    by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp)
+    by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
 
   text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des
   eigenen Wohlstands erlebt.
@@ -535,7 +535,7 @@ subsection\<open>Maxime für globales Optimum\<close>
 (*<*)
   lemma globaler_fortschritt_kommutiert:
     \<open>wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
-    by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwps_sym)
+    by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwps_sym handeln_def nachher_handeln.simps)
 (*>*)
   
 theorem 
@@ -544,7 +544,7 @@ theorem
  wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::person. globaler_fortschritt))\<close>
   apply(erule globale_maxime_katimp)
-      apply(cases \<open>welt\<close>, cases \<open>ha\<close>, simp add: ist_noop_def; fail)
+      apply(cases \<open>welt\<close>, cases \<open>ha\<close>, simp add: ist_noop_def handeln_def nachher_handeln.simps; fail)
      apply(simp add: globaler_fortschritt_kommutiert; fail)
     apply(simp add: zahlenwps_sym)
    apply (simp add: zahlenwps_twice; fail)

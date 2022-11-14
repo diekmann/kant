@@ -29,14 +29,21 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 definition ist_noop :: \<open>'world handlung \<Rightarrow> bool\<close> where
   \<open>ist_noop h \<equiv> vorher h = nachher h\<close>
 
+(*<*)
 
+lemma ist_noop_map_handlung:
+  shows \<open>ist_noop h \<Longrightarrow> ist_noop (map_handlung f h)\<close>
+  by(cases \<open>h\<close>, rename_tac vor nach, simp add: ist_noop_def)
+
+
+(*>*)
 
 
 text \<open>
 Handlung als Funktion gewrapped.
 Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder Intention.
 \<close>
-datatype ('person, 'world) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
+datatype ('person, 'world) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world option\<close>
 
 text \<open>
 Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
@@ -46,14 +53,27 @@ Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprint
 \<close>
 
 
-fun handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close> where
-\<open>handeln handelnde_person welt (Handlungsabsicht h) = Handlung welt (h handelnde_person welt)\<close>
+fun nachher_handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
+where
+  \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = 
+    (case h handelnde_person welt of Some welt' \<Rightarrow> welt'
+                                  | None \<Rightarrow> welt)\<close>
+
+definition handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
+where
+  \<open>handeln handelnde_person welt ha \<equiv> Handlung welt (nachher_handeln handelnde_person welt ha)\<close>
+
+
+text\<open>Die Funktion \<^const>\<open>nachher_handeln\<close> liefert die Welt nach der Handlung.
+Die Funktion \<^const>\<open>handeln\<close> liefert eine \<^typ>\<open>'world handlung\<close>,
+welche die Welt vor und nach der Handlung darstellt.\<close>
+
 
 text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
 Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
 \<close>
-definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then n+1 else n)\<close>
+definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then Some (n+1) else None)\<close>
 
 text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungsabsicht\<close> so aus:
 \<^value>\<open>beispiel_handlungsabsicht::(nat, int) handlungsabsicht\<close>\<close>
@@ -61,10 +81,39 @@ text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>b
 
 (*<*)
 lemma vorher_handeln[simp]: \<open>vorher (handeln p welt h) = welt\<close>
-  by(cases \<open>h\<close>, simp)
-lemma nachher_handeln: \<open>nachher (handeln p welt (Handlungsabsicht h)) = h p welt\<close>
-  by(simp)
+  by(cases \<open>h\<close>, simp add: handeln_def)
+lemma nachher_handeln_raw: \<open>nachher (handeln p welt (Handlungsabsicht h)) = 
+  (case h p welt of None \<Rightarrow> welt
+                  | Some w \<Rightarrow> w)\<close>
+  by(simp add: handeln_def)
+
+(*I don't want to expand this definition by default, but keep the handeln function around*)
+declare nachher_handeln.simps[simp del]
 (*>*)
+
+(**TODO*: erklaeren, warum Handlungen partiell.*)
+
+
+fun ausfuehrbar :: "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool"
+where
+  "ausfuehrbar p welt (Handlungsabsicht h) = (h p welt \<noteq> None)"
+
+(*<*)
+declare ausfuehrbar.simps[simp del]
+(*>*)
+
+lemma nicht_ausfuehrbar_ist_noop:
+  \<open>\<not>ausfuehrbar p welt ha \<Longrightarrow> ist_noop (handeln p welt ha)\<close>
+  apply(cases ha)
+  by(simp add: ausfuehrbar.simps ist_noop_def handeln_def nachher_handeln.simps)
+
+lemma ausfuehrbar_nachher_handeln:
+  \<open>ausfuehrbar p welt (Handlungsabsicht h) \<Longrightarrow>
+  nachher_handeln p welt (Handlungsabsicht h) = the (h p welt)\<close>
+  apply(simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
+  by fastforce
+
+
 
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
 text\<open>

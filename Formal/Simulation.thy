@@ -40,7 +40,7 @@ lemma \<open>simulate_handlungsabsicht
           ()
           (Maxime (\<lambda>_ _. True))
           (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-       (Handlungsabsicht (\<lambda>p w. w+1))
+       (Handlungsabsicht (\<lambda>p w. Some (w+1)))
        (32::int)
        (Gesetz {})= 
   (33,
@@ -101,7 +101,7 @@ Die Handlung ist es diese Zahl um Eins zu erhöhen,
 Das Ergebnis der Simulation ist dann, dass wir einfach von \<^term>\<open>32\<close> bis \<^term>\<open>42\<close> zählen.\<close>
 lemma \<open>simulateOne
         (SimConsts () (Maxime (\<lambda>_ _. True)) (\<lambda>h s. Rechtsnorm (Tatbestand h) (Rechtsfolge ''count'')))
-        10 (Handlungsabsicht (\<lambda>p n. Suc n))
+        10 (Handlungsabsicht (\<lambda>p n. Some (Suc n)))
         32
         (Gesetz {}) =
   Gesetz

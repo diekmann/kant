@@ -54,6 +54,7 @@ fun handeln_partial :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('perso
  (case h handelnde_person welt of None \<Rightarrow> Handlung welt welt
                              | Some welt' \<Rightarrow> Handlung welt welt')\<close>
 
+(*TODO: Das ist jetz partial!*)
 fun stehlen4_partial :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>stehlen4_partial beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
       (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
@@ -83,7 +84,7 @@ lemma
 lemma
     \<open>maxime_und_handlungsabsicht_generalisieren_partial
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
-  (\<lambda>p w. Some (reset p w)) p\<close>
+  (\<lambda>p w. reset p w) p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_partial_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
 (*Nitpick found a counterexample:
@@ -107,12 +108,12 @@ lemma
     \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop
   (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h)))
   (Handlungsabsicht (stehlen4 1 10)) p\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_aussernoop_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_aussernoop_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(elim conjE)
   apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split_asm if_split_asm)
-  done
+  by (smt (verit, ccfv_SIG) fun_upd_other fun_upd_same meins.simps)
 
 lemma
     \<open>maxime_und_handlungsabsicht_generalisieren_aussernoop
@@ -134,7 +135,7 @@ lemma
   apply(elim conjE)
   apply(case_tac \<open>w1\<close>, case_tac \<open>w2\<close>, simp)
   apply(case_tac \<open>h\<close>, simp)
-  apply(simp add: wohlgeformte_handlungsabsicht_def)
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
   oops (*kann ich eine welt in eine andere durch swappen umbauen, so dass das gilt?
     Vermutlich nicht, Leute koennen ja ganz beliebig besitz haben*)
   
@@ -146,7 +147,7 @@ lemma
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren2_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>w\<close>, simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split)
   apply(safe, simp_all)
   using the_single_elem_None_swap apply fastforce
@@ -157,7 +158,7 @@ lemma
 lemma
   \<open>maxime_und_handlungsabsicht_generalisieren3 zahlenwps
     (Maxime (\<lambda>ich h. individueller_fortschritt ich h)) (Handlungsabsicht (stehlen4 1 10))\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
+  apply(simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>welt\<close>, simp)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split)
@@ -170,7 +171,7 @@ lemma
     (Maxime (\<lambda>(ich::person) h. (\<forall>pX. individueller_fortschritt pX h))) (Handlungsabsicht (stehlen4 1 10))\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren3_def maxime_zahlenfortschritt_def, intro allI)
   apply(case_tac \<open>welt\<close>, simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp split: option.split)
   apply(safe, simp_all)
   by (smt (verit, del_insts) fun_upd_apply swap_b swap_nothing)
