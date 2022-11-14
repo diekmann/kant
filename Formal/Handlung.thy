@@ -45,19 +45,34 @@ Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder
 \<close>
 datatype ('person, 'world) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world option\<close>
 
-text \<open>
-Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
-Die Absicht die sich in einer Funktion verstecken kann ist schwer zu erkennen.
-Dies deckt sich ganz gut damit, dass Isabelle standardmäßig Funktionen nicht printet.
-Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprinted werden!
-\<close>
 
+text\<open>Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> gibt eine \<^typ>\<open>'world option\<close> zurück,
+anstatt einer \<^typ>\<open>'world\<close>.
+Handlungsabsichten sind damit partielle Funktionen, was modelliert,
+dass die Ausführung einer Handlungsabsicht scheitern kann.
+Beispielsweise könnte ein Dieb versuchen ein Opfer zu bestehlen;
+wenn sich allerdings kein passendes Opfer findet, dann darf die Handlung scheitern.
+Oder es könnte der pathologische Sonderfall eintreten, dass ein Dieb sich selbst
+bestehlen soll.
+Auch hier darf die Handlung scheitern.
+Von außen betrachtet ist eine soche gescheiterte Handlung nicht zu unterscheiden vom Nichtstun.
+Allerdings ist es für die moralische Betrachtung dennoch wichtig zu unterscheiden,
+ob die Handlungsabsicht ein gescheiterter Diebstahl war,
+oder ob die Handlungsabsicht einfach Nichtstun war.
+Dadurch dass Handlungsabsichten partiell sind, können wir unterscheiden ob die Handlung
+wie geplant ausgeführt wurde oder gescheitert ist.
+Moralisch sind Stehlen und Nichtstun sehr verschieden.\<close>
 
 fun nachher_handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
 where
   \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = 
     (case h handelnde_person welt of Some welt' \<Rightarrow> welt'
                                   | None \<Rightarrow> welt)\<close>
+
+text\<open>Die Funktion \<^const>\<open>nachher_handeln\<close> besagt, dass eine gescheiterte Handlung
+die Welt nicht verändert.
+Ab diesem Punkt sind also die Handlungen "sich selbst bestehlen" und "Nichtstun"
+von außen ununterscheidbar, da beide die Welt nicht verändern.\<close>
 
 definition handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
 where
@@ -71,9 +86,21 @@ welche die Welt vor und nach der Handlung darstellt.\<close>
 
 text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
-Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten bleibt sie unverändert.
+Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten schl'gt die Handlung fehl.
 \<close>
 definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then Some (n+1) else None)\<close>
+
+lemma "nachher_handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = 43" by eval
+lemma "handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = Handlung 42 43" by eval
+lemma "nachher_handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht = 9000" by eval
+lemma "ist_noop (handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht)" by eval
+
+text \<open>
+Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
+Die Absicht die sich in einer Funktion verstecken kann ist schwer zu erkennen.
+Dies deckt sich ganz gut damit, dass Isabelle standardmäßig Funktionen nicht printet.
+Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprinted werden!
+\<close>
 
 text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungsabsicht\<close> so aus:
 \<^value>\<open>beispiel_handlungsabsicht::(nat, int) handlungsabsicht\<close>\<close>
@@ -87,12 +114,15 @@ lemma nachher_handeln_raw: \<open>nachher (handeln p welt (Handlungsabsicht h)) 
                   | Some w \<Rightarrow> w)\<close>
   by(simp add: handeln_def)
 
-(*I don't want to expand this definition by default, but keep the handeln function around*)
+(*I don't want to expand this definition by default, but keep the handeln function around.
+Otherwise, case distinctions for the option type pop up in all proof obligations.*)
 declare nachher_handeln.simps[simp del]
 (*>*)
 
-(**TODO*: erklaeren, warum Handlungen partiell.*)
 
+text\<open>Um eine gescheiterte Handlung von einer Handlung welche die Welt nicht verändert
+zu unterscheiden, sagen wir, dass eine handlungsabsicht ausführbar ist,
+wenn die ausgeführte Handlungsabsicht nicht gescheitert ist:\<close>
 
 fun ausfuehrbar :: "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool"
 where
@@ -102,17 +132,19 @@ where
 declare ausfuehrbar.simps[simp del]
 (*>*)
 
+text\<open>Nicht ausführbare Handlungen resultieren in unserem Modell im Nichtstun:\<close>
 lemma nicht_ausfuehrbar_ist_noop:
   \<open>\<not>ausfuehrbar p welt ha \<Longrightarrow> ist_noop (handeln p welt ha)\<close>
   apply(cases ha)
   by(simp add: ausfuehrbar.simps ist_noop_def handeln_def nachher_handeln.simps)
 
+(*<*)
 lemma ausfuehrbar_nachher_handeln:
   \<open>ausfuehrbar p welt (Handlungsabsicht h) \<Longrightarrow>
   nachher_handeln p welt (Handlungsabsicht h) = the (h p welt)\<close>
   apply(simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
   by fastforce
-
+(*>*)
 
 
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
