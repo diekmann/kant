@@ -180,7 +180,7 @@ Nitpick found a counterexample:
   oops text\<open>TODO: finish, gilt aber nicht\<close> (*TODO*)
 
   text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr
-eingeschraenken kat imp zeigen.\<close>
+eingeschraenkten kat imp zeigen.\<close>
 lemma \<open>
   (\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
   ha = Handlungsabsicht (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))) \<Longrightarrow>
@@ -194,8 +194,6 @@ lemma \<open>
   apply(case_tac \<open>ha\<close>, rename_tac h, simp)
   apply(simp add: handeln_def nachher_handeln.simps)
   done
-
-
 
 
 subsection\<open>Setup für Beispiele\<close>

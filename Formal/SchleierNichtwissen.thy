@@ -112,7 +112,7 @@ lemma wohlgeformte_handlungsabsicht_wpsid_imp_handeln:
 
 lemma wfh_handeln_imp_wpsid:
   "(\<forall>p1 p2. handeln p1 welt ha =
-                 map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha)) \<Longrightarrow>
+            map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha)) \<Longrightarrow>
   wps_id wps welt"
   by(cases ha, simp add: wps_id_def handeln_def)
 
@@ -306,35 +306,32 @@ lemma \<open>wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<
 (*<*)
 subsection\<open>Generische Lemmata\<close>
 
-
-lemma ist_noop_map_handlung:
-  assumes wps_id:
+lemma ist_noop_map_handlung_wpsid:
+  assumes strong_wps_id:
         \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
-  shows \<open>ist_noop (map_handlung (wps p1 p2) h) = ist_noop h\<close>
+  shows \<open>ist_noop (map_handlung (wps p1 p2) h) \<longleftrightarrow> ist_noop h\<close>
   apply(cases \<open>h\<close>, rename_tac vor nach, simp add: ist_noop_def)
-  using wps_id by metis
-
-(* gilt leider nichtmehr, aber was aehnliches werde ich finden
-lemma ist_noop_wps_weak:
-  assumes wfh: \<open>wohlgeformte_handlungsabsicht wps welt ha\<close>
-    and swap_noop: \<open>\<forall>p1 p2 h. ist_noop (map_handlung (wps p1 p2) h) = ist_noop h\<close>
-  shows \<open>ist_noop (handeln ich (wps p2 ich welt) ha) \<longleftrightarrow> ist_noop (handeln p2 welt ha)\<close>
-  nitpick
-  apply(insert wfh)
-  apply(cases ha, simp add: wohlgeformte_handlungsabsicht.simps)
-  apply(simp add:  handeln_def nachher_handeln.simps)
-  apply(simp add: swap_noop)
-  done
+  using strong_wps_id by metis
 
 lemma ist_noop_wps:
   assumes wfh: \<open>wohlgeformte_handlungsabsicht wps welt ha\<close>
-  and wps_id:
-       \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
+  and wps_id: \<open>wps_id wps welt\<close>
+  and strong_wps_id: \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
   shows \<open>ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
-  apply(rule ist_noop_wps_weak[OF wfh])
-  using ist_noop_map_handlung[OF wps_id] by simp
-
-*)
+proof -
+  from wps_id have weak_wps_sym: "\<forall>p1 p2. wps p1 p2 welt = wps p2 p1 welt" by (metis strong_wps_id wps_id_def)
+  from wohlgeformte_handlungsabsicht_wpsid_imp_handeln[OF wfh wps_id]
+  have "ist_noop (handeln ich welt ha)
+        = ist_noop (Handlung welt (wps p2 ich (nachher_handeln p2 (wps ich p2 welt) ha)))"
+    by simp
+  also have "\<dots> = ist_noop (Handlung (wps ich p2 welt) (nachher_handeln p2 (wps ich p2 welt) ha))"
+    apply(simp add: ist_noop_def)
+    using strong_wps_id weak_wps_sym by metis
+  finally have "ist_noop (handeln ich welt ha)
+    = ist_noop (Handlung (wps ich p2 welt) (nachher_handeln p2 (wps ich p2 welt) ha))" .
+  thus ?thesis
+    by(simp add: handeln_def wps_id[simplified wps_id_def])
+qed
 
 
 (*>*)

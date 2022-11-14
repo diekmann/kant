@@ -29,7 +29,14 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 definition ist_noop :: \<open>'world handlung \<Rightarrow> bool\<close> where
   \<open>ist_noop h \<equiv> vorher h = nachher h\<close>
 
+(*<*)
 
+lemma ist_noop_map_handlung:
+  shows \<open>ist_noop h \<Longrightarrow> ist_noop (map_handlung f h)\<close>
+  by(cases \<open>h\<close>, rename_tac vor nach, simp add: ist_noop_def)
+
+
+(*>*)
 
 
 text \<open>
