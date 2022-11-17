@@ -40,6 +40,7 @@ abbreviation joint_probability ("\<P>'(_ ; _') _") where
 "\<P>(X ; Y) x \<equiv> \<P>(\<lambda>x. (X x, Y x)) x
 *)
 
+(*TODO: this can produce ambiguous parse trees.*)
 abbreviation num_fun_add_syntax ("_ '(_ += _')") where
   \<open>f(p += n) \<equiv> (f(p := (f p) + n))\<close>
 

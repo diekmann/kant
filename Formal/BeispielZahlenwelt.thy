@@ -146,10 +146,13 @@ subsection\<open>Wohlgeformte Handlungen\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt (besitz(p += int i)))\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht.simps)
-    apply(case_tac \<open>welt\<close>, simp)
+    apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
+    (*parse tree is
+      \<forall>p1 p2. (x (p1 += n)) = swap p2 p1 ((swap p1 p2 x) (p2 += n))
+     and I don't like this ambiguity*)
     apply(simp add: swap_def)
     done
+
 
   text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlung wohlgeformt.
   Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
