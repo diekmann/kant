@@ -68,7 +68,6 @@ section\<open>Beispiel: Zahlenwelt\<close>
   (*>*)
 
 
-  (*TODO: inline*)
   text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
   definition \<open>initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3]\<close>
 
@@ -160,7 +159,6 @@ subsection\<open>Wohlgeformte Handlungen\<close>
            of None \<Rightarrow> None
             | Some opfer \<Rightarrow> if opfer = dieb then None else Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
         )\<close>
-(*todo: ich \<noteq> opfer*)
 
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
@@ -269,23 +267,13 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       by(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, auto)
     done
 
-  text\<open>Gilt nicht:\<close>
+  text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
   lemma
-      \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
-  maxime_zahlenfortschritt (Handlungsabsicht (reset)) p\<close>
-      apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
-    apply(case_tac \<open>welt\<close>, simp)
-  (*
-  Nitpick found a counterexample:
-    Free variables:
-      p = p\<^sub>1
-      welt = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))
-    Skolem constants:
-      p1 = p\<^sub>3
-      p2 = p\<^sub>1
-      x = (\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)
-  *)
-    oops
+      \<open>\<not> maxime_und_handlungsabsicht_generalisieren
+         zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+         maxime_zahlenfortschritt (Handlungsabsicht (reset)) Alice\<close>
+    by eval
+
 
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt \<^bold>\<open>nicht\<close> den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>

@@ -44,7 +44,6 @@ Für eine bestimmte Handlungsabsicht:
 Wenn es eine Person gibt für die diese Handlungsabsicht moralisch ist,
 dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen Regel) sein.
 \<close>
-(*Ich muss hier noop ausschliessen glaube ich. Eigentlich mag ich das nicht. Man koennte handlungen partiell machen, das macht aber alles komplizierter.*)
 definition kategorischer_imperativ_auf
   :: \<open>('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where
