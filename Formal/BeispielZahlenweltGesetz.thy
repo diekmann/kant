@@ -121,7 +121,7 @@ subsection\<open>Beispiele\<close>
   (*check: ist auch eine moralische Handlung*)
   lemma\<open>beispiel_case_law_relativ
           (Maxime (\<lambda>ich. globaler_fortschritt))
-          (Handlungsabsicht (stehlen 5 Bob))
+          (Handlungsabsicht (stehlen_nichtwf 5 Bob))
     =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Erlaubnis))}\<close>
@@ -132,7 +132,7 @@ subsection\<open>Beispiele\<close>
 
   text\<open>Stehlen ist verboten:\<close>
   (*check: ist auch keine moralische Handlung*)
-  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob)) =
+  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (stehlen_nichtwf 5 Bob)) =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Verbot))}\<close>
     by eval
@@ -142,7 +142,7 @@ subsection\<open>Beispiele\<close>
   text\<open>Auch wenn \<^const>\<open>Alice\<close> von sich selbst stehlen möchte ist dies verboten,
   obwohl hier keiner etwas verliert:\<close>
   (*check: ist auch keine moralische Handlung*)
-  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Alice)) =
+  lemma \<open>beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (stehlen_nichtwf 5 Alice)) =
     Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot))}\<close>
     by eval
 
@@ -150,7 +150,7 @@ subsection\<open>Beispiele\<close>
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> die abstrakte Handlung "Alice wird bestohlen" gar nicht gut
   fände, wenn sie jemand anderes ausführt:\<close>
   lemma \<open>debug_maxime show_zahlenwelt initialwelt
-          maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Alice)) =
+          maxime_zahlenfortschritt (Handlungsabsicht (stehlen_nichtwf 5 Alice)) =
    {VerletzteMaxime (Opfer Alice) (Taeter Bob)
      (Handlung [(Alice, 5), (Bob, 10), (Carol, - 3)] [(Bob, 15), (Carol, - 3)]),
     VerletzteMaxime (Opfer Alice) (Taeter Carol)
@@ -172,7 +172,7 @@ subsection\<open>Beispiele\<close>
         Alice
         maxime_zahlenfortschritt
         (case_law_ableiten_relativ delta_zahlenwelt))
-      20 (Handlungsabsicht (stehlen 5 Alice)) initialwelt
+      20 (Handlungsabsicht (stehlen_nichtwf 5 Alice)) initialwelt
       (beispiel_case_law_relativ maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 0)))
     =
     Gesetz
@@ -207,7 +207,7 @@ Evtl in neue Datei, damit sich dieses Beipsiel noch gut liesst.*)
   text\<open>Folgende ungültige Maxime würde es erlauben, dass \<^const>\<open>Alice\<close> Leute bestehlen darf:\<close>
   lemma\<open>beispiel_case_law_relativ
             (Maxime (\<lambda>ich. individueller_fortschritt Alice))
-            (Handlungsabsicht (stehlen 5 Bob))
+            (Handlungsabsicht (stehlen_nichtwf 5 Bob))
     =
     Gesetz
     {(\<section> 1, Rechtsnorm (Tatbestand [Gewinnt Alice 5, Verliert Bob 5]) (Rechtsfolge Erlaubnis))}\<close>
