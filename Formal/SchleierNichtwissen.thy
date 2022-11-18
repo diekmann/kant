@@ -157,8 +157,27 @@ lemma wohlgeformte_handlungsabsicht_imp_swpaid:
 
 
 
-
-
+(*<*)
+text\<open>Wenn sich eine einfache Welt \<^typ>\<open>'w\<close> in eine komplexere Welt \<^typ>\<open>'zw\<close> übersetzen lässt,
+(wobei die Übersetzung hier \<^term>\<open>C::'w \<Rightarrow> 'zw\<close> ist),
+dann kann auch \<^const>\<open>wohlgeformte_handlungsabsicht\<close> mit übersetzt werden.\<close>
+lemma wfh_generalize_worldI:
+  fixes wps :: "('person, 'w) wp_swap"
+    and welt :: "'w"
+    and ha :: "'person \<Rightarrow> 'w \<Rightarrow> 'w option"
+    and C :: "'w \<Rightarrow> 'zw"
+  shows
+"wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha)) \<Longrightarrow>
+  zwelt = C welt \<Longrightarrow>
+  (\<And>p1 p2 w. zwps p1 p2 (C w) = C (wps p1 p2 w)) \<Longrightarrow>
+  (\<And>p w. zha p (C w) =  map_option C (ha p w)) \<Longrightarrow>
+wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht (zha))"
+  apply(simp)
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(simp add: option.map_comp)
+  apply(simp add: comp_def)
+  by (smt (verit, best) map_option_is_None option.exhaust_sel option.map_sel)
+(*>*)
 
 
 text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
