@@ -1,5 +1,5 @@
 theory BeispielZahlenwelt
-imports Zahlenwelt BeispielPerson Swap KategorischerImperativ
+imports Zahlenwelt BeispielPerson KategorischerImperativ
 begin
 
 section\<open>Beispiel: Zahlenwelt\<close>
@@ -68,7 +68,6 @@ section\<open>Beispiel: Zahlenwelt\<close>
   (*>*)
 
 
-  (*TODO: inline*)
   text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
   definition \<open>initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3]\<close>
 
@@ -86,12 +85,12 @@ subsection\<open>Ungültige Handlung\<close>
     done
 
 subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
-  fun stehlen :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
-    \<open>stehlen beute opfer dieb (Zahlenwelt besitz) =
+  fun stehlen_nichtwf :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>stehlen_nichtwf beute opfer dieb (Zahlenwelt besitz) =
         Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
-      (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen 5 Bob))
+      (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen_nichtwf 5 Bob))
       Alice Bob\<close>
     by(eval)
 
@@ -104,8 +103,8 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   | \<open>opfer_nach_besitz_auswaehlen b besitz (p#ps) = 
       (if besitz p = b then Some p else opfer_nach_besitz_auswaehlen b besitz ps)\<close>
   
-  fun stehlen2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
-      \<open>stehlen2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+  fun stehlen_nichtwf2 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+      \<open>stehlen_nichtwf2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
            of None \<Rightarrow> None
             | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
@@ -115,16 +114,16 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   dann bestimmt die Reihenfolge in \<^term>\<open>Enum.enum\<close> wer bestohlen wird.
   Diese Reihenfolge ist wieder eine Eigenschaft von \<^typ>\<open>person\<close> und nicht \<^typ>\<open>zahlenwelt\<close>.\<close>
   lemma\<open>handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
-                (Handlungsabsicht (stehlen2 5 10))
+                (Handlungsabsicht (stehlen_nichtwf2 5 10))
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
                (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])\<close> by eval
   lemma\<open>handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
-              (Handlungsabsicht (stehlen2 5 10))
+              (Handlungsabsicht (stehlen_nichtwf2 5 10))
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
              (Zahlenwelt \<^url>[Alice := 5, Bob := 15, Carol := - 3])\<close> by eval
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel
       zahlenwps
-      (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (Handlungsabsicht (stehlen2 5 10))
+      (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (Handlungsabsicht (stehlen_nichtwf2 5 10))
       Alice Bob\<close>
     by(eval)
 
@@ -134,7 +133,7 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   
   text\<open>Da wir ganze Zahlen verwenden und der Besitz auch beliebig negativ werden kann,
   ist Stehlen äquivalent dazu einen negativen Betrag zu verschenken:\<close>
-  lemma stehlen_ist_schenken: \<open>stehlen i = schenken (-i)\<close>
+  lemma stehlen_ist_schenken: \<open>stehlen_nichtwf i = schenken (-i)\<close>
     apply(simp add: fun_eq_iff)
     apply(intro allI, rename_tac p1 p2 welt, case_tac \<open>welt\<close>)
     by auto
@@ -147,32 +146,28 @@ subsection\<open>Wohlgeformte Handlungen\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt (besitz(p += int i)))\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht.simps)
-    apply(case_tac \<open>welt\<close>, simp)
+    apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
+    (*parse tree is
+      \<forall>p1 p2. (x (p1 += n)) = swap p2 p1 ((swap p1 p2 x) (p2 += n))
+     and I don't like this ambiguity*)
     apply(simp add: swap_def)
     done
+
 
   text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlung wohlgeformt.
   Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
   fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
-        (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
-           of None \<Rightarrow> None
-            | Some opfer \<Rightarrow> if opfer = dieb then None else Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
-        )\<close>
-(*todo: ich \<noteq> opfer*)
+        map_option Zahlenwelt (stehlen beute opfer_nach_besitz dieb besitz)\<close>
+
+
 
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
     \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
-      apply(simp add: wohlgeformte_handlungsabsicht.simps)
-      apply(case_tac \<open>welt\<close>, simp)
-      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
-      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
-      apply(simp add: the_single_elem)
-      apply(safe)
-       apply (simp add: swap_def; fail)
-      by (simp add: fun_upd_twist swap_def)
+    apply(cases welt)
+    apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen, where C=Zahlenwelt])
+    by(auto)
 (*>*)
 
   text\<open>Reset versetzt die Welt wieder in den Ausgangszustand. Eine sehr destruktive Handlung.\<close>
@@ -256,7 +251,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
 
   lemma "ha \<in> {
     Handlungsabsicht (erschaffen 5),
-    Handlungsabsicht (stehlen 5 Bob),
+    Handlungsabsicht (stehlen_nichtwf 5 Bob),
     Handlungsabsicht (stehlen4 5 10),
     Handlungsabsicht alles_kaputt_machen
   } \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt ha p"
@@ -269,23 +264,13 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       by(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, auto)
     done
 
-  text\<open>Gilt nicht:\<close>
+  text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
   lemma
-      \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
-  maxime_zahlenfortschritt (Handlungsabsicht (reset)) p\<close>
-      apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
-    apply(case_tac \<open>welt\<close>, simp)
-  (*
-  Nitpick found a counterexample:
-    Free variables:
-      p = p\<^sub>1
-      welt = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1))
-    Skolem constants:
-      p1 = p\<^sub>3
-      p2 = p\<^sub>1
-      x = (\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 0, p\<^sub>4 := - 1)
-  *)
-    oops
+      \<open>\<not> maxime_und_handlungsabsicht_generalisieren
+         zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+         maxime_zahlenfortschritt (Handlungsabsicht (reset)) Alice\<close>
+    by eval
+
 
   text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt \<^bold>\<open>nicht\<close> den \<^const>\<open>kategorischer_imperativ\<close>
   da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
@@ -312,7 +297,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       by(simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
   
     text\<open>In kein Welt ist Stehlen \<^const>\<open>moralisch\<close>:\<close>
-    lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 Bob))\<close>
+    lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen_nichtwf 5 Bob))\<close>
       by(cases \<open>welt\<close>, auto simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
   
     text\<open>In unserer \<^const>\<open>initialwelt\<close> in der \<^const>\<open>Bob\<close> als Opfer anhand seines Besitzes
@@ -553,7 +538,7 @@ theorem
 
   text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
   lemma \<open>moralisch initialwelt
-          (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen 5 Bob))\<close>
+          (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen_nichtwf 5 Bob))\<close>
     by(eval)
   lemma \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen4 5 10))\<close>

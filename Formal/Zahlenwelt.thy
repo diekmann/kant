@@ -1,5 +1,5 @@
 theory Zahlenwelt
-imports BeispielPerson ExecutableHelper Swap
+imports BeispielPerson ExecutableHelper Swap SchleierNichtwissen
 begin
 
 section\<open>Zahlenwelt Helper\<close>
@@ -40,6 +40,7 @@ abbreviation joint_probability ("\<P>'(_ ; _') _") where
 "\<P>(X ; Y) x \<equiv> \<P>(\<lambda>x. (X x, Y x)) x
 *)
 
+(*TODO: this can produce ambiguous parse trees.*)
 abbreviation num_fun_add_syntax ("_ '(_ += _')") where
   \<open>f(p += n) \<equiv> (f(p := (f p) + n))\<close>
 
@@ -286,8 +287,25 @@ lemma the_single_elem_Some_swap:
       the_single_elem {p. swap s p2 x p = a} = Some p2\<close>
   using the_single_elem_Some_ex_swap the_single_elem_Some_Some_swap by fastforce
 
+
 (*>*)
 
+fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> 'person::enum \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> ('person \<Rightarrow> int) option\<close> where
+  \<open>stehlen beute opfer_nach_besitz dieb besitz =
+    (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
+       of None \<Rightarrow> None
+        | Some opfer \<Rightarrow> if opfer = dieb then None else Some (besitz(opfer -= beute)(dieb += beute))
+    )\<close>
+
+lemma wohlgeformte_handlungsabsicht_stehlen:
+  \<open>wohlgeformte_handlungsabsicht swap welt (Handlungsabsicht (stehlen n p))\<close>
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+    apply(simp add: the_single_elem)
+    apply(safe)
+     apply (simp add: swap_def; fail)
+  by (simp add: fun_upd_twist swap_def)
 
 
 

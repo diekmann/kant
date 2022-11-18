@@ -147,37 +147,7 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
   apply(simp add: wohlgeformte_handlungsabsicht.simps comp_def fun_eq_iff)
   apply(safe)
   by (smt (verit, best) swap_a swap_b swap_nothing)
-  
-  
-  
 
-thm mehrverdiener_betrachtet_nur_ausgangszustand
-(*TODO: was kann ihc ueber die handlung ableiten, wenn maxime_und_handlungsabsicht_generalisieren_def gilt?*)
-(*steuerwps*)
-lemma \<open>ha = Handlungsabsicht (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))) \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt
-    (Maxime 
-      (\<lambda>ich handlung.
-           (\<forall>p\<in>mehrverdiener ich handlung.
-                steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
-  apply(cases \<open>welt\<close>, rename_tac eink, simp)
-  apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
-  apply(case_tac \<open>ha\<close>, rename_tac h, simp)
-  apply(thin_tac \<open>ha = _\<close>)
-  apply(safe)
-(*
-Nitpick found a counterexample:
-  Free variables:
-    steuerberechnung = (\<lambda>x. _)(- 1 := 0, 0 := - 1, 1 := - 1, 2 := - 1)
-    welt = Steuerwelt ((\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := - 1, p\<^sub>3 := 0, p\<^sub>4 := 0))
-  Skolem constants:
-    eink = (\<lambda>x. _)(p\<^sub>1 := - 1, p\<^sub>2 := - 1, p\<^sub>3 := 0, p\<^sub>4 := 0)
-    ich = p\<^sub>4
-    p = p\<^sub>3
-    p1 = p\<^sub>2
-*)
-  (*apply(simp add: mehrverdiener_betrachtet_nur_ausgangszustand)*)
-  oops text\<open>TODO: finish, gilt aber nicht\<close> (*TODO*)
 
   text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr
 eingeschraenkten kat imp zeigen.\<close>
