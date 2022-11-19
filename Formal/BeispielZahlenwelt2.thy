@@ -7,12 +7,13 @@ section\<open>Beispiel: Zahlenwelt2\<close>
 text\<open>Konsens laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Konsens_im_Rechtssystem\<close>:
 "die Übereinstimmung der Willenserklärungen beider Vertragspartner über die Punkte des Vertrages"\<close>
 
+(*TODO: (person, int) aenderung list muss ne map werden. So vong eindeutige Darstellung here.
+aber irgendwie sieht das mit Listen erstmal schoener aus.*)
+type_synonym  ('person, 'etwas) abmachung = "('person, 'etwas) aenderung list"
 
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>
-(*TODO: (person, int) aenderung list muss ne map werden. So vong eindeutige Darstellung here.
-aber irgendwie sieht das mit Listen erstmal schoener aus.*)
-  konsens :: \<open>person \<Rightarrow> (person, int) aenderung list list\<close>
+  konsens :: \<open>person \<Rightarrow> (person, int) abmachung list\<close>
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
@@ -28,7 +29,7 @@ definition initialwelt :: zahlenwelt
   umwelt = 600
  \<rparr>"
 
-definition enthaelt_konsens :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> bool"
+definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
 where
   "enthaelt_konsens delta welt \<equiv> \<forall>p \<in> set (betroffene delta). delta \<in> set (konsens welt p)"
 
@@ -57,15 +58,19 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
           (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := (besitz w)(Alice += 4)(Bob -= 4) \<rparr>))))"
   by eval
 
+
+
 fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt =  welt\<lparr> besitz := swap p1 p2 (besitz welt) \<rparr>\<close>
 (*TODO: auch den konsens swappen?
 und die aenderungen im konsens auch*)
 
 
+
+
 term aenderung_ausfuehren
 definition aenderung_ausfuehren
-  :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
+  :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
 where
   "aenderung_ausfuehren delta welt \<equiv> welt\<lparr> besitz := Aenderung.aenderung_ausfuehren delta (besitz welt) \<rparr>"
 
@@ -79,8 +84,8 @@ value\<open>remove1 9 [1::int,3,5,2,3]\<close>
 
 
 definition konsens_entfernen
- :: "(person, int) aenderung list \<Rightarrow> (person \<Rightarrow> (person, int) aenderung list list)
-   \<Rightarrow> person \<Rightarrow> (person, int) aenderung list list"
+ :: "('person, 'etwas) abmachung \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
+   \<Rightarrow> 'person \<Rightarrow> ('person, 'etwas) abmachung list"
  where
 "konsens_entfernen delta kons = fold (\<lambda>p k. k(p := remove1 delta (k p))) (betroffene delta) kons"
 
@@ -97,7 +102,7 @@ lemma \<open>konsens_entfernen [Gewinnt Alice 3, Verliert Bob 3] (konsens initia
 Damit die Handlungsabsicht wohlgeformt wird sollte ich vermutlich nur
 eine Person angeben und wir loesen dann konsent[0] ein.
 *)
-definition abmachung_einloesen :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
+definition abmachung_einloesen :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "abmachung_einloesen delta welt \<equiv> 
   if enthaelt_konsens delta welt
   then Some ((aenderung_ausfuehren delta welt)\<lparr> konsens := konsens_entfernen delta (konsens welt)\<rparr>)
@@ -130,6 +135,7 @@ lemma\<open>abmachung_einloesen [Gewinnt Alice 3] initialwelt
   by eval
 
 lemma\<open>abmachung_einloesen [Verliert Bob 3] initialwelt = None\<close>
+  by eval
 
 
 
