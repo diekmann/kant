@@ -26,6 +26,11 @@ lemma \<open>delta_num p1 i1 i2 = Some (Verliert p2 (i::int)) \<Longrightarrow> 
   by(auto simp add: delta_num_def split_ifs)
 
 
+
+lemma delta_num_same: "delta_num p (a::'a::ordered_ab_group_add) a = None"
+  by(simp add: delta_num_def)
+
+
 text\<open>Deltas, d.h. Unterschiede Zwischen Welten.
 
 Man könnte eine class Delta world einführen, mit einer delta-Funtion
@@ -34,6 +39,22 @@ Diese Klasse würde dann Welten mit Personen und Etwas in Relation setzen.
 Dafür bräuchte es MultiParamTypeClasses. Eine simple Funktion ist da einfacher.\<close>
 type_synonym ('world, 'person, 'etwas) delta =
     \<open>'world handlung \<Rightarrow> (('person, 'etwas) aenderung) list\<close>
+
+
+definition betroffen :: "('person, 'etwas) aenderung list \<Rightarrow> 'person list"
+  where
+"betroffen as \<equiv> map (\<lambda>a. case a of Verliert p _ \<Rightarrow> p | Gewinnt p _ \<Rightarrow> p) as"
+
+lemma betroffen_case_aenderung:
+  "betroffen = map (case_aenderung (\<lambda>p _. p) (\<lambda>p _. p))"
+  by(simp add: fun_eq_iff betroffen_def)
+
+lemma "betroffen [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
+  = [Alice, Bob, Carol, Eve]" by eval
+lemma "betroffen [Verliert Alice (5::nat), Gewinnt Bob 3, Verliert Eve 7]
+  = [Alice, Bob, Eve]" by eval
+lemma "betroffen [Verliert Alice (5::nat), Gewinnt Alice 3]
+  = [Alice, Alice]" by eval
 
 fun delta_num_map
   :: \<open>(('person::enum \<rightharpoonup> ('etwas::{zero,minus,ord})), 'person, 'etwas) delta\<close>
@@ -48,7 +69,6 @@ lemma\<open>delta_num_map
   (Handlung [Alice \<mapsto> 5::int, Bob \<mapsto> 10, Eve \<mapsto> 1]
             [Alice \<mapsto> 3, Bob \<mapsto> 13, Carol \<mapsto> 2])
   = [Verliert Alice 2, Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]\<close> by eval
-
 
 fun delta_num_fun
   :: \<open>(('person::enum \<Rightarrow> ('etwas::{minus,ord})), 'person, 'etwas) delta\<close>

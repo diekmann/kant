@@ -26,6 +26,27 @@ definition initialwelt :: zahlenwelt
   umwelt = 600
  \<rparr>"
 
+definition hat_konsens :: "zahlenwelt handlung \<Rightarrow> bool"
+where
+  "hat_konsens h \<equiv>
+    let delta = delta_num_fun (map_handlung besitz h) in
+     \<forall>p \<in> set (betroffen delta). set delta \<in> set ((konsens (vorher h)) p)"
+
+
+text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
+lemma "hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w)))"
+  apply(simp add: hat_konsens_def Let_def)
+  apply(simp add: handeln_def nachher_handeln.simps enum_person_def delta_num_same)
+  apply(code_simp)
+  done
+  
+lemma "hat_konsens (handeln Alice initialwelt
+        (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := (besitz w)(Alice += 3)(Bob -= 3) \<rparr>))))"
+  by eval
+lemma "\<not> hat_konsens (handeln Alice initialwelt
+          (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := (besitz w)(Alice += 4)(Bob -= 4) \<rparr>))))"
+  by eval
+
 fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt =  welt\<lparr> besitz := swap p1 p2 (besitz welt) \<rparr>\<close>
 
