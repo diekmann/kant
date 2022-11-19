@@ -10,7 +10,7 @@ text\<open>Konsens laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Kons
 
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>
-  konsens :: \<open>person \<Rightarrow> (person, int) aenderung set list\<close> (*TODO: wie modelliere ich das*)
+  konsens :: \<open>person \<Rightarrow> (person, int) aenderung set list\<close> (*TODO: (person, int) aenderung set muss ne map werden. So vong eindeutige Darstellung here*)
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
@@ -52,6 +52,12 @@ fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<R
 (*TODO: auch den konsens swappen?*)
 
 
+(*TODO:
+  das delta in handlungen umwandeln.
+  alle betroffenen muessen konsens haben
+  dann handlung auf besitz ausfuehren
+  und eingeloesten konsens entfernen
+*)
 definition einloesen :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "einloesen delta w \<equiv> Some w"
 
