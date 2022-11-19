@@ -1,15 +1,30 @@
 theory BeispielZahlenwelt2
-imports Zahlenwelt BeispielPerson KategorischerImperativ
+imports Zahlenwelt BeispielPerson Aenderung KategorischerImperativ
 begin
 
 section\<open>Beispiel: Zahlenwelt2\<close>
 
+text\<open>Konsens laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Konsens_im_Rechtssystem\<close>:
+"die Übereinstimmung der Willenserklärungen beider Vertragspartner über die Punkte des Vertrages"\<close>
+
+
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>
-  konsens :: \<open>unit\<close> (*TODO: wie modelliere ich das*)
+  konsens :: \<open>person \<Rightarrow> (person, int) aenderung set list\<close> (*TODO: wie modelliere ich das*)
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
+(*\<^url>[Alice := 5, Bob := 10, Carol := -3]*)
+definition initialwelt :: zahlenwelt
+  where
+"initialwelt \<equiv> \<lparr>
+  besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+  konsens = (\<lambda>_. [])(
+    Alice := [{Gewinnt Alice 3}, {Gewinnt Alice 3, Verliert Bob 3}],
+    Bob := [{Verliert Bob 3,Gewinnt Alice 3}]),
+  staatsbesitz = 9000,
+  umwelt = 600
+ \<rparr>"
 
 fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt =  welt\<lparr> besitz := swap p1 p2 (besitz welt) \<rparr>\<close>
@@ -24,5 +39,6 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abb
   done
 
 
+(*Ich glaube ich brauche eine Disjumktion von Maximen*)
 
 end
