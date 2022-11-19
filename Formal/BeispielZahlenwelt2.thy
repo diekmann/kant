@@ -165,6 +165,21 @@ lemma\<open>abmachung_einloesen [Verliert Bob 3] initialwelt = None\<close>
 
 
 
+(*Welllllll*)
+lemma "\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
+         (Handlungsabsicht (\<lambda>p w. abmachung_einloesen [Gewinnt Alice 3] w))"
+  by eval
+
+
+definition existierende_abmachung_einloesen :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
+  "existierende_abmachung_einloesen p welt \<equiv> 
+  case (konsens welt) p
+  of [] \<Rightarrow> None
+  |  d#_ \<Rightarrow> abmachung_einloesen d welt"
+
+lemma "wohlgeformte_handlungsabsicht zahlenwps initialwelt
+         (Handlungsabsicht existierende_abmachung_einloesen)"
+  by eval
 
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
