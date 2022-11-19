@@ -32,9 +32,7 @@ definition initialwelt :: zahlenwelt
 
 
 
-term map_upds
-
-fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt = 
       welt\<lparr> besitz := swap p1 p2 (besitz welt),
             konsens := swap p1 p2 ((map (map (aenderung_swap p1 p2))) \<circ> (konsens welt)) \<rparr>\<close>
@@ -181,6 +179,56 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps initialwelt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   by eval
 
+(*TODO: upstream und vereinfachen!*)
+lemma swap_aenderung_ausfuehren:
+  "swap p1 p2 (Aenderung.aenderung_ausfuehren a bes)
+      = Aenderung.aenderung_ausfuehren (map (aenderung_swap p1 p2) a) (swap p1 p2 bes)"
+  apply(induction a arbitrary: bes)
+   apply(simp)
+  apply(simp)
+  apply(case_tac a1)
+  subgoal
+    apply(simp)
+    apply(simp add: aenderung_swap_def, safe)
+      apply (simp_all add: fun_upd_twist swap_def)
+    done
+  apply(simp)
+    apply(simp add: aenderung_swap_def, safe)
+    apply (simp_all add: fun_upd_twist swap_def)
+  done
+
+lemma "swap p1 p2 (map (map (aenderung_swap p1 p2)) \<circ> konsens_entfernen a kons) =
+            konsens_entfernen (map (aenderung_swap p1 p2) a)
+             (swap p1 p2 (map (map (aenderung_swap p1 p2)) \<circ> kons))"
+  apply(simp add: konsens_entfernen_def comp_def)
+  apply(induction a)
+   apply(simp add: betroffene_def)
+  apply(simp)
+  oops
+
+lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
+  = existierende_abmachung_einloesen p2 (zahlenwps p1 p2 welt)"
+  apply(simp add: existierende_abmachung_einloesen_def)
+  apply(simp add: zahlenwps_def swap_b)
+  apply(case_tac "konsens welt p1")
+   apply(simp; fail)
+  apply(simp)
+  apply(simp add: abmachung_einloesen_def)
+  apply(safe)
+  apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
+  apply(simp add: zahlenwps_def)
+    apply(simp add: swap_aenderung_ausfuehren)
+
+  apply(simp add: zahlenwps_def swap_b)
+  apply(cases welt, simp)
+  
+  oops
+
+lemma "wohlgeformte_handlungsabsicht zahlenwps welt
+         (Handlungsabsicht existierende_abmachung_einloesen)"
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(cases welt, simp)
+  oops(*TODO*)
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
@@ -188,7 +236,8 @@ fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Righta
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abbauen n))\<close>
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
-  apply(simp add: swap_def)
+  apply(simp add: zahlenwps_def swap_def)
+  (*das galt mal und hier brauche ich lemmata*)
   done
 
 
