@@ -10,7 +10,9 @@ text\<open>Konsens laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Kons
 
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>
-  konsens :: \<open>person \<Rightarrow> (person, int) aenderung set list\<close> (*TODO: (person, int) aenderung set muss ne map werden. So vong eindeutige Darstellung here*)
+(*TODO: (person, int) aenderung list muss ne map werden. So vong eindeutige Darstellung here.
+aber irgendwie sieht das mit Listen erstmal schoener aus.*)
+  konsens :: \<open>person \<Rightarrow> (person, int) aenderung list list\<close>
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
@@ -20,17 +22,25 @@ definition initialwelt :: zahlenwelt
 "initialwelt \<equiv> \<lparr>
   besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
   konsens = (\<lambda>_. [])(
-    Alice := [{Gewinnt Alice 3}, {Gewinnt Alice 3, Verliert Bob 3}],
-    Bob := [{Verliert Bob 3,Gewinnt Alice 3}]),
+    Alice := [[Gewinnt Alice 3], [Gewinnt Alice 3, Verliert Bob 3]],
+    Bob := [[Gewinnt Alice 3, Verliert Bob 3]]),
   staatsbesitz = 9000,
   umwelt = 600
  \<rparr>"
 
+definition enthaelt_konsens :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> bool"
+where
+  "enthaelt_konsens delta welt \<equiv> \<forall>p \<in> set (betroffene delta). delta \<in> set (konsens welt p)"
+
+
+(*da der datentyp fuer konsens nicht eindeutig ist, kann das doof werden, ...*)
+(*
+Wenn das delta hier nicht genau das delta ist wie von hat_konsens berechnet ist das exploitable.*)
 definition hat_konsens :: "zahlenwelt handlung \<Rightarrow> bool"
 where
   "hat_konsens h \<equiv>
-    let delta = delta_num_fun (map_handlung besitz h) in
-     \<forall>p \<in> set (betroffene delta). set delta \<in> set ((konsens (vorher h)) p)"
+    let delta = delta_num_fun (map_handlung besitz h)
+    in enthaelt_konsens delta (vorher h)"
 
 
 text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
@@ -49,17 +59,80 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
 
 fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt =  welt\<lparr> besitz := swap p1 p2 (besitz welt) \<rparr>\<close>
-(*TODO: auch den konsens swappen?*)
+(*TODO: auch den konsens swappen?
+und die aenderungen im konsens auch*)
 
+
+term aenderung_ausfuehren
+definition aenderung_ausfuehren
+  :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
+where
+  "aenderung_ausfuehren delta welt \<equiv> welt\<lparr> besitz := Aenderung.aenderung_ausfuehren delta (besitz welt) \<rparr>"
+
+lemma\<open>aenderung_ausfuehren [Gewinnt Alice 3] initialwelt
+  = initialwelt\<lparr> besitz := (besitz initialwelt)(Alice += 3)\<rparr>\<close>
+  by eval
+
+value\<open>remove1 3 [1::int,3,5,2,3]\<close>
+value\<open>remove1 9 [1::int,3,5,2,3]\<close>
+
+
+
+definition konsens_entfernen
+ :: "(person, int) aenderung list \<Rightarrow> (person \<Rightarrow> (person, int) aenderung list list)
+   \<Rightarrow> person \<Rightarrow> (person, int) aenderung list list"
+ where
+"konsens_entfernen delta kons = fold (\<lambda>p k. k(p := remove1 delta (k p))) (betroffene delta) kons"
+
+(*TODO: upstream und testen*)
+
+lemma \<open>konsens_entfernen [Gewinnt Alice 3, Verliert Bob 3] (konsens initialwelt)
+  = (\<lambda>_. [])(
+    Alice := [[Gewinnt Alice 3]],
+    Bob := [])\<close>
+  by eval
 
 (*TODO:
-  das delta in handlungen umwandeln.
-  alle betroffenen muessen konsens haben
-  dann handlung auf besitz ausfuehren
-  und eingeloesten konsens entfernen
+
+Damit die Handlungsabsicht wohlgeformt wird sollte ich vermutlich nur
+eine Person angeben und wir loesen dann konsent[0] ein.
 *)
-definition einloesen :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
-  "einloesen delta w \<equiv> Some w"
+definition abmachung_einloesen :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
+  "abmachung_einloesen delta welt \<equiv> 
+  if enthaelt_konsens delta welt
+  then Some ((aenderung_ausfuehren delta welt)\<lparr> konsens := konsens_entfernen delta (konsens welt)\<rparr>)
+  else None"
+
+
+
+lemma\<open>abmachung_einloesen [Gewinnt Alice 3, Verliert Bob 3] initialwelt
+ = Some
+  \<lparr>
+    besitz = \<^url>[Alice := 8, Bob := 7, Carol := -3],
+    konsens = (\<lambda>_. [])(
+      Alice := [[Gewinnt Alice 3]],
+      Bob := []),
+    staatsbesitz = 9000,
+    umwelt = 600
+   \<rparr>\<close>
+  by eval
+
+lemma\<open>abmachung_einloesen [Gewinnt Alice 3] initialwelt
+ = Some
+  \<lparr>
+    besitz = \<^url>[Alice := 8, Bob := 10, Carol := -3],
+    konsens = (\<lambda>_. [])(
+      Alice := [[Gewinnt Alice 3, Verliert Bob 3]],
+      Bob := [[Gewinnt Alice 3, Verliert Bob 3]]),
+    staatsbesitz = 9000,
+    umwelt = 600
+   \<rparr>\<close>
+  by eval
+
+lemma\<open>abmachung_einloesen [Verliert Bob 3] initialwelt = None\<close>
+
+
+
 
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
