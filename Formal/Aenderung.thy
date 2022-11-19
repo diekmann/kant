@@ -227,5 +227,17 @@ lemma "aenderung_list_to_set
 = {Gewinnt Bob 3, Gewinnt Carol 2, Gewinnt Eve 2}"
   by eval
 
+
+(*TODO: das if will in die swap.thy?*)
+term map_aenderung
+definition aenderung_swap
+  :: "'person \<Rightarrow> 'person \<Rightarrow> ('person, 'etwas) aenderung \<Rightarrow> ('person, 'etwas) aenderung"
+where
+  "aenderung_swap p1 p2 a \<equiv> map_aenderung (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) id a"
+
+lemma\<open>aenderung_swap Alice Bob (Gewinnt Alice (3::nat)) = Gewinnt Bob 3\<close> by eval
+lemma\<open>aenderung_swap Alice Bob (Gewinnt Bob (3::nat)) = Gewinnt Alice 3\<close> by eval
+lemma\<open>aenderung_swap Alice Bob (Gewinnt Carol (3::nat)) = Gewinnt Carol 3\<close> by eval
+
 end
 (*>*)

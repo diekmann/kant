@@ -17,7 +17,7 @@ record zahlenwelt =
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
-(*\<^url>[Alice := 5, Bob := 10, Carol := -3]*)
+
 definition initialwelt :: zahlenwelt
   where
 "initialwelt \<equiv> \<lparr>
@@ -28,6 +28,39 @@ definition initialwelt :: zahlenwelt
   staatsbesitz = 9000,
   umwelt = 600
  \<rparr>"
+
+
+
+
+term map_upds
+
+fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
+  \<open>zahlenwps p1 p2 welt = 
+      welt\<lparr> besitz := swap p1 p2 (besitz welt),
+            konsens := swap p1 p2 ((map (map (aenderung_swap p1 p2))) \<circ> (konsens welt)) \<rparr>\<close>
+(*TODO: brauche konsens swap helper*)
+
+lemma \<open>zahlenwps Alice Bob initialwelt
+= \<lparr>
+  besitz = \<^url>[Alice := 10, Bob := 5, Carol := -3],
+  konsens = (\<lambda>_. [])(
+    Alice := [[Gewinnt Bob 3, Verliert Alice 3]],
+    Bob := [[Gewinnt Bob 3], [Gewinnt Bob 3, Verliert Alice 3]]),
+  staatsbesitz = 9000,
+  umwelt = 600
+ \<rparr>\<close> by eval
+
+
+lemma \<open>zahlenwps Alice Carol initialwelt
+= \<lparr>
+  besitz = \<^url>[Alice := -3, Bob := 10, Carol := 5],
+  konsens = (\<lambda>_. [])(
+    Bob := [[Gewinnt Carol 3, Verliert Bob 3]],
+    Carol := [[Gewinnt Carol 3], [Gewinnt Carol 3, Verliert Bob 3]]),
+  staatsbesitz = 9000,
+  umwelt = 600
+ \<rparr>\<close> by eval
+
 
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
 where
@@ -57,13 +90,6 @@ lemma "hat_konsens (handeln Alice initialwelt
 lemma "\<not> hat_konsens (handeln Alice initialwelt
           (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := (besitz w)(Alice += 4)(Bob -= 4) \<rparr>))))"
   by eval
-
-
-
-fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
-  \<open>zahlenwps p1 p2 welt =  welt\<lparr> besitz := swap p1 p2 (besitz welt) \<rparr>\<close>
-(*TODO: auch den konsens swappen?
-und die aenderungen im konsens auch*)
 
 
 
