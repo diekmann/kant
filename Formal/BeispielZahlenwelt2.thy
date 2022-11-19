@@ -49,6 +49,12 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
 
 fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt =  welt\<lparr> besitz := swap p1 p2 (besitz welt) \<rparr>\<close>
+(*TODO: auch den konsens swappen?*)
+
+
+definition einloesen :: "(person, int) aenderung list \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
+  "einloesen delta w \<equiv> Some w"
+
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
@@ -60,6 +66,6 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abb
   done
 
 
-(*Ich glaube ich brauche eine Disjumktion von Maximen*)
+(*Ich glaube ich brauche eine Disjunktion von Maximen*)
 
 end

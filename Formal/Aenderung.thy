@@ -1,6 +1,6 @@
 (*<*)
 theory Aenderung
-imports Main ExecutableHelper BeispielPerson Handlung
+imports Main ExecutableHelper BeispielPerson Handlung Zahlenwelt
 begin
 
 section\<open>Änderungen in Welten\<close>
@@ -86,6 +86,35 @@ lemma delta_num_map: \<open>delta_num_map (Handlung m1 m2) =
         delta_num_fun (Handlung (\<lambda>p. the_default (m1 p) 0) (\<lambda>p. the_default (m2 p) 0))\<close>
   by(simp)
 
+
+
+
+
+
+
+(*TODO: move*)
+fun aenderung_ausfuehren
+  :: "('person, 'etwas::{plus,minus}) aenderung list \<Rightarrow> ('person \<Rightarrow> 'etwas) \<Rightarrow> ('person \<Rightarrow> 'etwas)"
+where
+  "aenderung_ausfuehren [] bes = bes"
+| "aenderung_ausfuehren (Verliert p n # deltas) bes = aenderung_ausfuehren deltas (bes(p -= n))"
+| "aenderung_ausfuehren (Gewinnt p n # deltas) bes = aenderung_ausfuehren deltas (bes(p += n))"
+
+lemma
+\<open>aenderung_ausfuehren
+  [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
+  (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
+  =
+  (\<^url>[Alice:=6, Bob:=6, Carol:=2, Eve:= 4])\<close>
+  by eval
+
+lemma
+\<open>aenderung_ausfuehren
+  [Verliert Alice (2::int), Verliert Alice 6]
+  (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
+  =
+  (\<^url>[Bob:=3, Eve:= 5])\<close>
+  by eval
 
 end
 (*>*)
