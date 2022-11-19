@@ -30,7 +30,7 @@ definition hat_konsens :: "zahlenwelt handlung \<Rightarrow> bool"
 where
   "hat_konsens h \<equiv>
     let delta = delta_num_fun (map_handlung besitz h) in
-     \<forall>p \<in> set (betroffen delta). set delta \<in> set ((konsens (vorher h)) p)"
+     \<forall>p \<in> set (betroffene delta). set delta \<in> set ((konsens (vorher h)) p)"
 
 
 text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
