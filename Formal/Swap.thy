@@ -36,11 +36,19 @@ lemma sum_swap_none: \<open>a \<notin> P \<Longrightarrow> b \<notin> P \<Longri
 lemma swap_nothing: \<open>a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a\<close>
   by(simp add: swap_def)
 
+lemma swap_id_comp: "swap a a = id"
+  by(simp add: fun_eq_iff)
 lemma swap_fun_comp_id:
   "swap p1 p2 (f \<circ> swap p1 p2 (f \<circ> kons)) = f \<circ> (f \<circ> kons)"
   apply(simp add: comp_def fun_eq_iff)
   apply(simp add: swap_def)
   done
+lemma swap_fun_map_comp_id:
+  "swap p1 p2 (map (swap p1 p2) \<circ> swap p1 p2 (map (swap p1 p2) \<circ> kons)) = kons"
+  apply(simp add: comp_def fun_eq_iff)
+  apply(simp add: swap_def swap_id_comp)
+  by (simp add: map_idI)
+
 
 lemma swap_forall: \<open>(\<forall>p. P (swap p1 p2 a p) (swap p1 p2 b p)) \<longleftrightarrow> (\<forall>p. P (a p) (b p))\<close>
   by (metis swap_a swap_b swap_nothing)

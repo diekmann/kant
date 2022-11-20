@@ -178,26 +178,26 @@ lemma aenderung_merge_same_person_commute:
   by(simp_all add: aenderung_merge_same_person_def sum_delta_num_def Let_def add.commute)
 
 
-fun aenderung_map
+fun aenderung_aenderung_map
   :: "('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person \<rightharpoonup> ('person, 'etwas) aenderung)"
 where
-  "aenderung_map [] = Map.empty"
-| "aenderung_map (delta # deltas) = 
-   (case (aenderung_map deltas) (betroffen delta)
-      of None \<Rightarrow> (aenderung_map deltas)((betroffen delta) \<mapsto> delta)
-       | Some delta2 \<Rightarrow> (aenderung_map deltas)((betroffen delta) := aenderung_merge_same_person delta2 delta)
+  "aenderung_aenderung_map [] = Map.empty"
+| "aenderung_aenderung_map (delta # deltas) = 
+   (case (aenderung_aenderung_map deltas) (betroffen delta)
+      of None \<Rightarrow> (aenderung_aenderung_map deltas)((betroffen delta) \<mapsto> delta)
+       | Some delta2 \<Rightarrow> (aenderung_aenderung_map deltas)((betroffen delta) := aenderung_merge_same_person delta2 delta)
    )"
 
-lemma \<open>aenderung_map [Verliert Alice (2::int), Verliert Alice 6]
+lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Verliert Alice 6]
   = [Alice \<mapsto> Verliert Alice 8]\<close>
   by eval
 
-lemma \<open>aenderung_map [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
+lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
   = [Alice \<mapsto> Verliert Alice 2, Bob \<mapsto> Gewinnt Bob 3, Carol \<mapsto> Gewinnt Carol 2, Eve \<mapsto> Verliert Eve 1]\<close>
   by eval
 
 
-lemma \<open>aenderung_map [Verliert Alice (2::int), Gewinnt Alice 6]
+lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Gewinnt Alice 6]
   = [Alice \<mapsto> Gewinnt Alice 4]\<close>
   by eval
 
@@ -214,14 +214,12 @@ enthalten kann, welche gemerged werden müssen.\<close>
 definition aenderung_list_to_set
   :: "('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) aenderung set"
   where
-"aenderung_list_to_set as \<equiv> set (List.map_filter (aenderung_map as) Enum.enum)"
+"aenderung_list_to_set as \<equiv> set (List.map_filter (aenderung_aenderung_map as) Enum.enum)"
 
-lemma "aenderung_list_to_set as = ran (aenderung_map as)"
+lemma "aenderung_list_to_set as = ran (aenderung_aenderung_map as)"
   apply(simp add: aenderung_list_to_set_def)
   (*TODO!*)
   oops
-
-
 lemma "aenderung_list_to_set 
   [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Eve 3, Gewinnt Alice 2, Gewinnt Carol 2, Verliert Eve 1]
 = {Gewinnt Bob 3, Gewinnt Carol 2, Gewinnt Eve 2}"
@@ -229,6 +227,49 @@ lemma "aenderung_list_to_set
 
 
 
+(*
+eigentlich hatte ich
+type_synonym  ('person, 'etwas) abmachung = "('person, 'etwas) aenderung list
+was viel schoner aussieht.
+Aber Leider dann Abmachungen nicht Eindeutig sind, was sehr doof ist.
+
+TODO: erklaeren
+TODO: upstream
+*)
+type_synonym  ('person, 'etwas) abmachung = "'person \<rightharpoonup> 'etwas"
+
+(*TODO: dedup mit aenderung_aenderung_map*)
+fun aenderung_map
+  :: "('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) abmachung"
+where
+  "aenderung_map [] = Map.empty"
+| "aenderung_map (delta # deltas) = 
+   (case (aenderung_map deltas) (betroffen delta)
+      of None \<Rightarrow> (aenderung_map deltas)((betroffen delta) \<mapsto> aenderung_val delta)
+       | Some delta2 \<Rightarrow> (aenderung_map deltas)((betroffen delta) \<mapsto> (aenderung_val delta) + delta2)
+   )"
+(*TODO: 0 noch durch None ersetzen.*)
+
+
+lemma\<open>[aenderung_map [Gewinnt Alice (3::int)], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]
+= [[Alice \<mapsto> 3], [Alice \<mapsto> 3, Bob \<mapsto> -3]]\<close> by eval
+
+
+fun abmachung_to_aenderung_list
+  :: "'person list \<Rightarrow> ('person, 'etwas::{ord,zero,plus,minus,uminus}) abmachung \<Rightarrow> ('person, 'etwas) aenderung list"
+where
+  "abmachung_to_aenderung_list [] _ = []"
+| "abmachung_to_aenderung_list (p#ps) a =
+    (case a p of None \<Rightarrow> abmachung_to_aenderung_list ps a
+               | Some i \<Rightarrow> (if i > 0 then Gewinnt p i else Verliert p (- i)) # abmachung_to_aenderung_list ps a
+    )"
+
+definition abmachung_to_aenderung
+  :: "('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) abmachung \<Rightarrow> ('person, 'etwas) aenderung list"
+where
+  "abmachung_to_aenderung \<equiv> abmachung_to_aenderung_list Enum.enum"
+
+lemma \<open>abmachung_to_aenderung [Alice \<mapsto> (3::int), Bob \<mapsto> -3] = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
 
 (*TODO: das if will in die swap.thy?*)
 term map_aenderung
@@ -253,6 +294,20 @@ lemma aenderung_swap_sym: "aenderung_swap p1 p2 = aenderung_swap p2 p1"
   apply(simp add: fun_eq_iff aenderung_swap_def, intro allI, rename_tac a)
   apply(case_tac a)
   by simp_all
+
+lemma map_map_aenderung_swap:
+  "map (map (aenderung_swap p1 p2)) \<circ> (map (map (aenderung_swap p1 p2)) \<circ> kons) = kons"
+  by(simp add: fun_eq_iff aenderung_swap_id comp_def)
+
+lemma swap_map_map_aenderung_swap:
+  "swap p2 p1 (map (map (aenderung_swap p2 p1)) \<circ> swap p1 p2 (map (map (aenderung_swap p1 p2)) \<circ> kons))
+  = kons"
+  apply(subst aenderung_swap_sym)
+  apply(subst swap_symmetric)
+  apply(subst swap_fun_comp_id)
+  apply(simp add: map_map_aenderung_swap)
+  done
+
 
 end
 (*>*)
