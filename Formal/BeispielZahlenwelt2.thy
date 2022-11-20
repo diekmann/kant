@@ -375,7 +375,7 @@ lemma alles_kaputt_machen_code[code]:
 fun MaximeDisj
   :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
   where
-"MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
+"MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
 
 
 
@@ -429,9 +429,9 @@ value[simp] \<open>erzeuge_beispiel
    Handlungsabsicht alles_kaputt_machen]
   (maxime_altruistischer_fortschritt)\<close>
 
-(*Also das MaximeDisj funktioniert nicht so wie erwartet.
+(*TODO: MaximeDisj beweisen.
+
 Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed ist.
-In isolation funktionieren die Beispiele ja (Some maxime), aber in kombination nicht.
 *)
 value[simp] \<open>erzeuge_beispiel
   zahlenwps initialwelt
