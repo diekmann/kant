@@ -372,12 +372,33 @@ lemma alles_kaputt_machen_code[code]:
 
 
 (*Ich glaube ich brauche eine Disjunktion von Maximen*)
+(*TODO: upstream*)
 fun MaximeDisj
   :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
   where
 "MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
 
-
+lemma
+  "kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
+(*und ha2. Bessere disjI regel bauen?*)
+  apply(cases m1, cases m2, simp)
+(*Nitpick found a counterexample for card 'a = 2 and card 'b = 1:
+*)
+  oops
+lemma
+  "
+    ha1 = Handlungsabsicht (\<lambda>p w. Some w) \<Longrightarrow>
+    ha2 = Handlungsabsicht (\<lambda>p w. None) \<Longrightarrow>
+    m1 = Maxime (\<lambda>p h. False) \<Longrightarrow>
+    m2 = Maxime ((\<lambda>p h. False)(Bob := \<lambda>h. True)) \<Longrightarrow>
+    welt = (0::int) \<Longrightarrow>
+kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
+  \<not> kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
+  apply(simp)
+  apply(thin_tac "_ = _")+
+  apply(code_simp)
+  done
 
 fun individueller_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
   \<open>individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) \<le> (meins p nach)\<close>
