@@ -239,5 +239,18 @@ lemma\<open>aenderung_swap Alice Bob (Gewinnt Alice (3::nat)) = Gewinnt Bob 3\<c
 lemma\<open>aenderung_swap Alice Bob (Gewinnt Bob (3::nat)) = Gewinnt Alice 3\<close> by eval
 lemma\<open>aenderung_swap Alice Bob (Gewinnt Carol (3::nat)) = Gewinnt Carol 3\<close> by eval
 
+
+
+(*TODO: move*)
+lemma aenderung_swap_id: "aenderung_swap p1 p2 (aenderung_swap p1 p2 a) = a"
+  apply(simp add: aenderung_swap_def)
+  apply(cases a)
+  by simp_all
+
+lemma aenderung_swap_sym: "aenderung_swap p1 p2 = aenderung_swap p2 p1"
+  apply(simp add: fun_eq_iff aenderung_swap_def, intro allI, rename_tac a)
+  apply(case_tac a)
+  by simp_all
+
 end
 (*>*)

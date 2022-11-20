@@ -31,6 +31,14 @@ definition initialwelt :: zahlenwelt
 
 
 
+text\<open>Mein persönlicher Besitz:\<close>
+fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> where
+  \<open>meins p welt = (besitz welt) p\<close>
+
+lemma \<open>meins Carol initialwelt = -3\<close> by eval
+
+
+
 
 definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt = 
@@ -58,6 +66,27 @@ lemma \<open>zahlenwps Alice Carol initialwelt
   staatsbesitz = 9000,
   umwelt = 600
  \<rparr>\<close> by eval
+
+
+
+lemma map_map_aenderung_swap:
+  "map (map (aenderung_swap p1 p2)) \<circ> (map (map (aenderung_swap p1 p2)) \<circ> kons) = kons"
+  by(simp add: fun_eq_iff aenderung_swap_id comp_def)
+
+lemma swap_map_map_aenderung_swap:
+  "swap p2 p1 (map (map (aenderung_swap p2 p1)) \<circ> swap p1 p2 (map (map (aenderung_swap p1 p2)) \<circ> kons))
+  = kons"
+  apply(subst aenderung_swap_sym)
+  apply(subst swap_symmetric)
+  apply(subst swap_fun_comp_id)
+  apply(simp add: map_map_aenderung_swap)
+  done
+
+lemma zahlenwps_id: "zahlenwps p2 p1 (zahlenwps p1 p2 welt) = welt"
+  apply(simp add: zahlenwps_def)
+  apply(simp add: swap_map_map_aenderung_swap)
+  done
+
 
 
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
@@ -169,6 +198,7 @@ lemma "\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
   by eval
 
 
+(*ignoriert groesstenteils die handelnde person, nur um die Abmachung zu suchen*)
 definition existierende_abmachung_einloesen :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "existierende_abmachung_einloesen p welt \<equiv> 
   case (konsens welt) p
@@ -256,6 +286,30 @@ lemma "ausfuehrbar Alice
   (Handlungsabsicht existierende_abmachung_einloesen)"
   by eval
 
+(*bissal doof:*)
+text\<open>Da \<^const>\<open>Alice\<close> nicht betroffen is, bleibt \<^term>\<open>[Verliert Carol 3]\<close> bei \<^const>\<open>Alice\<close> übrig.\<close>
+lemma "nachher_handeln Alice
+  \<lparr>
+    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+    konsens = (\<lambda>_. [])(
+      Alice := [[Verliert Carol 3]],
+      Carol := [[Verliert Carol 3]]
+      ),
+    staatsbesitz = 9000,
+    umwelt = 600
+  \<rparr>
+  (Handlungsabsicht existierende_abmachung_einloesen)
+= \<lparr>
+    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -6],
+    konsens = (\<lambda>_. [])(
+      Alice := [[Verliert Carol 3]],
+      Carol := []
+      ),
+    staatsbesitz = 9000,
+    umwelt = 600
+  \<rparr>"
+  by eval
+
 
 
 
@@ -270,9 +324,60 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abb
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
   apply(simp add: zahlenwps_def swap_def)
   (*das galt mal und hier brauche ich lemmata*)
+  oops
+
+lemma \<open>wohlgeformte_handlungsabsicht zahlenwps initialwelt (Handlungsabsicht (abbauen n))\<close>
+  by(code_simp)
+
+
+
+
+
+
+
+fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+  \<open>reset ich welt = Some (welt\<lparr> besitz := \<lambda> _. 0\<rparr>)\<close>
+
+
+lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
+  apply(simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
+  apply(simp add: zahlenwps_def)
+  apply(simp add: swap_map_map_aenderung_swap)
+  apply(cases welt, simp)
+  apply(simp add: swap_def fun_eq_iff)
+  done
+  
+
+fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+  \<open>alles_kaputt_machen ich welt = Some (welt\<lparr> besitz := \<lambda> _. Min ((besitz welt) ` UNIV) - 1 \<rparr>)\<close>
+
+lemma alles_kaputt_machen_code[code]:
+  \<open>alles_kaputt_machen ich welt =
+   Some (welt\<lparr> besitz := (\<lambda>_. min_list (map (besitz welt) enum_class.enum) -1)\<rparr>)\<close>
+  apply(cases \<open>welt\<close>, simp add: alles_kaputt_machen_code_help)
   done
 
 
 (*Ich glaube ich brauche eine Disjunktion von Maximen*)
+
+
+
+fun individueller_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
+  \<open>individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) \<le> (meins p nach)\<close>
+
+definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
+  \<open>maxime_altruistischer_fortschritt \<equiv>
+      Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
+(*Oder konsens*)
+
+(*existierende_abmachung_einloesen macht dass die Maxime nicht erfuellt.*)
+value[simp] \<open>erzeuge_beispiel
+  zahlenwps initialwelt
+  [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht existierende_abmachung_einloesen,
+   Handlungsabsicht reset,
+   Handlungsabsicht alles_kaputt_machen]
+  maxime_altruistischer_fortschritt\<close>
+
 
 end
