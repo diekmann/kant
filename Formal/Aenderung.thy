@@ -220,12 +220,14 @@ lemma "aenderung_list_to_set as = ran (aenderung_map as)"
   apply(simp add: aenderung_list_to_set_def)
   (*TODO!*)
   oops
-  
+
 
 lemma "aenderung_list_to_set 
   [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Eve 3, Gewinnt Alice 2, Gewinnt Carol 2, Verliert Eve 1]
 = {Gewinnt Bob 3, Gewinnt Carol 2, Gewinnt Eve 2}"
   by eval
+
+
 
 
 (*TODO: das if will in die swap.thy?*)

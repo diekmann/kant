@@ -9,6 +9,9 @@ text\<open>Konsens laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Kons
 
 (*TODO: (person, int) aenderung list muss ne map werden. So vong eindeutige Darstellung here.
 aber irgendwie sieht das mit Listen erstmal schoener aus.*)
+(*TODO: also ich muss da wirklich ne map reinpacken. Das ist mir zu doof so.
+Und dann halt conversion funktionen zum showen und einlesen
+*)
 type_synonym  ('person, 'etwas) abmachung = "('person, 'etwas) aenderung list"
 
 record zahlenwelt =
@@ -89,9 +92,26 @@ lemma zahlenwps_id: "zahlenwps p2 p1 (zahlenwps p1 p2 welt) = welt"
 
 
 
+
+
+
+(*TODO: brauch lemmata?*)
+definition aenderung_minimize
+  :: "('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) aenderung list"
+  where
+"aenderung_minimize as \<equiv> List.map_filter (aenderung_map as) Enum.enum"
+
+lemma\<open>aenderung_minimize [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Eve 3, Gewinnt Alice 2, Gewinnt Carol 2, Verliert Eve 1]
+= [Gewinnt Bob 3, Gewinnt Carol 2, Gewinnt Eve 2]\<close> by eval
+
+
+(*Das wier hier vie aenderung_minimize normalisieren muessen ist echt doof*)
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
 where
-  "enthaelt_konsens delta welt \<equiv> \<forall>p \<in> set (betroffene delta). delta \<in> set (konsens welt p)"
+  "enthaelt_konsens delta welt \<equiv> \<forall>p \<in> set (betroffene delta).
+      (aenderung_minimize delta) \<in> set (map aenderung_minimize (konsens welt p))"
+
+
 
 
 (*da der datentyp fuer konsens nicht eindeutig ist, kann das doof werden, ...*)
@@ -102,6 +122,15 @@ where
   "hat_konsens h \<equiv>
     let delta = delta_num_fun (map_handlung besitz h)
     in enthaelt_konsens delta (vorher h)"
+
+
+lemma "enthaelt_konsens (TODOSWAP delta) (zahlenwps p1 p2 welt) = enthaelt_konsens delta welt" 
+  apply(simp add: enthaelt_konsens_def)
+  oops
+lemma "hat_konsens (map_handlung (zahlenwps p1 p2) h) = hat_konsens h"
+  apply(cases h, rename_tac vor nach, simp)
+  apply(simp add: hat_konsens_def)
+  oops
 
 
 text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
@@ -189,8 +218,6 @@ lemma\<open>abmachung_einloesen [Gewinnt Alice 3] initialwelt
 
 lemma\<open>abmachung_einloesen [Verliert Bob 3] initialwelt = None\<close>
   by eval
-
-
 
 (*Welllllll*)
 lemma "\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
@@ -359,6 +386,10 @@ lemma alles_kaputt_machen_code[code]:
 
 
 (*Ich glaube ich brauche eine Disjunktion von Maximen*)
+fun MaximeDisj
+  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  where
+"MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
 
 
 
@@ -368,9 +399,10 @@ fun individueller_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung
 definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
   \<open>maxime_altruistischer_fortschritt \<equiv>
       Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
-(*Oder konsens*)
 
-(*existierende_abmachung_einloesen macht dass die Maxime nicht erfuellt.*)
+
+
+(*existierende_abmachung_einloesen macht, dass die Maxime nicht erfuellt.*)
 value[simp] \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
@@ -378,6 +410,50 @@ value[simp] \<open>erzeuge_beispiel
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen]
   maxime_altruistischer_fortschritt\<close>
+
+
+(*TODO:
+  1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
+  2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
+*)
+definition maxime_hatte_konsens :: "(person, zahlenwelt) maxime" where
+  \<open>maxime_hatte_konsens \<equiv> Maxime (\<lambda>ich h. hat_konsens h)\<close>
+
+
+lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt [Handlungsabsicht existierende_abmachung_einloesen]).
+ wohlgeformte_maxime_auf
+    h zahlenwps 
+    maxime_hatte_konsens\<close> by eval
+
+
+
+value[simp] \<open>erzeuge_beispiel
+  zahlenwps initialwelt
+  [Handlungsabsicht existierende_abmachung_einloesen]
+  maxime_hatte_konsens\<close>
+
+lemma "wohlgeformte_maxime zahlenwps maxime_hatte_konsens"
+  apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def maxime_hatte_konsens_def)
+  oops
+
+value[simp] \<open>erzeuge_beispiel
+  zahlenwps initialwelt
+  [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht reset,
+   Handlungsabsicht alles_kaputt_machen]
+  (maxime_altruistischer_fortschritt)\<close>
+
+(*Also das MaximeDisj funktioniert nicht so wie erwartet.
+Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed ist.
+In isolation funktionieren die Beispiele ja (Some maxime), aber in kombination nicht.
+*)
+value[simp] \<open>erzeuge_beispiel
+  zahlenwps initialwelt
+  [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht existierende_abmachung_einloesen,
+   Handlungsabsicht reset,
+   Handlungsabsicht alles_kaputt_machen]
+  (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)\<close>
 
 
 end
