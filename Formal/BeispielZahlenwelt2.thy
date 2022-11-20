@@ -378,6 +378,7 @@ fun MaximeDisj
   where
 "MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
 
+
 lemma
   "kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
   kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
@@ -386,6 +387,7 @@ lemma
 (*Nitpick found a counterexample for card 'a = 2 and card 'b = 1:
 *)
   oops
+(*hmmmmm, nicht gut*)
 lemma
   "
     ha1 = Handlungsabsicht (\<lambda>p w. Some w) \<Longrightarrow>
@@ -399,6 +401,61 @@ kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperati
   apply(thin_tac "_ = _")+
   apply(code_simp)
   done
+
+
+(*Das ist gut, aber das oben mit mehreren Handlungsabsichten ist doof*)
+lemma
+  "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  apply(cases m1, cases m2, simp)
+  apply(simp add: kategorischer_imperativ_auf_def moralisch_simp)
+  by blast
+
+(*das waere die korrekte DisjI:*)
+lemma
+  "kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  apply(cases m1, cases m2, simp)
+  oops (*nitpick found a counter example*)
+
+
+
+fun MaximeConj
+  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  where
+"MaximeConj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
+lemma MaximeConjI:
+  "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeConj m1 m2)"
+  apply(cases m1, cases m2, simp)
+  apply(simp add: kategorischer_imperativ_auf_def moralisch_simp)
+  apply blast
+  done
+(*Ich glaube, die Rueckrichtung gilt nicht, daher ist das auch weniger hilfreich?
+Komischerweise gilt fuer MaximeDisj das gleiche.
+Irgendeine Rueckrichtung fuer MaximeConj brauche ich um das zu justifien.
+*)
+
+
+(*Folgendes gilt nicht, wodurch MaximeConj irgendwie in Frage gestellt wird.*)
+lemma "kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<Longrightarrow>
+kategorischer_imperativ_auf ha welt m1"
+  apply(cases m1, cases m2, simp)
+  apply(simp add: kategorischer_imperativ_auf_def)
+  (*thm moralisch_simp
+  using [[simp_trace_depth_limit=100, simp_trace]] apply(simp add: moralisch_simp)*)
+  (*counterexample*)
+  (*und wieso looped der simplifier?*)
+  oops
+(*Die regeln gelten vermutlich nur, wenn es jeweils jemanden gibt, der auch das ich im \<exists> erfuellt.*)
+
+
+
+
+
+
+
+
 
 fun individueller_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
   \<open>individueller_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) \<le> (meins p nach)\<close>
@@ -420,7 +477,8 @@ value[simp] \<open>erzeuge_beispiel
 
 
 (*TODO:
-  1) das reverse-engineered delta muss genau dem delta in der welt entsprechen (das sollte der neue map typ providen)
+  1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
+     (das sollte der neue map typ providen). Abgesehen von 0 oder None confsion.
   2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
 *)
 definition maxime_hatte_konsens :: "(person, zahlenwelt) maxime" where
