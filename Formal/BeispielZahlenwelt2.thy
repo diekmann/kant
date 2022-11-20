@@ -218,10 +218,6 @@ lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
   apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
   apply(simp add: zahlenwps_def)
     apply(simp add: swap_aenderung_ausfuehren)
-
-  apply(simp add: zahlenwps_def swap_b)
-  apply(cases welt, simp)
-  
   oops
 
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt
@@ -229,6 +225,42 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps welt
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
   apply(cases welt, simp)
   oops(*TODO*)
+
+
+
+text\<open>Es ist nur möglich, wenn alle Betroffenen auch zustimmen.
+Es is beispielsweise nicht möglich, dass \<^const>\<open>Alice\<close> eine Handlung
+ausführt, die \<^const>\<open>Carol\<close> betrifft, ohne deren Zustimmung.\<close>
+lemma "\<not> ausfuehrbar Alice
+  \<lparr>
+    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+    konsens = (\<lambda>_. [])(
+      Alice := [[Verliert Carol 3]]
+      ),
+    staatsbesitz = 9000,
+    umwelt = 600
+  \<rparr>
+  (Handlungsabsicht existierende_abmachung_einloesen)"
+  by eval
+text\<open>Nur wenn \<^const>\<open>Carol\<close> zustimmt wird die Handlung möglich.\<close>
+lemma "ausfuehrbar Alice
+  \<lparr>
+    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+    konsens = (\<lambda>_. [])(
+      Alice := [[Verliert Carol 3]],
+      Carol := [[Verliert Carol 3]]
+      ),
+    staatsbesitz = 9000,
+    umwelt = 600
+  \<rparr>
+  (Handlungsabsicht existierende_abmachung_einloesen)"
+  by eval
+
+
+
+
+
+
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
