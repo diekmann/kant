@@ -187,11 +187,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
   lemma alles_kaputt_machen_code[code]:
     \<open>alles_kaputt_machen ich welt =
      (case welt of Zahlenwelt besitz \<Rightarrow> Some (Zahlenwelt (\<lambda>_. min_list (map besitz enum_class.enum) -1)))\<close>
-    apply(cases \<open>welt\<close>, simp)
-    apply(subst min_list_Min)
-     apply(simp add: enum_person_def; fail)
-    apply(simp)
-    apply(simp add: enum_UNIV)
+    apply(cases \<open>welt\<close>, simp add: alles_kaputt_machen_code_help)
     done
 
   lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:

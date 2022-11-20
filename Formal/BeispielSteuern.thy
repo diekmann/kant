@@ -1,5 +1,5 @@
 theory BeispielSteuern
-imports Zahlenwelt Maxime Gesetze Simulation Steuern KategorischerImperativ
+imports Zahlenwelt Maxime Steuern Aenderung KategorischerImperativ
 begin
 
 
@@ -73,14 +73,12 @@ Diese Handlung kann ich aber nicht auf andere projezieren, da
 *)
 
 
-(*<*)
+
 fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where
   \<open>delta_steuerwelt (Handlung vor nach) =
       Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))\<close>
-(*>*)
 
-(*TODO: kategorischer Imperativ fuer diese maxime beweisen!*)
-thm globale_maxime_katimp (*generalisiert das?*)
+
 
 (*(Maxime 
       (\<lambda>ich handlung.
@@ -170,51 +168,23 @@ subsection\<open>Setup für Beispiele\<close>
 
 definition \<open>initialwelt \<equiv> Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]\<close>
 
-definition \<open>beispiel_case_law_absolut welt steuerfun \<equiv>
-  simulateOne
-    (SimConsts
-      Alice
-      maxime_steuern
-      (printable_case_law_ableiten_absolut (\<lambda>w. show_fun (get_einkommen w))))
-    3 steuerfun welt (Gesetz {})\<close>
-definition \<open>beispiel_case_law_relativ welt steuerfun \<equiv>
-  simulateOne
-    (SimConsts
-      Alice
-      maxime_steuern
-      (case_law_ableiten_relativ delta_steuerwelt))
-    1 steuerfun welt (Gesetz {})\<close>
-
 
 subsection\<open>Beispiel: Keiner Zahlt Steuern\<close>
 
 text\<open>Die Maxime ist erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
-lemma \<open>beispiel_case_law_relativ initialwelt (Handlungsabsicht (\<lambda>ich welt. Some welt)) =
-  Gesetz {(\<section> 1, Rechtsnorm (Tatbestand []) (Rechtsfolge Erlaubnis))}\<close> by eval
+lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht (\<lambda>ich welt. Some welt))\<close> by eval
 
 
 subsection\<open>Beispiel: Ich zahle 1 Steuer\<close>
 text\<open>Das funktioniert nicht:\<close>
 definition \<open>ich_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt ((get_einkommen welt)(ich -= 1)))\<close>
-lemma \<open>beispiel_case_law_absolut initialwelt (Handlungsabsicht ich_zahle_1_steuer) =
-  Gesetz
-  {(\<section> 1,
-    Rechtsnorm
-     (Tatbestand
-       ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
-        [(Alice, 7), (Bob, 3), (Carol, 0), (Eve, 5)]))
-     (Rechtsfolge Verbot))}\<close> by eval
-lemma \<open>beispiel_case_law_relativ initialwelt (Handlungsabsicht ich_zahle_1_steuer) =
-  Gesetz
-  {(\<section> 1, Rechtsnorm (Tatbestand [Verliert Alice 1])
-                            (Rechtsfolge Verbot))}\<close> by eval
+lemma \<open>\<not> moralisch initialwelt maxime_steuern (Handlungsabsicht ich_zahle_1_steuer)\<close> by eval
 
 text\<open>Denn jeder muss Steuer zahlen!
 Ich finde es super spannend, dass hier faktisch ein Gleichbehandlungsgrundsatz rausfällt,
 ohne dass wir soewtas jemals explizit gefordert haben.
 \<close>
-
 
 subsection\<open>Beiepiel: Jeder zahle 1 Steuer\<close>
 text\<open>Jeder muss steuern zahlen:
@@ -223,32 +193,7 @@ text\<open>Jeder muss steuern zahlen:
 Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
 definition \<open>jeder_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))\<close>
-lemma \<open>beispiel_case_law_absolut initialwelt (Handlungsabsicht jeder_zahle_1_steuer) =
-Gesetz
-  {(\<section> 3,
-    Rechtsnorm
-     (Tatbestand
-       ([(Alice, 6), (Bob, 1), (Carol, - 2), (Eve, 3)],
-        [(Alice, 5), (Bob, 0), (Carol, - 3), (Eve, 2)]))
-     (Rechtsfolge Erlaubnis)),
-   (\<section> 2,
-    Rechtsnorm
-     (Tatbestand
-       ([(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)],
-        [(Alice, 6), (Bob, 1), (Carol, - 2), (Eve, 3)]))
-     (Rechtsfolge Erlaubnis)),
-   (\<section> 1,
-    Rechtsnorm
-     (Tatbestand
-       ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
-        [(Alice, 7), (Bob, 2), (Carol, - 1), (Eve, 4)]))
-     (Rechtsfolge Erlaubnis))}\<close> by eval
-lemma \<open>beispiel_case_law_relativ initialwelt (Handlungsabsicht jeder_zahle_1_steuer) =
-  Gesetz
-  {(\<section> 1,
-    Rechtsnorm
-     (Tatbestand [Verliert Alice 1, Verliert Bob 1, Verliert Carol 1, Verliert Eve 1])
-     (Rechtsfolge Erlaubnis))}\<close> by eval
+lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht jeder_zahle_1_steuer)\<close> by eval
 
 
 subsection\<open>Beispiel: Vereinfachtes Deutsches Steuersystem\<close>
@@ -262,25 +207,19 @@ definition \<open>jeder_zahlt_einkommenssteuer p w \<equiv> Some (jeder_zahlt ei
 
 
 text\<open>Bei dem geringen Einkommen der \<^const>\<open>initialwelt\<close> zahlt keiner Steuern.\<close>
-lemma \<open>beispiel_case_law_absolut initialwelt (Handlungsabsicht jeder_zahlt_einkommenssteuer) = 
-  Gesetz
-  {(\<section> 1,
-    Rechtsnorm
-     (Tatbestand
-       ([(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)],
-        [(Alice, 8), (Bob, 3), (Carol, 0), (Eve, 5)]))
-     (Rechtsfolge Erlaubnis))}\<close> by eval
+lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 
 text\<open>Für höhere Einkommen erhalten wir plausible Werte und niemand rutscht ins negative:\<close>
-lemma \<open>beispiel_case_law_relativ
+lemma \<open>moralisch
   (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
-  (Handlungsabsicht jeder_zahlt_einkommenssteuer)
-  =
-  Gesetz
-  {(\<section> 1,
-    Rechtsnorm (Tatbestand [Verliert Bob 511, Verliert Eve 1857])
-     (Rechtsfolge Erlaubnis))}\<close> by eval
+  maxime_steuern
+  (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
+lemma \<open>delta_steuerwelt
+      (handeln
+      Alice (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
+      (Handlungsabsicht jeder_zahlt_einkommenssteuer))
+  = [Verliert Bob 511, Verliert Eve 1857]\<close> by eval
 
 
 section\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>

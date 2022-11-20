@@ -451,6 +451,19 @@ lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht
   \<rparr>\<close>
   by beispiel
 
+text\<open>Der Nachteil von \<^const>\<open>erzeuge_beispiel\<close> ist,
+dass der resultierende Record viele Funktionen enthält,
+welche eigentlich nicht geprintet werden können.
+Allerdings ist dies vermutlich die einzige (sinnvolle, einfache) Art eine Handlungsabsicht 
+darzustellen.
+
+Es wäre einfacher, nur die Handlung (also die \<^typ>\<open>'world handlung\<close>, nur die Welt vorher und nachher, ohne Absicht)
+aufzuschreiben.
+Allerdings erzeugt das ohne die Absicht sehr viel Unfug, da z.B. pathologische Grenzfälle
+(wie z.B. sich-selsbt-bestehlen, oder die-welt-die-zufällig-im-ausgangszustand-ist-resetten)
+dazu, dass diese no-op Handlungen verboten sind, da die dahinterliegende Absicht schlecht ist.
+Wenn wir allerdings nur die Ergebnisse einer solchen Handlung (ohne die Absicht) aufschreiben
+kommt heraus: Nichtstun ist verboten.\<close>
 
 
 end

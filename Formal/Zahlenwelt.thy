@@ -325,4 +325,25 @@ lemma aufsummieren_swap:
   apply(rule sum_list_swap)
   using enum_class.in_enum enum_class.enum_distinct by auto
 
+
+
+
+
+
+
+lemma list_not_empty_iff_has_element: "as \<noteq> [] \<longleftrightarrow> (\<exists>a. a \<in> set as)"
+  by (simp add: ex_in_conv)
+
+lemma enum_class_not_empty_list: "enum_class.enum \<noteq> []"
+  using enum_class.in_enum list_not_empty_iff_has_element by blast
+
+lemma alles_kaputt_machen_code_help:
+  "(\<lambda>_. Min (range x) - 1) = (\<lambda>_. min_list (map x enum_class.enum) - 1)"
+  apply(subst min_list_Min)
+   apply(simp add: enum_class_not_empty_list; fail)
+  apply(simp)
+  apply(simp add: enum_UNIV)
+  done
+
+
 end
