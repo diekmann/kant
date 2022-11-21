@@ -453,22 +453,7 @@ lemma MaximeDisjI:
 \<exists>ich. ausfuehrbar ich welt ha \<and> okay m2 ich (handeln ich welt ha) \<Longrightarrow>
 (kategorischer_imperativ_auf ha welt m1) \<or> (kategorischer_imperativ_auf ha welt m2) \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
-  unfolding kategorischer_imperativ_auf_def
-  apply(erule disjE)
-  apply(intro impI, elim exE conjE)
-  apply(simp add: okay_MaximeDisj)
-   apply(erule disjE)
-    apply(erule impE)
-     apply blast
-    apply (simp add: moralisch_MaximeDisj)
-  apply (metis moralisch_MaximeDisj)
-  apply(intro impI, elim exE conjE)
-  apply(simp add: okay_MaximeDisj)
-   apply(erule disjE)
-    apply(erule impE)
-     apply blast
-    apply (simp add: moralisch_MaximeDisj)
-  apply (metis moralisch_MaximeDisj)
+  apply(simp add: kategorischer_imperativ_auf_def okay_MaximeDisj moralisch_MaximeDisj)
   done
 
 fun MaximeConj
