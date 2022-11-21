@@ -378,6 +378,15 @@ fun MaximeDisj
   where
 "MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
 
+lemma okay_MaximeDisj: "okay (MaximeDisj m1 m2) p h \<longleftrightarrow> okay m1 p h \<or> okay m2 p h"
+  by(cases m1, cases m2, simp)
+
+(*rueckrichting gilt vermutlich nicht*)
+lemma moralisch_MaximeDisj:
+  "moralisch welt m1 ha \<or> moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  apply(simp add: moralisch_simp okay_MaximeDisj)
+  by auto
+
 
 lemma
   "kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
@@ -404,12 +413,33 @@ kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperati
 
 
 (*Das ist gut, aber das oben mit mehreren Handlungsabsichten ist doof*)
+(*Das \<and> da drinnen stoert mich*)
 lemma
   "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
   apply(cases m1, cases m2, simp)
   apply(simp add: kategorischer_imperativ_auf_def moralisch_simp)
   by blast
+
+lemma
+  "(kategorischer_imperativ_auf ha welt m1) \<or> (kategorischer_imperativ_auf ha welt m2) \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  unfolding kategorischer_imperativ_auf_def
+  apply(erule disjE)
+  apply(intro impI, elim exE conjE)
+  apply(simp add: okay_MaximeDisj)
+   apply(erule disjE)
+    apply(erule impE)
+     apply blast
+    apply (simp add: moralisch_MaximeDisj)
+  (*der fall geht nicht*)
+  oops
+
+lemma "kategorischer_imperativ_auf ha1 welt m1 \<and> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2) \<or>
+  kategorischer_imperativ_auf ha2 welt (MaximeDisj m1 m2)"
+  (*Nitpick found a counterexample *)
+oops
 
 (*das waere die korrekte DisjI:*)
 lemma
@@ -424,6 +454,17 @@ fun MaximeConj
   :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
   where
 "MaximeConj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
+
+(*das ist gut*)
+lemma okay_MaximeConj: "okay (MaximeConj m1 m2) p h \<longleftrightarrow> okay m1 p h \<and> okay m2 p h"
+  by(cases m1, cases m2, simp)
+
+lemma moralisch_MaximeConj:
+  "moralisch welt (MaximeConj m1 m2) ha \<longleftrightarrow> moralisch welt m1 ha \<and> moralisch welt m2 ha"
+  apply(simp add: moralisch_simp okay_MaximeConj)
+  by blast
+
+
 lemma MaximeConjI:
   "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeConj m1 m2)"
@@ -457,9 +498,19 @@ kategorischer_imperativ_auf ha welt m1"
 
 
 
+lemma MaximeConjD:
+  "\<exists>ich. ausfuehrbar ich welt ha \<and> okay (MaximeConj m1 m2) ich (handeln ich welt ha) \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2"
+  apply(simp add: kategorischer_imperativ_auf_def)
+  apply(simp add: moralisch_MaximeConj)
+  done
 
-
-
+lemma MaximeConj:
+  "\<exists>ich. ausfuehrbar ich welt ha \<and> okay (MaximeConj m1 m2) ich (handeln ich welt ha) \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<longleftrightarrow>
+    kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2"
+  using MaximeConjI MaximeConjD by metis
 
 
 
