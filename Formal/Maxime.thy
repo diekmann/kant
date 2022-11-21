@@ -299,7 +299,7 @@ lemma moralisch_MaximeConj:
   apply(simp add: moralisch_simp okay_MaximeConj)
   by blast
 
-declare MaximeConj.simps[code del]
+declare MaximeConj.simps[simp del]
 
 
 fun MaximeDisj
@@ -327,6 +327,6 @@ lemma moralisch_MaximeDisj2:
   "moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
   by(simp add: moralisch_MaximeDisjI)
 
-declare MaximeDisj.simps[code del]
+declare MaximeDisj.simps[simp del]
 
 end

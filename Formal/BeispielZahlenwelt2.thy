@@ -433,7 +433,6 @@ value[simp] \<open>erzeuge_beispiel
 
 Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed ist.
 *)
-(*Hey, das konnte mal ausgefuehrt werden! Was ist passiert?*)
 value[simp] \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),

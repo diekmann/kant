@@ -476,7 +476,7 @@ lemma MaximeConjI:
   "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeConj m1 m2)"
   apply(cases m1, cases m2, simp)
-  apply(simp add: kategorischer_imperativ_auf_def moralisch_simp)
+  apply(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
   apply blast
   done
 
