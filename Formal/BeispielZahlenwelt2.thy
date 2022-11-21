@@ -432,6 +432,9 @@ value[simp] \<open>erzeuge_beispiel
 (*TODO: MaximeDisj beweisen.
 
 Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed ist.
+
+Ich frage mich ja, ob MaximeDisj hier wirklich funktioniert
+oder nur in dieser einen Welt.
 *)
 value[simp] \<open>erzeuge_beispiel
   zahlenwps initialwelt

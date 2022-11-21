@@ -161,6 +161,15 @@ lemma kategorischer_imperativ_aufI:
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
 
+text\<open>Um den \<^const>\<open>kategorischer_imperativ_auf\<close> einer Handlungsabsicht zu zeigen muss
+entweder die Handlungsabsicht moralisch sein,
+oder es darf keine Person geben, die diese Handlung auch tatsächlich
+unter gegebener Maxime ausführen würde:\<close>
+lemma kategorischer_imperativ_auf2:
+  \<open>moralisch welt m ha \<or> \<not>(\<exists> p. ausfuehrbar p welt ha \<and> okay m p (handeln p welt ha))
+      \<longleftrightarrow> kategorischer_imperativ_auf ha welt m\<close>
+  by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
+
 subsection\<open>Triviale Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 text\<open>
 Die Maxime die keine Handlung erlaubt (weil immer False) erfüllt den kategorischen
