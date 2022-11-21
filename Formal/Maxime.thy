@@ -299,6 +299,14 @@ lemma moralisch_MaximeConj:
   apply(simp add: moralisch_simp okay_MaximeConj)
   by blast
 
+lemma moralisch_MaximeConj_False:
+  "moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. True))) ha \<longleftrightarrow> moralisch welt m1 ha"
+  by(simp add: moralisch_simp okay_MaximeConj)
+
+lemma moralisch_MaximeConj_True:
+  "\<not> moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. False))) ha"
+  by(simp add: moralisch_simp okay_MaximeConj)
+
 declare MaximeConj.simps[simp del]
 
 
@@ -326,6 +334,15 @@ lemma moralisch_MaximeDisj1:
 lemma moralisch_MaximeDisj2:
   "moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
   by(simp add: moralisch_MaximeDisjI)
+
+lemma moralisch_MaximeDisj_False:
+  "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. False))) ha \<longleftrightarrow> moralisch welt m1 ha"
+  by(simp add: moralisch_simp okay_MaximeDisj)
+
+lemma moralisch_MaximeDisj_True:
+  "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. True))) ha"
+  by(simp add: moralisch_simp okay_MaximeDisj)
+
 
 declare MaximeDisj.simps[simp del]
 

@@ -510,6 +510,20 @@ lemma kategorischer_imperativ_auf_MaximeConj_comm:
    \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeConj m2 m1)"
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
 
+lemma kategorischer_imperativ_auf_MaximeConj_True:
+  "kategorischer_imperativ_auf ha welt (MaximeConj m1 (Maxime (\<lambda>_ _. True)))
+  \<longleftrightarrow> kategorischer_imperativ_auf ha welt m1"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
+
+text\<open>Achtung: Das ist das Gegenteil, was man von einer Konjunktion erwarten würde.
+Normalerweise is \<^term>\<open>a \<and> False = False\<close>.
+Bei \<^const>\<open>MaximeConj\<close> ist dies aber \<^const>\<open>True\<close>!
+Dies liegt daran, dass \<^term>\<open>Maxime (\<lambda>_ _. False)\<close> keine Handlung erlaubt,
+und damit als pathologischen Grenzfall den kategorischen Imperativ erfüllt.\<close>
+lemma kategorischer_imperativ_auf_MaximeConj_False:
+  "kategorischer_imperativ_auf ha welt (MaximeConj m1 (Maxime (\<lambda>_ _. False)))"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
+
 
 
 
@@ -554,7 +568,15 @@ lemma kategorischer_imperativ_auf_MaximeDisj_comm:
    \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m2 m1)"
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
 
-
+text\<open>Für die Grenzfälle einer Disjunktion mit \<^const>\<open>True\<close> und \<^const>\<open>False\<close>
+verhält sich \<^const>\<open>MaximeDisj\<close> wie erwartet.\<close>
+lemma kategorischer_imperativ_auf_MaximeDisj_True:
+  "kategorischer_imperativ_auf ha welt (MaximeDisj m1 (Maxime (\<lambda>_ _. True)))"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
+lemma kategorischer_imperativ_auf_MaximeDisj_False:
+  "kategorischer_imperativ_auf ha welt (MaximeDisj m1 (Maxime (\<lambda>_ _. False)))
+  \<longleftrightarrow> kategorischer_imperativ_auf ha welt m1"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
 
 
 lemma
@@ -586,6 +608,7 @@ lemma
   "kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
   oops (*nitpick found a counter example*)
+
 
 
 
