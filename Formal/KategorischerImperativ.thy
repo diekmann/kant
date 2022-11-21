@@ -612,8 +612,20 @@ lemma
 
 
 
+(*TODO: move to Maxime.*)
+fun MaximeNot :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  where
+"MaximeNot (Maxime m) = Maxime (\<lambda>p h. \<not> m p h)"
 
+lemma okay_MaximeNot: "okay (MaximeNot m) p h \<longleftrightarrow> \<not> okay m p h"
+  by(cases m, simp)
 
+lemma kategorischer_imperativ_auf_Maxime_DeMorgan:
+"kategorischer_imperativ_auf ha welt (MaximeNot (MaximeConj m1 m2))
+  \<longleftrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj (MaximeNot m1) (MaximeNot m2))"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj okay_MaximeConj okay_MaximeNot)
+  
 
 
 
