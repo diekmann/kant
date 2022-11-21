@@ -627,7 +627,10 @@ lemma kategorischer_imperativ_auf_Maxime_DeMorgan:
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj okay_MaximeConj okay_MaximeNot)
   
 
-
+lemma kategorischer_imperativ_auf_MaximeNot_double:
+  "kategorischer_imperativ_auf ha welt (MaximeNot (MaximeNot m))
+    \<longleftrightarrow> kategorischer_imperativ_auf ha welt m"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeNot)
 
 
 
