@@ -412,6 +412,9 @@ lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt [Handl
     maxime_hatte_konsens\<close> by eval
 
 
+lemma "wohlgeformte_maxime zahlenwps maxime_hatte_konsens"
+  apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def maxime_hatte_konsens_def)
+  oops
 
 lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
@@ -423,10 +426,6 @@ lemma \<open>erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht existierende_abmachung_einloesen],
    bsp_verbotene_handlungen = []\<rparr>\<close>
   by beispiel
-
-lemma "wohlgeformte_maxime zahlenwps maxime_hatte_konsens"
-  apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def maxime_hatte_konsens_def)
-  oops
 
 lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
