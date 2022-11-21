@@ -283,4 +283,67 @@ lemma \<open>debug_maxime show_map
   by eval
 
 
+
+subsection\<open>Maximen Kombinieren\<close>
+
+fun MaximeConj
+  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  where
+"MaximeConj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
+
+lemma okay_MaximeConj: "okay (MaximeConj m1 m2) p h \<longleftrightarrow> okay m1 p h \<and> okay m2 p h"
+  by(cases m1, cases m2, simp)
+
+lemma moralisch_MaximeConj:
+  "moralisch welt (MaximeConj m1 m2) ha \<longleftrightarrow> moralisch welt m1 ha \<and> moralisch welt m2 ha"
+  apply(simp add: moralisch_simp okay_MaximeConj)
+  by blast
+
+lemma moralisch_MaximeConj_False:
+  "moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. True))) ha \<longleftrightarrow> moralisch welt m1 ha"
+  by(simp add: moralisch_simp okay_MaximeConj)
+
+lemma moralisch_MaximeConj_True:
+  "\<not> moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. False))) ha"
+  by(simp add: moralisch_simp okay_MaximeConj)
+
+declare MaximeConj.simps[simp del]
+
+
+fun MaximeDisj
+  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  where
+"MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
+
+lemma okay_MaximeDisj: "okay (MaximeDisj m1 m2) p h \<longleftrightarrow> okay m1 p h \<or> okay m2 p h"
+  by(cases m1, cases m2, simp)
+
+
+text\<open>Leider ist \<^const>\<open>MaximeDisj\<close> weniger schön,
+weil es kein genau-dann-wenn mit der Disjunktion (\<^term>\<open>m1 \<or> m2\<close>) gibt.\<close>
+
+lemma moralisch_MaximeDisjI:
+  "moralisch welt m1 ha \<or> moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  apply(simp add: moralisch_simp okay_MaximeDisj)
+  by auto
+text\<open>Rückrichtung gilt leider nicht.\<close>
+
+lemma moralisch_MaximeDisj1:
+  "moralisch welt m1 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  by(simp add: moralisch_MaximeDisjI)
+lemma moralisch_MaximeDisj2:
+  "moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  by(simp add: moralisch_MaximeDisjI)
+
+lemma moralisch_MaximeDisj_False:
+  "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. False))) ha \<longleftrightarrow> moralisch welt m1 ha"
+  by(simp add: moralisch_simp okay_MaximeDisj)
+
+lemma moralisch_MaximeDisj_True:
+  "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. True))) ha"
+  by(simp add: moralisch_simp okay_MaximeDisj)
+
+
+declare MaximeDisj.simps[simp del]
+
 end

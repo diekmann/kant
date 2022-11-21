@@ -259,8 +259,8 @@ lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
   apply(simp)
   apply(simp add: abmachung_einloesen_def)
   apply(safe)
-  apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
-  apply(simp add: zahlenwps_def)
+    apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
+    apply(simp add: zahlenwps_def)
     apply(simp add: swap_aenderung_ausfuehren)
   oops (*TODO*)
 
@@ -371,11 +371,12 @@ lemma alles_kaputt_machen_code[code]:
   done
 
 
-(*Ich glaube ich brauche eine Disjunktion von Maximen*)
-fun MaximeDisj
-  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
-  where
-"MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
+
+
+fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+  \<open>unmoeglich _ _ = None\<close>
+
+
 
 
 
@@ -394,12 +395,14 @@ value[simp] \<open>erzeuge_beispiel
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen]
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
   maxime_altruistischer_fortschritt\<close>
 
 
 (*TODO:
-  1) das reverse-engineered delta muss genau dem delta in der welt entsprechen (das sollte der neue map typ providen)
+  1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
+     (das sollte der neue map typ providen). Abgesehen von 0 oder None confsion.
   2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
 *)
 definition maxime_hatte_konsens :: "(person, zahlenwelt) maxime" where
@@ -412,34 +415,55 @@ lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt [Handl
     maxime_hatte_konsens\<close> by eval
 
 
-
-value[simp] \<open>erzeuge_beispiel
-  zahlenwps initialwelt
-  [Handlungsabsicht existierende_abmachung_einloesen]
-  maxime_hatte_konsens\<close>
-
 lemma "wohlgeformte_maxime zahlenwps maxime_hatte_konsens"
   apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def maxime_hatte_konsens_def)
   oops
 
-value[simp] \<open>erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
+  zahlenwps initialwelt
+  [Handlungsabsicht existierende_abmachung_einloesen]
+  maxime_hatte_konsens
+= Some
+  \<lparr>bsp_welt = initialwelt,
+   bsp_erfuellte_maxime = Some maxime_hatte_konsens,
+   bsp_erlaubte_handlungen = [Handlungsabsicht existierende_abmachung_einloesen],
+   bsp_verbotene_handlungen = []\<rparr>\<close>
+  by beispiel
+
+lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen]
-  (maxime_altruistischer_fortschritt)\<close>
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
+  maxime_altruistischer_fortschritt
+= Some
+  \<lparr>bsp_welt = initialwelt,
+   bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+  by beispiel
 
 (*TODO: MaximeDisj beweisen.
 
 Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed ist.
+
+Ich frage mich ja, ob MaximeDisj hier wirklich funktioniert
+oder nur in dieser einen Welt.
 *)
-value[simp] \<open>erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen]
-  (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)\<close>
-
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
+  (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
+= Some
+  \<lparr>bsp_welt = initialwelt,
+   bsp_erfuellte_maxime = Some (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens),
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen, Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+  by beispiel
 
 end
