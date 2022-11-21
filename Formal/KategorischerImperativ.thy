@@ -489,6 +489,10 @@ lemma MaximeConjI:
   apply blast
   done
 
+
+(*TODO: das was ich hier erfuellbar nenne will ne definition,
+damit sich folgende lemmata besser lesen.*)
+
 text\<open>Die Rückrichtung gilt nur, wenn wir annehmen, dass es auch einen Fall gibt
 in dem die \<^const>\<open>MaximeConj\<close> auch erfüllbar ist:\<close>
 lemma MaximeConjD:
@@ -529,7 +533,7 @@ lemma kategorischer_imperativ_auf_MaximeConj_False:
 
 text\<open>Für \<^const>\<open>MaximeDisj\<close> müssen wir generell annehmen,
 dass einer der Fälle erfüllbar ist.\<close>
-lemma MaximeDisjI:
+lemma kategorischer_imperativ_auf_MaximeDisjI:
 "((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m1 ich (handeln ich welt ha))
    \<and> kategorischer_imperativ_auf ha welt m1) \<or>
  ((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m2 ich (handeln ich welt ha))
@@ -551,14 +555,14 @@ lemma
 
 
 text\<open>Wenn wir die Annahme stärker machen gilt auch folgendes:\<close>
-lemma MaximeDisjI_from_conj:
+lemma kategorischer_imperativ_auf_MaximeDisjI_from_conj:
   "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
   apply(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
   by blast
 
 
-lemma moralisch_kapImp_MaximeDisjI:
+lemma moralisch_kategorischer_imperativ_auf_MaximeDisjI:
   "moralisch welt m1 ha \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
@@ -567,6 +571,26 @@ lemma kategorischer_imperativ_auf_MaximeDisj_comm:
   "kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)
    \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m2 m1)"
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
+
+
+text\<open>Als Introduction rule eignet sich vermutlich folgendes besser,
+weil es auch erlaubt,
+dass eine Handlungsabsicht nicht ausführbar ist oder von keiner Maxime erfüllbar ist.\<close>
+lemma kategorischer_imperativ_auf_MaximeDisjI2:
+"((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m1 ich (handeln ich welt ha))
+   \<and> kategorischer_imperativ_auf ha welt m1) \<or>
+ ((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m2 ich (handeln ich welt ha))
+   \<and> kategorischer_imperativ_auf ha welt m2) \<or>
+ (\<forall>ich. \<not>ausfuehrbar ich welt ha \<or>
+        \<not>(okay m1 ich (handeln ich welt ha) \<or> okay m2 ich (handeln ich welt ha)))
+\<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  apply(simp add: kategorischer_imperativ_auf_def okay_MaximeDisj)
+  apply(elim disjE)
+    apply (metis moralisch_MaximeDisjI)
+   apply (metis moralisch_MaximeDisjI)
+   apply blast
+  done
 
 text\<open>Für die Grenzfälle einer Disjunktion mit \<^const>\<open>True\<close> und \<^const>\<open>False\<close>
 verhält sich \<^const>\<open>MaximeDisj\<close> wie erwartet.\<close>
@@ -602,14 +626,15 @@ kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperati
   apply(code_simp)
   done
 
+(*definition disj :: "[bool, bool] \<Rightarrow> bool"  (infixr "\<or>" 30)
+  where or_def: "P \<or> Q \<equiv> \<forall>R. (P \<longrightarrow> R) \<longrightarrow> (Q \<longrightarrow> R) \<longrightarrow> R"*)
+thm disjE
 
 (*das waere die korrekte DisjI:*)
 lemma
   "kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
   oops (*nitpick found a counter example*)
-
-
 
 
 (*TODO: move to Maxime.*)
