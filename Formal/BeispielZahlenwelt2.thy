@@ -259,8 +259,8 @@ lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
   apply(simp)
   apply(simp add: abmachung_einloesen_def)
   apply(safe)
-  apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
-  apply(simp add: zahlenwps_def)
+    apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
+    apply(simp add: zahlenwps_def)
     apply(simp add: swap_aenderung_ausfuehren)
   oops (*TODO*)
 
@@ -442,6 +442,12 @@ lemma "kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<Longrightarrow>
 kategorischer_imperativ_auf ha welt m1"
   apply(cases m1, cases m2, simp)
   apply(simp add: kategorischer_imperativ_auf_def)
+  apply(simp add: moralisch_simp del:okay.simps)
+  apply(subst(asm) okay.simps)+
+  apply(subst okay.simps)+
+  (*using [[simp_trace_depth_limit=100, simp_trace]] apply(simp only:)*)
+  apply(thin_tac _)
+  apply(simp only:)
   (*thm moralisch_simp
   using [[simp_trace_depth_limit=100, simp_trace]] apply(simp add: moralisch_simp)*)
   (*counterexample*)
