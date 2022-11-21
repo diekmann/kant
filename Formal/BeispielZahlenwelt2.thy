@@ -413,21 +413,33 @@ lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt [Handl
 
 
 
-value[simp] \<open>erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht existierende_abmachung_einloesen]
-  maxime_hatte_konsens\<close>
+  maxime_hatte_konsens
+= Some
+  \<lparr>bsp_welt = initialwelt,
+   bsp_erfuellte_maxime = Some maxime_hatte_konsens,
+   bsp_erlaubte_handlungen = [Handlungsabsicht existierende_abmachung_einloesen],
+   bsp_verbotene_handlungen = []\<rparr>\<close>
+  by beispiel
 
 lemma "wohlgeformte_maxime zahlenwps maxime_hatte_konsens"
   apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def maxime_hatte_konsens_def)
   oops
 
-value[simp] \<open>erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen]
-  (maxime_altruistischer_fortschritt)\<close>
+  maxime_altruistischer_fortschritt
+= Some
+  \<lparr>bsp_welt = initialwelt,
+   bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5)],
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+  by beispiel
 
 (*TODO: MaximeDisj beweisen.
 
@@ -436,13 +448,18 @@ Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed
 Ich frage mich ja, ob MaximeDisj hier wirklich funktioniert
 oder nur in dieser einen Welt.
 *)
-value[simp] \<open>erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen]
-  (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)\<close>
-
+  (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
+= Some
+  \<lparr>bsp_welt = initialwelt,
+   bsp_erfuellte_maxime = Some (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens),
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen],
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+  by beispiel
 
 end
