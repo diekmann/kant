@@ -457,13 +457,122 @@ welche eigentlich nicht geprintet werden können.
 Allerdings ist dies vermutlich die einzige (sinnvolle, einfache) Art eine Handlungsabsicht 
 darzustellen.
 
-Es wäre einfacher, nur die Handlung (also die \<^typ>\<open>'world handlung\<close>, nur die Welt vorher und nachher, ohne Absicht)
-aufzuschreiben.
-Allerdings erzeugt das ohne die Absicht sehr viel Unfug, da z.B. pathologische Grenzfälle
+Es wäre einfacher, nur die Handlung (also die \<^typ>\<open>'world handlung\<close>,
+nur die Welt vorher und nachher, ohne Absicht) aufzuschreiben.
+Allerdings erzeugt das ohne die Absicht (i.e. \<^typ>\<open> ('person, 'world) handlungsabsicht\<close>)
+sehr viel Unfug, da z.B. pathologische Grenzfälle
 (wie z.B. sich-selsbt-bestehlen, oder die-welt-die-zufällig-im-ausgangszustand-ist-resetten)
 dazu, dass diese no-op Handlungen verboten sind, da die dahinterliegende Absicht schlecht ist.
 Wenn wir allerdings nur die Ergebnisse einer solchen Handlung (ohne die Absicht) aufschreiben
 kommt heraus: Nichtstun ist verboten.\<close>
+
+
+
+
+
+subsection\<open>Kombination vom Maximen\<close>
+
+lemma MaximeConjI:
+  "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeConj m1 m2)"
+  apply(cases m1, cases m2, simp)
+  apply(simp add: kategorischer_imperativ_auf_def moralisch_simp)
+  apply blast
+  done
+
+text\<open>Die Rückrichtung gilt nur, wenn wir annehmen, dass es auch einen Fall gibt
+in dem die \<^const>\<open>MaximeConj\<close> auch erfüllbar ist:\<close>
+lemma MaximeConjD:
+  "\<exists>ich. ausfuehrbar ich welt ha \<and> okay (MaximeConj m1 m2) ich (handeln ich welt ha) \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2"
+  apply(simp add: kategorischer_imperativ_auf_def)
+  apply(simp add: moralisch_MaximeConj)
+  done
+
+lemma MaximeConj:
+  "\<exists>ich. ausfuehrbar ich welt ha \<and> okay (MaximeConj m1 m2) ich (handeln ich welt ha) \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<longleftrightarrow>
+    kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2"
+  using MaximeConjI MaximeConjD by metis
+
+
+
+
+
+
+text\<open>Die Annahmen können abgeschwächt werden, da es reicht,
+wenn nur einer der Fälle erfüllbar ist.\<close>
+lemma MaximeDisjI:
+"((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m1 ich (handeln ich welt ha))
+   \<and> kategorischer_imperativ_auf ha welt m1) \<or>
+ ((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m2 ich (handeln ich welt ha))
+   \<and> kategorischer_imperativ_auf ha welt m2) \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  apply(simp add: kategorischer_imperativ_auf_def okay_MaximeDisj)
+  apply(erule disjE)
+  apply (metis moralisch_MaximeDisjI)+
+  done
+text\<open>Die Rückrichtung gilt leider nicht.\<close>
+
+text\<open>Die Annahmen sind leider sehr stark:\<close>
+lemma
+  "((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha))
+    \<and> kategorischer_imperativ_auf ha welt m)
+  \<Longrightarrow>
+  moralisch welt m ha"
+  by (simp add: kategorischer_imperativ_auf_def)
+
+
+text\<open>Wenn wir die Annahme stärker machen gilt auch folgendes:\<close>
+lemma MaximeDisjI_from_conj:
+  "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  apply(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
+  by blast
+
+
+  
+
+
+
+
+lemma
+  "kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
+  kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
+(*und ha2. Bessere disjI regel bauen?*)
+  apply(cases m1, cases m2, simp)
+(*Nitpick found a counterexample for card 'a = 2 and card 'b = 1:
+*)
+  oops
+(*hmmmmm, nicht gut*)
+lemma
+  "
+    ha1 = Handlungsabsicht (\<lambda>p w. Some w) \<Longrightarrow>
+    ha2 = Handlungsabsicht (\<lambda>p w. None) \<Longrightarrow>
+    m1 = Maxime (\<lambda>p h. False) \<Longrightarrow>
+    m2 = Maxime ((\<lambda>p h. False)(Bob := \<lambda>h. True)) \<Longrightarrow>
+    welt = (0::int) \<Longrightarrow>
+kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
+  \<not> kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
+  apply(simp)
+  apply(thin_tac "_ = _")+
+  apply(code_simp)
+  done
+
+
+(*das waere die korrekte DisjI:*)
+lemma
+  "kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  oops (*nitpick found a counter example*)
+
+
+
+
+
+
+
 
 
 end
