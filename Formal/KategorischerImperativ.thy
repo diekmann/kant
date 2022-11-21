@@ -496,13 +496,16 @@ lemma MaximeConj:
     kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2"
   using MaximeConjI MaximeConjD by metis
 
+lemma kategorischer_imperativ_auf_MaximeConj_comm:
+  "kategorischer_imperativ_auf ha welt (MaximeConj m1 m2)
+   \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeConj m2 m1)"
+  by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
 
 
 
 
-
-text\<open>Die Annahmen können abgeschwächt werden, da es reicht,
-wenn nur einer der Fälle erfüllbar ist.\<close>
+text\<open>Für \<^const>\<open>MaximeDisj\<close> müssen wir generell annehmen,
+dass einer der Fälle erfüllbar ist.\<close>
 lemma MaximeDisjI:
 "((\<exists>ich. ausfuehrbar ich welt ha \<and> okay m1 ich (handeln ich welt ha))
    \<and> kategorischer_imperativ_auf ha welt m1) \<or>
@@ -532,7 +535,15 @@ lemma MaximeDisjI_from_conj:
   by blast
 
 
-  
+lemma moralisch_kapImp_MaximeDisjI:
+  "moralisch welt m1 ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
+
+lemma kategorischer_imperativ_auf_MaximeDisj_comm:
+  "kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)
+   \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m2 m1)"
+  by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
 
 
 
@@ -566,6 +577,7 @@ lemma
   "kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
   oops (*nitpick found a counter example*)
+
 
 
 
