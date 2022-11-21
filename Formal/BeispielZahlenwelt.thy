@@ -207,12 +207,18 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
 
   (*TODO: Handlung alles_besser_machen.*)
 
+
+
+  fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>unmoeglich _ _ = None\<close>
+
 text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
 definition "handlungsabsichten \<equiv> [
   Handlungsabsicht (erschaffen 5),
   Handlungsabsicht (stehlen4 5 10),
   Handlungsabsicht reset,
-  Handlungsabsicht alles_kaputt_machen
+  Handlungsabsicht alles_kaputt_machen,
+  Handlungsabsicht unmoeglich
 ]"
 
 lemma \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
@@ -249,7 +255,8 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
     Handlungsabsicht (erschaffen 5),
     Handlungsabsicht (stehlen_nichtwf 5 Bob),
     Handlungsabsicht (stehlen4 5 10),
-    Handlungsabsicht alles_kaputt_machen
+    Handlungsabsicht alles_kaputt_machen,
+    Handlungsabsicht unmoeglich
   } \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt ha p"
     apply(simp)
     apply(safe)
@@ -258,6 +265,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
     subgoal using mhg_maxime_zahlenfortschritt_stehlen4 by simp
     subgoal
       by(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, auto)
+      apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
     done
 
   text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
@@ -319,7 +327,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
   Some
     \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
      bsp_erfuellte_maxime = None,
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
+     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
     by beispiel
 
@@ -348,7 +356,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   Some
     \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
      bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
+     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
     by beispiel
   text\<open>Das ist ein sehr schönes Beispiel.\<close>
@@ -497,7 +505,8 @@ subsection\<open>Maxime für globales striktes Optimum\<close>
      bsp_verbotene_handlungen = [
       Handlungsabsicht (stehlen4 5 10),
       Handlungsabsicht reset,
-      Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+      Handlungsabsicht alles_kaputt_machen,
+      Handlungsabsicht unmoeglich]\<rparr>\<close>
     by beispiel
 
 
@@ -548,7 +557,10 @@ theorem
   Some
     \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
      bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich. globaler_fortschritt)),
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10)],
+     bsp_erlaubte_handlungen = [
+      Handlungsabsicht (erschaffen 5),
+      Handlungsabsicht (stehlen4 5 10),
+      Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>

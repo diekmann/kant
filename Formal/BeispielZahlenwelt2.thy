@@ -373,6 +373,8 @@ lemma alles_kaputt_machen_code[code]:
 
 
 
+fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+  \<open>unmoeglich _ _ = None\<close>
 
 
 
@@ -393,7 +395,8 @@ value[simp] \<open>erzeuge_beispiel
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen]
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
   maxime_altruistischer_fortschritt\<close>
 
 
@@ -431,12 +434,13 @@ lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen]
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
   maxime_altruistischer_fortschritt
 = Some
   \<lparr>bsp_welt = initialwelt,
    bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
-   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5)],
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
   by beispiel
 
@@ -452,12 +456,13 @@ lemma \<open>erzeuge_beispiel
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen]
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
   (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
 = Some
   \<lparr>bsp_welt = initialwelt,
    bsp_erfuellte_maxime = Some (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens),
-   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen],
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen, Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
   by beispiel
 
