@@ -480,6 +480,7 @@ kommt heraus: Nichtstun ist verboten.\<close>
 
 
 subsection\<open>Kombination vom Maximen\<close>
+subsubsection\<open>Konjunktion\<close>
 
 lemma MaximeConjI:
   "kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2 \<Longrightarrow>
@@ -526,7 +527,7 @@ lemma kategorischer_imperativ_auf_MaximeConj_True:
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
 
 text\<open>Achtung: Das ist das Gegenteil, was man von einer Konjunktion erwarten würde.
-Normalerweise is \<^term>\<open>a \<and> False = False\<close>.
+Normalerweise ist \<^term>\<open>a \<and> False = False\<close>.
 Bei \<^const>\<open>MaximeConj\<close> ist dies aber \<^const>\<open>True\<close>!
 Dies liegt daran, dass \<^term>\<open>Maxime (\<lambda>_ _. False)\<close> keine Handlung erlaubt,
 und damit als pathologischen Grenzfall den kategorischen Imperativ erfüllt.\<close>
@@ -535,7 +536,7 @@ lemma kategorischer_imperativ_auf_MaximeConj_False:
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
 
 
-
+subsubsection\<open>Disjunktion\<close>
 
 text\<open>Für \<^const>\<open>MaximeDisj\<close> müssen wir generell annehmen,
 dass einer der Fälle erfüllbar ist.\<close>
@@ -565,17 +566,6 @@ lemma kategorischer_imperativ_auf_MaximeDisjI_from_conj:
   by blast
 
 
-lemma moralisch_kategorischer_imperativ_auf_MaximeDisjI:
-  "moralisch welt m1 ha \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
-  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
-
-lemma kategorischer_imperativ_auf_MaximeDisj_comm:
-  "kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)
-   \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m2 m1)"
-  by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
-
-
 text\<open>Als Introduction rule eignet sich vermutlich folgendes besser,
 weil es auch erlaubt,
 dass eine Handlungsabsicht nicht ausführbar ist oder von keiner Maxime erfüllbar ist.\<close>
@@ -599,14 +589,50 @@ lemma
    \<not> ex_erfuellbare_instanz (MaximeDisj m1 m2) welt ha"
   by(auto simp add: ex_erfuellbare_instanz_def okay_MaximeDisj)
 text\<open>Wenn wir also mental den \<^const>\<open>ex_erfuellbare_instanz\<close> Teil ausblenden,
-dann ließt sich obige Introduction rule wie folgt:
+dann liest sich obige Introduction Rule wie folgt:
 \<^term>\<open>kategorischer_imperativ_auf ha welt m1 \<or> kategorischer_imperativ_auf ha welt m2
-\<Longrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)\<close>
+\<Longrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)\<close>.
 Dies ist genau die Disjunktions Introduction Rule die ich gerne hätte.
 Die gesamte Regel ist leider leicht komplizierter,
 da der entsprechende Oder-Fall immer mit dem entsprechenden \<^const>\<open>ex_erfuellbare_instanz\<close>
 gepaart auftreten muss.
 \<close>
+
+text\<open>Eine gewöhnliche Introduction Rule (ohne die \<^const>\<open>ex_erfuellbare_instanz\<close> Teile)
+gilt leider nicht.\<close>
+lemma
+  "ha = Handlungsabsicht (\<lambda>p w. Some w) \<Longrightarrow>
+   m1 = Maxime ((\<lambda>p h. False)(Bob := \<lambda>h. True)) \<Longrightarrow>
+   welt = (0::int) \<Longrightarrow>
+kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
+  \<not> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  apply(simp)
+  apply(thin_tac "_ = _")+
+  apply(code_simp)
+  done
+
+text\<open>zumindest gelten folgende Regeln welche einer gewöhnlichen Disjuntions Intoroduction
+ähnlich sehen (mit leicht stärkeren Annahmen):\<close>
+lemma
+"(ex_erfuellbare_instanz m1 welt ha \<and> kategorischer_imperativ_auf ha welt m1)
+  \<Longrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+"moralisch welt m1 ha
+  \<Longrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+   apply (meson kategorischer_imperativ_auf_MaximeDisjI2)
+  by (simp add: kategorischer_imperativ_auf_def moralisch_MaximeDisj1 kategorischer_imperativ_auf_MaximeDisjI2)
+
+
+lemma moralisch_kategorischer_imperativ_auf_MaximeDisjI:
+  "moralisch welt m1 ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
+  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
+
+lemma kategorischer_imperativ_auf_MaximeDisj_comm:
+  "kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)
+   \<longleftrightarrow> kategorischer_imperativ_auf ha welt (MaximeDisj m2 m1)"
+  by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
+
+
 
 
 
@@ -621,38 +647,9 @@ lemma kategorischer_imperativ_auf_MaximeDisj_False:
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj)
 
 
-lemma
-  "kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
-  kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
-(*und ha2. Bessere disjI regel bauen?*)
-  apply(cases m1, cases m2, simp)
-(*Nitpick found a counterexample for card 'a = 2 and card 'b = 1:
-*)
-  oops
-(*hmmmmm, nicht gut*)
-lemma
-  "
-    ha1 = Handlungsabsicht (\<lambda>p w. Some w) \<Longrightarrow>
-    ha2 = Handlungsabsicht (\<lambda>p w. None) \<Longrightarrow>
-    m1 = Maxime (\<lambda>p h. False) \<Longrightarrow>
-    m2 = Maxime ((\<lambda>p h. False)(Bob := \<lambda>h. True)) \<Longrightarrow>
-    welt = (0::int) \<Longrightarrow>
-kategorischer_imperativ_auf ha1 welt m1 \<Longrightarrow> kategorischer_imperativ_auf ha2 welt m2 \<Longrightarrow>
-  \<not> kategorischer_imperativ_auf ha1 welt (MaximeDisj m1 m2)"
-  apply(simp)
-  apply(thin_tac "_ = _")+
-  apply(code_simp)
-  done
 
-(*definition disj :: "[bool, bool] \<Rightarrow> bool"  (infixr "\<or>" 30)
-  where or_def: "P \<or> Q \<equiv> \<forall>R. (P \<longrightarrow> R) \<longrightarrow> (Q \<longrightarrow> R) \<longrightarrow> R"*)
-thm disjE
 
-(*das waere die korrekte DisjI:*)
-lemma
-  "kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)"
-  oops (*nitpick found a counter example*)
+
 
 
 (*TODO: move to Maxime.*)
