@@ -49,7 +49,7 @@ text\<open>Ein jeder \<^typ>\<open>('person, 'world) wp_swap\<close> sollte mind
 definition wps_id :: "('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
 where
   "wps_id wps welt \<equiv> \<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt"
-(*                    \<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt *)
+
 
 text_raw\<open>
 \begin{equation*}
@@ -295,8 +295,21 @@ wpsm_kommutiert m wps welt\<close>
   apply(erule conjE)
   apply(drule wohlgeformte_handlungsabsicht_wpsid_imp_handeln[OF _ wpsid])
   by simp
-  
 
+
+lemma wpsm_kommutiert_map_handlung:
+  assumes wpsid: "wps_id wps welt"
+    and wps_sym: "wps p1 p2 welt = wps p2 p1 welt"
+  shows \<open>wpsm_kommutiert m wps (wps p1 p2 welt) \<Longrightarrow>
+    okay m p1 (map_handlung (wps p1 p2) (handeln p1 welt ha))
+    \<longleftrightarrow>
+    okay m p2 (handeln p1 welt ha)\<close>
+  apply(cases \<open>ha\<close>, simp)
+  apply(simp add: wpsm_kommutiert_def)
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(simp add: handeln_def wpsid[simplified wps_id_def])
+  by (metis wps_id_def wps_sym wpsid)
 
 subsection\<open>Wohlgeformte Maxime\<close>
 
