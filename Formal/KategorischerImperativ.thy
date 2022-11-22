@@ -390,8 +390,7 @@ qed
 
 *)
 
-section\<open>Experimental: Beispiel\<close>
-(*das wird technisch um da executable code zu bekommen, ...*)
+section\<open>Ausführbarer Beispielgenerator\<close>
 
 value\<open>[(x,y). x \<leftarrow> xs, y \<leftarrow> ys, x \<noteq> y]\<close>
 
@@ -436,7 +435,13 @@ lemma "erzeuge_beispiel wps welt has m = Some bsp \<Longrightarrow>
   (\<forall> ha \<in> set has. wohlgeformte_handlungsabsicht wps welt ha) \<and>
   (\<forall> h \<in> set (alle_moeglichen_handlungen welt has). wohlgeformte_maxime_auf h wps m)"
   by(simp add: erzeuge_beispiel_def split: if_split_asm)
-  
+
+text\<open>
+  \<^item> Wenn \<^const>\<open>bsp_erfuellte_maxime\<close> einen \<^const>\<open>Some\<close> term enthält ist der
+    \<^const>\<open>kategorischer_imperativ_auf\<close> den Handlungen erfüllt
+  \<^item> Die \<^const>\<open>bsp_erlaubte_handlungen\<close> und \<^const>\<open>bsp_verbotene_handlungen\<close> entspricht
+    quasi dem allgemeinen Gesetz, welches besagt, welche Handlungen erlaubt oder verboten sind.
+\<close>
 
 (*thx lars: https://stackoverflow.com/questions/74337244/turning-a-valuesimp-example-into-a-lemma-with-functions-in-them/74394525#74394525*)
 ML\<open>
