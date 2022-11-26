@@ -93,17 +93,16 @@ lemma zahlenwps_sym: "zahlenwps p1 p2 = zahlenwps p2 p1"
 
 
 (*TODO: upstream*)
-definition abmachungs_betroffene :: "('person::enum, 'etwas) abmachung \<Rightarrow> 'person list"
+definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> 'person list"
 where
-  "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> None]"
+  "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
 
-lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = dom a"
-  apply(simp add: abmachungs_betroffene_def enum_class.enum_UNIV)
-  by blast
-  
+lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = abmachung_dom a"
+  by(simp add: abmachung_dom_def abmachungs_betroffene_def enum_class.enum_UNIV)
 
-lemma \<open>abmachungs_betroffene (aenderung_map [Gewinnt Bob 3, Verliert Alice 3])
-  = [Alice, Bob]\<close> by code_simp (*TODO: eval geht nicht!*)
+
+lemma \<open>abmachungs_betroffene (aenderung_map [Gewinnt Bob (3::int), Verliert Alice 3])
+  = [Alice, Bob]\<close> by eval
 
 
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
@@ -173,7 +172,7 @@ value\<open>remove1 9 [1::int,3,5,2,3]\<close>
 
 
 definition konsens_entfernen
- :: "('person::enum, 'etwas) abmachung \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
+ :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
    \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
  where
 "konsens_entfernen abmachung kons =
@@ -405,7 +404,7 @@ value[simp] \<open>erzeuge_beispiel
 
 (*TODO:
   1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
-     (das sollte der neue map typ providen). Abgesehen von 0 oder None confsion.
+     (das sollte der neue function map typ providen).
   2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
 *)
 definition maxime_hatte_konsens :: "(person, zahlenwelt) maxime" where
