@@ -244,24 +244,15 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps initialwelt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   by eval
 
-(*TODO: upstream und vereinfachen!*)
-lemma swap_aenderung_ausfuehren:
-  "swap p1 p2 (Aenderung.aenderung_ausfuehren a bes)
-      = Aenderung.aenderung_ausfuehren (map (aenderung_swap p1 p2) a) (swap p1 p2 bes)"
-  apply(induction a arbitrary: bes)
-   apply(simp)
-  apply(simp)
-  apply(case_tac a1)
-  subgoal
-    apply(simp)
-    apply(simp add: aenderung_swap_def, safe)
-      apply (simp_all add: fun_upd_twist swap_def)
-    done
-  apply(simp)
-    apply(simp add: aenderung_swap_def, safe)
-    apply (simp_all add: fun_upd_twist swap_def)
-  done
 
+lemma "map_option (zahlenwps p1 p2) (abmachung_einloesen a welt) =
+       abmachung_einloesen (swap p1 p2 a) (zahlenwps p1 p2 welt)"
+  apply(simp add: abmachung_einloesen_def)
+  apply(safe)
+    apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
+    apply(simp add: zahlenwps_def)
+    apply(simp add: swap_aenderung_ausfuehren)
+  oops
 
 lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
   = existierende_abmachung_einloesen p2 (zahlenwps p1 p2 welt)"

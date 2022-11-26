@@ -128,6 +128,40 @@ lemma delta_num_map: \<open>delta_num_map (Handlung m1 m2) =
   by(simp)
 
 
+(*TODO: das if will in die swap.thy?*)
+term map_aenderung
+definition aenderung_swap
+  :: "'person \<Rightarrow> 'person \<Rightarrow> ('person, 'etwas) aenderung \<Rightarrow> ('person, 'etwas) aenderung"
+where
+  "aenderung_swap p1 p2 a \<equiv> map_aenderung (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) id a"
+
+lemma\<open>aenderung_swap Alice Bob (Gewinnt Alice (3::nat)) = Gewinnt Bob 3\<close> by eval
+lemma\<open>aenderung_swap Alice Bob (Gewinnt Bob (3::nat)) = Gewinnt Alice 3\<close> by eval
+lemma\<open>aenderung_swap Alice Bob (Gewinnt Carol (3::nat)) = Gewinnt Carol 3\<close> by eval
+
+
+lemma aenderung_swap_id: "aenderung_swap p1 p2 (aenderung_swap p1 p2 a) = a"
+  apply(simp add: aenderung_swap_def)
+  apply(cases a)
+  by simp_all
+
+lemma aenderung_swap_sym: "aenderung_swap p1 p2 = aenderung_swap p2 p1"
+  apply(simp add: fun_eq_iff aenderung_swap_def, intro allI, rename_tac a)
+  apply(case_tac a)
+  by simp_all
+
+lemma map_map_aenderung_swap:
+  "map (map (aenderung_swap p1 p2)) \<circ> (map (map (aenderung_swap p1 p2)) \<circ> kons) = kons"
+  by(simp add: fun_eq_iff aenderung_swap_id comp_def)
+
+lemma swap_map_map_aenderung_swap:
+  "swap p2 p1 (map (map (aenderung_swap p2 p1)) \<circ> swap p1 p2 (map (map (aenderung_swap p1 p2)) \<circ> kons))
+  = kons"
+  apply(subst aenderung_swap_sym)
+  apply(subst swap_symmetric)
+  apply(subst swap_fun_comp_id)
+  apply(simp add: map_map_aenderung_swap)
+  done
 
 
 
@@ -154,6 +188,25 @@ lemma
   =
   (\<^url>[Bob:=3, Eve:= 5])\<close>
   by eval
+
+
+(*TODO: upstream und vereinfachen!*)
+lemma swap_aenderung_ausfuehren:
+  "swap p1 p2 (Aenderung.aenderung_ausfuehren a bes)
+      = Aenderung.aenderung_ausfuehren (map (aenderung_swap p1 p2) a) (swap p1 p2 bes)"
+  apply(induction a arbitrary: bes)
+   apply(simp)
+  apply(simp)
+  apply(case_tac a1)
+  subgoal
+    apply(simp)
+    apply(simp add: aenderung_swap_def, safe)
+      apply (simp_all add: fun_upd_twist swap_def)
+    done
+  apply(simp)
+    apply(simp add: aenderung_swap_def, safe)
+    apply (simp_all add: fun_upd_twist swap_def)
+  done
 
 
 (*TODO: Achtung, das macht unfug wenn p1 und p2 unterschiedlich*)
@@ -271,42 +324,6 @@ where
 
 lemma \<open>abmachung_to_aenderung [Alice \<mapsto> (3::int), Bob \<mapsto> -3] = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
 
-(*TODO: das if will in die swap.thy?*)
-term map_aenderung
-definition aenderung_swap
-  :: "'person \<Rightarrow> 'person \<Rightarrow> ('person, 'etwas) aenderung \<Rightarrow> ('person, 'etwas) aenderung"
-where
-  "aenderung_swap p1 p2 a \<equiv> map_aenderung (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) id a"
-
-lemma\<open>aenderung_swap Alice Bob (Gewinnt Alice (3::nat)) = Gewinnt Bob 3\<close> by eval
-lemma\<open>aenderung_swap Alice Bob (Gewinnt Bob (3::nat)) = Gewinnt Alice 3\<close> by eval
-lemma\<open>aenderung_swap Alice Bob (Gewinnt Carol (3::nat)) = Gewinnt Carol 3\<close> by eval
-
-
-
-(*TODO: move*)
-lemma aenderung_swap_id: "aenderung_swap p1 p2 (aenderung_swap p1 p2 a) = a"
-  apply(simp add: aenderung_swap_def)
-  apply(cases a)
-  by simp_all
-
-lemma aenderung_swap_sym: "aenderung_swap p1 p2 = aenderung_swap p2 p1"
-  apply(simp add: fun_eq_iff aenderung_swap_def, intro allI, rename_tac a)
-  apply(case_tac a)
-  by simp_all
-
-lemma map_map_aenderung_swap:
-  "map (map (aenderung_swap p1 p2)) \<circ> (map (map (aenderung_swap p1 p2)) \<circ> kons) = kons"
-  by(simp add: fun_eq_iff aenderung_swap_id comp_def)
-
-lemma swap_map_map_aenderung_swap:
-  "swap p2 p1 (map (map (aenderung_swap p2 p1)) \<circ> swap p1 p2 (map (map (aenderung_swap p1 p2)) \<circ> kons))
-  = kons"
-  apply(subst aenderung_swap_sym)
-  apply(subst swap_symmetric)
-  apply(subst swap_fun_comp_id)
-  apply(simp add: map_map_aenderung_swap)
-  done
 
 
 end
