@@ -450,8 +450,8 @@ lemma aenderung_ausfuehren_abmachung_to_aenderung:
   apply(simp add: enum_class.enum_distinct)
   done
 
-(*TODO: does this make a good [code] rule?*)
-lemma abmachung_ausfuehren_TODO_DOESTHISGICVEMECODE:
+(*TODO: does this make a good [code] rule? I cannot measure performance changes.*)
+lemma abmachung_ausfuehren_aenderung:
   fixes abmachung :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
   shows "abmachung_ausfuehren abmachung = aenderung_ausfuehren (abmachung_to_aenderung abmachung)"
   apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
