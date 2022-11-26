@@ -61,7 +61,7 @@ fun stehlen4_partial :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Righ
          of None \<Rightarrow> None
           | Some opfer \<Rightarrow> if opfer = dieb
                           then None
-                          else Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
+                          else Some (Zahlenwelt \<lbrakk>\<lbrakk>besitz(opfer -= beute)\<rbrakk>(dieb += beute)\<rbrakk>)
       )\<close>
 
 definition maxime_und_handlungsabsicht_generalisieren_partial

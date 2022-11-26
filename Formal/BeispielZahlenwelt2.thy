@@ -145,10 +145,10 @@ lemma "hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w)))"
   done
   
 lemma "hat_konsens (handeln Alice initialwelt
-        (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := (besitz w)(Alice += 3)(Bob -= 3) \<rparr>))))"
+        (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk> \<rparr>))))"
   by eval
 lemma "\<not> hat_konsens (handeln Alice initialwelt
-          (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := (besitz w)(Alice += 4)(Bob -= 4) \<rparr>))))"
+          (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 4)\<rbrakk>(Bob -= 4)\<rbrakk> \<rparr>))))"
   by eval
 
 
@@ -164,7 +164,7 @@ where
       Aenderung.aenderung_ausfuehren (abmachung_to_aenderung abmachung) (besitz welt) \<rparr>"
 
 lemma\<open>aenderung_ausfuehren (aenderung_map [Gewinnt Alice 3]) initialwelt
-  = initialwelt\<lparr> besitz := (besitz initialwelt)(Alice += 3)\<rparr>\<close>
+  = initialwelt\<lparr> besitz := \<lbrakk>(besitz initialwelt)(Alice += 3)\<rbrakk>\<rparr>\<close>
   by eval
 
 value\<open>remove1 3 [1::int,3,5,2,3]\<close>
@@ -336,7 +336,7 @@ lemma "nachher_handeln Alice
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
-  \<open>abbauen i p welt = Some (welt\<lparr> besitz := (besitz welt)(p += int i), umwelt := (umwelt welt) - int i \<rparr>)\<close>
+  \<open>abbauen i p welt = Some (welt\<lparr> besitz := \<lbrakk>(besitz welt)(p += int i)\<rbrakk>, umwelt := (umwelt welt) - int i \<rparr>)\<close>
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abbauen n))\<close>
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)

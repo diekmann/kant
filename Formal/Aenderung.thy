@@ -263,29 +263,6 @@ lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Gewinnt Alice 6]
   = [Alice \<mapsto> Gewinnt Alice 4]\<close>
   by eval
 
-(*TODO:
-eventuell laesst sich
-  ('person, 'etwas) aenderung list
-deutlich besser als
-  ('person \<rightharpoonup> 'etwas::uminus
-darstellen, weil das viel eindeutiger ist.*)
-
-(*
-
-TODO
-TODO
-TODO
-TODO
-
-
-Maps sind leider auch nicht eindeutig, weil None und 0 die gleiche Semantik haben.
-Ich muss auf 'person \<Rightarrow> 'etwas::ordered_ab_group_add wechseln!
-
-
-TODO
-TODO
-TODO
-*)
 
 text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> in eine \<^typ>\<open>('person, 'etwas) aenderung set\<close>
 zu übersetzen ist nicht trivial, da Die Liste mehrere Änderungen der gleichen Person
@@ -315,6 +292,31 @@ Aber Leider dann Abmachungen nicht Eindeutig sind, was sehr doof ist.
 TODO: erklaeren
 TODO: upstream
 *)
+
+(*TODO:
+eventuell laesst sich
+  ('person, 'etwas) aenderung list
+deutlich besser als
+  ('person \<rightharpoonup> 'etwas::uminus
+darstellen, weil das viel eindeutiger ist.*)
+
+(*
+
+TODO
+TODO
+TODO
+TODO
+
+
+Maps sind leider auch nicht eindeutig, weil None und 0 die gleiche Semantik haben.
+Ich muss auf 'person \<Rightarrow> 'etwas::ordered_ab_group_add wechseln!
+
+
+TODO
+TODO
+TODO
+*)
+
 type_synonym  ('person, 'etwas) abmachung = "'person \<rightharpoonup> 'etwas"
 
 (*TODO: dedup mit aenderung_aenderung_map*)
@@ -447,7 +449,8 @@ where
                     | Some b' \<Rightarrow> (besitz p) + b'"
 
 
-lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
+lemma aenderung_ausfuehren_abmachung_to_aenderung_induction_helper:
+  fixes welt :: "'person::enum \<Rightarrow> 'etwas::ordered_ab_group_add"
   shows "dom abmachung \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> 
           aenderung_ausfuehren (abmachung_to_aenderung_list ps abmachung) welt p =
     welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
@@ -465,14 +468,19 @@ lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_a
   apply(subgoal_tac "aenderung_ausfuehren (abmachung_to_aenderung_list ps (abmachung(pa := None))) welt p =
            welt p + (case (abmachung(pa := None)) p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)")
    prefer 2   apply blast
-  by (smt (verit) abmachung_to_aenderung_list_not_in_ps fun_upd_other fun_upd_same option.simps(4) option.simps(5))
+  by (smt (verit) abmachung_to_aenderung_list_not_in_ps add.right_neutral fun_upd_other fun_upd_same option.simps(4) option.simps(5))
 
 
-lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
+
+lemma aenderung_ausfuehren_abmachung_to_aenderung:
+  fixes welt :: "'person::enum \<Rightarrow> 'etwas::ordered_ab_group_add"
   shows "aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt p = 
     welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
   apply(simp add: abmachung_to_aenderung_def)
-  oops
+  apply(rule aenderung_ausfuehren_abmachung_to_aenderung_induction_helper)
+   apply(simp add: enum_class.enum_UNIV)
+  apply(simp add: enum_class.enum_distinct)
+  done
 
 lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
   shows "abmachung_ausfuehren abmachung welt = aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt"
