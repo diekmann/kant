@@ -153,16 +153,14 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
 
 
 
-term aenderung_ausfuehren
+term Aenderung.abmachung_ausfuehren
 
-(*TODO: das abmachung_to_aenderung ist ein hack und muss raus*)
-definition aenderung_ausfuehren
+definition abmachung_ausfuehren
   :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
 where
-  "aenderung_ausfuehren abmachung welt \<equiv> welt\<lparr> besitz :=
-      Aenderung.aenderung_ausfuehren (abmachung_to_aenderung abmachung) (besitz welt) \<rparr>"
+  "abmachung_ausfuehren abmachung welt \<equiv> welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>"
 
-lemma\<open>aenderung_ausfuehren (aenderung_map [Gewinnt Alice 3]) initialwelt
+lemma\<open>abmachung_ausfuehren (aenderung_map [Gewinnt Alice 3]) initialwelt
   = initialwelt\<lparr> besitz := \<lbrakk>(besitz initialwelt)(Alice += 3)\<rbrakk>\<rparr>\<close>
   by eval
 
@@ -194,7 +192,7 @@ eine Person angeben und wir loesen dann konsent[0] ein.
 definition abmachung_einloesen :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "abmachung_einloesen delta welt \<equiv> 
   if enthaelt_konsens delta welt
-  then Some ((aenderung_ausfuehren delta welt)\<lparr> konsens := konsens_entfernen delta (konsens welt)\<rparr>)
+  then Some ((abmachung_ausfuehren delta welt)\<lparr> konsens := konsens_entfernen delta (konsens welt)\<rparr>)
   else None"
 
 
@@ -248,9 +246,9 @@ lemma "map_option (zahlenwps p1 p2) (abmachung_einloesen a welt) =
        abmachung_einloesen (swap p1 p2 a) (zahlenwps p1 p2 welt)"
   apply(simp add: abmachung_einloesen_def)
   apply(safe)
-    apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
+    apply(simp add: BeispielZahlenwelt2.abmachung_ausfuehren_def)
     apply(simp add: zahlenwps_def)
-    apply(simp add: swap_aenderung_ausfuehren)
+    (*apply(simp add: swap_aenderung_ausfuehren)*)
   oops
 
 lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
@@ -262,9 +260,6 @@ lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
   apply(simp)
   apply(simp add: abmachung_einloesen_def)
   apply(safe)
-    apply(simp add: BeispielZahlenwelt2.aenderung_ausfuehren_def)
-    apply(simp add: zahlenwps_def)
-    apply(simp add: swap_aenderung_ausfuehren)
   oops (*TODO*)
 
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt
@@ -340,8 +335,7 @@ fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Righta
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abbauen n))\<close>
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
   apply(simp add: zahlenwps_def swap_def)
-  (*das galt mal und hier brauche ich lemmata*)
-  oops
+  by (simp add: konsensswap_sym)
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps initialwelt (Handlungsabsicht (abbauen n))\<close>
   by(code_simp)
