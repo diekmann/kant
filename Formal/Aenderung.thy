@@ -454,9 +454,7 @@ lemma aenderung_ausfuehren_abmachung_to_aenderung:
 lemma abmachung_ausfuehren_aenderung:
   fixes abmachung :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
   shows "abmachung_ausfuehren abmachung = aenderung_ausfuehren (abmachung_to_aenderung abmachung)"
-  apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
-  apply(intro allI, rename_tac p)
-  by (simp add: aenderung_ausfuehren_abmachung_to_aenderung)
+  by(simp add: abmachung_ausfuehren_def fun_eq_iff aenderung_ausfuehren_abmachung_to_aenderung)
 
 
 end
