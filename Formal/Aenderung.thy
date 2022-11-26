@@ -300,60 +300,34 @@ deutlich besser als
   ('person \<rightharpoonup> 'etwas::uminus
 darstellen, weil das viel eindeutiger ist.*)
 
-(*
 
-TODO
-TODO
-TODO
-TODO
+(* 'person \<Rightarrow> 'etwas::ordered_ab_group_add  
 
+Weil das hoffentlich eindeutig.
 
-Maps sind leider auch nicht eindeutig, weil None und 0 die gleiche Semantik haben.
-Ich muss auf 'person \<Rightarrow> 'etwas::ordered_ab_group_add wechseln!
-
-
-TODO
-TODO
-TODO
+(\<lambda>_. 0)[Alice := 3, Bob := -3] bedeutet Alice bekommt 3, Bob verliert 3
 *)
-
-type_synonym  ('person, 'etwas) abmachung = "'person \<rightharpoonup> 'etwas"
+type_synonym  ('person, 'etwas) abmachung = "'person \<Rightarrow> 'etwas"
 
 (*TODO: dedup mit aenderung_aenderung_map*)
 fun aenderung_map
   :: "('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) abmachung"
 where
-  "aenderung_map [] = Map.empty"
+  "aenderung_map [] = (\<lambda>p. 0)"
 | "aenderung_map (delta # deltas) = 
-   (case (aenderung_map deltas) (betroffen delta)
-      of None \<Rightarrow> (aenderung_map deltas)((betroffen delta) \<mapsto> aenderung_val delta)
-       | Some delta2 \<Rightarrow> (aenderung_map deltas)((betroffen delta) \<mapsto> (aenderung_val delta) + delta2)
-   )"
-(*TODO: 0 noch durch None ersetzen.*)
+   \<lbrakk>(aenderung_map deltas)(betroffen delta += aenderung_val delta)\<rbrakk>"
 
-lemma aenderung_map_simp_cons:
-"aenderung_map (delta # deltas)
-  = (aenderung_map deltas)(
-      (betroffen delta) \<mapsto>
-        (case (aenderung_map deltas) (betroffen delta) of None \<Rightarrow> aenderung_val delta
-                                                        | Some delta2 \<Rightarrow> (aenderung_val delta) + delta2)
-    )"
-  by (simp add: option.case_eq_if)
-
-declare aenderung_map.simps(2)[simp del]
 
 lemma aenderung_map_simp_call:
   "aenderung_map (delta # deltas) p =
     (if p = betroffen delta
-     then (case (aenderung_map deltas p) of None \<Rightarrow> Some (aenderung_val delta)
-                                          | Some delta2 \<Rightarrow> Some ((aenderung_val delta) + delta2))
+     then (aenderung_map deltas p) + (aenderung_val delta)
      else (aenderung_map deltas p))"
-  apply(simp add: aenderung_map_simp_cons)
-  by(simp split: option.split)
+  by(simp)
 
 
 lemma\<open>[aenderung_map [Gewinnt Alice (3::int)], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]
-= [[Alice \<mapsto> 3], [Alice \<mapsto> 3, Bob \<mapsto> -3]]\<close> by eval
+= [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
 
 
 fun abmachung_to_aenderung_list
@@ -361,8 +335,9 @@ fun abmachung_to_aenderung_list
 where
   "abmachung_to_aenderung_list [] _ = []"
 | "abmachung_to_aenderung_list (p#ps) a =
-    (case a p of None \<Rightarrow> abmachung_to_aenderung_list ps a
-               | Some i \<Rightarrow> (if i > 0 then Gewinnt p i else Verliert p (- i)) # abmachung_to_aenderung_list ps a
+    (if a p = 0
+     then abmachung_to_aenderung_list ps a
+     else (if a p > 0 then Gewinnt p (a p) else Verliert p (- (a p))) # abmachung_to_aenderung_list ps a
     )"
 
 definition abmachung_to_aenderung
@@ -370,7 +345,7 @@ definition abmachung_to_aenderung
 where
   "abmachung_to_aenderung \<equiv> abmachung_to_aenderung_list Enum.enum"
 
-lemma \<open>abmachung_to_aenderung [Alice \<mapsto> (3::int), Bob \<mapsto> -3] = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
+lemma \<open>abmachung_to_aenderung ((\<lambda>p.0)(Alice := (3::int), Bob := -3)) = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
 
 
 
@@ -387,11 +362,8 @@ lemma fixes as :: "('person::enum, int) aenderung list"
 
 
 lemma abmachung_to_aenderung_list_aenderung_map_not_in_ps:
-  "p \<notin> set ps \<Longrightarrow>  aenderung_map (abmachung_to_aenderung_list ps a) p = None"
-  apply(induction ps)
-   apply(simp)
-  apply(simp)
-  by (simp add: aenderung_map_simp_call option.case_eq_if)
+  "p \<notin> set ps \<Longrightarrow>  aenderung_map (abmachung_to_aenderung_list ps a) p = 0"
+  by(induction ps) simp+
 
 lemma abmachung_to_aenderung_list_not_in_ps:
   "p \<notin> set ps \<Longrightarrow>
@@ -399,36 +371,36 @@ lemma abmachung_to_aenderung_list_not_in_ps:
   apply(induction ps)
    apply(simp)
   apply(simp)
-  apply (safe)
-  apply(simp split: option.split)
-  done
+  by fastforce
+
+definition abmachung_dom :: "('person, 'etwas::zero) abmachung \<Rightarrow> 'person set" where
+  "abmachung_dom m = {a. m a \<noteq> 0}"
 
 lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
   fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
-  shows "dom a \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> aenderung_map (abmachung_to_aenderung_list ps a) = a"
+  shows "abmachung_dom a \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> aenderung_map (abmachung_to_aenderung_list ps a) = a"
   apply(induction ps arbitrary: a)
-   apply(simp)
+   apply(simp add: abmachung_dom_def)
+   apply fastforce
   apply(rename_tac p ps a)
   apply(simp)
-  apply(case_tac "a p")
-   apply(simp)
-   apply (simp add: domIff subset_insert; fail)
-  apply(simp)
-  apply(simp add: aenderung_map_simp_cons)
-  apply(case_tac "p \<notin> dom a")
-   apply(subgoal_tac "dom a \<subseteq> set ps")
-    apply blast
-   apply blast
-  apply(simp)
   apply(simp add: abmachung_to_aenderung_list_aenderung_map_not_in_ps)
-  apply(subgoal_tac "dom (a(p := None)) \<subseteq> set ps")
+  apply(case_tac "p \<notin> abmachung_dom a")
+   apply(subgoal_tac "abmachung_dom a \<subseteq> set ps")
+    apply(simp add: abmachung_dom_def; fail)
+   apply(simp add: abmachung_dom_def)
+   apply blast
+  apply(subgoal_tac "abmachung_dom (a(p := 0)) \<subseteq> set ps")
    prefer 2
-   subgoal by auto[1]
-  apply(subgoal_tac "aenderung_map (abmachung_to_aenderung_list ps (a)) = (a(p := None))")
+   apply(simp add: abmachung_dom_def)
+   apply blast
+  apply(subgoal_tac "aenderung_map (abmachung_to_aenderung_list ps a) = (a(p := 0))") (*instantiate IH*)
    prefer 2
-   using abmachung_to_aenderung_list_not_in_ps apply metis
    apply(simp)
-   by fastforce
+   apply (metis abmachung_to_aenderung_list_not_in_ps)
+  apply(simp)
+  by fastforce
+
   
 
 lemma aenderung_to_abmachung_abmachung_to_aenderung:
