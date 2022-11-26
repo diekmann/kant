@@ -385,7 +385,7 @@ lemma abmachung_to_aenderung_list_not_in_ps:
   done
 
 lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
-  fixes a :: "('person::enum, int) abmachung"
+  fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
   shows "dom a \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> aenderung_map (abmachung_to_aenderung_list ps a) = a"
   apply(induction ps arbitrary: a)
    apply(simp)
@@ -413,7 +413,7 @@ lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
   
 
 lemma aenderung_to_abmachung_abmachung_to_aenderung:
-  fixes a :: "('person::enum, int) abmachung"
+  fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
   shows "aenderung_to_abmachung (abmachung_to_aenderung a) = a"
   apply(simp add: abmachung_to_aenderung_def aenderung_to_abmachung_def)
   apply(rule aenderung_map_abmachung_to_aenderung_list_induct_helper)
