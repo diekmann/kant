@@ -87,7 +87,7 @@ subsection\<open>Ungültige Handlung\<close>
 subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
   fun stehlen_nichtwf :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>stehlen_nichtwf beute opfer dieb (Zahlenwelt besitz) =
-        Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))\<close>
+        Some (Zahlenwelt \<lbrakk>\<lbrakk>besitz(opfer -= beute)\<rbrakk>(dieb += beute)\<rbrakk>)\<close>
   text\<open>Die Handlung \<^const>\<open>stehlen\<close> diskriminiert und ist damit nicht wohlgeformt:\<close>
   lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel zahlenwps
       (Zahlenwelt (\<lambda>x. 0)) (Handlungsabsicht (stehlen_nichtwf 5 Bob))
@@ -107,7 +107,7 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
       \<open>stehlen_nichtwf2 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         (case opfer_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
            of None \<Rightarrow> None
-            | Some opfer \<Rightarrow> Some (Zahlenwelt (besitz(opfer -= beute)(dieb += beute)))
+            | Some opfer \<Rightarrow> Some (Zahlenwelt \<lbrakk>\<lbrakk>besitz(opfer -= beute)\<rbrakk>(dieb += beute)\<rbrakk>)
         )\<close>
   text\<open>Leider ist diese Funktion auch diskriminierend:
   Wenn es mehrere potenzielle Opfer mit dem gleichen Besitz gibt,
@@ -129,7 +129,7 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
 
  fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>schenken betrag empfaenger schenker (Zahlenwelt besitz) =
-        Some (Zahlenwelt (besitz(schenker -= betrag)(empfaenger += betrag)))\<close>
+        Some (Zahlenwelt \<lbrakk>\<lbrakk>besitz(schenker -= betrag)\<rbrakk>(empfaenger += betrag)\<rbrakk>)\<close>
   
   text\<open>Da wir ganze Zahlen verwenden und der Besitz auch beliebig negativ werden kann,
   ist Stehlen äquivalent dazu einen negativen Betrag zu verschenken:\<close>
@@ -144,7 +144,7 @@ subsection\<open>Nicht-Wohlgeformte Handlungen\<close>
 subsection\<open>Wohlgeformte Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
-    \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt (besitz(p += int i)))\<close>
+    \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt \<lbrakk>besitz(p += int i)\<rbrakk>)\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
     apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
     (*parse tree is

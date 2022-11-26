@@ -40,18 +40,20 @@ abbreviation joint_probability ("\<P>'(_ ; _') _") where
 "\<P>(X ; Y) x \<equiv> \<P>(\<lambda>x. (X x, Y x)) x
 *)
 
-(*TODO: this can produce ambiguous parse trees.*)
-abbreviation num_fun_add_syntax ("_ '(_ += _')") where
-  \<open>f(p += n) \<equiv> (f(p := (f p) + n))\<close>
+(*TODO: this can produce ambiguous parse trees.
+So I added those \<lbrakk>\<rbrakk>
+*)
+abbreviation num_fun_add_syntax ("\<lbrakk>_ '(_ += _')\<rbrakk>") where
+  \<open>\<lbrakk>f(p += n)\<rbrakk> \<equiv> (f(p := (f p) + n))\<close>
 
-abbreviation num_fun_minus_syntax ("_ '(_ -= _')") where
-  \<open>f(p -= n) \<equiv> (f(p := (f p) - n))\<close>
+abbreviation num_fun_minus_syntax ("\<lbrakk>_ '(_ -= _')\<rbrakk>") where
+  \<open>\<lbrakk>f(p -= n)\<rbrakk> \<equiv> (f(p := (f p) - n))\<close>
 
-lemma \<open>(\<^url>[Alice:=8, Bob:=3, Eve:= 5])(Bob += 4) Bob = 7\<close> by eval
-lemma \<open>(\<^url>[Alice:=8, Bob:=3, Eve:= 5])(Bob -= 4) Bob = -1\<close> by eval
+lemma \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob += 4)\<rbrakk> Bob = 7\<close> by eval
+lemma \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob -= 4)\<rbrakk> Bob = -1\<close> by eval
 
 
-lemma fixes n:: \<open>int\<close> shows \<open>f(p += n)(p -= n) = f\<close> by(simp)
+lemma fixes n:: \<open>int\<close> shows \<open>\<lbrakk>\<lbrakk>f(p += n)\<rbrakk>(p -= n)\<rbrakk> = f\<close> by(simp)
 
 
 text\<open>Diskriminierungsfrei eine \<^typ>\<open>'person\<close> eindeutig anhand Ihres Besitzes auswählen:\<close>
@@ -294,7 +296,7 @@ fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> 'person::enum \<Righta
   \<open>stehlen beute opfer_nach_besitz dieb besitz =
     (case opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz Enum.enum
        of None \<Rightarrow> None
-        | Some opfer \<Rightarrow> if opfer = dieb then None else Some (besitz(opfer -= beute)(dieb += beute))
+        | Some opfer \<Rightarrow> if opfer = dieb then None else Some \<lbrakk>\<lbrakk>besitz(opfer -= beute)\<rbrakk>(dieb += beute)\<rbrakk>
     )\<close>
 
 lemma wohlgeformte_handlungsabsicht_stehlen:

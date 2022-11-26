@@ -179,8 +179,8 @@ fun aenderung_ausfuehren
   :: "('person, 'etwas::{plus,minus}) aenderung list \<Rightarrow> ('person \<Rightarrow> 'etwas) \<Rightarrow> ('person \<Rightarrow> 'etwas)"
 where
   "aenderung_ausfuehren [] bes = bes"
-| "aenderung_ausfuehren (Verliert p n # deltas) bes = aenderung_ausfuehren deltas (bes(p -= n))"
-| "aenderung_ausfuehren (Gewinnt p n # deltas) bes = aenderung_ausfuehren deltas (bes(p += n))"
+| "aenderung_ausfuehren (Verliert p n # deltas) bes = aenderung_ausfuehren deltas \<lbrakk>bes(p -= n)\<rbrakk>"
+| "aenderung_ausfuehren (Gewinnt p n # deltas) bes = aenderung_ausfuehren deltas \<lbrakk>bes(p += n)\<rbrakk>"
 
 lemma
 \<open>aenderung_ausfuehren
@@ -404,7 +404,7 @@ lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
   apply(simp add: abmachung_to_aenderung_list_aenderung_map_not_in_ps)
   apply(subgoal_tac "dom (a(p := None)) \<subseteq> set ps")
    prefer 2
-   apply auto[1]
+   subgoal by auto[1]
   apply(subgoal_tac "aenderung_map (abmachung_to_aenderung_list ps (a)) = (a(p := None))")
    prefer 2
    using abmachung_to_aenderung_list_not_in_ps apply metis
@@ -431,11 +431,32 @@ where
 
 
 lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
+  shows "dom abmachung \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> 
+          aenderung_ausfuehren (abmachung_to_aenderung_list ps abmachung) welt p =
+    welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
+  apply(induction ps arbitrary: abmachung)
+   apply(simp; fail)
+  apply(simp)
+  apply(rename_tac pa ps abmachung)
+  apply(case_tac "abmachung pa")
+   apply(simp)
+   apply (simp add: domIff subset_insert; fail)
+  apply(simp)
+  oops
+
+lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
+  shows "aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt p = 
+    welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
+  apply(simp add: abmachung_to_aenderung_def)
+  oops
+
+lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
   shows "abmachung_ausfuehren abmachung welt = aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt"
   apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
   apply(intro allI, rename_tac p)
   apply(case_tac "abmachung p")
    apply(simp)
+  
   oops
 (*TODO!*)
 

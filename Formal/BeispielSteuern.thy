@@ -178,7 +178,7 @@ lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht (\<lambda>ic
 subsection\<open>Beispiel: Ich zahle 1 Steuer\<close>
 text\<open>Das funktioniert nicht:\<close>
 definition \<open>ich_zahle_1_steuer ich welt \<equiv>
-  Some (Steuerwelt ((get_einkommen welt)(ich -= 1)))\<close>
+  Some (Steuerwelt \<lbrakk>(get_einkommen welt)(ich -= 1)\<rbrakk>)\<close>
 lemma \<open>\<not> moralisch initialwelt maxime_steuern (Handlungsabsicht ich_zahle_1_steuer)\<close> by eval
 
 text\<open>Denn jeder muss Steuer zahlen!
