@@ -270,6 +270,23 @@ deutlich besser als
   ('person \<rightharpoonup> 'etwas::uminus
 darstellen, weil das viel eindeutiger ist.*)
 
+(*
+
+TODO
+TODO
+TODO
+TODO
+
+
+Maps sind leider auch nicht eindeutig, weil None und 0 die gleiche Semantik haben.
+Ich muss auf 'person \<Rightarrow> 'etwas::ordered_ab_group_add wechseln!
+
+
+TODO
+TODO
+TODO
+*)
+
 text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> in eine \<^typ>\<open>('person, 'etwas) aenderung set\<close>
 zu übersetzen ist nicht trivial, da Die Liste mehrere Änderungen der gleichen Person
 enthalten kann, welche gemerged werden müssen.\<close>
@@ -434,15 +451,22 @@ lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_a
   shows "dom abmachung \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> 
           aenderung_ausfuehren (abmachung_to_aenderung_list ps abmachung) welt p =
     welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
-  apply(induction ps arbitrary: abmachung)
+  apply(induction ps arbitrary: abmachung welt)
    apply(simp; fail)
   apply(simp)
-  apply(rename_tac pa ps abmachung)
+  apply(rename_tac pa ps abmachung welt)
   apply(case_tac "abmachung pa")
    apply(simp)
    apply (simp add: domIff subset_insert; fail)
   apply(simp)
-  oops
+  apply(subgoal_tac "dom (abmachung(pa := None)) \<subseteq> set ps")
+   prefer 2
+  subgoal by auto[1]
+  apply(subgoal_tac "aenderung_ausfuehren (abmachung_to_aenderung_list ps (abmachung(pa := None))) welt p =
+           welt p + (case (abmachung(pa := None)) p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)")
+   prefer 2   apply blast
+  by (smt (verit) abmachung_to_aenderung_list_not_in_ps fun_upd_other fun_upd_same option.simps(4) option.simps(5))
+
 
 lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
   shows "aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt p = 
