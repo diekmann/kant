@@ -35,13 +35,30 @@ fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> wh
 lemma \<open>meins Carol initialwelt = -3\<close> by eval
 
 
+(*TODO: upstream*)
+definition konsensswap
+:: "'person \<Rightarrow> 'person \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
+    \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
+  where
+"konsensswap p1 p2 kons \<equiv> swap p1 p2 ((map (swap p1 p2)) \<circ> kons)"
+
+lemma konsensswap_id[simp]: "konsensswap p1 p2 (konsensswap p1 p2 kons) = kons"
+  apply(simp add: konsensswap_def)
+  apply(subst swap_fun_map_comp_id)
+  by simp
+
+lemma konsensswap_sym: "konsensswap p1 p2 = konsensswap p2 p1"
+  by(simp add: fun_eq_iff konsensswap_def swap_symmetric)
+
+
+
 
 
 definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt = 
       welt\<lparr> besitz := swap p1 p2 (besitz welt),
-            konsens := swap p1 p2 ((map (swap p1 p2)) \<circ> (konsens welt)) \<rparr>\<close>
-(*TODO: brauche konsens swap helper*)
+            konsens := konsensswap p1 p2 (konsens welt) \<rparr>\<close>
+
 
 lemma \<open>zahlenwps Alice Bob initialwelt
 = \<lparr>
@@ -66,16 +83,12 @@ lemma \<open>zahlenwps Alice Carol initialwelt
 
 
 
-
-
 lemma zahlenwps_id: "zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt"
-  apply(simp add: zahlenwps_def)
-  apply(subst swap_fun_map_comp_id)
-  by simp
+  by(simp add: zahlenwps_def)
 
 lemma zahlenwps_sym: "zahlenwps p1 p2 = zahlenwps p2 p1"
   apply(simp add: fun_eq_iff zahlenwps_def)
-  by (simp add: swap_symmetric)
+  by (simp add: swap_symmetric konsensswap_sym)
   
 
 
@@ -253,7 +266,7 @@ lemma swap_aenderung_ausfuehren:
 lemma "map_option (zahlenwps p1 p2) (existierende_abmachung_einloesen p1 welt)
   = existierende_abmachung_einloesen p2 (zahlenwps p1 p2 welt)"
   apply(simp add: existierende_abmachung_einloesen_def)
-  apply(simp add: zahlenwps_def swap_b)
+  apply(simp add: zahlenwps_def swap_b konsensswap_def)
   apply(case_tac "konsens welt p1")
    apply(simp; fail)
   apply(simp)
@@ -355,8 +368,7 @@ fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt opt
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
   apply(simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
-  apply(simp add: zahlenwps_def)
-  apply (simp add: swap_fun_map_comp_id swap_symmetric)
+  apply(simp add: zahlenwps_def konsensswap_sym)
   apply(simp add: swap_def fun_eq_iff)
   done
   
