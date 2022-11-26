@@ -416,53 +416,48 @@ lemma aenderung_to_abmachung_abmachung_to_aenderung:
 definition abmachung_ausfuehren
   :: "('person, 'etwas::{plus,minus}) abmachung \<Rightarrow> ('person \<Rightarrow> 'etwas) \<Rightarrow> ('person \<Rightarrow> 'etwas)"
 where
-  "abmachung_ausfuehren a besitz \<equiv>
-      \<lambda>p. case a p of None \<Rightarrow> besitz p
-                    | Some b' \<Rightarrow> (besitz p) + b'"
+  "abmachung_ausfuehren a besitz \<equiv> \<lambda>p. a p + (besitz p)"
 
 
 lemma aenderung_ausfuehren_abmachung_to_aenderung_induction_helper:
   fixes welt :: "'person::enum \<Rightarrow> 'etwas::ordered_ab_group_add"
-  shows "dom abmachung \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> 
+  shows "abmachung_dom abmachung \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> 
           aenderung_ausfuehren (abmachung_to_aenderung_list ps abmachung) welt p =
-    welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
+            welt p + (abmachung p)"
   apply(induction ps arbitrary: abmachung welt)
-   apply(simp; fail)
+   apply(simp add: abmachung_dom_def; fail)
   apply(simp)
   apply(rename_tac pa ps abmachung welt)
-  apply(case_tac "abmachung pa")
-   apply(simp)
-   apply (simp add: domIff subset_insert; fail)
-  apply(simp)
-  apply(subgoal_tac "dom (abmachung(pa := None)) \<subseteq> set ps")
+  apply(subgoal_tac "abmachung_dom (abmachung(pa := 0)) \<subseteq> set ps")
    prefer 2
-  subgoal by auto[1]
-  apply(subgoal_tac "aenderung_ausfuehren (abmachung_to_aenderung_list ps (abmachung(pa := None))) welt p =
-           welt p + (case (abmachung(pa := None)) p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)")
-   prefer 2   apply blast
-  by (smt (verit) abmachung_to_aenderung_list_not_in_ps add.right_neutral fun_upd_other fun_upd_same option.simps(4) option.simps(5))
-
+  subgoal
+    apply(simp add: abmachung_dom_def)
+    by blast
+  apply(subgoal_tac "aenderung_ausfuehren (abmachung_to_aenderung_list ps (abmachung(pa := 0))) welt p =
+           welt p + (abmachung(pa := 0)) p")
+   prefer 2
+   apply blast
+  by (metis (no_types, lifting) abmachung_to_aenderung_list_not_in_ps add.right_neutral fun_upd_other fun_upd_same)
+  
 
 
 lemma aenderung_ausfuehren_abmachung_to_aenderung:
   fixes welt :: "'person::enum \<Rightarrow> 'etwas::ordered_ab_group_add"
-  shows "aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt p = 
-    welt p + (case abmachung p of None \<Rightarrow> 0 | Some d \<Rightarrow> d)"
+  shows "aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt p = welt p + (abmachung p)"
   apply(simp add: abmachung_to_aenderung_def)
   apply(rule aenderung_ausfuehren_abmachung_to_aenderung_induction_helper)
    apply(simp add: enum_class.enum_UNIV)
   apply(simp add: enum_class.enum_distinct)
   done
 
-lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
-  shows "abmachung_ausfuehren abmachung welt = aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt"
+(*TODO: does this make a good [code] rule?*)
+lemma abmachung_ausfuehren_TODO_DOESTHISGICVEMECODE:
+  fixes abmachung :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
+  shows "abmachung_ausfuehren abmachung = aenderung_ausfuehren (abmachung_to_aenderung abmachung)"
   apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
   apply(intro allI, rename_tac p)
-  apply(case_tac "abmachung p")
-   apply(simp)
-  
-  oops
-(*TODO!*)
+  by (simp add: aenderung_ausfuehren_abmachung_to_aenderung)
+
 
 end
 (*>*)
