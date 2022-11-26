@@ -97,6 +97,15 @@ definition aenderung_val :: "('person, ('etwas::uminus)) aenderung \<Rightarrow>
 lemma "aenderung_val (Verliert Alice (2::int)) = -2" by eval
 lemma "aenderung_val (Gewinnt Alice (2::int)) = 2" by eval
 
+lemma betroffen_simps[simp]:
+  "betroffen (Gewinnt a ab) = a"
+  "betroffen (Verliert a ab) = a"
+  by(simp add: betroffen_def)+
+lemma aenderung_val_simps[simp]:
+  "aenderung_val (Gewinnt a ab) = ab"
+  "aenderung_val (Verliert a ab) = -ab"
+  by(simp add: aenderung_val_def)+
+
 fun delta_num_map
   :: \<open>(('person::enum \<rightharpoonup> ('etwas::{zero,minus,ord})), 'person, 'etwas) delta\<close>
   where
@@ -303,6 +312,26 @@ where
    )"
 (*TODO: 0 noch durch None ersetzen.*)
 
+lemma aenderung_map_simp_cons:
+"aenderung_map (delta # deltas)
+  = (aenderung_map deltas)(
+      (betroffen delta) \<mapsto>
+        (case (aenderung_map deltas) (betroffen delta) of None \<Rightarrow> aenderung_val delta
+                                                        | Some delta2 \<Rightarrow> (aenderung_val delta) + delta2)
+    )"
+  by (simp add: option.case_eq_if)
+
+declare aenderung_map.simps(2)[simp del]
+
+lemma aenderung_map_simp_call:
+  "aenderung_map (delta # deltas) p =
+    (if p = betroffen delta
+     then (case (aenderung_map deltas p) of None \<Rightarrow> Some (aenderung_val delta)
+                                          | Some delta2 \<Rightarrow> Some ((aenderung_val delta) + delta2))
+     else (aenderung_map deltas p))"
+  apply(simp add: aenderung_map_simp_cons)
+  by(simp split: option.split)
+
 
 lemma\<open>[aenderung_map [Gewinnt Alice (3::int)], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]
 = [[Alice \<mapsto> 3], [Alice \<mapsto> 3, Bob \<mapsto> -3]]\<close> by eval
@@ -325,6 +354,90 @@ where
 lemma \<open>abmachung_to_aenderung [Alice \<mapsto> (3::int), Bob \<mapsto> -3] = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
 
 
+
+definition aenderung_to_abmachung
+  :: "('person, 'etwas) aenderung list \<Rightarrow> ('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) abmachung"
+where
+  "aenderung_to_abmachung \<equiv> aenderung_map"
+
+
+lemma fixes as :: "('person::enum, int) aenderung list"
+  shows "abmachung_to_aenderung (aenderung_to_abmachung as) = as"
+  (* nitpick as = [Verliert person\<^sub>1 (- 1)] *)
+  oops (*gilt nicht, weil aenderungen nicht eindeutig*)
+
+
+lemma abmachung_to_aenderung_list_aenderung_map_not_in_ps:
+  "p \<notin> set ps \<Longrightarrow>  aenderung_map (abmachung_to_aenderung_list ps a) p = None"
+  apply(induction ps)
+   apply(simp)
+  apply(simp)
+  by (simp add: aenderung_map_simp_call option.case_eq_if)
+
+lemma abmachung_to_aenderung_list_not_in_ps:
+  "p \<notin> set ps \<Longrightarrow>
+       abmachung_to_aenderung_list ps (a(p := v)) = abmachung_to_aenderung_list ps a"
+  apply(induction ps)
+   apply(simp)
+  apply(simp)
+  apply (safe)
+  apply(simp split: option.split)
+  done
+
+lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
+  fixes a :: "('person::enum, int) abmachung"
+  shows "dom a \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> aenderung_map (abmachung_to_aenderung_list ps a) = a"
+  apply(induction ps arbitrary: a)
+   apply(simp)
+  apply(rename_tac p ps a)
+  apply(simp)
+  apply(case_tac "a p")
+   apply(simp)
+   apply (simp add: domIff subset_insert; fail)
+  apply(simp)
+  apply(simp add: aenderung_map_simp_cons)
+  apply(case_tac "p \<notin> dom a")
+   apply(subgoal_tac "dom a \<subseteq> set ps")
+    apply blast
+   apply blast
+  apply(simp)
+  apply(simp add: abmachung_to_aenderung_list_aenderung_map_not_in_ps)
+  apply(subgoal_tac "dom (a(p := None)) \<subseteq> set ps")
+   prefer 2
+   apply auto[1]
+  apply(subgoal_tac "aenderung_map (abmachung_to_aenderung_list ps (a)) = (a(p := None))")
+   prefer 2
+   using abmachung_to_aenderung_list_not_in_ps apply metis
+   apply(simp)
+   by fastforce
+  
+
+lemma aenderung_to_abmachung_abmachung_to_aenderung:
+  fixes a :: "('person::enum, int) abmachung"
+  shows "aenderung_to_abmachung (abmachung_to_aenderung a) = a"
+  apply(simp add: abmachung_to_aenderung_def aenderung_to_abmachung_def)
+  apply(rule aenderung_map_abmachung_to_aenderung_list_induct_helper)
+   apply(simp add: enum_class.enum_UNIV)
+  apply(simp add: enum_class.enum_distinct)
+  done
+
+
+definition abmachung_ausfuehren
+  :: "('person, 'etwas::{plus,minus}) abmachung \<Rightarrow> ('person \<Rightarrow> 'etwas) \<Rightarrow> ('person \<Rightarrow> 'etwas)"
+where
+  "abmachung_ausfuehren a besitz \<equiv>
+      \<lambda>p. case a p of None \<Rightarrow> besitz p
+                    | Some b' \<Rightarrow> (besitz p) + b'"
+
+
+lemma fixes welt :: "'person::enum \<Rightarrow> int" (*TODO: ordered_ab_group_add*)
+  shows "abmachung_ausfuehren abmachung welt = aenderung_ausfuehren (abmachung_to_aenderung abmachung) welt"
+  apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
+  apply(intro allI, rename_tac p)
+  apply(case_tac "abmachung p")
+   apply(simp)
+  oops
+(*TODO!*)
 
 end
 (*>*)
