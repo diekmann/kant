@@ -5,8 +5,8 @@ begin
 section\<open>Schleier des Nichtwissens\<close>
 text\<open>
 Rawls' Schleier des Nichtwissens \<^url>\<open>https://de.wikipedia.org/wiki/Schleier_des_Nichtwissens\<close>
-ist ein fiktives Modell,
->> über die zukünftige Gesellschaftsordnung entscheiden können,
+ist ein fiktives Modell, in der Personen
+>>über die zukünftige Gesellschaftsordnung entscheiden können,
 aber selbst nicht wissen,
 an welcher Stelle dieser Ordnung sie sich später befinden werden,
 also unter einem „Schleier des Nichtwissens“ stehen.<< Quote wikipedia

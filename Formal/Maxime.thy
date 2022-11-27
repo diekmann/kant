@@ -48,7 +48,7 @@ Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) han
 
 
 Kant unterscheidet unter Anderem
-"zwischen {\guillemotright}apriorischen{\guillemotleft} und {\guillemotright}empirischen{\guillemotleft} Urteilen" \cite{russellphi}.
+"zwischen >>apriorischen<< und >>empirischen<< Urteilen" \cite{russellphi}.
 Wenn wir uns den Typ \<^typ>\<open>'world handlung\<close> als Beobachtung der Welt \<^const>\<open>vorher\<close> und \<^const>\<open>nachher\<close> anschauen,
 dann könnte man sagen, unser Moralbegriff der \<^const>\<open>Maxime\<close> sei empirisch.
 Für Kant gilt jedoch:
