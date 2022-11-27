@@ -57,6 +57,7 @@ fordern wir einfach, dass die Maxime für aller Personen erfüllt sein muss.\<cl
 (*TODO: gegen moralisch beweisen?
 und erklaeren! Warum \<forall>
 Macht eine maxime unabhängig von der person*)
+(*TODO: upstream nach Maxime und katImp beweis!*)
 fun maximeNeutralisieren :: \<open>('person, 'world) maxime \<Rightarrow> ('world handlung \<Rightarrow> bool)\<close> where
   \<open>maximeNeutralisieren (Maxime m) = (\<lambda>welt. \<forall>p::'person. m p welt)\<close>
 
@@ -207,5 +208,14 @@ theorem
   apply(auto simp add: bevoelkerung_def)
   done
 
+
+text\<open>
+"Wie zu erwarten, will Kant nichts vom Utilitarismus oder sonstigen Lehren wissen,
+die der Moral einen außerhalb ihrer selbst liegenden Zweck zuschreiben" \cite{russellphi}.
+Die eben bewiesene Konsitenz von Gesinnungsethik und Verantwortungsethik zeigt,
+das unsere Grunddefinition bereits eine Formalisierung des Kategorischen Imperativs
+komplett im strengen Sinne Kants ausschließen.
+Dennoch finde ich unsere Interpretation bis jetzt nicht abwegig.
+\<close>
 
 end

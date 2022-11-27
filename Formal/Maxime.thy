@@ -46,12 +46,28 @@ Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'world 
 die nur durch ihre Folgen gegeben ist.
 Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungsabsicht\<close>.
 
+
+Kant unterscheidet unter Anderem
+"zwischen {\guillemotright}apriorischen{\guillemotleft} und {\guillemotright}empirischen{\guillemotleft} Urteilen" \cite{russellphi}.
+Wenn wir uns den Typ \<^typ>\<open>'world handlung\<close> als Beobachtung der Welt \<^const>\<open>vorher\<close> und \<^const>\<open>nachher\<close> anschauen,
+dann könnte man sagen, unser Moralbegriff der \<^const>\<open>Maxime\<close> sei empirisch.
+Für Kant gilt jedoch:
+"Alle Moralbegriffe [...] haben \<^emph>\<open>a priori\<close> ihren Sitz und Ursprung ausschließlich in der Vernunft" \cite{russellphi}.
+Hier widerspricht unser Modell wieder Kant, da unser modell empirisch ist und nich apriorisch.
+
+
 Dies mag nun als Fehler in unserem Modell verstanden werden.
 Doch irgendwo müssen wir praktisch werden.
 Nur von Handlungsabsichten zu reden, ohne dass die beabsichtigten Folgen betrachtet werden
 ist mir einfach zu abstrakt und nicht greifbar.
 
-Kants kategorischer Imperativ und die Goldene Regel grundverschieden:
+
+Alles ist jedoch nicht verloren, denn "Alle rein mathematischen Sätze sind [...] apriorisch" \cite{russellphi}.
+Und auch Russel schlussfolgert:
+"Um ein ausreichendes Kriterium zu gewinnen, müßten wir Kants rein formalen Standpunkt aufgeben
+und die Wirkung der Handlungen in Betracht ziehen" \cite{russellphi}.
+
+Auch Kants kategorischer Imperativ und die Goldene Regel sind grundverschieden:
 \<^url>\<open>https://web.archive.org/web/20220123174117/https://www.goethegymnasium-hildesheim.de/index.php/faecher/faecher/gesellschaftswissenschaften/philosophie\<close>
 Dennoch, betrachten wir den kategorischen Imperativ als eine Verallgemeinerung
 der goldenen Regel.
@@ -285,7 +301,7 @@ lemma \<open>debug_maxime show_map
 
 
 subsection\<open>Maximen Kombinieren\<close>
-
+text\<open>Konjunktion (Und) zweier Maximen.\<close>
 fun MaximeConj
   :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
   where
@@ -307,9 +323,11 @@ lemma moralisch_MaximeConj_True:
   "\<not> moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. False))) ha"
   by(simp add: moralisch_simp okay_MaximeConj)
 
+(*<*)
 declare MaximeConj.simps[simp del]
+(*>*)
 
-
+text\<open>Disjunktion (Oder) zweier Maximen.\<close>
 fun MaximeDisj
   :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
   where
@@ -343,7 +361,8 @@ lemma moralisch_MaximeDisj_True:
   "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. True))) ha"
   by(simp add: moralisch_simp okay_MaximeDisj)
 
-
+(*<*)
 declare MaximeDisj.simps[simp del]
+(*>*)
 
 end

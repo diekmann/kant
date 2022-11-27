@@ -246,7 +246,7 @@ lemma steuersystem_imp_maxime:
    apply(simp; fail)
   by (simp add: steuer_defs.netto_def)
 
-
+(*<*)
 text\<open>Danke ihr nats. Macht also keinen Sinn das als Annahme in die Maxime zu packen....\<close>
 lemma steuern_kleiner_einkommen_nat:
       \<open>steuerlast ich (Handlung welt (jeder_zahlt steuersystem_impl ich welt))
@@ -255,8 +255,10 @@ lemma steuern_kleiner_einkommen_nat:
   apply(subst steuerlast.simps)
   apply(simp add: jeder_zahlt_def)
   done
+(*>*)
 
-(*Braucht ein paar Annahmen.*)
+
+text\<open>Mit genug zusätzlichen Annahmen gilt auch die Rückrichtung:\<close>
 lemma maxime_imp_steuersystem:
     \<open>(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
        (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
@@ -308,6 +310,19 @@ next
         \<Longrightarrow> einkommen \<le> 9888 \<Longrightarrow> steuersystem_impl einkommen = 0\<close>
     by simp
 qed
+
+text\<open>
+Dass die eine Richtung gilt (Maxime impliziert \<^const>\<open>steuersystem\<close>),
+die andere Richtung (\<^const>\<open>steuersystem\<close> impliziert Maxime) jedoch nicht ohne weiter Annahmen,
+stimmt auch mit Russels Beobachtung überein:
+"Kants Maxime [das allgemeine Konzept, nicht meine Implementierung]
+scheint tatsächlich ein notwendiges, jedoch nicht \<^emph>\<open>ausreichendes\<close> Kriterium der Tugens zu geben"
+\cite{russellphi}.
+Insbesondere Russels Folgesatz freut mich, da er mir bestätigt, dass unsere extensionale
+Betrachtung von Handlungen vielversprechend ist:
+"Um ein ausreichendes Kriterium zu gewinnen, müßten wir Kants rein formalen Standpunkt aufgeben
+und die Wirkung der Handlungen in Betracht ziehen" \cite{russellphi}.
+\<close>
 
 
 text\<open>
