@@ -97,8 +97,19 @@ definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<R
 where
   "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
 
+lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
+proof -
+  have "concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as" for as
+    by(induction as) auto
+  thus ?thesis
+    by(simp add: abmachungs_betroffene_def)
+qed
+lemma abmachungs_betroffene_distinct: "distinct (abmachungs_betroffene a)"
+  apply(simp add: abmachungs_betroffene_simp)
+  using enum_class.enum_distinct distinct_filter by blast
+
 lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = abmachung_dom a"
-  by(simp add: abmachung_dom_def abmachungs_betroffene_def enum_class.enum_UNIV)
+  by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
 
 
 lemma \<open>abmachungs_betroffene (aenderung_map [Gewinnt Bob (3::int), Verliert Alice 3])
@@ -217,28 +228,20 @@ lemma konsens_entfernen_fold_induct_helper:
    apply(simp)
   apply blast
   done
-
-
-lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
-  oops (*TODO*)
-lemma "distinct (abmachungs_betroffene a)"
-  apply(simp add: abmachungs_betroffene_def)
-  oops (*need better simp rule!*)
 lemma konsens_entfernen_simp:
-  (*TODO: das muss gelten!*)
   "konsens_entfernen a kons = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
   apply(simp add: konsens_entfernen_def fun_eq_iff)
   apply(intro allI conjI impI)
    apply(subst konsens_entfernen_fold_induct_helper, simp_all)
-   defer
+   apply(simp add: abmachungs_betroffene_distinct)
   apply(simp add: konsens_entfernen_fold_induct_helper_helper)
-  oops
+  done
 
 
 
 
 thm list.induct
-(*why is this not in the std lib? *)
+(*why is this not in the std lib? Well, because this is not really helpful*)
 lemma enum_induct:
   "P [] \<Longrightarrow> (\<And>x xs. P xs \<Longrightarrow> P (x # xs)) \<Longrightarrow> P enum_class.enum"
   by (metis list_nonempty_induct) (*lol wut?*)
@@ -246,13 +249,13 @@ lemma enum_induct:
 lemma
   "konsensswap p2 p1 (konsens_entfernen (swap p1 p2 a) (konsensswap p1 p2 kons))
     = konsens_entfernen a kons"
-  apply(simp add: konsens_entfernen_def)
-  apply(simp add: abmachungs_betroffene_def)
+  apply(simp add: konsens_entfernen_simp fun_eq_iff)
+ (* apply(simp add: abmachungs_betroffene_def)
   apply(rule enum_induct) (*why no induct?*)
   apply(simp)
    apply (simp add: konsensswap_sym; fail)
   apply(simp)
-  apply(safe)
+  apply(safe)*)
   oops
 
 
