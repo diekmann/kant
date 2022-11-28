@@ -418,6 +418,10 @@ definition abmachung_ausfuehren
 where
   "abmachung_ausfuehren a besitz \<equiv> \<lambda>p. a p + (besitz p)"
 
+lemma abmachung_ausfuehren_swap:
+  "abmachung_ausfuehren (swap p1 p2 a) (swap p1 p2 welt)
+    = swap p2 p1 (abmachung_ausfuehren a welt)"
+  by(auto simp add: abmachung_ausfuehren_def swap_def)
 
 lemma aenderung_ausfuehren_abmachung_to_aenderung_induction_helper:
   fixes welt :: "'person::enum \<Rightarrow> 'etwas::ordered_ab_group_add"
