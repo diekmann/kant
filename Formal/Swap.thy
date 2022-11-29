@@ -90,4 +90,21 @@ lemma min_list_swap_int_enum:
   apply(subst min_list_swap_int)
   by(simp_all add: enum_class.enum_UNIV)
 
+lemma remove1_swap:
+  "remove1 (swap p1 p2 a) (map (swap p1 p2) ks)
+    = map (swap p1 p2) (remove1 a ks)"
+  apply(induction ks)
+   apply(simp)
+  apply(simp)
+  by (metis swap2)
+
+lemma remove1_swap2:
+  "map (swap p1 p2) (remove1 (swap p1 p2 a) (map (swap p1 p2) ks))
+    =  remove1 a ks"
+  apply(induction ks)
+   apply(simp)
+  apply(simp add: comp_def)
+  by (metis (mono_tags, lifting) swap2)
+
+
 end

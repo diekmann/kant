@@ -50,6 +50,10 @@ lemma konsensswap_id[simp]: "konsensswap p1 p2 (konsensswap p1 p2 kons) = kons"
 lemma konsensswap_sym: "konsensswap p1 p2 = konsensswap p2 p1"
   by(simp add: fun_eq_iff konsensswap_def swap_symmetric)
 
+lemma konsensswap_apply:
+  "konsensswap p1 p2 kons p =  map (swap p1 p2) (swap p1 p2 kons p)"
+  apply(simp add: konsensswap_def comp_def)
+  by (metis swap_a swap_b swap_nothing)
 
 
 
@@ -97,6 +101,9 @@ definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<R
 where
   "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
 
+lemma \<open>abmachungs_betroffene (aenderung_map [Gewinnt Bob (3::int), Verliert Alice 3])
+  = [Alice, Bob]\<close> by eval
+
 lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
 proof -
   have "concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as" for as
@@ -104,6 +111,7 @@ proof -
   thus ?thesis
     by(simp add: abmachungs_betroffene_def)
 qed
+
 lemma abmachungs_betroffene_distinct: "distinct (abmachungs_betroffene a)"
   apply(simp add: abmachungs_betroffene_simp)
   using enum_class.enum_distinct distinct_filter by blast
@@ -111,9 +119,14 @@ lemma abmachungs_betroffene_distinct: "distinct (abmachungs_betroffene a)"
 lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = abmachung_dom a"
   by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
 
+lemma set_abmachungs_betroffene_swap:
+  "set (abmachungs_betroffene (swap p1 p2 a)) = (swap p1 p2 id) ` set (abmachungs_betroffene a)"
+  apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  apply(simp add: swap_def)
+  by fast
 
-lemma \<open>abmachungs_betroffene (aenderung_map [Gewinnt Bob (3::int), Verliert Alice 3])
-  = [Alice, Bob]\<close> by eval
 
 
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
@@ -229,7 +242,8 @@ lemma konsens_entfernen_fold_induct_helper:
   apply blast
   done
 lemma konsens_entfernen_simp:
-  "konsens_entfernen a kons = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
+  "konsens_entfernen a kons
+    = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
   apply(simp add: konsens_entfernen_def fun_eq_iff)
   apply(intro allI conjI impI)
    apply(subst konsens_entfernen_fold_induct_helper, simp_all)
@@ -238,7 +252,12 @@ lemma konsens_entfernen_simp:
   done
 
 
-
+(*TODO: upstream*)
+  
+lemma remove1_konsensswap:
+  "remove1 (swap p1 p2 a) (konsensswap p1 p2 kons p)
+    = map (swap p1 p2) (remove1 a (swap p1 p2 kons p))"
+  by(simp add: konsensswap_apply remove1_swap)
 
 thm list.induct
 (*why is this not in the std lib? Well, because this is not really helpful*)
@@ -246,17 +265,35 @@ lemma enum_induct:
   "P [] \<Longrightarrow> (\<And>x xs. P xs \<Longrightarrow> P (x # xs)) \<Longrightarrow> P enum_class.enum"
   by (metis list_nonempty_induct) (*lol wut?*)
 
-lemma
+(*TODO: upstream*)
+lemma swap_if_move_inner:
+  "swap p2 p1 (\<lambda>p. if P p then A p else B p)
+    = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))"
+  by(simp add: swap_def fun_eq_iff)
+  
+lemma swap_id_in_set:
+  "swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A"
+  by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
+  
+
+lemma konsens_entfernen_konsensswap:
   "konsensswap p2 p1 (konsens_entfernen (swap p1 p2 a) (konsensswap p1 p2 kons))
     = konsens_entfernen a kons"
   apply(simp add: konsens_entfernen_simp fun_eq_iff)
- (* apply(simp add: abmachungs_betroffene_def)
-  apply(rule enum_induct) (*why no induct?*)
-  apply(simp)
-   apply (simp add: konsensswap_sym; fail)
-  apply(simp)
-  apply(safe)*)
-  oops
+  apply(safe)
+   apply(simp add: set_abmachungs_betroffene_swap)
+   apply(simp add: konsensswap_apply)
+   apply(simp add: swap_if_move_inner)
+   apply(simp add: swap_id_in_set)
+   apply(subst(2) remove1_swap2[of p1 p2, symmetric])
+   apply(auto simp add: konsensswap_apply swap_def)[1] (*wants helper*)
+
+  apply(simp add: set_abmachungs_betroffene_swap)
+  apply(simp add: konsensswap_apply)
+  apply(simp add: swap_if_move_inner)
+  apply(simp add: swap_id_in_set)
+  apply(simp add: konsensswap_apply swap_def comp_def)
+  by (simp add: list.map_ident_strong)
 
 
 (*TODO:
