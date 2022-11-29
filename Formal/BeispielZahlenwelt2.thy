@@ -359,8 +359,8 @@ lemma zahlenwelt_abmachung_ausfuehren_swap:
     apply(simp add: BeispielZahlenwelt2.abmachung_ausfuehren_def)
   by(simp add: zahlenwps_def abmachung_ausfuehren_swap konsensswap_sym)
 
-lemma
-  " map_option (zahlenwps p2 p1) (existierende_abmachung_einloesen p2 (zahlenwps p1 p2 welt)) =
+lemma existierende_abmachung_einloesen_map_zahlenwps:
+  "map_option (zahlenwps p2 p1) (existierende_abmachung_einloesen p2 (zahlenwps p1 p2 welt)) =
     existierende_abmachung_einloesen p1 welt"
   apply(simp add: existierende_abmachung_einloesen_def)
   apply(simp add: zahlenwps_def swap_b konsensswap_def)
@@ -371,14 +371,14 @@ lemma
   apply(safe)
   apply(simp add: zahlenwelt_abmachung_ausfuehren_swap)
 
-  apply(simp add: zahlenwps_def)
-  oops (*TODO*)
+  apply(simp add: zahlenwps_def konsens_entfernen_konsensswap)
+  done
 
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
   apply(cases welt, simp)
-  oops(*TODO*)
+  using existierende_abmachung_einloesen_map_zahlenwps by simp
 
 
 
