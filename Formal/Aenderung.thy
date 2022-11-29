@@ -373,8 +373,17 @@ lemma abmachung_to_aenderung_list_not_in_ps:
   apply(simp)
   by fastforce
 
+
 definition abmachung_dom :: "('person, 'etwas::zero) abmachung \<Rightarrow> 'person set" where
   "abmachung_dom m = {a. m a \<noteq> 0}"
+
+lemma abmachung_dom_swap:
+  "abmachung_dom (swap p1 p2 a) = (swap p1 p2 id) ` (abmachung_dom a)"
+  apply(simp add: abmachung_dom_def)
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  apply(simp add: swap_def)
+  by fast
 
 lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
   fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
@@ -400,8 +409,6 @@ lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
    apply (metis abmachung_to_aenderung_list_not_in_ps)
   apply(simp)
   by fastforce
-
-  
 
 lemma aenderung_to_abmachung_abmachung_to_aenderung:
   fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"

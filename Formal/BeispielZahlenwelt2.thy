@@ -135,17 +135,6 @@ where
       abmachung \<in> set (konsens welt betroffene_person)"
 
 
-(*upstream*)
-text\<open>\<^const>\<open>swap\<close> funktioniert auch auf Mengen.\<close>
-lemma "(swap Alice Carol id) ` {Alice, Bob} = {Carol, Bob}" by eval
-
-lemma abmachung_dom_swap:
-  "abmachung_dom (swap p1 p2 a) = (swap p1 p2 id) ` (abmachung_dom a)"
-  apply(simp add: abmachung_dom_def)
-  apply(simp add: image_def)
-  apply(rule Collect_cong)
-  apply(simp add: swap_def)
-  by fast
 
 lemma enthaelt_konsens_swap:
   "enthaelt_konsens (swap p1 p2 a) (zahlenwps p1 p2 welt) = enthaelt_konsens a welt" 
@@ -225,7 +214,7 @@ lemma \<open>konsens_entfernen (aenderung_map [Gewinnt Alice 3, Verliert Bob 3])
     Bob := [])\<close>
   by eval
 
-
+(*<*)
 lemma konsens_entfernen_fold_induct_helper_helper:
   "a \<notin> set as \<Longrightarrow> fold (\<lambda>a k. k(a := f (k a))) as kons a = kons a"
   by(induction as arbitrary: kons) simp+
@@ -241,6 +230,8 @@ lemma konsens_entfernen_fold_induct_helper:
    apply(simp)
   apply blast
   done
+(*>*)
+text\<open>Alternative Definition:\<close>
 lemma konsens_entfernen_simp:
   "konsens_entfernen a kons
     = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
@@ -251,30 +242,11 @@ lemma konsens_entfernen_simp:
   apply(simp add: konsens_entfernen_fold_induct_helper_helper)
   done
 
-
-(*TODO: upstream*)
-  
+(*<*)  
 lemma remove1_konsensswap:
   "remove1 (swap p1 p2 a) (konsensswap p1 p2 kons p)
     = map (swap p1 p2) (remove1 a (swap p1 p2 kons p))"
   by(simp add: konsensswap_apply remove1_swap)
-
-thm list.induct
-(*why is this not in the std lib? Well, because this is not really helpful*)
-lemma enum_induct:
-  "P [] \<Longrightarrow> (\<And>x xs. P xs \<Longrightarrow> P (x # xs)) \<Longrightarrow> P enum_class.enum"
-  by (metis list_nonempty_induct) (*lol wut?*)
-
-(*TODO: upstream*)
-lemma swap_if_move_inner:
-  "swap p2 p1 (\<lambda>p. if P p then A p else B p)
-    = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))"
-  by(simp add: swap_def fun_eq_iff)
-  
-lemma swap_id_in_set:
-  "swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A"
-  by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
-  
 
 lemma konsens_entfernen_konsensswap:
   "konsensswap p2 p1 (konsens_entfernen (swap p1 p2 a) (konsensswap p1 p2 kons))
@@ -294,13 +266,9 @@ lemma konsens_entfernen_konsensswap:
   apply(simp add: swap_id_in_set)
   apply(simp add: konsensswap_apply swap_def comp_def)
   by (simp add: list.map_ident_strong)
+(*>*)
 
 
-(*TODO:
-
-Damit die Handlungsabsicht wohlgeformt wird sollte ich vermutlich nur
-eine Person angeben und wir loesen dann konsent[0] ein.
-*)
 definition abmachung_einloesen :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "abmachung_einloesen delta welt \<equiv> 
   if enthaelt_konsens delta welt
@@ -353,6 +321,7 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps initialwelt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   by eval
 
+(*<*)
 lemma zahlenwelt_abmachung_ausfuehren_swap:
   "(BeispielZahlenwelt2.abmachung_ausfuehren (swap p1 p2 a) (zahlenwps p1 p2 welt)) =
        zahlenwps p2 p1 (BeispielZahlenwelt2.abmachung_ausfuehren a welt)"
@@ -370,10 +339,11 @@ lemma existierende_abmachung_einloesen_map_zahlenwps:
   apply(simp add: abmachung_einloesen_def enthaelt_konsens_swap)
   apply(safe)
   apply(simp add: zahlenwelt_abmachung_ausfuehren_swap)
-
   apply(simp add: zahlenwps_def konsens_entfernen_konsensswap)
   done
+(*>*)
 
+text\<open>Auch in jeder welt gilt:\<close>
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   apply(simp add: wohlgeformte_handlungsabsicht.simps)

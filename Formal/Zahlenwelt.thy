@@ -348,4 +348,10 @@ lemma alles_kaputt_machen_code_help:
   done
 
 
+
+
+text\<open>\<^const>\<open>swap\<close> funktioniert auch auf Mengen.\<close>
+lemma "(swap Alice Carol id) ` {Alice, Bob} = {Carol, Bob}" by eval
+
+
 end
