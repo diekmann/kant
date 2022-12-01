@@ -89,8 +89,17 @@ text\<open>Mengen funktionieren wie normale mathematische Mengen.
 
 Beispiel. Die Menge der geraden Zahlen:
 \<close>
-lemma \<open>{0,2,4,6,8,10,12} \<subseteq> {n::int. n mod 2 = 0}\<close>
+lemma \<open>{0,2,4,6,8,10,12} \<subseteq> {n::nat. n mod 2 = 0}\<close>
   by(simp)
 
+lemma \<open>{0,2,4,6,8,10} = {n::nat. n mod 2 = 0 \<and> n \<le> 10}\<close>
+  by fastforce
+
+text\<open>Bei vorherigen Beispiel können wir das Prinzip der (mathematischen) \<^emph>\<open>Extensionalität\<close> sehen:
+Intensional sind die beiden Mengen \<^term>\<open>{0,2,4,6,8,10}::nat set\<close> und \<^term>\<open>{n::nat. n mod 2 = 0 \<and> n \<le> 10}\<close>
+verschieden, da sie unterschiedlich definiert sind.
+Extensional betrachtet, sind die beiden Mengen jedoch gleich,
+da sie genau die gleichen äußeren Eigenschaften haben,
+d.h. da sie genau die gleichen Elemente enthalten.\<close>
 
 end
