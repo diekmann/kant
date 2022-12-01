@@ -40,6 +40,13 @@ Dabei sind die Wörter wie folgt zu verstehen
     sondern enthält sehr viele persönliche Meinungen.
   \<^item> \<^emph>\<open>Kategorischer Imperativ\<close> bezieht sich auf Kants Kategorischer Imperativ.
     Ziel dieser Theorie ist es, moralische Entscheidungen basierend auf Kants Idee zu machen.
+
+
+Der Titel in einfacher Sprache:
+Der kategorische Imperativ, aber wohl nicht so wie Kant ihn gedacht hat,
+also, dass nur der innere, gute Wille zählt,
+sondern die gegenteilige Umsetzung,
+bei der wir uns auf die Ergebnisse einer Handlung fokussieren.
 \<close>
 
 end
