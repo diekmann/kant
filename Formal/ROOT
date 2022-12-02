@@ -15,8 +15,8 @@ session Kant = Cache +
     Swap
     Helper
   theories [show_question_marks = false]
-    SchnelleinstiegHOL
     Disclaimer
+    SchnelleinstiegHOL
     Handlung
     Kant
     Maxime

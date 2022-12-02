@@ -90,4 +90,30 @@ lemma min_list_swap_int_enum:
   apply(subst min_list_swap_int)
   by(simp_all add: enum_class.enum_UNIV)
 
+lemma remove1_swap:
+  "remove1 (swap p1 p2 a) (map (swap p1 p2) ks)
+    = map (swap p1 p2) (remove1 a ks)"
+  apply(induction ks)
+   apply(simp)
+  apply(simp)
+  by (metis swap2)
+
+lemma remove1_swap2:
+  "map (swap p1 p2) (remove1 (swap p1 p2 a) (map (swap p1 p2) ks))
+    =  remove1 a ks"
+  apply(induction ks)
+   apply(simp)
+  apply(simp add: comp_def)
+  by (metis (mono_tags, lifting) swap2)
+
+lemma swap_if_move_inner:
+  "swap p2 p1 (\<lambda>p. if P p then A p else B p)
+    = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))"
+  by(simp add: swap_def fun_eq_iff)
+  
+lemma swap_id_in_set:
+  "swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A"
+  by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
+
+
 end

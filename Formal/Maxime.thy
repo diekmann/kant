@@ -48,7 +48,7 @@ Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) han
 
 
 Kant unterscheidet unter Anderem
-"zwischen {\guillemotright}apriorischen{\guillemotleft} und {\guillemotright}empirischen{\guillemotleft} Urteilen" \cite{russellphi}.
+"zwischen >>apriorischen<< und >>empirischen<< Urteilen" \cite{russellphi}.
 Wenn wir uns den Typ \<^typ>\<open>'world handlung\<close> als Beobachtung der Welt \<^const>\<open>vorher\<close> und \<^const>\<open>nachher\<close> anschauen,
 dann könnte man sagen, unser Moralbegriff der \<^const>\<open>Maxime\<close> sei empirisch.
 Für Kant gilt jedoch:
@@ -307,6 +307,7 @@ fun MaximeConj
   where
 "MaximeConj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
 
+text\<open>Die erwarteten Regeln auf einer Konjunktion gelten.\<close>
 lemma okay_MaximeConj: "okay (MaximeConj m1 m2) p h \<longleftrightarrow> okay m1 p h \<and> okay m2 p h"
   by(cases m1, cases m2, simp)
 
@@ -344,7 +345,11 @@ lemma moralisch_MaximeDisjI:
   "moralisch welt m1 ha \<or> moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
   apply(simp add: moralisch_simp okay_MaximeDisj)
   by auto
-text\<open>Rückrichtung gilt leider nicht.\<close>
+text\<open>Rückrichtung gilt leider nicht.
+\<^term>\<open>MaximeDisj m1 m2\<close> is effektiv schwächer, da sich jede Person unabhängig entscheiden darf,
+ob sie \<^term>\<open>m1\<close> oder \<^term>\<open>m2\<close> folgt.
+Im Gegensatz dazu sagt \<^term>\<open>moralisch welt m1 ha \<or> moralisch welt m2 ha\<close> dass für
+\<^emph>\<open>alle\<close> Personen entweder \<^term>\<open>m1\<close> oder \<^term>\<open>m2\<close> gelten muss.\<close>
 
 lemma moralisch_MaximeDisj1:
   "moralisch welt m1 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
