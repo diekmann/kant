@@ -20,8 +20,8 @@ definition initialwelt :: zahlenwelt
 "initialwelt \<equiv> \<lparr>
   besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
   konsens = (\<lambda>_. [])(
-    Alice := [aenderung_map [Gewinnt Alice 3], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]],
-    Bob := [aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]),
+    Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
+    Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]),
   staatsbesitz = 9000,
   umwelt = 600
  \<rparr>"
@@ -68,8 +68,8 @@ lemma \<open>zahlenwps Alice Bob initialwelt
 = \<lparr>
   besitz = \<^url>[Alice := 10, Bob := 5, Carol := -3],
   konsens = (\<lambda>_. [])(
-    Alice := [aenderung_map [Gewinnt Bob 3, Verliert Alice 3]],
-    Bob := [aenderung_map [Gewinnt Bob 3], aenderung_map [Gewinnt Bob 3, Verliert Alice 3]]),
+    Alice := [to_abmachung [Gewinnt Bob 3, Verliert Alice 3]],
+    Bob := [to_abmachung [Gewinnt Bob 3], to_abmachung [Gewinnt Bob 3, Verliert Alice 3]]),
   staatsbesitz = 9000,
   umwelt = 600
  \<rparr>\<close> by eval
@@ -79,8 +79,8 @@ lemma \<open>zahlenwps Alice Carol initialwelt
 = \<lparr>
   besitz = \<^url>[Alice := -3, Bob := 10, Carol := 5],
   konsens = (\<lambda>_. [])(
-    Bob := [aenderung_map [Gewinnt Carol 3, Verliert Bob 3]],
-    Carol := [aenderung_map [Gewinnt Carol 3], aenderung_map [Gewinnt Carol 3, Verliert Bob 3]]),
+    Bob := [to_abmachung [Gewinnt Carol 3, Verliert Bob 3]],
+    Carol := [to_abmachung [Gewinnt Carol 3], to_abmachung [Gewinnt Carol 3, Verliert Bob 3]]),
   staatsbesitz = 9000,
   umwelt = 600
  \<rparr>\<close> by eval
@@ -101,7 +101,7 @@ definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<R
 where
   "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
 
-lemma \<open>abmachungs_betroffene (aenderung_map [Gewinnt Bob (3::int), Verliert Alice 3])
+lemma \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
   = [Alice, Bob]\<close> by eval
 
 lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
@@ -149,15 +149,15 @@ lemma enthaelt_konsens_swap:
 (*
 Wenn das delta hier nicht genau das delta ist wie von hat_konsens berechnet ist das exploitable.
 
-Also `aenderung_map (delta_num_fun (map_handlung besitz h))` muss eindeutig genau das richtige
+Also `to_abmachung (delta_num_fun (map_handlung besitz h))` muss eindeutig genau das richtige
 reverse engineeren.
 
-TODO: `aenderung_map (delta_num_fu` ersetzen durch direktes Funktion bauen!
+TODO: `to_abmachung (delta_num_fu` ersetzen durch direktes Funktion bauen!
 *)
 definition hat_konsens :: "zahlenwelt handlung \<Rightarrow> bool"
 where
   "hat_konsens h \<equiv>
-    let abmachung = aenderung_map (delta_num_fun (map_handlung besitz h))
+    let abmachung = to_abmachung (delta_num_fun (map_handlung besitz h))
     in enthaelt_konsens abmachung (vorher h)"
 
 
@@ -190,7 +190,7 @@ definition abmachung_ausfuehren
 where
   "abmachung_ausfuehren abmachung welt \<equiv> welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>"
 
-lemma\<open>abmachung_ausfuehren (aenderung_map [Gewinnt Alice 3]) initialwelt
+lemma\<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
   = initialwelt\<lparr> besitz := \<lbrakk>(besitz initialwelt)(Alice += 3)\<rbrakk>\<rparr>\<close>
   by eval
 
@@ -208,9 +208,9 @@ definition konsens_entfernen
 
 (*TODO: upstream und testen*)
 
-lemma \<open>konsens_entfernen (aenderung_map [Gewinnt Alice 3, Verliert Bob 3]) (konsens initialwelt)
+lemma \<open>konsens_entfernen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) (konsens initialwelt)
   = (\<lambda>_. [])(
-    Alice := [aenderung_map [Gewinnt Alice 3]],
+    Alice := [to_abmachung [Gewinnt Alice 3]],
     Bob := [])\<close>
   by eval
 
@@ -277,36 +277,36 @@ definition abmachung_einloesen :: "(person, int) abmachung \<Rightarrow> zahlenw
 
 
 
-lemma\<open>abmachung_einloesen (aenderung_map [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
+lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
  = Some
   \<lparr>
     besitz = \<^url>[Alice := 8, Bob := 7, Carol := -3],
     konsens = (\<lambda>_. [])(
-      Alice := [aenderung_map [Gewinnt Alice 3]],
+      Alice := [to_abmachung [Gewinnt Alice 3]],
       Bob := []),
     staatsbesitz = 9000,
     umwelt = 600
    \<rparr>\<close>
   by eval
 
-lemma\<open>abmachung_einloesen (aenderung_map [Gewinnt Alice 3]) initialwelt
+lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
  = Some
   \<lparr>
     besitz = \<^url>[Alice := 8, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
-      Alice := [aenderung_map [Gewinnt Alice 3, Verliert Bob 3]],
-      Bob := [aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]),
+      Alice := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
+      Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]),
     staatsbesitz = 9000,
     umwelt = 600
    \<rparr>\<close>
   by eval
 
-lemma\<open>abmachung_einloesen (aenderung_map [Verliert Bob 3]) initialwelt = None\<close>
+lemma\<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = None\<close>
   by eval
 
 (*Welllllll*)
 lemma "\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
-         (Handlungsabsicht (\<lambda>p w. abmachung_einloesen (aenderung_map [Gewinnt Alice 3]) w))"
+         (Handlungsabsicht (\<lambda>p w. abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) w))"
   by eval
 
 
@@ -359,7 +359,7 @@ lemma "\<not> ausfuehrbar Alice
   \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
-      Alice := [aenderung_map [Verliert Carol 3]]
+      Alice := [to_abmachung [Verliert Carol 3]]
       ),
     staatsbesitz = 9000,
     umwelt = 600
@@ -371,8 +371,8 @@ lemma "ausfuehrbar Alice
   \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
-      Alice := [aenderung_map [Verliert Carol 3]],
-      Carol := [aenderung_map [Verliert Carol 3]]
+      Alice := [to_abmachung [Verliert Carol 3]],
+      Carol := [to_abmachung [Verliert Carol 3]]
       ),
     staatsbesitz = 9000,
     umwelt = 600
@@ -386,8 +386,8 @@ lemma "nachher_handeln Alice
   \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
-      Alice := [aenderung_map [Verliert Carol 3]],
-      Carol := [aenderung_map [Verliert Carol 3]]
+      Alice := [to_abmachung [Verliert Carol 3]],
+      Carol := [to_abmachung [Verliert Carol 3]]
       ),
     staatsbesitz = 9000,
     umwelt = 600
@@ -396,7 +396,7 @@ lemma "nachher_handeln Alice
 = \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -6],
     konsens = (\<lambda>_. [])(
-      Alice := [aenderung_map [Verliert Carol 3]],
+      Alice := [to_abmachung [Verliert Carol 3]],
       Carol := []
       ),
     staatsbesitz = 9000,

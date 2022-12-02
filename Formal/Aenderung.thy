@@ -246,26 +246,26 @@ lemma aenderung_merge_same_person_commute:
   by(simp_all add: aenderung_merge_same_person_def sum_delta_num_def Let_def add.commute)
 
 
-fun aenderung_aenderung_map
+fun aenderung_list_to_to_abmachung
   :: "('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person \<rightharpoonup> ('person, 'etwas) aenderung)"
 where
-  "aenderung_aenderung_map [] = Map.empty"
-| "aenderung_aenderung_map (delta # deltas) = 
-   (case (aenderung_aenderung_map deltas) (betroffen delta)
-      of None \<Rightarrow> (aenderung_aenderung_map deltas)((betroffen delta) \<mapsto> delta)
-       | Some delta2 \<Rightarrow> (aenderung_aenderung_map deltas)((betroffen delta) := aenderung_merge_same_person delta2 delta)
+  "aenderung_list_to_to_abmachung [] = Map.empty"
+| "aenderung_list_to_to_abmachung (delta # deltas) = 
+   (case (aenderung_list_to_to_abmachung deltas) (betroffen delta)
+      of None \<Rightarrow> (aenderung_list_to_to_abmachung deltas)((betroffen delta) \<mapsto> delta)
+       | Some delta2 \<Rightarrow> (aenderung_list_to_to_abmachung deltas)((betroffen delta) := aenderung_merge_same_person delta2 delta)
    )"
 
-lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Verliert Alice 6]
+lemma \<open>aenderung_list_to_to_abmachung [Verliert Alice (2::int), Verliert Alice 6]
   = [Alice \<mapsto> Verliert Alice 8]\<close>
   by eval
 
-lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
+lemma \<open>aenderung_list_to_to_abmachung [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
   = [Alice \<mapsto> Verliert Alice 2, Bob \<mapsto> Gewinnt Bob 3, Carol \<mapsto> Gewinnt Carol 2, Eve \<mapsto> Verliert Eve 1]\<close>
   by eval
 
 
-lemma \<open>aenderung_aenderung_map [Verliert Alice (2::int), Gewinnt Alice 6]
+lemma \<open>aenderung_list_to_to_abmachung [Verliert Alice (2::int), Gewinnt Alice 6]
   = [Alice \<mapsto> Gewinnt Alice 4]\<close>
   by eval
 
@@ -276,9 +276,9 @@ enthalten kann, welche gemerged werden müssen.\<close>
 definition aenderung_list_to_set
   :: "('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) aenderung set"
   where
-"aenderung_list_to_set as \<equiv> set (List.map_filter (aenderung_aenderung_map as) Enum.enum)"
+"aenderung_list_to_set as \<equiv> set (List.map_filter (aenderung_list_to_to_abmachung as) Enum.enum)"
 
-lemma "aenderung_list_to_set as = ran (aenderung_aenderung_map as)"
+lemma "aenderung_list_to_set as = ran (aenderung_list_to_to_abmachung as)"
   apply(simp add: aenderung_list_to_set_def)
   (*TODO!*)
   oops
@@ -313,24 +313,26 @@ totale Funktion \<^typ>\<open>'person \<Rightarrow> ('etwas::{uminus, plus, zero
 \<close>
 type_synonym  ('person, 'etwas) abmachung = "'person \<Rightarrow> 'etwas"
 
-(*TODO: dedup mit aenderung_aenderung_map*)
-fun aenderung_map
+(*TODO: dedup mit aenderung_list_to_to_abmachung*)
+fun to_abmachung
   :: "('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) abmachung"
 where
-  "aenderung_map [] = (\<lambda>p. 0)"
-| "aenderung_map (delta # deltas) = 
-   \<lbrakk>(aenderung_map deltas)(betroffen delta += aenderung_val delta)\<rbrakk>"
+  "to_abmachung [] = (\<lambda>p. 0)"
+| "to_abmachung (delta # deltas) = 
+   \<lbrakk>(to_abmachung deltas)(betroffen delta += aenderung_val delta)\<rbrakk>"
 
 (*<*)
-lemma aenderung_map_simp_call:
-  "aenderung_map (delta # deltas) p =
+lemma to_abmachung_simp_call:
+  "to_abmachung (delta # deltas) p =
     (if p = betroffen delta
-     then (aenderung_map deltas p) + (aenderung_val delta)
-     else (aenderung_map deltas p))"
+     then (to_abmachung deltas p) + (aenderung_val delta)
+     else (to_abmachung deltas p))"
   by(simp)
 (*>*)
 
-lemma \<open>[aenderung_map [Gewinnt Alice (3::int)], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]
+
+
+lemma \<open>[to_abmachung [Gewinnt Alice (3::int)], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]
         = [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
 
 (*<*)
@@ -356,7 +358,7 @@ lemma \<open>abmachung_to_aenderung ((\<lambda>p.0)(Alice := (3::int), Bob := -3
 definition aenderung_to_abmachung
   :: "('person, 'etwas) aenderung list \<Rightarrow> ('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) abmachung"
 where
-  "aenderung_to_abmachung \<equiv> aenderung_map"
+  "aenderung_to_abmachung \<equiv> to_abmachung"
 
 
 lemma fixes as :: "('person::enum, int) aenderung list"
@@ -365,8 +367,8 @@ lemma fixes as :: "('person::enum, int) aenderung list"
   oops (*gilt nicht, weil aenderungen nicht eindeutig*)
 
 
-lemma abmachung_to_aenderung_list_aenderung_map_not_in_ps:
-  "p \<notin> set ps \<Longrightarrow>  aenderung_map (abmachung_to_aenderung_list ps a) p = 0"
+lemma abmachung_to_aenderung_list_to_abmachung_not_in_ps:
+  "p \<notin> set ps \<Longrightarrow>  to_abmachung (abmachung_to_aenderung_list ps a) p = 0"
   by(induction ps) simp+
 
 lemma abmachung_to_aenderung_list_not_in_ps:
@@ -389,15 +391,15 @@ lemma abmachung_dom_swap:
   apply(simp add: swap_def)
   by fast
 
-lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
+lemma to_abmachung_abmachung_to_aenderung_list_induct_helper:
   fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
-  shows "abmachung_dom a \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> aenderung_map (abmachung_to_aenderung_list ps a) = a"
+  shows "abmachung_dom a \<subseteq> set ps \<Longrightarrow> distinct ps \<Longrightarrow> to_abmachung (abmachung_to_aenderung_list ps a) = a"
   apply(induction ps arbitrary: a)
    apply(simp add: abmachung_dom_def)
    apply fastforce
   apply(rename_tac p ps a)
   apply(simp)
-  apply(simp add: abmachung_to_aenderung_list_aenderung_map_not_in_ps)
+  apply(simp add: abmachung_to_aenderung_list_to_abmachung_not_in_ps)
   apply(case_tac "p \<notin> abmachung_dom a")
    apply(subgoal_tac "abmachung_dom a \<subseteq> set ps")
     apply(simp add: abmachung_dom_def; fail)
@@ -407,7 +409,7 @@ lemma aenderung_map_abmachung_to_aenderung_list_induct_helper:
    prefer 2
    apply(simp add: abmachung_dom_def)
    apply blast
-  apply(subgoal_tac "aenderung_map (abmachung_to_aenderung_list ps a) = (a(p := 0))") (*instantiate IH*)
+  apply(subgoal_tac "to_abmachung (abmachung_to_aenderung_list ps a) = (a(p := 0))") (*instantiate IH*)
    prefer 2
    apply(simp)
    apply (metis abmachung_to_aenderung_list_not_in_ps)
@@ -418,11 +420,12 @@ lemma aenderung_to_abmachung_abmachung_to_aenderung:
   fixes a :: "('person::enum, 'etwas::ordered_ab_group_add) abmachung"
   shows "aenderung_to_abmachung (abmachung_to_aenderung a) = a"
   apply(simp add: abmachung_to_aenderung_def aenderung_to_abmachung_def)
-  apply(rule aenderung_map_abmachung_to_aenderung_list_induct_helper)
+  apply(rule to_abmachung_abmachung_to_aenderung_list_induct_helper)
    apply(simp add: enum_class.enum_UNIV)
   apply(simp add: enum_class.enum_distinct)
   done
 (*>*)
+
 
 
 definition abmachung_ausfuehren
@@ -433,7 +436,7 @@ where
 text\<open>Beispiel:\<close>
 lemma
   "abmachung_ausfuehren
-    (aenderung_map [Gewinnt Alice 3, Verliert Bob 3])
+    (to_abmachung [Gewinnt Alice 3, Verliert Bob 3])
     (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
   = (\<^url>[Alice:=11, Bob:=0, Eve:= 5])"
   by(code_simp)
