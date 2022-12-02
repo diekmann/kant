@@ -487,4 +487,160 @@ lemma abmachung_ausfuehren_aenderung:
 
 (*>*)
 
+
+text\<open>Laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Konsens_im_Rechtssystem\<close> lässt sich Konsens
+wie folg definieren:
+"die Übereinstimmung der Willenserklärungen beider Vertragspartner über die Punkte des Vertrages".
+Wir können also \<^term>\<open>to_abmachung [Gewinnt Alice 3, Verliert Bob 3]\<close> verwenden,
+um Konsens zu modellieren.
+Dabei müssen alle Betroffenen die gleiche Vorstellung der Abmachung haben.
+Beispielsweise lässt sich der gesamte Konsens in einer Welt darstellen als
+\<^typ>\<open>person \<Rightarrow> (person, int) abmachung list\<close>, wobei jeder person genau die Abmachungen
+zugeordnet werden, deren sie zustimmt.
+Die Abmachungen sind in einer Liste und keiner Menge, da eine Person eventuell bereit ist,
+Abmachungen mehrfach auszuführen.
+\<close>
+
+(*<*)
+definition konsensswap
+:: "'person \<Rightarrow> 'person \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
+    \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
+  where
+"konsensswap p1 p2 kons \<equiv> swap p1 p2 ((map (swap p1 p2)) \<circ> kons)"
+
+lemma konsensswap_id[simp]: "konsensswap p1 p2 (konsensswap p1 p2 kons) = kons"
+  apply(simp add: konsensswap_def)
+  apply(subst swap_fun_map_comp_id)
+  by simp
+
+lemma konsensswap_sym: "konsensswap p1 p2 = konsensswap p2 p1"
+  by(simp add: fun_eq_iff konsensswap_def swap_symmetric)
+
+lemma konsensswap_apply:
+  "konsensswap p1 p2 kons p =  map (swap p1 p2) (swap p1 p2 kons p)"
+  apply(simp add: konsensswap_def comp_def)
+  by (metis swap_a swap_b swap_nothing)
+(*>*)
+
+
+
+definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> 'person list"
+where
+  "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
+
+lemma \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
+  = [Alice, Bob]\<close> by eval
+
+
+(*<*)
+lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
+proof -
+  have "concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as" for as
+    by(induction as) auto
+  thus ?thesis
+    by(simp add: abmachungs_betroffene_def)
+qed
+
+lemma abmachungs_betroffene_distinct: "distinct (abmachungs_betroffene a)"
+  apply(simp add: abmachungs_betroffene_simp)
+  using enum_class.enum_distinct distinct_filter by blast
+
+lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = abmachung_dom a"
+  by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
+
+lemma set_abmachungs_betroffene_swap:
+  "set (abmachungs_betroffene (swap p1 p2 a)) = (swap p1 p2 id) ` set (abmachungs_betroffene a)"
+  apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  apply(simp add: swap_def)
+  by fast
+(*>*)
+
+
+
+text\<open>Eine (ausgeführte) Abmachung einlösen, bzw. entfernen.\<close>
+definition konsens_entfernen
+ :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
+   \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
+ where
+"konsens_entfernen abmachung kons =
+      fold (\<lambda>p k. k(p := remove1 abmachung (k p))) (abmachungs_betroffene abmachung) kons"
+
+
+lemma
+  \<open>konsens_entfernen
+    (to_abmachung [Gewinnt Alice (3::int), Verliert Bob 3])
+    ((\<lambda>_. [])(
+      Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
+      Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]])
+    )
+  = (\<lambda>_. [])(
+    Alice := [to_abmachung [Gewinnt Alice 3]],
+    Bob := [])\<close>
+  by eval
+
+
+(*<*)
+lemma konsens_entfernen_fold_induct_helper_helper:
+  "a \<notin> set as \<Longrightarrow> fold (\<lambda>a k. k(a := f (k a))) as kons a = kons a"
+  by(induction as arbitrary: kons) simp+
+lemma konsens_entfernen_fold_induct_helper:
+  "x \<in> set as \<Longrightarrow> distinct as \<Longrightarrow>
+         fold (\<lambda>a k. k(a := f (k a))) as kons x = f (kons x)"
+  apply(induction as arbitrary: kons)
+   apply(simp; fail)
+  apply(simp)
+  apply(erule disjE)
+   apply(simp)
+  apply(simp add: konsens_entfernen_fold_induct_helper_helper; fail)
+   apply(simp)
+  apply blast
+  done
+(*>*)
+
+
+
+text\<open>Alternative Definition:\<close>
+lemma konsens_entfernen_simp:
+  "konsens_entfernen a kons
+    = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
+  apply(simp add: konsens_entfernen_def fun_eq_iff)
+  apply(intro allI conjI impI)
+   apply(subst konsens_entfernen_fold_induct_helper, simp_all)
+   apply(simp add: abmachungs_betroffene_distinct)
+  apply(simp add: konsens_entfernen_fold_induct_helper_helper)
+  done
+
+
+(*<*)  
+lemma remove1_konsensswap:
+  "remove1 (swap p1 p2 a) (konsensswap p1 p2 kons p)
+    = map (swap p1 p2) (remove1 a (swap p1 p2 kons p))"
+  by(simp add: konsensswap_apply remove1_swap)
+
+lemma konsens_entfernen_konsensswap:
+  "konsensswap p2 p1 (konsens_entfernen (swap p1 p2 a) (konsensswap p1 p2 kons))
+    = konsens_entfernen a kons"
+  apply(simp add: konsens_entfernen_simp fun_eq_iff)
+  apply(safe)
+   apply(simp add: set_abmachungs_betroffene_swap)
+   apply(simp add: konsensswap_apply)
+   apply(simp add: swap_if_move_inner)
+   apply(simp add: swap_id_in_set)
+   apply(subst(2) remove1_swap2[of p1 p2, symmetric])
+   apply(auto simp add: konsensswap_apply swap_def)[1] (*wants helper*)
+
+  apply(simp add: set_abmachungs_betroffene_swap)
+  apply(simp add: konsensswap_apply)
+  apply(simp add: swap_if_move_inner)
+  apply(simp add: swap_id_in_set)
+  apply(simp add: konsensswap_apply swap_def comp_def)
+  by (simp add: list.map_ident_strong)
+(*>*)
+
+
+
+
+
 end
