@@ -1,4 +1,3 @@
-(*<*)
 theory Aenderung
 imports Main ExecutableHelper BeispielPerson Handlung Zahlenwelt
 begin
@@ -7,7 +6,10 @@ section\<open>Änderungen in Welten\<close>
 
 datatype ('person, 'etwas) aenderung = Verliert \<open>'person\<close> \<open>'etwas\<close> | Gewinnt \<open>'person\<close> \<open>'etwas\<close>
 
-text\<open>The delta to get from \<^term>\<open>i2\<close> to \<^term>\<open>i2\<close>\<close>
+text\<open>Beispiel: \<^term>\<open>[Gewinnt Alice 3, Verliert Bob 3]::(person, int) aenderung list\<close>.\<close>
+
+(*<*)
+text\<open>Das Delta um von \<^term>\<open>i2\<close> nach \<^term>\<open>i2\<close> zu kommen.\<close>
 definition delta_num
   :: \<open>'person \<Rightarrow> 'etwas::{ord,minus} \<Rightarrow> 'etwas \<Rightarrow> (('person, 'etwas) aenderung) option\<close>
   where
@@ -59,16 +61,18 @@ lemma  delta_num_sum_delta_num:
   shows "delta_num p i1 i2 = sum_delta_num p (-i1) i2"
   by(simp add: sum_delta_num_def delta_num_def Let_def)
 
+(*>*)
 
-text\<open>Deltas, d.h. Unterschiede Zwischen Welten.
-
-Man könnte eine class Delta world einführen, mit einer delta-Funtion
+subsection\<open>Deltas\<close>
+text\<open>Deltas, d.h. Unterschiede zwischen Welten.\<close>
+(*Man könnte eine class Delta world einführen, mit einer delta-Funtion
   :: welt -> welt -> [Aenderung person etwas]
 Diese Klasse würde dann Welten mit Personen und Etwas in Relation setzen.
-Dafür bräuchte es MultiParamTypeClasses. Eine simple Funktion ist da einfacher.\<close>
+Dafür bräuchte es MultiParamTypeClasses. Eine simple Funktion ist da einfacher.*)
 type_synonym ('world, 'person, 'etwas) delta =
     \<open>'world handlung \<Rightarrow> (('person, 'etwas) aenderung) list\<close>
 
+text\<open>Von einer \<^typ>\<open>('person, 'etwas) aenderung\<close> betroffene.\<close>
 definition betroffen :: "('person, 'etwas) aenderung \<Rightarrow> 'person"
   where
 "betroffen a \<equiv> case a of Verliert p _ \<Rightarrow> p | Gewinnt p _ \<Rightarrow> p"
@@ -77,10 +81,12 @@ definition betroffene :: "('person, 'etwas) aenderung list \<Rightarrow> 'person
   where
 "betroffene as \<equiv> map betroffen as"
 
-
+(*<*)
 lemma betroffene_case_aenderung:
   "betroffene = map (case_aenderung (\<lambda>p _. p) (\<lambda>p _. p))"
   by(simp add: fun_eq_iff betroffene_def betroffen_def)
+(*>*)
+
 
 lemma "betroffene [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
   = [Alice, Bob, Carol, Eve]" by eval
@@ -89,7 +95,7 @@ lemma "betroffene [Verliert Alice (5::nat), Gewinnt Bob 3, Verliert Eve 7]
 lemma "betroffene [Verliert Alice (5::nat), Gewinnt Alice 3]
   = [Alice, Alice]" by eval
 
-
+(*<*)
 definition aenderung_val :: "('person, ('etwas::uminus)) aenderung \<Rightarrow> 'etwas"
   where
 "aenderung_val a \<equiv> case a of Verliert _ n \<Rightarrow> -n | Gewinnt _ n \<Rightarrow> n"
@@ -171,7 +177,7 @@ lemma swap_map_map_aenderung_swap:
   apply(subst swap_fun_comp_id)
   apply(simp add: map_map_aenderung_swap)
   done
-
+(*>*)
 
 
 
@@ -198,7 +204,7 @@ lemma
   (\<^url>[Bob:=3, Eve:= 5])\<close>
   by eval
 
-
+(*<*)
 (*TODO: upstream und vereinfachen!*)
 lemma swap_aenderung_ausfuehren:
   "swap p1 p2 (Aenderung.aenderung_ausfuehren a bes)
@@ -280,33 +286,31 @@ lemma "aenderung_list_to_set
   [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Eve 3, Gewinnt Alice 2, Gewinnt Carol 2, Verliert Eve 1]
 = {Gewinnt Bob 3, Gewinnt Carol 2, Gewinnt Eve 2}"
   by eval
+(*>*)
 
-
-
-(*
-eigentlich hatte ich
-type_synonym  ('person, 'etwas) abmachung = "('person, 'etwas) aenderung list
-was viel schoner aussieht.
-Aber Leider dann Abmachungen nicht Eindeutig sind, was sehr doof ist.
-
-TODO: erklaeren
-TODO: upstream
-*)
-
-(*TODO:
-eventuell laesst sich
-  ('person, 'etwas) aenderung list
-deutlich besser als
-  ('person \<rightharpoonup> 'etwas::uminus
-darstellen, weil das viel eindeutiger ist.*)
-
-
-(* 'person \<Rightarrow> 'etwas::ordered_ab_group_add  
-
-Weil das hoffentlich eindeutig.
-
-(\<lambda>_. 0)[Alice := 3, Bob := -3] bedeutet Alice bekommt 3, Bob verliert 3
-*)
+subsection\<open>Abmachungen\<close>
+text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> wie
+z.B. \<^term>\<open>[Gewinnt Alice (3::int), Verliert Bob 3]\<close> ließe sich gut verwenden,
+um eine Abmachung zwischen \<^const>\<open>Alice\<close> und \<^const>\<open>Bob\<close> zu modellieren.
+Allerdings ist diese Darstellung unpraktisch zu benutzen.
+Beispielsweise sind 
+\<^term>\<open>[Gewinnt Alice (3::int), Verliert Bob 3]\<close>, \<^term>\<open>[Verliert Bob 3, Gewinnt Alice (3::int)]\<close>,
+\<^term>\<open>[Gewinnt Alice (1::int), Gewinnt Alice 1, Gewinnt Alice 1, Verliert Bob 3, Verliert Carol 0]\<close>,
+extensional betrachtet alle equivalent.
+Es ist praktischer, eine Darstellung zu wählen, in der syntaktische und semantische Äquivalenz
+zusammenfallen.
+Das bedeutet, eine Abmachung muss eindeutig dargestellt werden.
+Ein Kandidat dafür wäre eine Map \<^typ>\<open>'person \<rightharpoonup> 'etwas\<close>, da diese eindeutig einer
+\<^typ>\<open>'person\<close> ein \<^typ>\<open>'etwas\<close> zuordnet.
+Dies funktioniert allerdings nur, wenn \<^typ>\<open>'etwas::{uminus,plus}\<close> mit Plus und Minus
+dargestellt werden kann, um \<^const>\<open>Gewinnt\<close> und \<^const>\<open>Verliert\<close> darzustellen.
+Allerdings ist auch diese Darstellung nicht eindeutig,
+da z.B. \<^term>\<open>[Alice \<mapsto> 0] = Map.empty\<close> semantisch gilt,
+solange \<^term>\<open>0\<close> ein neutrales Element ist.
+Deshalb stellen wir eine Abmachung als eine
+totale Funktion \<^typ>\<open>'person \<Rightarrow> ('etwas::{uminus, plus, zero})\<close> dar.
+\<^term>\<open>(\<lambda>_. 0)(Alice := 3, Bob := -3)\<close> bedeutet \<^const>\<open>Alice\<close> bekommt 3, \<^const>\<open>Bob\<close> verliert 3.
+\<close>
 type_synonym  ('person, 'etwas) abmachung = "'person \<Rightarrow> 'etwas"
 
 (*TODO: dedup mit aenderung_aenderung_map*)
@@ -317,19 +321,19 @@ where
 | "aenderung_map (delta # deltas) = 
    \<lbrakk>(aenderung_map deltas)(betroffen delta += aenderung_val delta)\<rbrakk>"
 
-
+(*<*)
 lemma aenderung_map_simp_call:
   "aenderung_map (delta # deltas) p =
     (if p = betroffen delta
      then (aenderung_map deltas p) + (aenderung_val delta)
      else (aenderung_map deltas p))"
   by(simp)
+(*>*)
 
+lemma \<open>[aenderung_map [Gewinnt Alice (3::int)], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]
+        = [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
 
-lemma\<open>[aenderung_map [Gewinnt Alice (3::int)], aenderung_map [Gewinnt Alice 3, Verliert Bob 3]]
-= [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
-
-
+(*<*)
 fun abmachung_to_aenderung_list
   :: "'person list \<Rightarrow> ('person, 'etwas::{ord,zero,plus,minus,uminus}) abmachung \<Rightarrow> ('person, 'etwas) aenderung list"
 where
@@ -418,6 +422,7 @@ lemma aenderung_to_abmachung_abmachung_to_aenderung:
    apply(simp add: enum_class.enum_UNIV)
   apply(simp add: enum_class.enum_distinct)
   done
+(*>*)
 
 
 definition abmachung_ausfuehren
@@ -425,6 +430,16 @@ definition abmachung_ausfuehren
 where
   "abmachung_ausfuehren a besitz \<equiv> \<lambda>p. a p + (besitz p)"
 
+text\<open>Beispiel:\<close>
+lemma
+  "abmachung_ausfuehren
+    (aenderung_map [Gewinnt Alice 3, Verliert Bob 3])
+    (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
+  = (\<^url>[Alice:=11, Bob:=0, Eve:= 5])"
+  by(code_simp)
+
+
+(*<*)
 lemma abmachung_ausfuehren_swap:
   "abmachung_ausfuehren (swap p1 p2 a) (swap p1 p2 welt)
     = swap p2 p1 (abmachung_ausfuehren a welt)"
@@ -467,6 +482,6 @@ lemma abmachung_ausfuehren_aenderung:
   shows "abmachung_ausfuehren abmachung = aenderung_ausfuehren (abmachung_to_aenderung abmachung)"
   by(simp add: abmachung_ausfuehren_def fun_eq_iff aenderung_ausfuehren_abmachung_to_aenderung)
 
+(*>*)
 
 end
-(*>*)
