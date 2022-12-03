@@ -495,16 +495,19 @@ Wir können also \<^term>\<open>to_abmachung [Gewinnt Alice 3, Verliert Bob 3]\<
 um Konsens zu modellieren.
 Dabei müssen alle Betroffenen die gleiche Vorstellung der Abmachung haben.
 Beispielsweise lässt sich der gesamte Konsens in einer Welt darstellen als
-\<^typ>\<open>person \<Rightarrow> (person, int) abmachung list\<close>, wobei jeder person genau die Abmachungen
+\<^typ>\<open>'person \<Rightarrow> ('person, 'etwas) abmachung list\<close>, wobei jeder person genau die Abmachungen
 zugeordnet werden, deren sie zustimmt.
 Die Abmachungen sind in einer Liste und keiner Menge, da eine Person eventuell bereit ist,
 Abmachungen mehrfach auszuführen.
 \<close>
 
+
+type_synonym ('person, 'etwas) globaler_konsens = "'person \<Rightarrow> ('person, 'etwas) abmachung list"
+
 (*<*)
 definition konsensswap
-:: "'person \<Rightarrow> 'person \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
-    \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
+:: "'person \<Rightarrow> 'person \<Rightarrow> ('person, 'etwas) globaler_konsens
+    \<Rightarrow> ('person, 'etwas) globaler_konsens"
   where
 "konsensswap p1 p2 kons \<equiv> swap p1 p2 ((map (swap p1 p2)) \<circ> kons)"
 
@@ -556,6 +559,21 @@ lemma set_abmachungs_betroffene_swap:
   apply(simp add: swap_def)
   by fast
 (*>*)
+
+
+
+definition enthaelt_konsens
+  :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person, 'etwas) globaler_konsens \<Rightarrow> bool"
+where
+  "enthaelt_konsens abmachung konsens \<equiv> \<forall>betroffene_person \<in> set (abmachungs_betroffene abmachung).
+      abmachung \<in> set (konsens betroffene_person)"
+
+lemma enthaelt_konsens_swap:
+  "enthaelt_konsens (swap p1 p2 a) (konsensswap p1 p2 konsens) = enthaelt_konsens a konsens" 
+  apply(simp add: enthaelt_konsens_def abmachungs_betroffene_is_dom)
+  apply(simp add: abmachung_dom_swap)
+  apply(simp add: konsensswap_def comp_def)
+  by (smt (z3) id_apply image_def list.set_map mem_Collect_eq swap2 swap_a swap_b swap_nothing)
 
 
 

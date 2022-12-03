@@ -6,7 +6,7 @@ section\<open>Beispiel: Zahlenwelt2\<close>
 
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>
-  konsens :: \<open>person \<Rightarrow> (person, int) abmachung list\<close>
+  konsens :: \<open>(person, int) globaler_konsens\<close>
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
@@ -65,24 +65,17 @@ lemma zahlenwps_id: "zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt"
 lemma zahlenwps_sym: "zahlenwps p1 p2 = zahlenwps p2 p1"
   apply(simp add: fun_eq_iff zahlenwps_def)
   by (simp add: swap_symmetric konsensswap_sym)
-(*>*)
 
 
-(*TODO: partial upstream*)
+
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
 where
-  "enthaelt_konsens abmachung welt \<equiv> \<forall>betroffene_person \<in> set (abmachungs_betroffene abmachung).
-      abmachung \<in> set (konsens welt betroffene_person)"
+  "enthaelt_konsens abmachung welt \<equiv> Aenderung.enthaelt_konsens abmachung (konsens welt)"
 
 lemma enthaelt_konsens_swap:
   "enthaelt_konsens (swap p1 p2 a) (zahlenwps p1 p2 welt) = enthaelt_konsens a welt" 
-  apply(simp add: enthaelt_konsens_def abmachungs_betroffene_is_dom)
-  apply(simp add: abmachung_dom_swap)
-  apply(simp add: zahlenwps_def)
-  apply(cases welt, simp)
-  apply(simp add: konsensswap_def comp_def)
-  by (smt (z3) id_apply image_def list.set_map mem_Collect_eq swap2 swap_a swap_b swap_nothing)
-
+  by(simp add: enthaelt_konsens_def zahlenwps_def Aenderung.enthaelt_konsens_swap)
+(*>*)
 
 (*
 Wenn das delta hier nicht genau das delta ist wie von hat_konsens berechnet ist das exploitable.
@@ -120,8 +113,6 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
   by eval
 
 
-
-term Aenderung.abmachung_ausfuehren
 
 definition abmachung_ausfuehren
   :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
