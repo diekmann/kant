@@ -58,7 +58,6 @@ lemma \<open>zahlenwps Alice Carol initialwelt
  \<rparr>\<close> by eval
 
 
-
 lemma zahlenwps_id: "zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt"
   by(simp add: zahlenwps_def)
 
@@ -117,20 +116,22 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
 definition abmachung_ausfuehren
   :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
 where
-  "abmachung_ausfuehren abmachung welt \<equiv> welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>"
+  "abmachung_ausfuehren abmachung welt \<equiv>
+    welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>"
 
-lemma\<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
+lemma \<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
   = initialwelt\<lparr> besitz := \<lbrakk>(besitz initialwelt)(Alice += 3)\<rbrakk>\<rparr>\<close>
   by eval
 
 
-
+text\<open>Um eine \<^typ>\<open>(person, int) abmachung\<close> einzulösen wird diese erst ausgeführt
+und danach aus dem globalen Konsens entfernt, damit die Abmachung
+nicht mehrfach eingelöst werden kann.\<close>
 definition abmachung_einloesen :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "abmachung_einloesen delta welt \<equiv> 
   if enthaelt_konsens delta welt
   then Some ((abmachung_ausfuehren delta welt)\<lparr> konsens := konsens_entfernen delta (konsens welt)\<rparr>)
   else None"
-
 
 
 lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
@@ -160,13 +161,18 @@ lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
 lemma\<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = None\<close>
   by eval
 
-(*Welllllll*)
+text\<open>Die Handlungsabsicht \<^const>\<open>abmachung_einloesen\<close> stellt keine
+\<^const>\<open>wohlgeformte_handlungsabsicht\<close> dar, da in der Abmachung Personen
+hardcedoded sind.
+\<close>
 lemma "\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
          (Handlungsabsicht (\<lambda>p w. abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) w))"
   by eval
 
 
-(*ignoriert groesstenteils die handelnde person, nur um die Abmachung zu suchen*)
+text\<open>Wir können aber schnell eine wohlgeformte Handlungsabsicht daraus bauen,
+indem wir nicht die Abmachung an sich in die Handlungsabsicht hardcoden,
+sondern indem wir eine bestehende Abmachung in der Welt referenzieren.\<close>
 definition existierende_abmachung_einloesen :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "existierende_abmachung_einloesen p welt \<equiv> 
   case (konsens welt) p
@@ -199,7 +205,7 @@ lemma existierende_abmachung_einloesen_map_zahlenwps:
   done
 (*>*)
 
-text\<open>Auch in jeder welt gilt:\<close>
+text\<open>In jeder Welt ist damit die Handlungsabsicht wohlgeformt.\<close>
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
@@ -208,7 +214,8 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps welt
 
 
 
-text\<open>Es ist nur möglich, wenn alle Betroffenen auch zustimmen.
+text\<open>Es ist nur möglich eine \<^const>\<open>existierende_abmachung_einloesen\<close>,
+wenn alle Betroffenen auch zustimmen.
 Es is beispielsweise nicht möglich, dass \<^const>\<open>Alice\<close> eine Handlung
 ausführt, die \<^const>\<open>Carol\<close> betrifft, ohne deren Zustimmung.\<close>
 lemma "\<not> ausfuehrbar Alice
