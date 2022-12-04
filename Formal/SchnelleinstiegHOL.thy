@@ -14,7 +14,7 @@ maschinengeprüfte Beweise zu machen.
 
 Beispiel:\<close>
 
-lemma\<open>3 = 2+1\<close> by simp
+lemma \<open>3 = 2+1\<close> by simp
 
 text\<open>In der PDFversion wird der eigentliche Beweis ausgelassen.
 Aber keine Sorge, der Computer hat den Beweis überprüft.
@@ -59,7 +59,6 @@ text\<open>Funktionen sind gecurried. Hier ist eine Funktion welche 2 natürlich
 und eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat \<Rightarrow> nat\<close>):\<close>
 fun addieren :: \<open>nat \<Rightarrow> nat \<Rightarrow> nat\<close> where
   \<open>addieren a b = a + b\<close>
-
 
 lemma \<open>addieren 32 10 = 42\<close> by eval
 

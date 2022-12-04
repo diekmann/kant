@@ -53,7 +53,7 @@ Wenn wir uns den Typ \<^typ>\<open>'world handlung\<close> als Beobachtung der W
 dann könnte man sagen, unser Moralbegriff der \<^const>\<open>Maxime\<close> sei empirisch.
 Für Kant gilt jedoch:
 "Alle Moralbegriffe [...] haben \<^emph>\<open>a priori\<close> ihren Sitz und Ursprung ausschließlich in der Vernunft" \cite{russellphi}.
-Hier widerspricht unser Modell wieder Kant, da unser modell empirisch ist und nich apriorisch.
+Hier widerspricht unser Modell wieder Kant, da unser Modell empirisch ist und nicht apriorisch.
 
 
 Dies mag nun als Fehler in unserem Modell verstanden werden.
@@ -93,11 +93,13 @@ Beispielsweise mag "stehlen" und "bestohlen werden" die gleiche Handlung sein,
 jedoch wird sie von Täter und Opfer grundverschieden wahrgenommen.
 \<close>
 definition bevoelkerung :: \<open>'person set\<close> where \<open>bevoelkerung \<equiv> UNIV\<close>
+
 definition wenn_jeder_so_handelt
     :: \<open>'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> ('world handlung) set\<close>
   where
     \<open>wenn_jeder_so_handelt welt handlungsabsicht \<equiv>
       (\<lambda>handelnde_person. handeln handelnde_person welt handlungsabsicht) ` bevoelkerung\<close>
+
 fun was_wenn_jeder_so_handelt_aus_sicht_von
     :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
@@ -114,7 +116,7 @@ definition moralisch ::
   \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht maxime p\<close>
 
 text\<open>
-Faktisch bedeutet diese Definition, wir bilden das Kreuzprodukt Bevölkerung x Bevölkerung,
+Faktisch bedeutet diese Definition, wir bilden das Kreuzprodukt \<^term>\<open>bevoelkerung \<times> bevoelkerung\<close>,
 wobei jeder einmal als handelnde Person auftritt und einmal als betroffene Person.
 \<close>
 lemma moralisch_unfold:
@@ -245,7 +247,6 @@ lemma debug_maxime_exhaust [code]:
 
 subsection \<open>Beispiel\<close>
 (*TODO: bekomme ich das irgendwie in einen eignenen namespace?*)
-
 (*this causes
   fun moralisch _ _ _ = raise Fail "Kant.moralisch";
 when we don't use moralisch_exhaust.
@@ -345,7 +346,7 @@ lemma moralisch_MaximeDisjI:
   \<open>moralisch welt m1 ha \<or> moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha\<close>
   apply(simp add: moralisch_simp okay_MaximeDisj)
   by auto
-text\<open>Rückrichtung gilt leider nicht.
+text\<open>Die Rückrichtung gilt leider nicht.
 \<^term>\<open>MaximeDisj m1 m2\<close> is effektiv schwächer, da sich jede Person unabhängig entscheiden darf,
 ob sie \<^term>\<open>m1\<close> oder \<^term>\<open>m2\<close> folgt.
 Im Gegensatz dazu sagt \<^term>\<open>moralisch welt m1 ha \<or> moralisch welt m2 ha\<close> dass für
@@ -370,4 +371,25 @@ lemma moralisch_MaximeDisj_True:
 declare MaximeDisj.simps[simp del]
 (*>*)
 
+text\<open>Negation.\<close>
+fun MaximeNot :: \<open>('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime\<close>
+  where
+\<open>MaximeNot (Maxime m) = Maxime (\<lambda>p h. \<not> m p h)\<close>
+
+lemma okay_MaximeNot: \<open>okay (MaximeNot m) p h \<longleftrightarrow> \<not> okay m p h\<close>
+  by(cases \<open>m\<close>, simp)
+
+lemma okay_DeMorgan:
+\<open>okay (MaximeNot (MaximeConj m1 m2)) p h
+  \<longleftrightarrow>  okay (MaximeDisj (MaximeNot m1) (MaximeNot m2)) p h\<close>
+  by (simp add: okay_MaximeConj okay_MaximeDisj okay_MaximeNot)
+
+lemma moralisch_DeMorgan:
+\<open>moralisch welt (MaximeNot (MaximeConj m1 m2)) ha
+  \<longleftrightarrow>  moralisch welt (MaximeDisj (MaximeNot m1) (MaximeNot m2)) ha\<close>
+  by (simp add: moralisch_simp okay_DeMorgan)
+  
+(*<*)
+declare MaximeNot.simps[simp del]
+(*>*)
 end

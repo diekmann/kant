@@ -26,6 +26,8 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 (*>*)
 
 
+text\<open>Folgende Funktion beschreibt ob eine Handlung eine No-Op ist,
+also eine Handlung welche die Welt nicht verändert.\<close>
 definition ist_noop :: \<open>'world handlung \<Rightarrow> bool\<close> where
   \<open>ist_noop h \<equiv> vorher h = nachher h\<close>
 
@@ -55,7 +57,7 @@ wenn sich allerdings kein passendes Opfer findet, dann darf die Handlung scheite
 Oder es könnte der pathologische Sonderfall eintreten, dass ein Dieb sich selbst
 bestehlen soll.
 Auch hier darf die Handlung scheitern.
-Von außen betrachtet ist eine soche gescheiterte Handlung nicht zu unterscheiden vom Nichtstun.
+Von außen betrachtet ist eine solche gescheiterte Handlung nicht zu unterscheiden vom Nichtstun.
 Allerdings ist es für die moralische Betrachtung dennoch wichtig zu unterscheiden,
 ob die Handlungsabsicht ein gescheiterter Diebstahl war,
 oder ob die Handlungsabsicht einfach Nichtstun war.
@@ -63,7 +65,8 @@ Dadurch dass Handlungsabsichten partiell sind, können wir unterscheiden ob die 
 wie geplant ausgeführt wurde oder gescheitert ist.
 Moralisch sind Stehlen und Nichtstun sehr verschieden.\<close>
 
-fun nachher_handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
+fun nachher_handeln
+  :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
 where
   \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = 
     (case h handelnde_person welt of Some welt' \<Rightarrow> welt'
@@ -74,7 +77,8 @@ die Welt nicht verändert.
 Ab diesem Punkt sind also die Handlungen "sich selbst bestehlen" und "Nichtstun"
 von außen ununterscheidbar, da beide die Welt nicht verändern.\<close>
 
-definition handeln :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
+definition handeln
+  :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
 where
   \<open>handeln handelnde_person welt ha \<equiv> Handlung welt (nachher_handeln handelnde_person welt ha)\<close>
 
@@ -86,7 +90,7 @@ welche die Welt vor und nach der Handlung darstellt.\<close>
 
 text\<open>
 Beispiel, für eine Welt die nur aus einer Zahl besteht:
-Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten schl'gt die Handlung fehl.
+Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten schlägt die Handlung fehl.
 \<close>
 definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then Some (n+1) else None)\<close>
 
@@ -121,7 +125,7 @@ declare nachher_handeln.simps[simp del]
 
 
 text\<open>Um eine gescheiterte Handlung von einer Handlung welche die Welt nicht verändert
-zu unterscheiden, sagen wir, dass eine handlungsabsicht ausführbar ist,
+zu unterscheiden, sagen wir, dass eine Handlungsabsicht ausführbar ist,
 wenn die ausgeführte Handlungsabsicht nicht gescheitert ist:\<close>
 
 fun ausfuehrbar :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>

@@ -17,6 +17,4 @@ text_raw\<open>
 text\<open>\<^url>\<open>https://de.wikipedia.org/wiki/Kategorischer_Imperativ\<close>\<close>
 
 
-text\<open>Meine persönliche, etwas utilitaristische, Interpretation.\<close>
-
 end

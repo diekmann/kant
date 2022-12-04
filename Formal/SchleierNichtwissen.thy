@@ -55,18 +55,24 @@ text_raw\<open>
 \begin{equation*}
 \begin{tikzcd}[column sep=14em, row sep=huge]
 \textit{welt}
-  \arrow[red, d, "\textit{welt-personen-swap}\ \textit{p1}\ \textit{p2}" near start]
-  \arrow[blue]{r}[blue]{\textit{handeln}\ \textit{p1}}
+  \arrow[red, d, "\textit{wps}\ \textit{p1}\ \textit{p2}" near start]
+  \arrow[blue, r, "\textit{handeln}\ \textit{p1}"]
 & \textit{welt'} \\
 \textit{alternativ-welt}
-  \arrow[red]{r}{\textit{handeln}\ \textit{p2}}
+  \arrow[red, r, "\textit{handeln}\ \textit{p2}"]
 & \textit{alternativ-welt'}
-  \arrow[red, u, "\textit{welt-personen-swap}\ \textit{p1}\ \textit{p2}" near start]
+  \arrow[red, u, "\textit{wps}\ \textit{p1}\ \textit{p2}" near start]
 \end{tikzcd}
 \end{equation*}
 \<close>
 
 subsection\<open>Wohlgeformte Handlungsabsicht\<close>
+text\<open>Wir sagen, eine Handlungsabsicht ist wohlgeformt,
+genau dann wenn sie obiges kommutatives Diagramm erfüllt,
+d.h. wenn folgendes equivalent ist
+  \<^item> handeln in einer Welt.
+  \<^item> zwei Personen in einer Welt zu vertauschen, in der veränderten Welt zu handeln,
+    und die beiden Personen wieder zurück tauschen.\<close>
 
 fun wohlgeformte_handlungsabsicht
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
@@ -74,6 +80,7 @@ where
   \<open>wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h) =
    (\<forall>p1 p2. h p1 welt = map_option (wps p2 p1) (h p2 (wps p1 p2 welt)))\<close>
 
+(*<*)
 declare wohlgeformte_handlungsabsicht.simps[simp del]
 
 lemma wohlgeformte_handlungsabsicht_ausfuehrbar:
@@ -98,6 +105,7 @@ lemma wohlgeformte_handlungsabsicht_mit_wpsid:
   apply(simp split: option.split)
   apply(simp add: wps_id_def)
   done
+(*>*)
 
 
 text\<open>Folgende Folgerung erklärt die Definition vermutlich besser:\<close>
@@ -109,7 +117,43 @@ lemma wohlgeformte_handlungsabsicht_wpsid_imp_handeln:
   apply(drule(1) wohlgeformte_handlungsabsicht_mit_wpsid)
   apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht.simps handeln_def)
   done
+(*TODO: das sollte ein Homomorphismus sein.*)
 
+text\<open>Folgendes Lemma erlaubt es uns das kommutative Diagramm auch leicht anders zu zeichnen.\<close>
+lemma wohlgeformte_handlungsabsicht_wpsid_wpssym_komm:
+  assumes wpsid: \<open>\<forall>welt. wps_id wps welt\<close>
+    and wps_sym: \<open>\<forall>welt. wps p1 p2 welt = wps p2 p1 welt\<close>
+  shows \<open>wohlgeformte_handlungsabsicht wps (wps p1 p2 welt) ha \<Longrightarrow>
+    handeln p1 (wps p1 p2 welt) ha =
+            map_handlung (wps p1 p2) (handeln p2 welt ha)\<close>
+  apply(drule wohlgeformte_handlungsabsicht_mit_wpsid)
+  subgoal using wpsid by simp
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(subgoal_tac "wps p1 p2 (wps p1 p2 welt) = welt")
+   prefer 2
+   apply (metis wps_id_def wps_sym wpsid)
+  apply(simp add: )
+  apply(subgoal_tac "wps p2 p1 = wps p1 p2")
+   prefer 2 using wps_sym apply presburger
+  by simp
+
+  text_raw\<open>
+\begin{equation*}
+\begin{tikzcd}[column sep=14em, row sep=huge]
+\textit{welt}
+  \arrow[blue, d, "\textit{wps}\ \textit{p1}\ \textit{p2}" near start]
+  \arrow[red, r, "\textit{handeln}\ \textit{p2}"]
+& \textit{welt'} 
+  \arrow[red, d, "\textit{wps}\ \textit{p1}\ \textit{p2}" near start]\\
+\textit{alternativ-welt}
+  \arrow[blue, r, "\textit{handeln}\ \textit{p1}"]
+& \textit{alternativ-welt'}
+\end{tikzcd}
+\end{equation*}
+\<close>
+
+(*<*)
 lemma wfh_handeln_imp_wpsid:
   \<open>(\<forall>p1 p2. handeln p1 welt ha =
             map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha)) \<Longrightarrow>
@@ -133,27 +177,22 @@ lemma wohlgeformte_handlungsabsicht_wpsid_simp:
    apply (metis ausfuehrbar.simps)
   apply(simp add: ausfuehrbar.simps)
   by (metis option.simps(5))
-  
+(*>*)
 
 
+text\<open>In einigen späteren Beispielen möchten wir zeigen, dass bestimmte Handlungsabsichten
+nicht wohlgeformt sind.\<close>
 fun wohlgeformte_handlungsabsicht_gegenbeispiel
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt (Handlungsabsicht h) taeter opfer \<longleftrightarrow>
   h taeter welt \<noteq> map_option (wps opfer taeter) (h opfer (wps taeter opfer welt))\<close>
 
-lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt ha p1 p2 \<Longrightarrow>
+lemma \<open>\<exists>p1 p2. wohlgeformte_handlungsabsicht_gegenbeispiel wps welt ha p1 p2 \<longleftrightarrow>
         \<not>wohlgeformte_handlungsabsicht wps welt ha\<close>
-  by(cases \<open>ha\<close>, auto simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
+  by blast
 
-(*TODO: das sollte ein Homomorphismus sein.*)
-
-(* das gilt nicht mehr! wpsid muss ich annehmen
-lemma wohlgeformte_handlungsabsicht_imp_swpaid:
-  \<open>wohlgeformte_handlungsabsicht wps welt h \<Longrightarrow>
-    wps p1 p2 (wps p2 p1 welt) = welt\<close>
-  by(simp add: wohlgeformte_handlungsabsicht_simp)
-*)
 
 
 
@@ -180,11 +219,14 @@ wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht (zha))\<close>
 (*>*)
 
 
-text\<open>Nach der gleichen Argumentation müssen Maxime und Handlungsabsicht so generisch sein,
-dass sie in allen Welten zum gleichen Ergebnis kommen.\<close>
-(*
-Warum die Vorbedingung: Sonderfall noops: (bsp von sich selbst stehlen). Ohne das geht z.B. stehlen nicht.
-*)
+subsection\<open>Spezialfall: Maxime und Handlungsabsichten haben nette Eigenschaften\<close>
+text\<open>Dieses Kapitel darf gerne übersprungen werden,
+da der Spezialfall nur in bestimmten Beweisen interessant wird.\<close>
+
+text\<open>Nach der gleichen Argumentation müssten Maxime und Handlungsabsicht so generisch sein,
+dass sie in allen Welten zum gleichen Ergebnis kommen.
+Dies gilt jedoch nicht immer.
+Wenn dieser Sonderfall eintritt sagen wir, Maxime und Handlungsabsicht generalisieren.\<close>
 definition maxime_und_handlungsabsicht_generalisieren
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> 
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
@@ -192,7 +234,13 @@ where
   \<open>maxime_und_handlungsabsicht_generalisieren wps welt m h p =
     (\<forall>p1 p2. (ausfuehrbar p welt h \<and> ausfuehrbar p (wps p1 p2 welt) h)
               \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (wps p1 p2 welt) h))\<close>
-
+text\<open>Die Vorbedingungen in obiger Definition,
+nämlich dass die Handlungsabsicht \<^const>\<open>ausfuehrbar\<close> ist,
+ist nötig, um z.B. Handlungsabsichten wie das Stehlen zu ermöglichen;
+jedoch gibt es beim Stehlen genau den pathologischen Grenzfall von-sich-selbst Stehlen,
+welcher in einer No-Op endet und das Ergebnis damit nicht moralisch falsch ist.
+Durch die Einschränkung auf \<^const>\<open>ausfuehrbar\<close> Fälle lassen sich solche pathologischen Grenzfälle
+ausklammern.\<close>
 
 text\<open>Für eine gegebene Maxime schließt die Forderung
 \<^const>\<open>maxime_und_handlungsabsicht_generalisieren\<close> leider einige Handlungen aus.
@@ -218,11 +266,12 @@ lemma
   
 
 
-text\<open>Die Maxime und \<^typ>\<open>('person, 'world) wp_swap\<close> müssen einige Eigenschaften erfüllen.
+text\<open>Die Maxime und \<^typ>\<open>('person, 'world) wp_swap\<close> können einige Eigenschaften erfüllen.
+
 Wir kürzen das ab mit \<^term>\<open>wpsm :: ('person, 'world) wp_swap\<close>: Welt Person Swap Maxime.\<close>
 
 text\<open>Die Person für die Maxime ausgewertet wird und swappen der Personen in der Welt
-muss equivalent sein:\<close>
+kann equivalent sein:\<close>
 definition wpsm_kommutiert
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
@@ -232,6 +281,7 @@ where
     \<longleftrightarrow>
     okay m p1 (Handlung welt (wps p1 p2 (nachher_handeln p1 (wps p2 p1 welt) ha)))\<close>
 
+(*<*)
 lemma wpsm_kommutiert_handlung_raw:
   \<open>wpsm_kommutiert m wps welt =
   (\<forall> p1 p2 ha.
@@ -260,8 +310,10 @@ lemma wpsm_kommutiert_unfold_handlungsabsicht:
   )\<close>
   apply(simp add: wpsm_kommutiert_handlung_raw)
   by (simp add: handeln_def nachher_handeln.simps)
+(*>*)
 
-text\<open>Wenn sowohl \<^const>\<open>wohlgeformte_handlungsabsicht\<close> als auch \<^const>\<open>wpsm_kommutiert\<close>,
+text\<open>Wenn sowohl eine \<^const>\<open>wohlgeformte_handlungsabsicht\<close> vorliegt,
+als auch \<^const>\<open>wpsm_kommutiert\<close>,
 dann erhalten wir ein sehr intuitives Ergebnis,
 welches besagt, dass ich handelnde Person und Person für die die Maxime gelten soll
 vertauschen kann.\<close>

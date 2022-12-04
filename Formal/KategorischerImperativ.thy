@@ -117,7 +117,7 @@ lemma
 text\<open>Vergleich zu \<^const>\<open>moralisch\<close>.
 Wenn eine Handlung moralisch ist, dann impliziert diese Handlung die Kernforderung des
 \<^const>\<open>kategorischer_imperativ\<close>.
-Wenn die Handlungsabsicht für mich okaz ist, ist sie auch für alle anderen okay.\<close>
+Wenn die Handlungsabsicht für mich okay ist, ist sie auch für alle anderen okay.\<close>
 lemma \<open>moralisch welt m ha \<Longrightarrow>
         kategorischer_imperativ_auf ha welt m\<close>
   by(simp add: moralisch_simp kategorischer_imperativ_auf_def)
@@ -526,7 +526,7 @@ kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
   apply(code_simp)
   done
 
-text\<open>zumindest gelten folgende Regeln welche einer gewöhnlichen Disjuntions Intoroduction
+text\<open>zumindest gelten folgende Regeln welche einer gewöhnlichen Disjuntions Introduction
 ähnlich sehen (mit leicht stärkeren Annahmen):\<close>
 lemma
 \<open>(ex_erfuellbare_instanz m1 welt ha \<and> kategorischer_imperativ_auf ha welt m1)
@@ -563,26 +563,12 @@ lemma kategorischer_imperativ_auf_MaximeDisj_False:
 
 
 
-
-
-
-
-(*TODO: move to Maxime.*)
-fun MaximeNot :: \<open>('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime\<close>
-  where
-\<open>MaximeNot (Maxime m) = Maxime (\<lambda>p h. \<not> m p h)\<close>
-
-lemma okay_MaximeNot: \<open>okay (MaximeNot m) p h \<longleftrightarrow> \<not> okay m p h\<close>
-  by(cases \<open>m\<close>, simp)
-
-declare MaximeNot.simps[simp del]
-
+text\<open>Die Negation verhält sich wie erwartet.\<close>
 lemma kategorischer_imperativ_auf_Maxime_DeMorgan:
 \<open>kategorischer_imperativ_auf ha welt (MaximeNot (MaximeConj m1 m2))
   \<longleftrightarrow>
   kategorischer_imperativ_auf ha welt (MaximeDisj (MaximeNot m1) (MaximeNot m2))\<close>
-  by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeDisj okay_MaximeConj okay_MaximeNot)
-  
+  by (simp add: kategorischer_imperativ_auf_def moralisch_DeMorgan okay_DeMorgan)
 
 lemma kategorischer_imperativ_auf_MaximeNot_double:
   \<open>kategorischer_imperativ_auf ha welt (MaximeNot (MaximeNot m))

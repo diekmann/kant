@@ -28,7 +28,7 @@ begin
   definition \<open>enum_ex_person P \<longleftrightarrow> P Alice \<or> P Bob \<or> P Carol \<or> P Eve\<close>
 
 instance proof
-  qed (simp_all only: enum_person_def enum_all_person_def enum_ex_person_def UNIV_person, simp_all)
+  qed (simp_all add: enum_person_def enum_all_person_def enum_ex_person_def UNIV_person)
 end
 
 text\<open>Also makes maps partially executable.\<close>
