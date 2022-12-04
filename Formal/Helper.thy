@@ -43,4 +43,17 @@ lemma count_list_distinct: \<open>distinct P \<Longrightarrow> x \<in> set P \<L
   by(auto)
 
 
+
+text\<open>For some reason, I like \<^const>\<open>List.map_filter\<close>. But standard library support is poor.\<close>
+lemma List_map_filter_as_comprehension:
+  "List.map_filter f xs = [the (f x). x \<leftarrow> xs, f x \<noteq> None]"
+  by(induction xs) (simp add: List.map_filter_def)+
+lemma List_map_filter_as_foldr:
+  "List.map_filter f xs = foldr (\<lambda>x acc. case f x of Some a \<Rightarrow> a#acc | None \<Rightarrow> acc) xs []"
+  apply(induction xs)
+  apply(simp add: List.map_filter_def)
+  apply(simp add: List.map_filter_def)
+  apply(safe, simp)
+  done
+
 end

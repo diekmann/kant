@@ -328,6 +328,18 @@ lemma to_abmachung_simp_call:
      then (to_abmachung deltas p) + (aenderung_val delta)
      else (to_abmachung deltas p))"
   by(simp)
+
+lemma to_abmachung_fold_induct_helper:
+  fixes as :: "('person, 'etwas::ordered_ab_group_add) aenderung list"
+  shows "fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as abmachung =
+    (\<lambda>p. to_abmachung as p + abmachung p)"
+  apply(induction as arbitrary:abmachung)
+  by(simp add: fun_eq_iff)+
+lemma to_abmachung_fold:
+  fixes as :: "('person, 'etwas::ordered_ab_group_add) aenderung list"
+shows "to_abmachung as = fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as (\<lambda>_. 0)"
+  apply(subst to_abmachung_fold_induct_helper[where abmachung="\<lambda>_. 0"])
+  by simp
 (*>*)
 
 
@@ -659,6 +671,16 @@ lemma konsens_entfernen_konsensswap:
 
 
 
+definition reverse_engineer_abmachung
+  :: "('person::enum \<Rightarrow> int) handlung \<Rightarrow> ('person, int) abmachung"
+where
+  "reverse_engineer_abmachung h \<equiv>
+    fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)"
 
+lemma "reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)"
+  apply(simp add: to_abmachung_fold reverse_engineer_abmachung_def)
+  apply(cases h, simp add: delta_num_def)
+  apply(simp add: List.map_filter_def)
+  oops
 
 end
