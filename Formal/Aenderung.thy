@@ -340,6 +340,55 @@ lemma to_abmachung_fold:
 shows "to_abmachung as = fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as (\<lambda>_. 0)"
   apply(subst to_abmachung_fold_induct_helper[where abmachung="\<lambda>_. 0"])
   by simp
+
+
+lemma to_abmachung_List_map_filter_simp_call:
+  fixes f :: "'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option"
+  assumes valid_f: "\<forall>p. (case f p of Some a \<Rightarrow> betroffen a = p | None \<Rightarrow> True)"
+  shows
+  "p \<in> set as \<Longrightarrow> distinct as \<Longrightarrow>
+   to_abmachung (List.map_filter f as) p =
+    (case f p of Some a \<Rightarrow> to_abmachung [a] p | None \<Rightarrow> 0)"
+proof(induction as)
+  case Nil
+  then show ?case by simp
+next
+  case (Cons a as)
+  from valid_f have filter_not_in_set:
+    "p \<notin> set ps \<Longrightarrow> to_abmachung (List.map_filter f ps) p = 0" for p ps
+    apply(induction ps)
+    apply(simp add: List.map_filter_simps)
+    apply(simp add: List.map_filter_simps split:option.split)
+    apply(clarsimp, rename_tac a ps a2)
+    apply(subgoal_tac "betroffen a2 = a")
+     apply simp
+    by (metis (mono_tags, lifting) option.simps(5))
+
+  from Cons show ?case
+    apply(simp add: List.map_filter_simps)
+    apply(safe)
+     apply(case_tac "f p")
+      apply(simp add: filter_not_in_set; fail)
+     apply(simp add: filter_not_in_set)
+    using filter_not_in_set apply blast
+    apply(simp)
+     apply(case_tac "f a")
+      apply(simp add: filter_not_in_set; fail)
+    apply(simp add: filter_not_in_set)
+    by (metis (mono_tags, lifting) option.simps(5) valid_f)
+qed
+
+lemma to_abmachung_List_map_filter_enum_simp_call:
+fixes f :: "'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option"
+  assumes valid_f: "\<forall>p. (case f p of Some a \<Rightarrow> betroffen a = p | None \<Rightarrow> True)"
+  shows
+  "to_abmachung (List.map_filter f Enum.enum) p =
+    (case f p of Some a \<Rightarrow> to_abmachung [a] p | None \<Rightarrow> 0)"
+  apply(rule to_abmachung_List_map_filter_simp_call)
+  using valid_f apply(simp)
+   apply(simp add: enum_class.enum_UNIV)
+  apply(simp add: enum_class.enum_distinct)
+  done
 (*>*)
 
 
@@ -667,6 +716,17 @@ lemma konsens_entfernen_konsensswap:
   apply(simp add: swap_id_in_set)
   apply(simp add: konsensswap_apply swap_def comp_def)
   by (simp add: list.map_ident_strong)
+
+
+
+lemma to_abmachung_delta_num_fun_simp_call:
+  (*stronger than the usual ordered_ab_group_add*)
+  fixes vor::"('person::enum \<Rightarrow> 'etwas::linordered_ab_group_add)"
+  shows "to_abmachung (delta_num_fun (Handlung vor nach)) p = nach p - vor p"
+  apply(simp)
+  apply(subst to_abmachung_List_map_filter_enum_simp_call)
+  subgoal by(simp add: delta_num_def)
+  by(simp add: delta_num_def)
 (*>*)
 
 
@@ -677,10 +737,13 @@ where
   "reverse_engineer_abmachung h \<equiv>
     fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)"
 
-lemma "reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)"
-  apply(simp add: to_abmachung_fold reverse_engineer_abmachung_def)
-  apply(cases h, simp add: delta_num_def)
-  apply(simp add: List.map_filter_def)
-  oops
+lemma reverse_engineer_abmachung:
+  "reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)"
+  apply(simp add: fun_eq_iff reverse_engineer_abmachung_def)
+  apply(cases h, simp del: delta_num_fun.simps)
+  apply(subst to_abmachung_delta_num_fun_simp_call)
+  apply(subst fold_enum_fun_update_call)
+  by simp
+
 
 end

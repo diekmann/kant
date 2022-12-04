@@ -56,4 +56,27 @@ lemma List_map_filter_as_foldr:
   apply(safe, simp)
   done
 
+
+
+
+lemma fold_fun_update_call_helper:
+  "p \<notin> set xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = start p"
+  by(induction xs arbitrary: start) simp+
+
+lemma fold_fun_update_call:
+  "p \<in> set xs \<Longrightarrow> distinct xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = f p"
+  apply(induction xs arbitrary: start)
+   apply(simp; fail)
+  apply(simp)
+  apply(safe)
+   apply(simp add: fold_fun_update_call_helper; fail)
+  apply(simp)
+  done
+
+lemma fold_enum_fun_update_call:
+  "fold (\<lambda>x acc. acc(x := f x)) Enum.enum start p = f p"
+  apply(rule fold_fun_update_call)
+   apply(simp add: enum_class.enum_UNIV)
+  apply(simp add: enum_class.enum_distinct)
+  done
 end
