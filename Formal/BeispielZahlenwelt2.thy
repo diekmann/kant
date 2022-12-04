@@ -76,31 +76,33 @@ lemma enthaelt_konsens_swap:
   by(simp add: enthaelt_konsens_def zahlenwps_def Aenderung.enthaelt_konsens_swap)
 (*>*)
 
-(*
-Wenn das delta hier nicht genau das delta ist wie von hat_konsens berechnet ist das exploitable.
 
-Also `to_abmachung (delta_num_fun (map_handlung besitz h))` muss eindeutig genau das richtige
-reverse engineeren.
-
-TODO: `to_abmachung (delta_num_fu` ersetzen durch direktes Funktion bauen!
-*)
+text\<open>Wenn \<^const>\<open>reverse_engineer_abmachung\<close> hier nicht genau die gleiche Abmachung
+berechnet wie später eingelöst, dann wird das ganze exploitable.
+Da eine \<^typ>\<open>('person, 'etwas) abmachung\<close> aber eine eindeutige Darstellung sein sollte,
+müsst das so funktionieren.\<close>
 definition hat_konsens :: "zahlenwelt handlung \<Rightarrow> bool"
 where
   "hat_konsens h \<equiv>
-    let abmachung = to_abmachung (delta_num_fun (map_handlung besitz h))
+    let abmachung = reverse_engineer_abmachung (map_handlung besitz h)
     in enthaelt_konsens abmachung (vorher h)"
 
 
-lemma "hat_konsens (map_handlung (zahlenwps p1 p2) h) = hat_konsens h"
+(*<*)
+lemma hat_konsens_swap:
+  "hat_konsens (map_handlung (zahlenwps p1 p2) h) = hat_konsens h"
   apply(cases h, rename_tac vor nach, simp)
   apply(simp add: hat_konsens_def)
-  oops (*erst funktion updaten*)
+  apply(case_tac vor, case_tac nach, simp add: zahlenwps_def)
+  apply(simp add: reverse_engineer_abmachung_swap)
+  by (simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
+(*>*)
 
 
 text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
 lemma "hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w)))"
   apply(simp add: hat_konsens_def Let_def)
-  apply(simp add: handeln_def nachher_handeln.simps enum_person_def delta_num_same)
+  apply(simp add: handeln_def nachher_handeln.simps reverse_engineer_abmachung_same)
   apply(code_simp)
   done
   

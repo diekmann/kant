@@ -79,4 +79,8 @@ lemma fold_enum_fun_update_call:
    apply(simp add: enum_class.enum_UNIV)
   apply(simp add: enum_class.enum_distinct)
   done
+
+lemma fold_enum_fun_update:
+  "fold (\<lambda>x acc. acc(x := f x)) Enum.enum start = f"
+  using fold_enum_fun_update_call by auto  
 end

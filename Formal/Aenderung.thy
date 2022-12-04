@@ -732,7 +732,7 @@ lemma to_abmachung_delta_num_fun_simp_call:
 
 
 definition reverse_engineer_abmachung
-  :: "('person::enum \<Rightarrow> int) handlung \<Rightarrow> ('person, int) abmachung"
+  :: "('person::enum \<Rightarrow> 'etwas::linordered_ab_group_add) handlung \<Rightarrow> ('person, 'etwas) abmachung"
 where
   "reverse_engineer_abmachung h \<equiv>
     fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)"
@@ -744,6 +744,17 @@ lemma reverse_engineer_abmachung:
   apply(subst to_abmachung_delta_num_fun_simp_call)
   apply(subst fold_enum_fun_update_call)
   by simp
+
+(*<*)
+lemma reverse_engineer_abmachung_same:
+  "reverse_engineer_abmachung (Handlung v v) = (\<lambda>_. 0)"
+  by(simp add: reverse_engineer_abmachung_def fun_eq_iff fold_enum_fun_update_call)
+
+lemma reverse_engineer_abmachung_swap:
+  "reverse_engineer_abmachung (Handlung (swap p1 p2 vor) (swap p1 p2 nach)) =
+        swap p1 p2 (reverse_engineer_abmachung (Handlung vor nach))"
+  by(simp add: fun_eq_iff reverse_engineer_abmachung_def fold_enum_fun_update swap_def)
+(*>*)
 
 
 end
