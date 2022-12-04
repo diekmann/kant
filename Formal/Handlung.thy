@@ -90,10 +90,10 @@ Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten schl'gt die Handlu
 \<close>
 definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then Some (n+1) else None)\<close>
 
-lemma "nachher_handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = 43" by eval
-lemma "handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = Handlung 42 43" by eval
-lemma "nachher_handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht = 9000" by eval
-lemma "ist_noop (handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht)" by eval
+lemma \<open>nachher_handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = 43\<close> by eval
+lemma \<open>handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = Handlung 42 43\<close> by eval
+lemma \<open>nachher_handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht = 9000\<close> by eval
+lemma \<open>ist_noop (handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht)\<close> by eval
 
 text \<open>
 Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
@@ -124,9 +124,9 @@ text\<open>Um eine gescheiterte Handlung von einer Handlung welche die Welt nich
 zu unterscheiden, sagen wir, dass eine handlungsabsicht ausführbar ist,
 wenn die ausgeführte Handlungsabsicht nicht gescheitert ist:\<close>
 
-fun ausfuehrbar :: "'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool"
+fun ausfuehrbar :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 where
-  "ausfuehrbar p welt (Handlungsabsicht h) = (h p welt \<noteq> None)"
+  \<open>ausfuehrbar p welt (Handlungsabsicht h) = (h p welt \<noteq> None)\<close>
 
 (*<*)
 declare ausfuehrbar.simps[simp del]
@@ -135,7 +135,7 @@ declare ausfuehrbar.simps[simp del]
 text\<open>Nicht ausführbare Handlungen resultieren in unserem Modell im Nichtstun:\<close>
 lemma nicht_ausfuehrbar_ist_noop:
   \<open>\<not>ausfuehrbar p welt ha \<Longrightarrow> ist_noop (handeln p welt ha)\<close>
-  apply(cases ha)
+  apply(cases \<open>ha\<close>)
   by(simp add: ausfuehrbar.simps ist_noop_def handeln_def nachher_handeln.simps)
 
 (*<*)

@@ -46,11 +46,11 @@ lemma count_list_distinct: \<open>distinct P \<Longrightarrow> x \<in> set P \<L
 
 text\<open>For some reason, I like \<^const>\<open>List.map_filter\<close>. But standard library support is poor.\<close>
 lemma List_map_filter_as_comprehension:
-  "List.map_filter f xs = [the (f x). x \<leftarrow> xs, f x \<noteq> None]"
-  by(induction xs) (simp add: List.map_filter_def)+
+  \<open>List.map_filter f xs = [the (f x). x \<leftarrow> xs, f x \<noteq> None]\<close>
+  by(induction \<open>xs\<close>) (simp add: List.map_filter_def)+
 lemma List_map_filter_as_foldr:
-  "List.map_filter f xs = foldr (\<lambda>x acc. case f x of Some a \<Rightarrow> a#acc | None \<Rightarrow> acc) xs []"
-  apply(induction xs)
+  \<open>List.map_filter f xs = foldr (\<lambda>x acc. case f x of Some a \<Rightarrow> a#acc | None \<Rightarrow> acc) xs []\<close>
+  apply(induction \<open>xs\<close>)
   apply(simp add: List.map_filter_def)
   apply(simp add: List.map_filter_def)
   apply(safe, simp)
@@ -60,12 +60,12 @@ lemma List_map_filter_as_foldr:
 
 
 lemma fold_fun_update_call_helper:
-  "p \<notin> set xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = start p"
-  by(induction xs arbitrary: start) simp+
+  \<open>p \<notin> set xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = start p\<close>
+  by(induction \<open>xs\<close> arbitrary: \<open>start\<close>) simp+
 
 lemma fold_fun_update_call:
-  "p \<in> set xs \<Longrightarrow> distinct xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = f p"
-  apply(induction xs arbitrary: start)
+  \<open>p \<in> set xs \<Longrightarrow> distinct xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = f p\<close>
+  apply(induction \<open>xs\<close> arbitrary: \<open>start\<close>)
    apply(simp; fail)
   apply(simp)
   apply(safe)
@@ -74,13 +74,13 @@ lemma fold_fun_update_call:
   done
 
 lemma fold_enum_fun_update_call:
-  "fold (\<lambda>x acc. acc(x := f x)) Enum.enum start p = f p"
+  \<open>fold (\<lambda>x acc. acc(x := f x)) Enum.enum start p = f p\<close>
   apply(rule fold_fun_update_call)
    apply(simp add: enum_class.enum_UNIV)
   apply(simp add: enum_class.enum_distinct)
   done
 
 lemma fold_enum_fun_update:
-  "fold (\<lambda>x acc. acc(x := f x)) Enum.enum start = f"
+  \<open>fold (\<lambda>x acc. acc(x := f x)) Enum.enum start = f\<close>
   using fold_enum_fun_update_call by auto  
 end

@@ -11,9 +11,9 @@ lemma swap1[simp]: \<open>swap a b (swap a b f) = f\<close>
   by(simp add: swap_def)
 lemma swap2[simp]: \<open>swap b a (swap a b f) = f\<close>
   by(simp add: swap_def)
-lemma swap3: "(swap p1 p2 swap) p1 p2 x = x" (*wow, types*)
+lemma swap3: \<open>(swap p1 p2 swap) p1 p2 x = x\<close> (*wow, types*)
   by(simp add: swap_def)
-lemma swap4: "(swap p2 p1 swap) p1 p2 x = x" (*wow, types*)
+lemma swap4: \<open>(swap p2 p1 swap) p1 p2 x = x\<close> (*wow, types*)
   by(simp add: swap_def)
 lemma swap_id[simp]: \<open>swap a a f = f\<close>
   by(simp add: swap_def)
@@ -36,15 +36,15 @@ lemma sum_swap_none: \<open>a \<notin> P \<Longrightarrow> b \<notin> P \<Longri
 lemma swap_nothing: \<open>a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a\<close>
   by(simp add: swap_def)
 
-lemma swap_id_comp: "swap a a = id"
+lemma swap_id_comp: \<open>swap a a = id\<close>
   by(simp add: fun_eq_iff)
 lemma swap_fun_comp_id:
-  "swap p1 p2 (f \<circ> swap p1 p2 (f \<circ> kons)) = f \<circ> (f \<circ> kons)"
+  \<open>swap p1 p2 (f \<circ> swap p1 p2 (f \<circ> kons)) = f \<circ> (f \<circ> kons)\<close>
   apply(simp add: comp_def fun_eq_iff)
   apply(simp add: swap_def)
   done
 lemma swap_fun_map_comp_id:
-  "swap p1 p2 (map (swap p1 p2) \<circ> swap p1 p2 (map (swap p1 p2) \<circ> kons)) = kons"
+  \<open>swap p1 p2 (map (swap p1 p2) \<circ> swap p1 p2 (map (swap p1 p2) \<circ> kons)) = kons\<close>
   apply(simp add: comp_def fun_eq_iff)
   apply(simp add: swap_def swap_id_comp)
   by (simp add: map_idI)
@@ -75,44 +75,44 @@ lemma sum_list_swap: \<open>p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Lo
 
 
 lemma min_list_swap_int:
-  fixes f::"'person \<Rightarrow> int"
-  shows "p1 \<in> set ps \<Longrightarrow> p2 \<in> set ps \<Longrightarrow> min_list (map (swap p1 p2 f) ps) = min_list (map f ps)"
-  apply(cases "ps = []")
+  fixes f::\<open>'person \<Rightarrow> int\<close>
+  shows \<open>p1 \<in> set ps \<Longrightarrow> p2 \<in> set ps \<Longrightarrow> min_list (map (swap p1 p2 f) ps) = min_list (map f ps)\<close>
+  apply(cases \<open>ps = []\<close>)
    apply(simp; fail)
   apply(simp add: min_list_Min)
-  apply(cases "p1 = p2")
+  apply(cases \<open>p1 = p2\<close>)
    apply(simp)
   by (smt (verit, best) List.finite_set Min_in Min_le arg_min_list_in f_arg_min_list_f finite_imageI imageE image_eqI image_is_empty swap2 swap_a swap_b swap_nothing)
 
 lemma min_list_swap_int_enum:
-  fixes f::"'person::enum \<Rightarrow> int"
-  shows "min_list (map (swap p1 p2 f) enum_class.enum) = min_list (map f enum_class.enum)"
+  fixes f::\<open>'person::enum \<Rightarrow> int\<close>
+  shows \<open>min_list (map (swap p1 p2 f) enum_class.enum) = min_list (map f enum_class.enum)\<close>
   apply(subst min_list_swap_int)
   by(simp_all add: enum_class.enum_UNIV)
 
 lemma remove1_swap:
-  "remove1 (swap p1 p2 a) (map (swap p1 p2) ks)
-    = map (swap p1 p2) (remove1 a ks)"
-  apply(induction ks)
+  \<open>remove1 (swap p1 p2 a) (map (swap p1 p2) ks)
+    = map (swap p1 p2) (remove1 a ks)\<close>
+  apply(induction \<open>ks\<close>)
    apply(simp)
   apply(simp)
   by (metis swap2)
 
 lemma remove1_swap2:
-  "map (swap p1 p2) (remove1 (swap p1 p2 a) (map (swap p1 p2) ks))
-    =  remove1 a ks"
-  apply(induction ks)
+  \<open>map (swap p1 p2) (remove1 (swap p1 p2 a) (map (swap p1 p2) ks))
+    =  remove1 a ks\<close>
+  apply(induction \<open>ks\<close>)
    apply(simp)
   apply(simp add: comp_def)
   by (metis (mono_tags, lifting) swap2)
 
 lemma swap_if_move_inner:
-  "swap p2 p1 (\<lambda>p. if P p then A p else B p)
-    = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))"
+  \<open>swap p2 p1 (\<lambda>p. if P p then A p else B p)
+    = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))\<close>
   by(simp add: swap_def fun_eq_iff)
   
 lemma swap_id_in_set:
-  "swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A"
+  \<open>swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A\<close>
   by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
 
 

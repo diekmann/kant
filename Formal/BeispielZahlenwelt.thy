@@ -165,8 +165,8 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
     \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
-    apply(cases welt)
-    apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen, where C=Zahlenwelt])
+    apply(cases \<open>welt\<close>)
+    apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen, where C=\<open>Zahlenwelt\<close>])
     by(auto)
 (*>*)
 
@@ -213,13 +213,13 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
     \<open>unmoeglich _ _ = None\<close>
 
 text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
-definition "handlungsabsichten \<equiv> [
+definition \<open>handlungsabsichten \<equiv> [
   Handlungsabsicht (erschaffen 5),
   Handlungsabsicht (stehlen4 5 10),
   Handlungsabsicht reset,
   Handlungsabsicht alles_kaputt_machen,
   Handlungsabsicht unmoeglich
-]"
+]\<close>
 
 lemma \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
   apply(simp add: handlungsabsichten_def)
@@ -251,13 +251,13 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       done
   (*>*)
 
-  lemma "ha \<in> {
+  lemma \<open>ha \<in> {
     Handlungsabsicht (erschaffen 5),
     Handlungsabsicht (stehlen_nichtwf 5 Bob),
     Handlungsabsicht (stehlen4 5 10),
     Handlungsabsicht alles_kaputt_machen,
     Handlungsabsicht unmoeglich
-  } \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt ha p"
+  } \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt ha p\<close>
     apply(simp)
     apply(safe)
        apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
@@ -579,17 +579,17 @@ subsection\<open>Ungültige Maxime\<close>
     apply(intro allI, rename_tac h, case_tac \<open>h\<close>)
     apply(simp)
     done
-  lemma "\<not>wohlgeformte_maxime_auf
+  lemma \<open>\<not>wohlgeformte_maxime_auf
     (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
-    (Maxime (\<lambda>ich. individueller_fortschritt Alice))"
+    (Maxime (\<lambda>ich. individueller_fortschritt Alice))\<close>
     apply(simp add: wohlgeformte_maxime_auf_def)
-    apply(rule_tac x=Alice in exI)
-    apply(rule_tac x=Bob in exI)
+    apply(rule_tac x=\<open>Alice\<close> in exI)
+    apply(rule_tac x=\<open>Bob\<close> in exI)
     apply(code_simp)
     done
-  lemma "wohlgeformte_maxime_auf
+  lemma \<open>wohlgeformte_maxime_auf
     (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
-    (Maxime (\<lambda>ich. individueller_fortschritt ich))"
+    (Maxime (\<lambda>ich. individueller_fortschritt ich))\<close>
     apply(simp add: wohlgeformte_maxime_auf_def)
     apply(code_simp)
     done

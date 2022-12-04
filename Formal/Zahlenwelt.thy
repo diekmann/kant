@@ -333,14 +333,14 @@ lemma aufsummieren_swap:
 
 
 
-lemma list_not_empty_iff_has_element: "as \<noteq> [] \<longleftrightarrow> (\<exists>a. a \<in> set as)"
+lemma list_not_empty_iff_has_element: \<open>as \<noteq> [] \<longleftrightarrow> (\<exists>a. a \<in> set as)\<close>
   by (simp add: ex_in_conv)
 
-lemma enum_class_not_empty_list: "enum_class.enum \<noteq> []"
+lemma enum_class_not_empty_list: \<open>enum_class.enum \<noteq> []\<close>
   using enum_class.in_enum list_not_empty_iff_has_element by blast
 
 lemma alles_kaputt_machen_code_help:
-  "(\<lambda>_. Min (range x) - 1) = (\<lambda>_. min_list (map x enum_class.enum) - 1)"
+  \<open>(\<lambda>_. Min (range x) - 1) = (\<lambda>_. min_list (map x enum_class.enum) - 1)\<close>
   apply(subst min_list_Min)
    apply(simp add: enum_class_not_empty_list; fail)
   apply(simp)
@@ -351,7 +351,7 @@ lemma alles_kaputt_machen_code_help:
 
 
 text\<open>\<^const>\<open>swap\<close> funktioniert auch auf Mengen.\<close>
-lemma "(swap Alice Carol id) ` {Alice, Bob} = {Carol, Bob}" by eval
+lemma \<open>(swap Alice Carol id) ` {Alice, Bob} = {Carol, Bob}\<close> by eval
 
 
 end

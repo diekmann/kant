@@ -303,25 +303,25 @@ lemma \<open>debug_maxime show_map
 subsection\<open>Maximen Kombinieren\<close>
 text\<open>Konjunktion (Und) zweier Maximen.\<close>
 fun MaximeConj
-  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  :: \<open>('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime\<close>
   where
-"MaximeConj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)"
+\<open>MaximeConj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<and> m2 p h)\<close>
 
 text\<open>Die erwarteten Regeln auf einer Konjunktion gelten.\<close>
-lemma okay_MaximeConj: "okay (MaximeConj m1 m2) p h \<longleftrightarrow> okay m1 p h \<and> okay m2 p h"
-  by(cases m1, cases m2, simp)
+lemma okay_MaximeConj: \<open>okay (MaximeConj m1 m2) p h \<longleftrightarrow> okay m1 p h \<and> okay m2 p h\<close>
+  by(cases \<open>m1\<close>, cases \<open>m2\<close>, simp)
 
 lemma moralisch_MaximeConj:
-  "moralisch welt (MaximeConj m1 m2) ha \<longleftrightarrow> moralisch welt m1 ha \<and> moralisch welt m2 ha"
+  \<open>moralisch welt (MaximeConj m1 m2) ha \<longleftrightarrow> moralisch welt m1 ha \<and> moralisch welt m2 ha\<close>
   apply(simp add: moralisch_simp okay_MaximeConj)
   by blast
 
 lemma moralisch_MaximeConj_False:
-  "moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. True))) ha \<longleftrightarrow> moralisch welt m1 ha"
+  \<open>moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. True))) ha \<longleftrightarrow> moralisch welt m1 ha\<close>
   by(simp add: moralisch_simp okay_MaximeConj)
 
 lemma moralisch_MaximeConj_True:
-  "\<not> moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. False))) ha"
+  \<open>\<not> moralisch welt (MaximeConj m1 (Maxime (\<lambda>_ _. False))) ha\<close>
   by(simp add: moralisch_simp okay_MaximeConj)
 
 (*<*)
@@ -330,19 +330,19 @@ declare MaximeConj.simps[simp del]
 
 text\<open>Disjunktion (Oder) zweier Maximen.\<close>
 fun MaximeDisj
-  :: "('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime"
+  :: \<open>('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) maxime\<close>
   where
-"MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)"
+\<open>MaximeDisj (Maxime m1) (Maxime m2) = Maxime (\<lambda>p h. m1 p h \<or> m2 p h)\<close>
 
-lemma okay_MaximeDisj: "okay (MaximeDisj m1 m2) p h \<longleftrightarrow> okay m1 p h \<or> okay m2 p h"
-  by(cases m1, cases m2, simp)
+lemma okay_MaximeDisj: \<open>okay (MaximeDisj m1 m2) p h \<longleftrightarrow> okay m1 p h \<or> okay m2 p h\<close>
+  by(cases \<open>m1\<close>, cases \<open>m2\<close>, simp)
 
 
 text\<open>Leider ist \<^const>\<open>MaximeDisj\<close> weniger schön,
 weil es kein genau-dann-wenn mit der Disjunktion (\<^term>\<open>m1 \<or> m2\<close>) gibt.\<close>
 
 lemma moralisch_MaximeDisjI:
-  "moralisch welt m1 ha \<or> moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  \<open>moralisch welt m1 ha \<or> moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha\<close>
   apply(simp add: moralisch_simp okay_MaximeDisj)
   by auto
 text\<open>Rückrichtung gilt leider nicht.
@@ -352,18 +352,18 @@ Im Gegensatz dazu sagt \<^term>\<open>moralisch welt m1 ha \<or> moralisch welt 
 \<^emph>\<open>alle\<close> Personen entweder \<^term>\<open>m1\<close> oder \<^term>\<open>m2\<close> gelten muss.\<close>
 
 lemma moralisch_MaximeDisj1:
-  "moralisch welt m1 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  \<open>moralisch welt m1 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha\<close>
   by(simp add: moralisch_MaximeDisjI)
 lemma moralisch_MaximeDisj2:
-  "moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha"
+  \<open>moralisch welt m2 ha \<Longrightarrow> moralisch welt (MaximeDisj m1 m2) ha\<close>
   by(simp add: moralisch_MaximeDisjI)
 
 lemma moralisch_MaximeDisj_False:
-  "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. False))) ha \<longleftrightarrow> moralisch welt m1 ha"
+  \<open>moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. False))) ha \<longleftrightarrow> moralisch welt m1 ha\<close>
   by(simp add: moralisch_simp okay_MaximeDisj)
 
 lemma moralisch_MaximeDisj_True:
-  "moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. True))) ha"
+  \<open>moralisch welt (MaximeDisj m1 (Maxime (\<lambda>_ _. True))) ha\<close>
   by(simp add: moralisch_simp okay_MaximeDisj)
 
 (*<*)

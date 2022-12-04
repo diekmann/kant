@@ -46,9 +46,9 @@ die alle Weltlichen Eigenschaften von 2 Personen vertauscht:\<close>
 type_synonym ('person, 'world) wp_swap = \<open>'person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
 
 text\<open>Ein jeder \<^typ>\<open>('person, 'world) wp_swap\<close> sollte mindestens folgendes erfüllen:\<close>
-definition wps_id :: "('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool"
+definition wps_id :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
 where
-  "wps_id wps welt \<equiv> \<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt"
+  \<open>wps_id wps welt \<equiv> \<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt\<close>
 
 
 text_raw\<open>
@@ -77,9 +77,9 @@ where
 declare wohlgeformte_handlungsabsicht.simps[simp del]
 
 lemma wohlgeformte_handlungsabsicht_ausfuehrbar:
-  "wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
-        \<forall>p1 p2. ausfuehrbar p1 welt ha \<longleftrightarrow> ausfuehrbar p2 (wps p1 p2 welt) ha"
-  apply(cases ha, simp add: wohlgeformte_handlungsabsicht.simps)
+  \<open>wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
+        \<forall>p1 p2. ausfuehrbar p1 welt ha \<longleftrightarrow> ausfuehrbar p2 (wps p1 p2 welt) ha\<close>
+  apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
   by (metis ausfuehrbar.simps option.map_disc_iff)
 
 
@@ -88,12 +88,12 @@ lemma wohlgeformte_handlungsabsicht_mit_wpsid:
    wps_id wps welt \<Longrightarrow>
     \<forall>p1 p2. handeln p1 welt ha =
             map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha)\<close>
-  apply(cases ha, simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
   apply(simp add: handeln_def nachher_handeln.simps)
   apply(safe)
    apply(simp add: wps_id_def; fail)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
   apply(simp)
   apply(simp split: option.split)
   apply(simp add: wps_id_def)
@@ -111,24 +111,24 @@ lemma wohlgeformte_handlungsabsicht_wpsid_imp_handeln:
   done
 
 lemma wfh_handeln_imp_wpsid:
-  "(\<forall>p1 p2. handeln p1 welt ha =
+  \<open>(\<forall>p1 p2. handeln p1 welt ha =
             map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha)) \<Longrightarrow>
-  wps_id wps welt"
-  by(cases ha, simp add: wps_id_def handeln_def)
+  wps_id wps welt\<close>
+  by(cases \<open>ha\<close>, simp add: wps_id_def handeln_def)
 
 lemma wohlgeformte_handlungsabsicht_wpsid_simp:
-  "wohlgeformte_handlungsabsicht wps welt ha \<and> wps_id wps welt
+  \<open>wohlgeformte_handlungsabsicht wps welt ha \<and> wps_id wps welt
   \<longleftrightarrow>
       (\<forall>p1 p2. ausfuehrbar p1 welt ha \<longleftrightarrow> ausfuehrbar p2 (wps p1 p2 welt) ha)
       \<and> (\<forall>p1 p2. handeln p1 welt ha =
-                 map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha))"
+                 map_handlung (wps p2 p1) (handeln p2 (wps p1 p2 welt) ha))\<close>
   apply(rule iffI)
   using wohlgeformte_handlungsabsicht_ausfuehrbar wohlgeformte_handlungsabsicht_mit_wpsid apply fast
   apply(rule conjI)
    prefer 2 using wfh_handeln_imp_wpsid apply fast
-  apply(cases ha, simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
+  apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
   apply(intro allI, rename_tac h p1 p2)
-  apply(case_tac "h p2 (wps p1 p2 welt)")
+  apply(case_tac \<open>h p2 (wps p1 p2 welt)\<close>)
    apply(simp)
    apply (metis ausfuehrbar.simps)
   apply(simp add: ausfuehrbar.simps)
@@ -144,7 +144,7 @@ where
 
 lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt ha p1 p2 \<Longrightarrow>
         \<not>wohlgeformte_handlungsabsicht wps welt ha\<close>
-  by(cases ha, auto simp add: wohlgeformte_handlungsabsicht.simps)
+  by(cases \<open>ha\<close>, auto simp add: wohlgeformte_handlungsabsicht.simps)
 
 (*TODO: das sollte ein Homomorphismus sein.*)
 
@@ -162,16 +162,16 @@ text\<open>Wenn sich eine einfache Welt \<^typ>\<open>'w\<close> in eine komplex
 (wobei die Übersetzung hier \<^term>\<open>C::'w \<Rightarrow> 'zw\<close> ist),
 dann kann auch \<^const>\<open>wohlgeformte_handlungsabsicht\<close> mit übersetzt werden.\<close>
 lemma wfh_generalize_worldI:
-  fixes wps :: "('person, 'w) wp_swap"
-    and welt :: "'w"
-    and ha :: "'person \<Rightarrow> 'w \<Rightarrow> 'w option"
-    and C :: "'w \<Rightarrow> 'zw"
+  fixes wps :: \<open>('person, 'w) wp_swap\<close>
+    and welt :: \<open>'w\<close>
+    and ha :: \<open>'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>
+    and C :: \<open>'w \<Rightarrow> 'zw\<close>
   shows
-"wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha)) \<Longrightarrow>
+\<open>wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha)) \<Longrightarrow>
   zwelt = C welt \<Longrightarrow>
   (\<And>p1 p2 w. zwps p1 p2 (C w) = C (wps p1 p2 w)) \<Longrightarrow>
   (\<And>p w. zha p (C w) =  map_option C (ha p w)) \<Longrightarrow>
-wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht (zha))"
+wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht (zha))\<close>
   apply(simp)
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
   apply(simp add: option.map_comp)
@@ -241,12 +241,12 @@ lemma wpsm_kommutiert_handlung_raw:
   apply(simp add: wpsm_kommutiert_def)
   apply(rule iffI)
    apply(intro allI)
-   apply(erule_tac x=p1 in allE)
-   apply(erule_tac x=p2 in allE)
-   apply(erule_tac x="ha" in allE)
+   apply(erule_tac x=\<open>p1\<close> in allE)
+   apply(erule_tac x=\<open>p2\<close> in allE)
+   apply(erule_tac x=\<open>ha\<close> in allE)
    apply(simp add: nachher_handeln.simps handeln_def; fail)
   apply(intro allI)
-  apply(case_tac ha)
+  apply(case_tac \<open>ha\<close>)
   apply(simp add: handeln_def)
   done
 
@@ -266,7 +266,7 @@ dann erhalten wir ein sehr intuitives Ergebnis,
 welches besagt, dass ich handelnde Person und Person für die die Maxime gelten soll
 vertauschen kann.\<close>
 lemma wfh_wpsm_kommutiert_simp:
-  assumes wpsid: "wps_id wps welt"
+  assumes wpsid: \<open>wps_id wps welt\<close>
   shows \<open>wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
   wpsm_kommutiert m wps welt \<Longrightarrow>
     okay m p2 (handeln p1 (wps p1 p2 welt) ha)
@@ -281,7 +281,7 @@ text\<open>Die Rückrichtung gilt auch,
 aber da wir das für alle Handlungsabsichten in der Annahme brauchen,
 ist das eher weniger hilfreich.\<close>
 lemma wfh_kommutiert_wpsm:
-  assumes wpsid: "wps_id wps welt"
+  assumes wpsid: \<open>wps_id wps welt\<close>
   shows 
   \<open>\<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<and>
        (\<forall>p1 p2. okay m p2 (handeln p1 (wps p1 p2 welt) ha)
@@ -290,24 +290,24 @@ lemma wfh_kommutiert_wpsm:
 wpsm_kommutiert m wps welt\<close>
   apply(simp add: wpsm_kommutiert_def)
   apply(intro allI, rename_tac p1 p2 ha)
-  apply(erule_tac x=ha in allE)
-  apply(case_tac ha, simp)
+  apply(erule_tac x=\<open>ha\<close> in allE)
+  apply(case_tac \<open>ha\<close>, simp)
   apply(erule conjE)
   apply(drule wohlgeformte_handlungsabsicht_wpsid_imp_handeln[OF _ wpsid])
   by simp
 
 
 lemma wpsm_kommutiert_map_handlung:
-  assumes wpsid: "wps_id wps welt"
-    and wps_sym: "wps p1 p2 welt = wps p2 p1 welt"
+  assumes wpsid: \<open>wps_id wps welt\<close>
+    and wps_sym: \<open>wps p1 p2 welt = wps p2 p1 welt\<close>
   shows \<open>wpsm_kommutiert m wps (wps p1 p2 welt) \<Longrightarrow>
     okay m p1 (map_handlung (wps p1 p2) (handeln p1 welt ha))
     \<longleftrightarrow>
     okay m p2 (handeln p1 welt ha)\<close>
   apply(cases \<open>ha\<close>, simp)
   apply(simp add: wpsm_kommutiert_def)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
   apply(simp add: handeln_def wpsid[simplified wps_id_def])
   by (metis wps_id_def wps_sym wpsid)
 
@@ -351,17 +351,17 @@ lemma ist_noop_wps:
   and strong_wps_id: \<open>\<forall>p1 p2 welt. wps p1 p2 (wps p1 p2 welt) = welt\<close>
   shows \<open>ist_noop (handeln p2 (wps ich p2 welt) ha) \<longleftrightarrow> ist_noop (handeln ich welt ha)\<close>
 proof -
-  from wps_id have weak_wps_sym: "\<forall>p1 p2. wps p1 p2 welt = wps p2 p1 welt" by (metis strong_wps_id wps_id_def)
+  from wps_id have weak_wps_sym: \<open>\<forall>p1 p2. wps p1 p2 welt = wps p2 p1 welt\<close> by (metis strong_wps_id wps_id_def)
   from wohlgeformte_handlungsabsicht_wpsid_imp_handeln[OF wfh wps_id]
-  have "ist_noop (handeln ich welt ha)
-        = ist_noop (Handlung welt (wps p2 ich (nachher_handeln p2 (wps ich p2 welt) ha)))"
+  have \<open>ist_noop (handeln ich welt ha)
+        = ist_noop (Handlung welt (wps p2 ich (nachher_handeln p2 (wps ich p2 welt) ha)))\<close>
     by simp
-  also have "\<dots> = ist_noop (Handlung (wps ich p2 welt) (nachher_handeln p2 (wps ich p2 welt) ha))"
+  also have \<open>\<dots> = ist_noop (Handlung (wps ich p2 welt) (nachher_handeln p2 (wps ich p2 welt) ha))\<close>
     apply(simp add: ist_noop_def)
     using strong_wps_id weak_wps_sym by metis
-  finally have "ist_noop (handeln ich welt ha)
-    = ist_noop (Handlung (wps ich p2 welt) (nachher_handeln p2 (wps ich p2 welt) ha))" .
-  thus ?thesis
+  finally have \<open>ist_noop (handeln ich welt ha)
+    = ist_noop (Handlung (wps ich p2 welt) (nachher_handeln p2 (wps ich p2 welt) ha))\<close> .
+  thus \<open>?thesis\<close>
     by(simp add: handeln_def wps_id[simplified wps_id_def])
 qed
 
