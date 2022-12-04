@@ -339,7 +339,7 @@ lemma wfh_kommutiert_wpsm:
        (\<forall>p1 p2. okay m p2 (handeln p1 (wps p1 p2 welt) ha)
            \<longleftrightarrow>
            okay m p1 (handeln p2 welt ha)) \<Longrightarrow>
-wpsm_kommutiert m wps welt\<close>
+    wpsm_kommutiert m wps welt\<close>
   apply(simp add: wpsm_kommutiert_def)
   apply(intro allI, rename_tac p1 p2 ha)
   apply(erule_tac x=\<open>ha\<close> in allE)
@@ -348,7 +348,7 @@ wpsm_kommutiert m wps welt\<close>
   apply(drule wohlgeformte_handlungsabsicht_wpsid_imp_handeln[OF _ wpsid])
   by simp
 
-
+(*<*)
 lemma wpsm_kommutiert_map_handlung:
   assumes wpsid: \<open>wps_id wps welt\<close>
     and wps_sym: \<open>wps p1 p2 welt = wps p2 p1 welt\<close>
@@ -362,6 +362,8 @@ lemma wpsm_kommutiert_map_handlung:
   apply(erule_tac x=\<open>p2\<close> in allE)
   apply(simp add: handeln_def wpsid[simplified wps_id_def])
   by (metis wps_id_def wps_sym wpsid)
+(*>*)
+
 
 subsection\<open>Wohlgeformte Maxime\<close>
 
