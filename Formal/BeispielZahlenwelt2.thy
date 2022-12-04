@@ -4,14 +4,9 @@ begin
 
 section\<open>Beispiel: Zahlenwelt2\<close>
 
-text\<open>Konsens laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Konsens_im_Rechtssystem\<close>:
-"die Übereinstimmung der Willenserklärungen beider Vertragspartner über die Punkte des Vertrages"\<close>
-
-
-
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>
-  konsens :: \<open>person \<Rightarrow> (person, int) abmachung list\<close>
+  konsens :: \<open>(person, int) globaler_konsens\<close>
   staatsbesitz :: \<open>int\<close> \<comment>\<open>Der Staat ist keine natürliche Person und damit besonders.\<close>
   umwelt :: \<open>int\<close>
 
@@ -34,30 +29,7 @@ fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> wh
 
 lemma \<open>meins Carol initialwelt = -3\<close> by eval
 
-
-(*TODO: upstream*)
-definition konsensswap
-:: "'person \<Rightarrow> 'person \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
-    \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
-  where
-"konsensswap p1 p2 kons \<equiv> swap p1 p2 ((map (swap p1 p2)) \<circ> kons)"
-
-lemma konsensswap_id[simp]: "konsensswap p1 p2 (konsensswap p1 p2 kons) = kons"
-  apply(simp add: konsensswap_def)
-  apply(subst swap_fun_map_comp_id)
-  by simp
-
-lemma konsensswap_sym: "konsensswap p1 p2 = konsensswap p2 p1"
-  by(simp add: fun_eq_iff konsensswap_def swap_symmetric)
-
-lemma konsensswap_apply:
-  "konsensswap p1 p2 kons p =  map (swap p1 p2) (swap p1 p2 kons p)"
-  apply(simp add: konsensswap_def comp_def)
-  by (metis swap_a swap_b swap_nothing)
-
-
-
-
+(*<*)
 definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
   \<open>zahlenwps p1 p2 welt = 
       welt\<lparr> besitz := swap p1 p2 (besitz welt),
@@ -86,91 +58,51 @@ lemma \<open>zahlenwps Alice Carol initialwelt
  \<rparr>\<close> by eval
 
 
-
 lemma zahlenwps_id: "zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt"
   by(simp add: zahlenwps_def)
 
 lemma zahlenwps_sym: "zahlenwps p1 p2 = zahlenwps p2 p1"
   apply(simp add: fun_eq_iff zahlenwps_def)
   by (simp add: swap_symmetric konsensswap_sym)
-  
-
-
-(*TODO: upstream*)
-definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> 'person list"
-where
-  "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
-
-lemma \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
-  = [Alice, Bob]\<close> by eval
-
-lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
-proof -
-  have "concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as" for as
-    by(induction as) auto
-  thus ?thesis
-    by(simp add: abmachungs_betroffene_def)
-qed
-
-lemma abmachungs_betroffene_distinct: "distinct (abmachungs_betroffene a)"
-  apply(simp add: abmachungs_betroffene_simp)
-  using enum_class.enum_distinct distinct_filter by blast
-
-lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = abmachung_dom a"
-  by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
-
-lemma set_abmachungs_betroffene_swap:
-  "set (abmachungs_betroffene (swap p1 p2 a)) = (swap p1 p2 id) ` set (abmachungs_betroffene a)"
-  apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
-  apply(simp add: image_def)
-  apply(rule Collect_cong)
-  apply(simp add: swap_def)
-  by fast
 
 
 
 definition enthaelt_konsens :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool"
 where
-  "enthaelt_konsens abmachung welt \<equiv> \<forall>betroffene_person \<in> set (abmachungs_betroffene abmachung).
-      abmachung \<in> set (konsens welt betroffene_person)"
-
-
+  "enthaelt_konsens abmachung welt \<equiv> Aenderung.enthaelt_konsens abmachung (konsens welt)"
 
 lemma enthaelt_konsens_swap:
   "enthaelt_konsens (swap p1 p2 a) (zahlenwps p1 p2 welt) = enthaelt_konsens a welt" 
-  apply(simp add: enthaelt_konsens_def abmachungs_betroffene_is_dom)
-  apply(simp add: abmachung_dom_swap)
-  apply(simp add: zahlenwps_def)
-  apply(cases welt, simp)
-  apply(simp add: konsensswap_def comp_def)
-  by (smt (z3) id_apply image_def list.set_map mem_Collect_eq swap2 swap_a swap_b swap_nothing)
+  by(simp add: enthaelt_konsens_def zahlenwps_def Aenderung.enthaelt_konsens_swap)
+(*>*)
 
 
-(*
-Wenn das delta hier nicht genau das delta ist wie von hat_konsens berechnet ist das exploitable.
-
-Also `to_abmachung (delta_num_fun (map_handlung besitz h))` muss eindeutig genau das richtige
-reverse engineeren.
-
-TODO: `to_abmachung (delta_num_fu` ersetzen durch direktes Funktion bauen!
-*)
+text\<open>Wenn \<^const>\<open>reverse_engineer_abmachung\<close> hier nicht genau die gleiche Abmachung
+berechnet wie später eingelöst, dann wird das ganze exploitable.
+Da eine \<^typ>\<open>('person, 'etwas) abmachung\<close> aber eine eindeutige Darstellung sein sollte,
+müsst das so funktionieren.\<close>
 definition hat_konsens :: "zahlenwelt handlung \<Rightarrow> bool"
 where
   "hat_konsens h \<equiv>
-    let abmachung = to_abmachung (delta_num_fun (map_handlung besitz h))
+    let abmachung = reverse_engineer_abmachung (map_handlung besitz h)
     in enthaelt_konsens abmachung (vorher h)"
 
 
-lemma "hat_konsens (map_handlung (zahlenwps p1 p2) h) = hat_konsens h"
+(*<*)
+lemma hat_konsens_swap:
+  "hat_konsens (map_handlung (zahlenwps p1 p2) h) = hat_konsens h"
   apply(cases h, rename_tac vor nach, simp)
   apply(simp add: hat_konsens_def)
-  oops (*erst funktion updaten*)
+  apply(case_tac vor, case_tac nach, simp add: zahlenwps_def)
+  apply(simp add: reverse_engineer_abmachung_swap)
+  by (simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
+(*>*)
 
 
 text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
 lemma "hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w)))"
   apply(simp add: hat_konsens_def Let_def)
-  apply(simp add: handeln_def nachher_handeln.simps enum_person_def delta_num_same)
+  apply(simp add: handeln_def nachher_handeln.simps reverse_engineer_abmachung_same)
   apply(code_simp)
   done
   
@@ -183,98 +115,25 @@ lemma "\<not> hat_konsens (handeln Alice initialwelt
 
 
 
-term Aenderung.abmachung_ausfuehren
-
 definition abmachung_ausfuehren
   :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt"
 where
-  "abmachung_ausfuehren abmachung welt \<equiv> welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>"
+  "abmachung_ausfuehren abmachung welt \<equiv>
+    welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>"
 
-lemma\<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
+lemma \<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
   = initialwelt\<lparr> besitz := \<lbrakk>(besitz initialwelt)(Alice += 3)\<rbrakk>\<rparr>\<close>
   by eval
 
-value\<open>remove1 3 [1::int,3,5,2,3]\<close>
-value\<open>remove1 9 [1::int,3,5,2,3]\<close>
 
-
-
-definition konsens_entfernen
- :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
-   \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
- where
-"konsens_entfernen abmachung kons =
-      fold (\<lambda>p k. k(p := remove1 abmachung (k p))) (abmachungs_betroffene abmachung) kons"
-
-(*TODO: upstream und testen*)
-
-lemma \<open>konsens_entfernen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) (konsens initialwelt)
-  = (\<lambda>_. [])(
-    Alice := [to_abmachung [Gewinnt Alice 3]],
-    Bob := [])\<close>
-  by eval
-
-(*<*)
-lemma konsens_entfernen_fold_induct_helper_helper:
-  "a \<notin> set as \<Longrightarrow> fold (\<lambda>a k. k(a := f (k a))) as kons a = kons a"
-  by(induction as arbitrary: kons) simp+
-lemma konsens_entfernen_fold_induct_helper:
-  "x \<in> set as \<Longrightarrow> distinct as \<Longrightarrow>
-         fold (\<lambda>a k. k(a := f (k a))) as kons x = f (kons x)"
-  apply(induction as arbitrary: kons)
-   apply(simp; fail)
-  apply(simp)
-  apply(erule disjE)
-   apply(simp)
-  apply(simp add: konsens_entfernen_fold_induct_helper_helper; fail)
-   apply(simp)
-  apply blast
-  done
-(*>*)
-text\<open>Alternative Definition:\<close>
-lemma konsens_entfernen_simp:
-  "konsens_entfernen a kons
-    = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
-  apply(simp add: konsens_entfernen_def fun_eq_iff)
-  apply(intro allI conjI impI)
-   apply(subst konsens_entfernen_fold_induct_helper, simp_all)
-   apply(simp add: abmachungs_betroffene_distinct)
-  apply(simp add: konsens_entfernen_fold_induct_helper_helper)
-  done
-
-(*<*)  
-lemma remove1_konsensswap:
-  "remove1 (swap p1 p2 a) (konsensswap p1 p2 kons p)
-    = map (swap p1 p2) (remove1 a (swap p1 p2 kons p))"
-  by(simp add: konsensswap_apply remove1_swap)
-
-lemma konsens_entfernen_konsensswap:
-  "konsensswap p2 p1 (konsens_entfernen (swap p1 p2 a) (konsensswap p1 p2 kons))
-    = konsens_entfernen a kons"
-  apply(simp add: konsens_entfernen_simp fun_eq_iff)
-  apply(safe)
-   apply(simp add: set_abmachungs_betroffene_swap)
-   apply(simp add: konsensswap_apply)
-   apply(simp add: swap_if_move_inner)
-   apply(simp add: swap_id_in_set)
-   apply(subst(2) remove1_swap2[of p1 p2, symmetric])
-   apply(auto simp add: konsensswap_apply swap_def)[1] (*wants helper*)
-
-  apply(simp add: set_abmachungs_betroffene_swap)
-  apply(simp add: konsensswap_apply)
-  apply(simp add: swap_if_move_inner)
-  apply(simp add: swap_id_in_set)
-  apply(simp add: konsensswap_apply swap_def comp_def)
-  by (simp add: list.map_ident_strong)
-(*>*)
-
-
+text\<open>Um eine \<^typ>\<open>(person, int) abmachung\<close> einzulösen wird diese erst ausgeführt
+und danach aus dem globalen Konsens entfernt, damit die Abmachung
+nicht mehrfach eingelöst werden kann.\<close>
 definition abmachung_einloesen :: "(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "abmachung_einloesen delta welt \<equiv> 
   if enthaelt_konsens delta welt
   then Some ((abmachung_ausfuehren delta welt)\<lparr> konsens := konsens_entfernen delta (konsens welt)\<rparr>)
   else None"
-
 
 
 lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
@@ -304,13 +163,18 @@ lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
 lemma\<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = None\<close>
   by eval
 
-(*Welllllll*)
+text\<open>Die Handlungsabsicht \<^const>\<open>abmachung_einloesen\<close> stellt keine
+\<^const>\<open>wohlgeformte_handlungsabsicht\<close> dar, da in der Abmachung Personen
+hardcedoded sind.
+\<close>
 lemma "\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
          (Handlungsabsicht (\<lambda>p w. abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) w))"
   by eval
 
 
-(*ignoriert groesstenteils die handelnde person, nur um die Abmachung zu suchen*)
+text\<open>Wir können aber schnell eine wohlgeformte Handlungsabsicht daraus bauen,
+indem wir nicht die Abmachung an sich in die Handlungsabsicht hardcoden,
+sondern indem wir eine bestehende Abmachung in der Welt referenzieren.\<close>
 definition existierende_abmachung_einloesen :: "person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option" where
   "existierende_abmachung_einloesen p welt \<equiv> 
   case (konsens welt) p
@@ -343,7 +207,7 @@ lemma existierende_abmachung_einloesen_map_zahlenwps:
   done
 (*>*)
 
-text\<open>Auch in jeder welt gilt:\<close>
+text\<open>In jeder Welt ist damit die Handlungsabsicht wohlgeformt.\<close>
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt
          (Handlungsabsicht existierende_abmachung_einloesen)"
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
@@ -352,7 +216,8 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps welt
 
 
 
-text\<open>Es ist nur möglich, wenn alle Betroffenen auch zustimmen.
+text\<open>Es ist nur möglich eine \<^const>\<open>existierende_abmachung_einloesen\<close>,
+wenn alle Betroffenen auch zustimmen.
 Es is beispielsweise nicht möglich, dass \<^const>\<open>Alice\<close> eine Handlung
 ausführt, die \<^const>\<open>Carol\<close> betrifft, ohne deren Zustimmung.\<close>
 lemma "\<not> ausfuehrbar Alice

@@ -328,6 +328,67 @@ lemma to_abmachung_simp_call:
      then (to_abmachung deltas p) + (aenderung_val delta)
      else (to_abmachung deltas p))"
   by(simp)
+
+lemma to_abmachung_fold_induct_helper:
+  fixes as :: "('person, 'etwas::ordered_ab_group_add) aenderung list"
+  shows "fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as abmachung =
+    (\<lambda>p. to_abmachung as p + abmachung p)"
+  apply(induction as arbitrary:abmachung)
+  by(simp add: fun_eq_iff)+
+lemma to_abmachung_fold:
+  fixes as :: "('person, 'etwas::ordered_ab_group_add) aenderung list"
+shows "to_abmachung as = fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as (\<lambda>_. 0)"
+  apply(subst to_abmachung_fold_induct_helper[where abmachung="\<lambda>_. 0"])
+  by simp
+
+
+lemma to_abmachung_List_map_filter_simp_call:
+  fixes f :: "'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option"
+  assumes valid_f: "\<forall>p. (case f p of Some a \<Rightarrow> betroffen a = p | None \<Rightarrow> True)"
+  shows
+  "p \<in> set as \<Longrightarrow> distinct as \<Longrightarrow>
+   to_abmachung (List.map_filter f as) p =
+    (case f p of Some a \<Rightarrow> to_abmachung [a] p | None \<Rightarrow> 0)"
+proof(induction as)
+  case Nil
+  then show ?case by simp
+next
+  case (Cons a as)
+  from valid_f have filter_not_in_set:
+    "p \<notin> set ps \<Longrightarrow> to_abmachung (List.map_filter f ps) p = 0" for p ps
+    apply(induction ps)
+    apply(simp add: List.map_filter_simps)
+    apply(simp add: List.map_filter_simps split:option.split)
+    apply(clarsimp, rename_tac a ps a2)
+    apply(subgoal_tac "betroffen a2 = a")
+     apply simp
+    by (metis (mono_tags, lifting) option.simps(5))
+
+  from Cons show ?case
+    apply(simp add: List.map_filter_simps)
+    apply(safe)
+     apply(case_tac "f p")
+      apply(simp add: filter_not_in_set; fail)
+     apply(simp add: filter_not_in_set)
+    using filter_not_in_set apply blast
+    apply(simp)
+     apply(case_tac "f a")
+      apply(simp add: filter_not_in_set; fail)
+    apply(simp add: filter_not_in_set)
+    by (metis (mono_tags, lifting) option.simps(5) valid_f)
+qed
+
+lemma to_abmachung_List_map_filter_enum_simp_call:
+fixes f :: "'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option"
+  assumes valid_f: "\<forall>p. (case f p of Some a \<Rightarrow> betroffen a = p | None \<Rightarrow> True)"
+  shows
+  "to_abmachung (List.map_filter f Enum.enum) p =
+    (case f p of Some a \<Rightarrow> to_abmachung [a] p | None \<Rightarrow> 0)"
+  apply(rule to_abmachung_List_map_filter_simp_call)
+  using valid_f apply(simp)
+   apply(simp add: enum_class.enum_UNIV)
+  apply(simp add: enum_class.enum_distinct)
+  done
 (*>*)
 
 
@@ -486,5 +547,214 @@ lemma abmachung_ausfuehren_aenderung:
   by(simp add: abmachung_ausfuehren_def fun_eq_iff aenderung_ausfuehren_abmachung_to_aenderung)
 
 (*>*)
+
+
+text\<open>Laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Konsens_im_Rechtssystem\<close> lässt sich Konsens
+wie folg definieren:
+"die Übereinstimmung der Willenserklärungen beider Vertragspartner über die Punkte des Vertrages".
+Wir können also \<^term>\<open>to_abmachung [Gewinnt Alice 3, Verliert Bob 3]\<close> verwenden,
+um Konsens zu modellieren.
+Dabei müssen alle Betroffenen die gleiche Vorstellung der Abmachung haben.
+Beispielsweise lässt sich der gesamte Konsens in einer Welt darstellen als
+\<^typ>\<open>'person \<Rightarrow> ('person, 'etwas) abmachung list\<close>, wobei jeder person genau die Abmachungen
+zugeordnet werden, deren sie zustimmt.
+Die Abmachungen sind in einer Liste und keiner Menge, da eine Person eventuell bereit ist,
+Abmachungen mehrfach auszuführen.
+\<close>
+
+
+type_synonym ('person, 'etwas) globaler_konsens = "'person \<Rightarrow> ('person, 'etwas) abmachung list"
+
+(*<*)
+definition konsensswap
+:: "'person \<Rightarrow> 'person \<Rightarrow> ('person, 'etwas) globaler_konsens
+    \<Rightarrow> ('person, 'etwas) globaler_konsens"
+  where
+"konsensswap p1 p2 kons \<equiv> swap p1 p2 ((map (swap p1 p2)) \<circ> kons)"
+
+lemma konsensswap_id[simp]: "konsensswap p1 p2 (konsensswap p1 p2 kons) = kons"
+  apply(simp add: konsensswap_def)
+  apply(subst swap_fun_map_comp_id)
+  by simp
+
+lemma konsensswap_sym: "konsensswap p1 p2 = konsensswap p2 p1"
+  by(simp add: fun_eq_iff konsensswap_def swap_symmetric)
+
+lemma konsensswap_apply:
+  "konsensswap p1 p2 kons p =  map (swap p1 p2) (swap p1 p2 kons p)"
+  apply(simp add: konsensswap_def comp_def)
+  by (metis swap_a swap_b swap_nothing)
+(*>*)
+
+
+
+definition abmachungs_betroffene :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> 'person list"
+where
+  "abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]"
+
+lemma \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
+  = [Alice, Bob]\<close> by eval
+
+
+(*<*)
+lemma abmachungs_betroffene_simp: "abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum"
+proof -
+  have "concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as" for as
+    by(induction as) auto
+  thus ?thesis
+    by(simp add: abmachungs_betroffene_def)
+qed
+
+lemma abmachungs_betroffene_distinct: "distinct (abmachungs_betroffene a)"
+  apply(simp add: abmachungs_betroffene_simp)
+  using enum_class.enum_distinct distinct_filter by blast
+
+lemma abmachungs_betroffene_is_dom: "set (abmachungs_betroffene a) = abmachung_dom a"
+  by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
+
+lemma set_abmachungs_betroffene_swap:
+  "set (abmachungs_betroffene (swap p1 p2 a)) = (swap p1 p2 id) ` set (abmachungs_betroffene a)"
+  apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  apply(simp add: swap_def)
+  by fast
+(*>*)
+
+
+
+definition enthaelt_konsens
+  :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person, 'etwas) globaler_konsens \<Rightarrow> bool"
+where
+  "enthaelt_konsens abmachung konsens \<equiv> \<forall>betroffene_person \<in> set (abmachungs_betroffene abmachung).
+      abmachung \<in> set (konsens betroffene_person)"
+
+lemma enthaelt_konsens_swap:
+  "enthaelt_konsens (swap p1 p2 a) (konsensswap p1 p2 konsens) = enthaelt_konsens a konsens" 
+  apply(simp add: enthaelt_konsens_def abmachungs_betroffene_is_dom)
+  apply(simp add: abmachung_dom_swap)
+  apply(simp add: konsensswap_def comp_def)
+  by (smt (z3) id_apply image_def list.set_map mem_Collect_eq swap2 swap_a swap_b swap_nothing)
+
+
+
+text\<open>Eine (ausgeführte) Abmachung einlösen, bzw. entfernen.\<close>
+definition konsens_entfernen
+ :: "('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)
+   \<Rightarrow> ('person \<Rightarrow> ('person, 'etwas) abmachung list)"
+ where
+"konsens_entfernen abmachung kons =
+      fold (\<lambda>p k. k(p := remove1 abmachung (k p))) (abmachungs_betroffene abmachung) kons"
+
+
+lemma
+  \<open>konsens_entfernen
+    (to_abmachung [Gewinnt Alice (3::int), Verliert Bob 3])
+    ((\<lambda>_. [])(
+      Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
+      Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]])
+    )
+  = (\<lambda>_. [])(
+    Alice := [to_abmachung [Gewinnt Alice 3]],
+    Bob := [])\<close>
+  by eval
+
+
+(*<*)
+lemma konsens_entfernen_fold_induct_helper_helper:
+  "a \<notin> set as \<Longrightarrow> fold (\<lambda>a k. k(a := f (k a))) as kons a = kons a"
+  by(induction as arbitrary: kons) simp+
+lemma konsens_entfernen_fold_induct_helper:
+  "x \<in> set as \<Longrightarrow> distinct as \<Longrightarrow>
+         fold (\<lambda>a k. k(a := f (k a))) as kons x = f (kons x)"
+  apply(induction as arbitrary: kons)
+   apply(simp; fail)
+  apply(simp)
+  apply(erule disjE)
+   apply(simp)
+  apply(simp add: konsens_entfernen_fold_induct_helper_helper; fail)
+   apply(simp)
+  apply blast
+  done
+(*>*)
+
+
+
+text\<open>Alternative Definition:\<close>
+lemma konsens_entfernen_simp:
+  "konsens_entfernen a kons
+    = (\<lambda>p. if p \<in> set (abmachungs_betroffene a) then remove1 a (kons p) else (kons p))"
+  apply(simp add: konsens_entfernen_def fun_eq_iff)
+  apply(intro allI conjI impI)
+   apply(subst konsens_entfernen_fold_induct_helper, simp_all)
+   apply(simp add: abmachungs_betroffene_distinct)
+  apply(simp add: konsens_entfernen_fold_induct_helper_helper)
+  done
+
+
+(*<*)  
+lemma remove1_konsensswap:
+  "remove1 (swap p1 p2 a) (konsensswap p1 p2 kons p)
+    = map (swap p1 p2) (remove1 a (swap p1 p2 kons p))"
+  by(simp add: konsensswap_apply remove1_swap)
+
+lemma konsens_entfernen_konsensswap:
+  "konsensswap p2 p1 (konsens_entfernen (swap p1 p2 a) (konsensswap p1 p2 kons))
+    = konsens_entfernen a kons"
+  apply(simp add: konsens_entfernen_simp fun_eq_iff)
+  apply(safe)
+   apply(simp add: set_abmachungs_betroffene_swap)
+   apply(simp add: konsensswap_apply)
+   apply(simp add: swap_if_move_inner)
+   apply(simp add: swap_id_in_set)
+   apply(subst(2) remove1_swap2[of p1 p2, symmetric])
+   apply(auto simp add: konsensswap_apply swap_def)[1] (*wants helper*)
+
+  apply(simp add: set_abmachungs_betroffene_swap)
+  apply(simp add: konsensswap_apply)
+  apply(simp add: swap_if_move_inner)
+  apply(simp add: swap_id_in_set)
+  apply(simp add: konsensswap_apply swap_def comp_def)
+  by (simp add: list.map_ident_strong)
+
+
+
+lemma to_abmachung_delta_num_fun_simp_call:
+  (*stronger than the usual ordered_ab_group_add*)
+  fixes vor::"('person::enum \<Rightarrow> 'etwas::linordered_ab_group_add)"
+  shows "to_abmachung (delta_num_fun (Handlung vor nach)) p = nach p - vor p"
+  apply(simp)
+  apply(subst to_abmachung_List_map_filter_enum_simp_call)
+  subgoal by(simp add: delta_num_def)
+  by(simp add: delta_num_def)
+(*>*)
+
+
+
+definition reverse_engineer_abmachung
+  :: "('person::enum \<Rightarrow> 'etwas::linordered_ab_group_add) handlung \<Rightarrow> ('person, 'etwas) abmachung"
+where
+  "reverse_engineer_abmachung h \<equiv>
+    fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)"
+
+lemma reverse_engineer_abmachung:
+  "reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)"
+  apply(simp add: fun_eq_iff reverse_engineer_abmachung_def)
+  apply(cases h, simp del: delta_num_fun.simps)
+  apply(subst to_abmachung_delta_num_fun_simp_call)
+  apply(subst fold_enum_fun_update_call)
+  by simp
+
+(*<*)
+lemma reverse_engineer_abmachung_same:
+  "reverse_engineer_abmachung (Handlung v v) = (\<lambda>_. 0)"
+  by(simp add: reverse_engineer_abmachung_def fun_eq_iff fold_enum_fun_update_call)
+
+lemma reverse_engineer_abmachung_swap:
+  "reverse_engineer_abmachung (Handlung (swap p1 p2 vor) (swap p1 p2 nach)) =
+        swap p1 p2 (reverse_engineer_abmachung (Handlung vor nach))"
+  by(simp add: fun_eq_iff reverse_engineer_abmachung_def fold_enum_fun_update swap_def)
+(*>*)
+
 
 end
