@@ -366,6 +366,9 @@ lemma wpsm_kommutiert_map_handlung:
 
 
 subsection\<open>Wohlgeformte Maxime\<close>
+text\<open>Nach dem gleichen Konzept nach dem wir die \<^const>\<open>wohlgeformte_handlungsabsicht\<close>
+definiert haben,
+definieren wir, was es bedeutet für eine Maxime wohlgeformt zu sein.\<close>
 
 (*Eigentlich sollte das fuer alle Handlungen gelten, aber wenn ich ausfuehrbaren code will
 habe ich ein Problem, dass Handlungen nicht enumerable sind.*)
