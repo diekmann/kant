@@ -355,7 +355,7 @@ lemma moralisch_MaximeDisjI:
 text\<open>Die Rückrichtung gilt leider nicht.
 \<^term>\<open>MaximeDisj m1 m2\<close> is effektiv schwächer, da sich jede Person unabhängig entscheiden darf,
 ob sie \<^term>\<open>m1\<close> oder \<^term>\<open>m2\<close> folgt.
-Im Gegensatz dazu sagt \<^term>\<open>moralisch welt m1 ha \<or> moralisch welt m2 ha\<close> dass für
+Im Gegensatz dazu sagt \<^term>\<open>moralisch welt m1 ha \<or> moralisch welt m2 ha\<close>, dass für
 \<^emph>\<open>alle\<close> Personen entweder \<^term>\<open>m1\<close> oder \<^term>\<open>m2\<close> gelten muss.\<close>
 
 lemma moralisch_MaximeDisj1:
