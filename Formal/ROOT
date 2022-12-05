@@ -24,12 +24,12 @@ session Kant = Cache +
     Utilitarismus
     BeispielZahlenwelt
     BeispielZahlenwelt2
+    BeispielSteuern
+  theories [document = false]
     Gesetz
     Gesetze
     AllgemeinesGesetz
     BeispielZahlenweltGesetz
-    BeispielSteuern
-  theories [document = false]
     FailDraft
   document_files
     "420px-Kant.png"
