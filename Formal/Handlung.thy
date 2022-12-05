@@ -151,7 +151,7 @@ lemma ausfuehrbar_nachher_handeln:
 (*>*)
 
 
-subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik\<close>
+subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik \label{sec:gesinnungsverantwortungsethik}\<close>
 text\<open>
 Sei eine Ethik eine Funktion, welche einem beliebigen \<^typ>\<open>'\<alpha>\<close> eine
 Bewertung Gut = \<^const>\<open>True\<close>, Schlecht = \<^const>\<open>False\<close> zuordnet.
@@ -197,8 +197,10 @@ definition gesinnungsethik_verantwortungsethik_konsistent
       (\<forall>person welt. verantwortungsethik (handeln person welt handlungsabsicht))\<close>
 
 
-text\<open>Ich habe kein Beispiel für eine Gesinnungsethik
+text\<open>Ich habe aktuell kein Beispiel für eine Gesinnungsethik
 und eine Verantwortungsethik,
-die tatsächlich konsistent sind.\<close>
+die tatsächlich konsistent sind.
+Später (In \S\ref{sec:golregelutilkonsistent}) werden wir sehen, dass es eine Übersetzung gibt,
+mit der die goldene Regel und der Utilitarismus konsistent sind.\<close>
 
 end

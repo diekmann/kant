@@ -23,16 +23,23 @@ lemma \<open>(\<lambda>h::ereal handlung. case h of Handlung vor nach \<Rightarr
 lemma \<open>(\<lambda>h::ereal handlung. case h of Handlung vor nach \<Rightarrow> nach - vor) (Handlung 3 (-\<infinity>)) = -\<infinity>\<close>
   by simp
 
+
+text\<open>Eine Handlung ist genau dann moralisch richtig,
+wenn die Gesamtbilanz einen positiven Nutzen aufweist.\<close>
 definition moralisch_richtig :: \<open>'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool\<close> where
   \<open>moralisch_richtig glueck_messen handlung \<equiv> (glueck_messen handlung) \<ge> 0\<close>
 
-subsection\<open>Goldene Regel und Utilitarismus im Einklang\<close>
+subsection\<open>Goldene Regel und Utilitarismus im Einklang \label{sec:golregelutilkonsistent}\<close>
 text\<open>
-In diese kleinen Intermezzo werden wir zeigen, wie sich die Gesinnungsethik der goldenen Regel
+In \S\ref{sec:gesinnungsverantwortungsethik} haben wir
+Gesinnungsethik und Verantwortungsethik definiert.
+
+In diesem kleinen Intermezzo werden wir zeigen, wie sich die Gesinnungsethik der goldenen Regel
 in die Verantwortungsethik des Utilitarismus übersetzen lässt.
 \<close>
 
-(*TODO: das ist die goldene Regel? Kant braucht \<forall>Maxime.*)
+
+text\<open>Wir modellieren die goldene Regel als Gesinnungsethik.\<close>
 definition goldene_regel_als_gesinnungsethik
   :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
 where
@@ -51,7 +58,7 @@ text\<open>
 Eine Maxime ist immer aus Sicht einer bestimmten Person definiert.
 Wir "neutralisieren" eine Maxime indem wir diese bestimmte Person entfernen
 und die Maxime so allgemeingültiger machen.
-Alle Personen müssen gleich behandelt werden
+Alle Personen müssen gleich behandelt werden.
 Um die Maxime unabhängig von einer bestimmten Person zu machen,
 fordern wir einfach, dass die Maxime für aller Personen erfüllt sein muss.\<close>
 (*TODO: gegen moralisch beweisen?
@@ -102,7 +109,7 @@ sondern der Trick besteht in \<^const>\<open>maximeNeutralisieren\<close>, welch
 aufzuaddieren und mit Leid zu verrechnen, sondern dank des Allquantors dafür sorgt,
 dass auch nur das kleinste Leid dazu führt, dass sofort \<^const>\<open>False\<close> zurückgegebn wird.
 
-Aber wenn wir ordentlich aufsummieren, jedoch einer verletzten Maxime \<^term>\<open>-\<infinity>::ereal\<close>
+Aber auch wenn wir ordentlich aufsummieren, jedoch einer verletzten Maxime \<^term>\<open>-\<infinity>::ereal\<close>
 Nutzen zuordnen und zusätzlich annehmen, dass die Bevölkerung endlich ist,
 dann funktioniert das auch:
 \<close>
@@ -213,9 +220,12 @@ text\<open>
 "Wie zu erwarten, will Kant nichts vom Utilitarismus oder sonstigen Lehren wissen,
 die der Moral einen außerhalb ihrer selbst liegenden Zweck zuschreiben" \cite{russellphi}.
 Die eben bewiesene Konsitenz von Gesinnungsethik und Verantwortungsethik zeigt,
-das unsere Grunddefinition bereits eine Formalisierung des Kategorischen Imperativs
+das unsere Grunddefinitionen bereits eine Formalisierung des Kategorischen Imperativs
 komplett im strengen Sinne Kants ausschließen.
 Dennoch finde ich unsere Interpretation bis jetzt nicht abwegig.
+Der große Trick besteht darin, dass wir eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close>
+sehr einfach in eine \<^typ>\<open>'world handlung\<close> in unserem theoretischen Modell überführen können.
+Die widerspricht Kants Grundannahme, dass die Folgen einer Handlungsabsicht unvorhersehbar sind.
 \<close>
 
 end

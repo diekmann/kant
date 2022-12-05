@@ -378,6 +378,15 @@ where
   \<open>wohlgeformte_maxime_auf h wps m \<equiv>
     \<forall>p1 p2. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (wps p1 p2) h)\<close>
 
+text\<open>Eigentlich sollte eine Maxime wohlgeformte sein für alle Handlungen.
+Jedoch definieren wir hier eine restriktive Version \<^const>\<open>wohlgeformte_maxime_auf\<close> welche
+nur auf einer Handlung wohlgeformt ist.
+Der Grund ist leider ein Implementierungsdetail.
+Da wir ausführbaren Code wollen und Handlungen normalerweise nicht vollständig
+aufzählbar sind, werden wir auch den kategorischen Imperativ auf eine endliche Menge
+von Handlungsabsichten beschränken.
+Die eigentlich schönere (jedoch schwer zu beweisende) Forderung lautet:\<close>
+
 definition wohlgeformte_maxime
   :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 where

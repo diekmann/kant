@@ -6,7 +6,7 @@ section\<open>Kategorischer Imperativ\<close>
 
 text\<open>
 Wir haben mit der goldenen Regel bereits definiert, 
-wann für eine gegebene Welt und eine gegebene maxime, eine Handlungsabsicht moralisch ist:
+wann für eine gegebene Welt und eine gegebene Maxime, eine Handlungsabsicht moralisch ist:
 
  \<^item> \<^term_type>\<open>moralisch :: 
      'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
@@ -17,11 +17,15 @@ Nach meinem Verständnis generalisiert Kant mit dem Kategorischen Imperativ dies
 indem die Maxime nicht mehr als gegeben angenommen wird,
 sondern die Maxime selbst getestet wird.
 Sei die Welt weiterhin gegeben,
-dass müsste der kategorische Imperativ folgende Typsignatur haben:
+dann müsste der kategorische Imperativ folgende Typsignatur haben:
 
   \<^item> \<^typ>\<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
 
+
 Eine Implementierung muss dann über alle möglichen Handlungsabsichten allquantifizieren.
+
+Grob gesagt: Die goldene Regel urteilt über eine Handlungsabsicht gegeben eine Maxime,
+der kategorische Imperativ urteilt über die Maxime an sich.
 
 
 Ich behaupte, der kategorischer Imperativ lässt sich wie folgt umformulieren:
@@ -31,12 +35,12 @@ Ich behaupte, der kategorischer Imperativ lässt sich wie folgt umformulieren:
   \<^item> Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
     dass sie jeder befolgt, im Sinne der goldenen Regel.
   \<^item> Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst,
-    dass sie (Handlung+Maxime) moralisch ist.
+    dass sie (Handlung und Maxime) moralisch ist.
   \<^item> Wenn es jemanden gibt der nach einer Maxime handeln will,
     dann muss diese Handlung nach der Maxime moralisch sein.
   \<^item> Für jede Handlungsabsicht muss gelten:
-    Wenn jemand in jeder Welt nach der Handlungsabsicht handeln würde,
-    dann muss diese Handlung moralisch sein.
+    Wenn jemand einer Handlungsabsicht handeln würde (getestet durch die Maxime),
+    dann muss diese Handlung moralisch sein (getestet durch die Maxime).
 
 Daraus ergibt sich diese Formalisierung:
 
@@ -51,6 +55,10 @@ where
      (\<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)) \<longrightarrow> moralisch welt m ha\<close>
 
 text\<open>
+Wir beschränken uns auf die \<^const>\<open>ausfuehrbar\<close>en Handlungsabsichten um pathologische
+Grenzfälle (welche keinen Rückschluss auf moralische Gesinnung lassen) auszuschließen.
+
+
 Für alle möglichen (wohlgeformten) Handlungsabsichten muss dies nun gelten:
 \<close>
 definition kategorischer_imperativ
@@ -64,29 +72,25 @@ text\<open>Wir führen die interne Hilfsdefinition \<^const>\<open>kategorischer
 um den kategorischen Imperativ nur für eine Teilmenge aller Handlungen besser
 diskutieren zu können.
 
-TODO: Leider fehlen mir Beispiele von Maximen welche den kategorischen Imperativ uneingeschränkt
+Leider fehlen mir nicht-triviale Beispiele von Maximen welche den kategorischen Imperativ uneingeschränkt
 auf allen Handlungsabsichten erfüllen.
 \<close>
 
-text\<open>Diese \<^term>\<open>\<not>ist_noop (handeln ich welt h)\<close> gefällt mir gar nicht.
-Wir brauchen es aber, damit die Beispiele funktionieren.
-Das ist nötig, um pathologische Grenzfälle auszuschließen.
-Beispielsweise ist von-sich-selbst stehlen eine no-op.
+text\<open>Die Vorbedingung \<^term>\<open>ausfuehrbar ich welt ha\<close> in \<^const>\<open>kategorischer_imperativ_auf\<close>
+wirkt etwas holprig.
+Wir brauchen sie aber, um pathologische Grenzfälle auszuschließen.
+Beispielsweise ist von-sich-selbst stehlen eine (nicht ausführbare) No-Op.
 No-ops sind normalerweise nicht böse.
 Stehlen ist schon böse.
 Dieser Grenzfall in dem Stehlen zur no-op wird versteckt also den Charakter der
 Handlungsabsicht und muss daher ausgeschlossen werden.
-Ganz glücklich bin ich mit der Rechtfertigung aber nicht.
-Eventuell wäre es schöner, Handlungen partiell zu machen,
-also dass Handlungsabsichten auch mal \<^const>\<open>None\<close> zurückgeben dürfen.
-Das könnte einiges rechtfertigen.
-Beispielsweise ist Stehlen: jemand anderen etwas wegnehmen.
-Nicht von sich selbst.
-Allerdings machen partielle Handlungen alles komplizierter.
+Da Handlungen partiell sind, ist von-sich-selbst-stehlen auch also nicht ausführbar modelliert,
+da Stehlen bedeutet "jemand anderen etwas wegnehmen" und im Grenzfall "von sich selbst stehlen"
+nicht definiert ist.
 \<close>
 
 
-text\<open>In der Definition is \<^const>\<open>wohlgeformte_handlungsabsicht\<close>
+text\<open>In der Definition \<^const>\<open>kategorischer_imperativ\<close> ist \<^const>\<open>wohlgeformte_handlungsabsicht\<close>
 ein technisch notwendiges Implementierungsdetail um nicht-wohlgeformte Handlungen
 auszuschließen.\<close>
 
@@ -130,7 +134,8 @@ lemma \<open>m = Maxime (\<lambda>_ _. False) \<Longrightarrow>
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
 
-text\<open>Für jede Handlungsabsicht:
+text\<open>Der \<^const>\<open>kategorischer_imperativ\<close> lässt sich auch wie folgt umformulieren.
+Für jede Handlungsabsicht:
   wenn ich so handeln würde muss es auch okay sein, wenn zwei beliebige
   Personen so handeln, wobei einer Täter und einer Opfer ist.\<close>
 lemma kategorischer_imperativ_simp:
@@ -143,6 +148,7 @@ lemma kategorischer_imperativ_simp:
   by blast
 
 
+(*<*)
 text\<open>Introduction rules\<close>
 lemma kategorischer_imperativI:
   \<open>(\<And>ha ich p1 p2. wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
@@ -152,13 +158,12 @@ lemma kategorischer_imperativI:
       \<Longrightarrow> kategorischer_imperativ wps welt m\<close>
   by(auto simp add: kategorischer_imperativ_simp)
 
-(**TODO: handlungsabsicht ha und h konsitent verwenden**)
-
 lemma kategorischer_imperativ_aufI:
   \<open>(\<And>ich p1 p2. ausfuehrbar ich welt ha
       \<Longrightarrow> okay m ich (handeln ich welt ha) \<Longrightarrow> okay m p1 (handeln p2 welt ha))
       \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
+(*>*)
 
 
 text\<open>Um den \<^const>\<open>kategorischer_imperativ_auf\<close> einer Handlungsabsicht zu zeigen muss
@@ -169,6 +174,22 @@ lemma kategorischer_imperativ_auf2:
   \<open>moralisch welt m ha \<or> \<not>(\<exists> p. ausfuehrbar p welt ha \<and> okay m p (handeln p welt ha))
       \<longleftrightarrow> kategorischer_imperativ_auf ha welt m\<close>
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
+
+
+text\<open>Für Beispiele wird es einfacher zu zeigen, dass eine Maxime nicht den
+kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
+(*insbesondere weil ich das proof document als outline baue und man den beweis,
+also das Gegenbeispiel, nicht sieht.*)
+definition \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<equiv>
+wohlgeformte_handlungsabsicht wps welt ha \<and> 
+       ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha) \<and>
+      \<not> okay m p1 (handeln p2 welt ha)\<close>
+
+lemma \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<Longrightarrow>
+  \<not> kategorischer_imperativ wps welt m\<close>
+  apply(simp add: kategorischer_imperativ_simp kategorischer_imperativ_gegenbeispiel_def)
+  apply(rule_tac x=\<open>ha\<close> in exI, simp)
+  by blast
 
 subsection\<open>Triviale Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 text\<open>
@@ -186,7 +207,7 @@ Imperativ:\<close>
 lemma \<open>kategorischer_imperativ wps welt (Maxime (\<lambda>ich h. True))\<close>
   by(simp add: kategorischer_imperativ_simp)
 
-text\<open>Allerdings ist mot so einer Maxime alles moralisch.\<close>
+text\<open>Allerdings ist mit so einer Maxime alles moralisch.\<close>
 lemma \<open>moralisch welt (Maxime (\<lambda>ich h. True)) h\<close>
   by(simp add: moralisch_simp)
 
@@ -200,9 +221,15 @@ Mit der goldenen Regel konnten wir wie folgt moralische Entscheidungen treffen:
 In Worten:
 Wenn eine Handlungsabsicht moralisch ist (nach goldener Regel)
 und es okay ist für mich diese Handlung auszuführen,
-denn ist es auch für mich okay, wenn jeder andere diese Handlung mit mir als Opfer ausführt. 
+dann ist es auch für mich okay, wenn jeder andere diese Handlung mit mir als Opfer ausführt. 
 
-Der kategorische Imperativ liftet dies eine Abstraktionsebene:
+Der kategorische Imperativ hebt diese eine Abstraktionsebene höher.
+Wenn eine Maxime den kategorischen Imperativ erfüllt
+und es okay ist für mich eine Handlung nach dieser Maxime auszuführen (wie in der goldenen Regel),
+dann ist diese Handlungsabsicht allgemein moralisch.
+Die goldene Regel konnte nur folgern, dass eine Handlungsabsicht auch okay ist wenn ich das
+Opfer wäre, der kategorisch Imperativ schließt, dass eine Handlungsabsicht allgemein moralisch
+sein muss, wobei beliebige Personen (nicht nur ich) Täter und Opfer sein können.
 \<close>
 
 lemma \<open>kategorischer_imperativ wps welt m \<Longrightarrow>
@@ -219,20 +246,7 @@ und es für eine beliebige (wohlgeformte) Handlung auszuführen für mich okay i
 dann ist diese Handlung moralisch..
 \<close>
 
-text\<open>Für Beispiele wird es einfacher zu zeigen, dass eine Maxime nicht den
-kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
-(*insbesondere weil ich das proof document als outline baue und man den beweis,
-also das Gegenbeispiel, nicht sieht.*)
-definition \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<equiv>
-wohlgeformte_handlungsabsicht wps welt ha \<and> 
-       ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha) \<and>
-      \<not> okay m p1 (handeln p2 welt ha)\<close>
 
-lemma \<open>kategorischer_imperativ_gegenbeispiel wps welt m ha ich p1 p2 \<Longrightarrow>
-  \<not> kategorischer_imperativ wps welt m\<close>
-  apply(simp add: kategorischer_imperativ_simp kategorischer_imperativ_gegenbeispiel_def)
-  apply(rule_tac x=\<open>ha\<close> in exI, simp)
-  by blast
 
 subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 
@@ -252,7 +266,8 @@ lemma blinde_maxime_katimp:
 
 
 text\<open>Eine Maxime welche das \<^term>\<open>ich::'person\<close> ignoriert,
-also nur die Handlung global betrachtet, erfüllt den kategorischen Imperativ.\<close>
+also nur die Handlung global betrachtet, erfüllt den kategorischen Imperativ
+(mit einigen weiteren Annahmen).\<close>
 theorem globale_maxime_katimp:
   fixes P :: \<open>'world handlung \<Rightarrow> bool\<close>
   assumes mhg: \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren wps welt (Maxime (\<lambda>ich::'person. P)) ha p\<close>
@@ -300,10 +315,15 @@ proof(rule kategorischer_imperativ_aufI, simp)
 qed
 
 
-section\<open>Ausführbarer Beispielgenerator\<close>
+subsection\<open>Ausführbarer Beispielgenerator\<close>
+text\<open>Gegeben sei eine Welt, sowie eine Maxime, und eine Liste von Handlungsabsichten.
+Wir wollen nun wissen ob die Maxime und Handlungsabsichten wohlgeformt sind,
+und wenn ja, ob die Maxime auf diesen Handlungsabsichten den kategorischen Imperativ erfüllt,
+und wie die Handlungen bewertet werden.\<close>
 
+(*<*)
 value\<open>[(x,y). x \<leftarrow> xs, y \<leftarrow> ys, x \<noteq> y]\<close>
-
+(*>*)
 
 definition alle_moeglichen_handlungen
   :: \<open>'world \<Rightarrow> ('person::enum, 'world) handlungsabsicht list \<Rightarrow> 'world handlung list\<close>
@@ -340,19 +360,21 @@ definition erzeuge_beispiel
      bsp_verbotene_handlungen = [ha\<leftarrow>has. \<not> moralisch welt m ha]
    \<rparr>\<close>
 
-text\<open>\<^const>\<open>erzeuge_beispiel\<close> erzeugt nur ein Beiespiel wenn alles wohlgeformt ist.\<close>
-lemma \<open>erzeuge_beispiel wps welt has m = Some bsp \<Longrightarrow>
-  (\<forall> ha \<in> set has. wohlgeformte_handlungsabsicht wps welt ha) \<and>
-  (\<forall> h \<in> set (alle_moeglichen_handlungen welt has). wohlgeformte_maxime_auf h wps m)\<close>
-  by(simp add: erzeuge_beispiel_def split: if_split_asm)
-
 text\<open>
+Das Ergebnis von \<^const>\<open>erzeuge_beispiel\<close> ließt sich wie folgt.
   \<^item> Wenn \<^const>\<open>bsp_erfuellte_maxime\<close> einen \<^const>\<open>Some\<close> term enthält ist der
     \<^const>\<open>kategorischer_imperativ_auf\<close> den Handlungen erfüllt
   \<^item> Die \<^const>\<open>bsp_erlaubte_handlungen\<close> und \<^const>\<open>bsp_verbotene_handlungen\<close> entspricht
     quasi dem allgemeinen Gesetz, welches besagt, welche Handlungen erlaubt oder verboten sind.
 \<close>
 
+text\<open>\<^const>\<open>erzeuge_beispiel\<close> erzeugt nur ein Beiespiel wenn alles wohlgeformt ist.\<close>
+lemma \<open>erzeuge_beispiel wps welt has m = Some bsp \<Longrightarrow>
+  (\<forall> ha \<in> set has. wohlgeformte_handlungsabsicht wps welt ha) \<and>
+  (\<forall> h \<in> set (alle_moeglichen_handlungen welt has). wohlgeformte_maxime_auf h wps m)\<close>
+  by(simp add: erzeuge_beispiel_def split: if_split_asm)
+
+(*<*)
 (*thx lars: https://stackoverflow.com/questions/74337244/turning-a-valuesimp-example-into-a-lemma-with-functions-in-them/74394525#74394525*)
 ML\<open>
 fun beispiel_conv ctxt =
@@ -363,7 +385,7 @@ fun beispiel_tac ctxt =
 \<close>
 
 method_setup beispiel = \<open>Scan.succeed (SIMPLE_METHOD o beispiel_tac)\<close>
-
+(*>*)
 
 lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. Some w)] (Maxime (\<lambda>ich w. True))
   =
@@ -388,13 +410,31 @@ sehr viel Unfug, da z.B. pathologische Grenzfälle
 (wie z.B. sich-selsbt-bestehlen, oder die-welt-die-zufällig-im-ausgangszustand-ist-resetten)
 dazu, dass diese no-op Handlungen verboten sind, da die dahinterliegende Absicht schlecht ist.
 Wenn wir allerdings nur die Ergebnisse einer solchen Handlung (ohne die Absicht) aufschreiben
-kommt heraus: Nichtstun ist verboten.\<close>
+kommt heraus: Nichtstun ist verboten.
+
+Glücklicherweise hat Lars uns 4 Zeilen ML geschrieben, welche \<^const>\<open>erzeuge_beispiel\<close> als
+ausführbares Beispiel benutzbar macht und dabei es auch erlaubt die Funktionen richtig
+zu printen, solange diese einen Namen haben.\<close>
 
 
 
 
 
 subsection\<open>Kombination vom Maximen\<close>
+text\<open>Die folgenden Lemmata über Konjunktion, Disjunktion, und Negation von Maximen werden
+leider etwas kompliziert.
+Wir führen eine Hilfsdefinition ein, welche besagt, ob es einen Fall gibt
+in dem die Handlungsabsicht tatsächlich ausführbar ist und die Maxime erfüllt.
+Dabei werden gezielt die pathologischen Grenzfälle ausgeklammert,
+in denen die Handlungsabsicht nicht ausführbar ist und in einer No-Op resultieren würde.\<close>
+(*TODO: in die kat imp definition folden!*)
+definition ex_erfuellbare_instanz
+  :: \<open>('person, 'world) maxime \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
+where
+  \<open>ex_erfuellbare_instanz m welt ha \<equiv>
+      \<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)\<close>
+
+
 subsubsection\<open>Konjunktion\<close>
 
 lemma MaximeConjI:
@@ -404,16 +444,6 @@ lemma MaximeConjI:
   apply(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
   apply blast
   done
-
-
-(*TODO: das was ich hier erfuellbar nenne will ne definition,
-damit sich folgende lemmata besser lesen.*)
-(*TODO: in die kat imp definition folden!*)
-definition ex_erfuellbare_instanz
-  :: \<open>('person, 'world) maxime \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
-where
-  \<open>ex_erfuellbare_instanz m welt ha \<equiv>
-      \<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)\<close>
 
 text\<open>Die Rückrichtung gilt nur, wenn wir annehmen, dass es auch einen Fall gibt
 in dem die \<^const>\<open>MaximeConj\<close> auch erfüllbar ist:\<close>
@@ -425,6 +455,8 @@ lemma MaximeConjD:
   apply(simp add: moralisch_MaximeConj)
   done
 
+text\<open>Wenn wir \<^const>\<open>ex_erfuellbare_instanz\<close> annehmen, dann verhält sich \<^const>\<open>MaximeConj\<close>
+im \<^const>\<open>kategorischer_imperativ_auf\<close> wie eine normale Konjunktion.\<close>
 lemma MaximeConj:
   \<open>ex_erfuellbare_instanz (MaximeConj m1 m2) welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<longleftrightarrow>
@@ -441,7 +473,7 @@ lemma kategorischer_imperativ_auf_MaximeConj_True:
   \<longleftrightarrow> kategorischer_imperativ_auf ha welt m1\<close>
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp okay_MaximeConj)
 
-text\<open>Achtung: Das ist das Gegenteil, was man von einer Konjunktion erwarten würde.
+text\<open>Achtung: Folgendes lemma ist das Gegenteil, was man von einer Konjunktion erwarten würde.
 Normalerweise ist \<^term>\<open>a \<and> False = False\<close>.
 Bei \<^const>\<open>MaximeConj\<close> ist dies aber \<^const>\<open>True\<close>!
 Dies liegt daran, dass \<^term>\<open>Maxime (\<lambda>_ _. False)\<close> keine Handlung erlaubt,
@@ -526,7 +558,7 @@ kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
   apply(code_simp)
   done
 
-text\<open>zumindest gelten folgende Regeln welche einer gewöhnlichen Disjuntions Introduction
+text\<open>Zumindest gelten folgende Regeln welche einer gewöhnlichen Disjuntions Introduction
 ähnlich sehen (mit leicht stärkeren Annahmen):\<close>
 lemma
 \<open>(ex_erfuellbare_instanz m1 welt ha \<and> kategorischer_imperativ_auf ha welt m1)
