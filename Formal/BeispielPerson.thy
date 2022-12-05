@@ -3,11 +3,14 @@ imports Main
 begin
 
 section\<open>Beispiel Person\<close>
-text\<open>Eine Beispielbevölkerung.\<close>
+text\<open>Wir führen eine Beispielbevölkerung für Beispiele ein.
+Sie besteht aus vier Personen.\<close>
 
 datatype person = Alice | Bob | Carol | Eve
 
-text\<open>Unsere Bevölkerung ist sehr endlich:\<close>
+text\<open>In Isabelle/HOL steht die Konstante \<^term>\<open>UNIV::'a set\<close> vom Typ \<^typ>\<open>'a set\<close> für die Menge aller \<^typ>\<open>'a\<close>,
+also das Universum über \<^typ>\<open>'a\<close>.
+Das Universum \<^term>\<open>UNIV::person set\<close> vom Typ \<^typ>\<open>person set\<close> unserer Bevölkerung ist sehr endlich:\<close>
 lemma UNIV_person: \<open>UNIV = {Alice, Bob, Carol, Eve}\<close>
   by(auto intro:person.exhaust UNIV_eq_I)
 
@@ -38,5 +41,4 @@ lemma \<open>dom [Alice \<mapsto> (3::nat), Carol \<mapsto> 6] = {Alice, Carol}\
 value "sorted_list_of_set {Alice, Carol}"
 *)
 (*>*)
-
 end

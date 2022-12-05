@@ -12,7 +12,7 @@ Nach Kant ist eine Maxime ein "subjektives Prinzip des Wollens".
 Modell einer \<^emph>\<open>Maxime\<close>:
 Eine Maxime in diesem Modell beschreibt ob eine Handlung in einer gegebenen Welt gut ist.
 
-Faktisch ist eine Maxime
+Faktisch bruachen wir um eine Maxime zu modellieren
   \<^item> \<^typ>\<open>'person\<close>: die handelnde Person, i.e., \<^emph>\<open>ich\<close>.
   \<^item> \<^typ>\<open>'world handlung\<close>: die zu betrachtende Handlung.
   \<^item> \<^typ>\<open>bool\<close>: Das Ergebnis der Betrachtung. \<^const>\<open>True\<close> = Gut; \<^const>\<open>False\<close> = Schlecht.
