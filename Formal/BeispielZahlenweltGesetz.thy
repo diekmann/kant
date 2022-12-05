@@ -149,6 +149,7 @@ subsection\<open>Beispiele\<close>
 
   text\<open>Der Grund ist, dass \<^const>\<open>Alice\<close> die abstrakte Handlung "Alice wird bestohlen" gar nicht gut
   fände, wenn sie jemand anderes ausführt:\<close>
+(*
   lemma \<open>debug_maxime show_zahlenwelt initialwelt
           maxime_zahlenfortschritt (Handlungsabsicht (stehlen_nichtwf 5 Alice)) =
    {VerletzteMaxime (Opfer Alice) (Taeter Bob)
@@ -159,7 +160,7 @@ subsection\<open>Beispiele\<close>
      (Handlung [(Alice, 5), (Bob, 10), (Carol, - 3)] [(Bob, 10), (Carol, - 3), (Eve, 5)])
    }\<close>
     by eval
-  
+*)  
   text\<open>Leider ist das hier abgeleitete Gesetz sehr fragwürdig:
   \<^term>\<open>Rechtsnorm (Tatbestand []) (Rechtsfolge Verbot)\<close>
   

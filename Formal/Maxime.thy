@@ -203,25 +203,28 @@ wobei \<^const>\<open>moralisch_exhaust\<close> implementiert ist als @{thm mora
 subsection\<open>Maximen Debugging\<close>
 text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
 Maxime verletzt ist:\<close>
-datatype 'person opfer = Opfer \<open>'person\<close>
-datatype 'person taeter = Taeter \<open>'person\<close>
-datatype ('person, 'world) verletzte_maxime = 
-  VerletzteMaxime
-    \<open>'person opfer\<close> \<comment>\<open>verletzt für; das Opfer\<close>
-    \<open>'person taeter\<close> \<comment>\<open>handelnde Person; der Täter\<close>
-    \<open>'world handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
+
+record ('person, 'world) dbg_verletzte_maxime =
+  dbg_opfer :: \<open>'person\<close> \<comment>\<open>verletzt für; das Opfer\<close>
+  dbg_taeter :: \<open>'person\<close> \<comment>\<open>handelnde Person; der Täter\<close>
+  dbg_handlung :: \<open>'world handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
+
+text\<open>Alle Feldnamen bekommen das Präfix "dbg" für Debug um den Namensraum nicht zu verunreinigen.\<close>
+    
 
 text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
 fun debug_maxime
   :: \<open>('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht
-      \<Rightarrow> (('person, 'printable_world) verletzte_maxime) set\<close>
+      \<Rightarrow> (('person, 'printable_world) dbg_verletzte_maxime) set\<close>
 where
   \<open>debug_maxime print_world welt m handlungsabsicht =
-    {VerletzteMaxime
-      (Opfer p1) (Taeter p2)
-      (map_handlung print_world (handeln p2 welt handlungsabsicht)) | p1 p2.
-          \<not>okay m p1 (handeln p2 welt handlungsabsicht)}\<close>
+    {\<lparr>
+      dbg_opfer = p1,
+      dbg_taeter = p2,
+      dbg_handlung = map_handlung print_world (handeln p2 welt handlungsabsicht)
+     \<rparr>
+      | p1 p2. \<not>okay m p1 (handeln p2 welt handlungsabsicht)}\<close>
 
 
 text\<open>Es gibt genau dann keine Beispiele für Verletzungen, wenn die Maxime erfüllt ist:\<close>
@@ -234,7 +237,7 @@ lemma \<open>debug_maxime print_world welt maxime handlungsabsicht = {}
 definition debug_maxime_exhaust where
   \<open>debug_maxime_exhaust bevoelk print_world welt maxime ha \<equiv>
     (case maxime of (Maxime m) \<Rightarrow> 
-      map (\<lambda>(p1,p2). VerletzteMaxime (Opfer p1) (Taeter p2) (map_handlung print_world (handeln p2 welt ha)))
+      map (\<lambda>(p1,p2). \<lparr> dbg_opfer=p1, dbg_taeter=p2, dbg_handlung=map_handlung print_world (handeln p2 welt ha)\<rparr>)
         (filter (\<lambda>(p1,p2). \<not>m p1 (handeln p2 welt ha)) (List.product bevoelk bevoelk)))\<close>
 
 lemma debug_maxime_exhaust [code]:
@@ -294,9 +297,12 @@ lemma \<open>debug_maxime show_map
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
             (Handlungsabsicht (\<lambda>person welt. Some (welt(person \<mapsto> 3))))
-  = {VerletzteMaxime (Opfer Bob) (Taeter Bob)
-     (Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
-               [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)])}\<close>
+  = {\<lparr>
+      dbg_opfer = Bob,
+      dbg_taeter = Bob,
+      dbg_handlung = Handlung [(Alice, 0), (Bob, 4), (Carol, 0), (Eve, 0)]
+                              [(Alice, 0), (Bob, 3), (Carol, 0), (Eve, 0)]
+     \<rparr>}\<close>
   by eval
 
 

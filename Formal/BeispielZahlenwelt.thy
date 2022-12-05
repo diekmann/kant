@@ -460,8 +460,11 @@ subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
   
   Beispielsweise ist \<^const>\<open>Bob\<close> das Opfer wenn \<^const>\<open>Alice\<close> sich
   5 Wohlstand erschafft, aber \<^const>\<open>Bob\<close>'s Wohlstand sich nicht erhöht:\<close>
-  lemma\<open>VerletzteMaxime (Opfer Bob) (Taeter Alice)
-          (Handlung [(Alice, 5), (Bob, 10), (Carol, -3)] [(Alice, 10), (Bob, 10), (Carol, -3)])
+  lemma
+    \<open>\<lparr>
+      dbg_opfer = Bob, dbg_taeter = Alice,
+      dbg_handlung = Handlung [(Alice, 5), (Bob, 10), (Carol, -3)] [(Alice, 10), (Bob, 10), (Carol, -3)]
+     \<rparr>
           \<in> debug_maxime show_zahlenwelt initialwelt
             (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (Handlungsabsicht (erschaffen 5)) \<close>
     by eval
