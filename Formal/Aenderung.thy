@@ -584,6 +584,11 @@ lemma konsensswap_apply:
   \<open>konsensswap p1 p2 kons p =  map (swap p1 p2) (swap p1 p2 kons p)\<close>
   apply(simp add: konsensswap_def comp_def)
   by (metis swap_a swap_b swap_nothing)
+
+
+lemma konsensswap_same[simp]:
+  "konsensswap p p konsens = konsens"
+  by(simp add: konsensswap_def swap_id_comp)
 (*>*)
 
 

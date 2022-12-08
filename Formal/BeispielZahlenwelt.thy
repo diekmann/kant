@@ -363,9 +363,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
 
 (*<*)
   lemma wpsm_kommutiert_altruistischer_fortschritt:
-    \<open>wpsm_kommutiert
-           maxime_altruistischer_fortschritt
-           zahlenwps welt\<close>
+    \<open>wpsm_kommutiert maxime_altruistischer_fortschritt zahlenwps welt\<close>
     apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def handeln_def nachher_handeln.simps)
     apply(safe)
      apply(case_tac \<open>p1 = p2\<close>)

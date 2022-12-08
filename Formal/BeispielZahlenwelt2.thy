@@ -57,7 +57,7 @@ lemma \<open>zahlenwps Alice Carol initialwelt
   umwelt = 600
  \<rparr>\<close> by eval
 
-
+(*<*)
 lemma zahlenwps_id: \<open>zahlenwps p1 p2 (zahlenwps p1 p2 welt) = welt\<close>
   by(simp add: zahlenwps_def)
 
@@ -65,6 +65,9 @@ lemma zahlenwps_sym: \<open>zahlenwps p1 p2 = zahlenwps p2 p1\<close>
   apply(simp add: fun_eq_iff zahlenwps_def)
   by (simp add: swap_symmetric konsensswap_sym)
 
+lemma zahlenwps_same: \<open>zahlenwps p p w = w\<close>
+  by(cases \<open>w\<close>, simp add: zahlenwps_def)
+(*>*)
 
 
 definition enthaelt_konsens :: \<open>(person, int) abmachung \<Rightarrow> zahlenwelt \<Rightarrow> bool\<close>
@@ -409,6 +412,7 @@ value[simp] \<open>erzeuge_beispiel
 (*TODO:
   1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
      (das sollte der neue function map typ providen).
+     hat_konsens_existierende_abmachung_einloesen zeigt, dass dies zumindest fuer diese eine HA gilt.
   2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
 *)
 definition maxime_hatte_konsens :: \<open>(person, zahlenwelt) maxime\<close> where
@@ -485,7 +489,7 @@ lemma "maxime_und_handlungsabsicht_generalisieren zahlenwps welt
   apply(simp add: hat_konsens_existierende_abmachung_einloesen)
   done
   
-theorem 
+lemma mhg_katimp_maxime_hatte_konsens:
   \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_hatte_konsens ha p \<Longrightarrow>
     wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt maxime_hatte_konsens\<close>
@@ -498,4 +502,42 @@ theorem
   by simp
 
 
+
+lemma wpsm_kommutiert_altruistischer_fortschritt:
+  \<open>wpsm_kommutiert maxime_altruistischer_fortschritt zahlenwps welt\<close>
+  apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def handeln_def nachher_handeln.simps)
+  apply(safe)
+   apply(case_tac \<open>p1 = p2\<close>)
+    apply(simp add: zahlenwps_same; fail)
+   apply(case_tac \<open>pX = p1\<close>)
+    apply(simp)
+    apply (metis swap_b zahlenwelt.simps(1) zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def zahlenwps_sym)
+   apply (smt (verit, del_insts) swap_b swap_nothing zahlenwelt.ext_inject zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def zahlenwps_sym)
+  by (smt (z3) swap_b swap_nothing zahlenwelt.select_convs(1) zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def zahlenwps_sym)
+
+lemma mhg_katimp_maxime_altruistischer_fortschritt:
+  \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
+    wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
+  apply(simp add: maxime_altruistischer_fortschritt_def)
+  apply(erule globale_maxime_katimp)
+      apply (simp add: handeln_def hat_konsens_noop ist_noop_def; fail)
+     using wpsm_kommutiert_altruistischer_fortschritt
+     apply (simp add: maxime_altruistischer_fortschritt_def) 
+    using zahlenwps_sym apply fastforce
+   apply (simp add: zahlenwps_id)
+    by simp
+
+
+theorem 
+  \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren
+          zahlenwps welt (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens) ha p \<Longrightarrow>
+    wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt
+      (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)\<close>
+  apply(rule kategorischer_imperativ_auf_MaximeDisjI2)
+  apply(cases "ex_erfuellbare_instanz maxime_altruistischer_fortschritt welt ha", simp)
+  (*maxime_und_handlungsabsicht_generalisieren und MaximeDisj gehen nicht zam!*)
+  using mhg_katimp_maxime_altruistischer_fortschritt 
+  oops (*stuck*)
 end

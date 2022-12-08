@@ -262,6 +262,24 @@ lemma
   apply(simp add: ist_noop_def fun_eq_iff handeln_def nachher_handeln.simps)
   by (smt (verit) ausfuehrbar.simps fun_upd_same fun_upd_twist not_numeral_le_zero option.simps(3) person.distinct(5) swap_def)
 
+(*<*)
+lemma maxime_und_handlungsabsicht_generalisieren_MaximeConj:
+  "maxime_und_handlungsabsicht_generalisieren wps welt m1 ha p
+    \<and> maxime_und_handlungsabsicht_generalisieren wps welt m2 ha p
+  \<Longrightarrow>maxime_und_handlungsabsicht_generalisieren wps welt (MaximeConj m1 m2) ha p"
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def okay_MaximeConj)
+  apply(clarsimp)
+  done
+
+(*there is an \<and> in there, not an \<or>*)
+lemma maxime_und_handlungsabsicht_generalisieren_MaximeDisj_Conj:
+  "maxime_und_handlungsabsicht_generalisieren wps welt m1 ha p
+    \<and> maxime_und_handlungsabsicht_generalisieren wps welt m2 ha p
+    \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren wps welt (MaximeDisj m1 m2) ha p"
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def okay_MaximeDisj)
+  apply(clarsimp)
+  done
+(*>*)
   
   
 
