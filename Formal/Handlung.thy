@@ -145,9 +145,13 @@ lemma nicht_ausfuehrbar_ist_noop:
 (*<*)
 lemma ausfuehrbar_nachher_handeln:
   \<open>ausfuehrbar p welt (Handlungsabsicht h) \<Longrightarrow>
-  nachher_handeln p welt (Handlungsabsicht h) = the (h p welt)\<close>
+    nachher_handeln p welt (Handlungsabsicht h) = the (h p welt)\<close>
   apply(simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
   by fastforce
+lemma nicht_ausfuehrbar_nachher_handeln:
+  \<open>\<not>ausfuehrbar p welt ha \<Longrightarrow>
+    nachher_handeln p welt ha = welt\<close>
+  by(cases ha, simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
 (*>*)
 
 

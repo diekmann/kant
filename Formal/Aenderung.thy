@@ -737,7 +737,7 @@ where
   \<open>reverse_engineer_abmachung h \<equiv>
     fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)\<close>
 
-lemma reverse_engineer_abmachung:
+lemma reverse_engineer_abmachung_delta_num_fun:
   \<open>reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)\<close>
   apply(simp add: fun_eq_iff reverse_engineer_abmachung_def)
   apply(cases \<open>h\<close>, simp del: delta_num_fun.simps)
@@ -756,5 +756,10 @@ lemma reverse_engineer_abmachung_swap:
   by(simp add: fun_eq_iff reverse_engineer_abmachung_def fold_enum_fun_update swap_def)
 (*>*)
 
+lemma reverse_engineer_abmachung:
+  "reverse_engineer_abmachung (Handlung welt welt') = a \<longleftrightarrow> abmachung_ausfuehren a welt = welt'"
+  apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
+  apply(simp add: reverse_engineer_abmachung_def fold_enum_fun_update_call)
+  by (metis add_diff_cancel diff_add_cancel)
 
 end

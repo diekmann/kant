@@ -205,6 +205,25 @@ lemma existierende_abmachung_einloesen_map_zahlenwps:
   apply(simp add: zahlenwelt_abmachung_ausfuehren_swap)
   apply(simp add: zahlenwps_def konsens_entfernen_konsensswap)
   done
+
+lemma existierende_abmachung_einloesen_zahlenwps_pullout:
+  \<open>existierende_abmachung_einloesen p (zahlenwps p1 p2 welt)
+    = map_option (zahlenwps p2 p1) (existierende_abmachung_einloesen (swap p1 p2 id p) welt)\<close>
+  apply(cases "p = p1")
+  apply(simp add: swap_a)
+  apply (metis existierende_abmachung_einloesen_map_zahlenwps zahlenwps_id)
+  apply(cases "p = p2")
+  apply(simp add: swap_b)
+   apply (metis existierende_abmachung_einloesen_map_zahlenwps zahlenwps_id zahlenwps_sym)
+  apply(simp add: swap_nothing)
+
+  apply(simp add: existierende_abmachung_einloesen_def)
+  apply(simp add: zahlenwps_def konsensswap_def swap_nothing)
+  apply(case_tac \<open>konsens welt p\<close>)
+   apply(simp; fail)
+  apply(simp)
+  (*TODO: copy of above proof could get rid of smt*)
+  by (smt (z3) BeispielZahlenwelt2.abmachung_ausfuehren_def BeispielZahlenwelt2.enthaelt_konsens_swap abmachung_ausfuehren_swap abmachung_einloesen_def konsens_entfernen_konsensswap konsensswap_id map_option_eq_Some option.map_disc_iff zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def)
 (*>*)
 
 text\<open>In jeder Welt ist damit die Handlungsabsicht wohlgeformt.\<close>
@@ -407,5 +426,62 @@ lemma \<open>erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen, Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
   by beispiel
+
+
+(*move up*)
+lemma hat_konsens_noop: "hat_konsens (Handlung welt welt)"
+  apply(simp add: hat_konsens_def reverse_engineer_abmachung_same)
+  by(code_simp)
+
+lemma nicht_ausfuehrbar_hat_konsens:
+  "\<not> ausfuehrbar p welt ha \<Longrightarrow> hat_konsens (handeln p welt ha)"
+  apply(simp add: handeln_def nicht_ausfuehrbar_nachher_handeln hat_konsens_noop)
+  done
+  
+
+lemma abmachung_einloesen_some_entahelt_konsens:
+  "abmachung_einloesen a welt = Some welt' \<Longrightarrow> enthaelt_konsens a welt"
+  by(simp add: abmachung_einloesen_def split: if_split_asm)
+lemma abmachung_einloesen_reverse_engineer:
+  "abmachung_einloesen a welt = Some welt' \<Longrightarrow> reverse_engineer_abmachung (Handlung (besitz welt) (besitz welt')) = a"
+  apply(simp add: abmachung_einloesen_def split: if_split_asm)
+  apply(simp add: abmachung_ausfuehren_def)
+  apply(simp add: reverse_engineer_abmachung)
+  by force
+
+text\<open>Für\<^const>\<open>existierende_abmachung_einloesen\<close> gilt immer \<^const>\<open>hat_konsens\<close>.
+Das \<^const>\<open>reverse_engineer_abmachung\<close> macht also das Richtige.\<close>
+lemma hat_konsens_existierende_abmachung_einloesen:
+  "hat_konsens (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))"
+  apply(simp add: hat_konsens_def handeln_def nachher_handeln.simps)
+  apply(cases "existierende_abmachung_einloesen p welt")
+  apply(simp)
+  using hat_konsens_def hat_konsens_noop apply fastforce
+  apply(simp)
+  apply(rename_tac welt')
+  apply(simp add: existierende_abmachung_einloesen_def split:list.split_asm)
+  apply(frule abmachung_einloesen_some_entahelt_konsens)
+  apply(simp add: abmachung_einloesen_reverse_engineer)
+  done
+
+lemma "maxime_und_handlungsabsicht_generalisieren zahlenwps welt
+     maxime_hatte_konsens (Handlungsabsicht existierende_abmachung_einloesen) p"
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_hatte_konsens_def)
+  apply(clarsimp)
+  apply(simp add: hat_konsens_existierende_abmachung_einloesen)
+  done
+  
+theorem 
+  \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_hatte_konsens ha p \<Longrightarrow>
+    wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt maxime_hatte_konsens\<close>
+  apply(simp add: maxime_hatte_konsens_def)
+  apply(erule globale_maxime_katimp)
+      apply (simp add: handeln_def hat_konsens_noop ist_noop_def; fail)
+     apply (smt (verit, del_insts) handlung.map hat_konsens_swap okay.simps wpsm_kommutiert_handlung_raw zahlenwps_id zahlenwps_sym)
+  using zahlenwps_sym apply fastforce
+   apply (simp add: zahlenwps_id)
+  by simp
+
 
 end
