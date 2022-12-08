@@ -96,6 +96,15 @@ lemma hat_konsens_swap:
   apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp add: zahlenwps_def)
   apply(simp add: reverse_engineer_abmachung_swap)
   by (simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
+
+lemma hat_konsens_noop: "hat_konsens (Handlung welt welt)"
+  apply(simp add: hat_konsens_def reverse_engineer_abmachung_same)
+  by(code_simp)
+
+lemma nicht_ausfuehrbar_hat_konsens:
+  "\<not> ausfuehrbar p welt ha \<Longrightarrow> hat_konsens (handeln p welt ha)"
+  apply(simp add: handeln_def nicht_ausfuehrbar_nachher_handeln hat_konsens_noop)
+  done
 (*>*)
 
 
@@ -163,6 +172,36 @@ lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
 lemma\<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = None\<close>
   by eval
 
+(*<*)
+lemma abmachung_einloesen_some_entahelt_konsens:
+  "abmachung_einloesen a welt = Some welt' \<Longrightarrow> enthaelt_konsens a welt"
+  by(simp add: abmachung_einloesen_def split: if_split_asm)
+
+lemma abmachung_einloesen_reverse_engineer:
+  "abmachung_einloesen a welt = Some welt'
+    \<Longrightarrow> reverse_engineer_abmachung (Handlung (besitz welt) (besitz welt')) = a"
+  apply(simp add: abmachung_einloesen_def split: if_split_asm)
+  apply(simp add: abmachung_ausfuehren_def)
+  apply(simp add: reverse_engineer_abmachung)
+  by force
+
+lemma zahlenwelt_abmachung_ausfuehren_swap:
+  \<open>(BeispielZahlenwelt2.abmachung_ausfuehren (swap p1 p2 a) (zahlenwps p1 p2 welt)) =
+       zahlenwps p2 p1 (BeispielZahlenwelt2.abmachung_ausfuehren a welt)\<close>
+    apply(simp add: BeispielZahlenwelt2.abmachung_ausfuehren_def)
+  by(simp add: zahlenwps_def abmachung_ausfuehren_swap konsensswap_sym)
+
+lemma abmachung_einloesen_zahlenwps_pullout:
+  "abmachung_einloesen (swap p1 p2 a) (zahlenwps p1 p2 welt)
+    = map_option (zahlenwps p2 p1) (abmachung_einloesen a welt)"
+  apply(simp add: abmachung_einloesen_def enthaelt_konsens_swap)
+  apply(clarsimp)
+  apply(simp add: zahlenwelt_abmachung_ausfuehren_swap)
+  apply(simp add: zahlenwps_def konsens_entfernen_konsensswap)
+  by (metis konsens_entfernen_konsensswap konsensswap_id)
+(*>*)
+
+
 text\<open>Die Handlungsabsicht \<^const>\<open>abmachung_einloesen\<close> stellt keine
 \<^const>\<open>wohlgeformte_handlungsabsicht\<close> dar, da in der Abmachung Personen
 hardcedoded sind.
@@ -186,11 +225,6 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps initialwelt
   by eval
 
 (*<*)
-lemma zahlenwelt_abmachung_ausfuehren_swap:
-  \<open>(BeispielZahlenwelt2.abmachung_ausfuehren (swap p1 p2 a) (zahlenwps p1 p2 welt)) =
-       zahlenwps p2 p1 (BeispielZahlenwelt2.abmachung_ausfuehren a welt)\<close>
-    apply(simp add: BeispielZahlenwelt2.abmachung_ausfuehren_def)
-  by(simp add: zahlenwps_def abmachung_ausfuehren_swap konsensswap_sym)
 
 lemma existierende_abmachung_einloesen_map_zahlenwps:
   \<open>map_option (zahlenwps p2 p1) (existierende_abmachung_einloesen p2 (zahlenwps p1 p2 welt)) =
@@ -200,11 +234,8 @@ lemma existierende_abmachung_einloesen_map_zahlenwps:
   apply(case_tac \<open>konsens welt p1\<close>)
    apply(simp; fail)
   apply(simp)
-  apply(simp add: abmachung_einloesen_def enthaelt_konsens_swap)
-  apply(safe)
-  apply(simp add: zahlenwelt_abmachung_ausfuehren_swap)
-  apply(simp add: zahlenwps_def konsens_entfernen_konsensswap)
-  done
+  using abmachung_einloesen_zahlenwps_pullout
+  by (metis swap2 swap_symmetric zahlenwps_id)
 
 lemma existierende_abmachung_einloesen_zahlenwps_pullout:
   \<open>existierende_abmachung_einloesen p (zahlenwps p1 p2 welt)
@@ -222,8 +253,7 @@ lemma existierende_abmachung_einloesen_zahlenwps_pullout:
   apply(case_tac \<open>konsens welt p\<close>)
    apply(simp; fail)
   apply(simp)
-  (*TODO: copy of above proof could get rid of smt*)
-  by (smt (z3) BeispielZahlenwelt2.abmachung_ausfuehren_def BeispielZahlenwelt2.enthaelt_konsens_swap abmachung_ausfuehren_swap abmachung_einloesen_def konsens_entfernen_konsensswap konsensswap_id map_option_eq_Some option.map_disc_iff zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def)
+  using abmachung_einloesen_zahlenwps_pullout by simp
 (*>*)
 
 text\<open>In jeder Welt ist damit die Handlungsabsicht wohlgeformt.\<close>
@@ -289,6 +319,20 @@ lemma \<open>nachher_handeln Alice
   by eval
 
 
+text\<open>Für\<^const>\<open>existierende_abmachung_einloesen\<close> gilt immer \<^const>\<open>hat_konsens\<close>.
+Das \<^const>\<open>reverse_engineer_abmachung\<close> macht also das Richtige.\<close>
+lemma hat_konsens_existierende_abmachung_einloesen:
+  "hat_konsens (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))"
+  apply(simp add: hat_konsens_def handeln_def nachher_handeln.simps)
+  apply(cases "existierende_abmachung_einloesen p welt")
+  apply(simp)
+  using hat_konsens_def hat_konsens_noop apply fastforce
+  apply(simp)
+  apply(rename_tac welt')
+  apply(simp add: existierende_abmachung_einloesen_def split:list.split_asm)
+  apply(frule abmachung_einloesen_some_entahelt_konsens)
+  apply(simp add: abmachung_einloesen_reverse_engineer)
+  done
 
 
 
@@ -428,41 +472,11 @@ lemma \<open>erzeuge_beispiel
   by beispiel
 
 
-(*move up*)
-lemma hat_konsens_noop: "hat_konsens (Handlung welt welt)"
-  apply(simp add: hat_konsens_def reverse_engineer_abmachung_same)
-  by(code_simp)
 
-lemma nicht_ausfuehrbar_hat_konsens:
-  "\<not> ausfuehrbar p welt ha \<Longrightarrow> hat_konsens (handeln p welt ha)"
-  apply(simp add: handeln_def nicht_ausfuehrbar_nachher_handeln hat_konsens_noop)
-  done
   
 
-lemma abmachung_einloesen_some_entahelt_konsens:
-  "abmachung_einloesen a welt = Some welt' \<Longrightarrow> enthaelt_konsens a welt"
-  by(simp add: abmachung_einloesen_def split: if_split_asm)
-lemma abmachung_einloesen_reverse_engineer:
-  "abmachung_einloesen a welt = Some welt' \<Longrightarrow> reverse_engineer_abmachung (Handlung (besitz welt) (besitz welt')) = a"
-  apply(simp add: abmachung_einloesen_def split: if_split_asm)
-  apply(simp add: abmachung_ausfuehren_def)
-  apply(simp add: reverse_engineer_abmachung)
-  by force
 
-text\<open>Für\<^const>\<open>existierende_abmachung_einloesen\<close> gilt immer \<^const>\<open>hat_konsens\<close>.
-Das \<^const>\<open>reverse_engineer_abmachung\<close> macht also das Richtige.\<close>
-lemma hat_konsens_existierende_abmachung_einloesen:
-  "hat_konsens (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))"
-  apply(simp add: hat_konsens_def handeln_def nachher_handeln.simps)
-  apply(cases "existierende_abmachung_einloesen p welt")
-  apply(simp)
-  using hat_konsens_def hat_konsens_noop apply fastforce
-  apply(simp)
-  apply(rename_tac welt')
-  apply(simp add: existierende_abmachung_einloesen_def split:list.split_asm)
-  apply(frule abmachung_einloesen_some_entahelt_konsens)
-  apply(simp add: abmachung_einloesen_reverse_engineer)
-  done
+
 
 lemma "maxime_und_handlungsabsicht_generalisieren zahlenwps welt
      maxime_hatte_konsens (Handlungsabsicht existierende_abmachung_einloesen) p"
