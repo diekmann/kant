@@ -530,14 +530,19 @@ lemma mhg_katimp_maxime_altruistischer_fortschritt:
 
 
 theorem 
-  \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren
-          zahlenwps welt (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens) ha p \<Longrightarrow>
+  \<open>ex_erfuellbare_instanz maxime_altruistischer_fortschritt welt ha \<and>
+    (\<forall>p. maxime_und_handlungsabsicht_generalisieren
+          zahlenwps welt maxime_altruistischer_fortschritt ha p)
+   \<or>
+   ex_erfuellbare_instanz maxime_hatte_konsens welt ha \<and>
+    (\<forall>p. maxime_und_handlungsabsicht_generalisieren
+          zahlenwps welt maxime_hatte_konsens ha p) \<Longrightarrow>
     wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt
       (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)\<close>
   apply(rule kategorischer_imperativ_auf_MaximeDisjI2)
-  apply(cases "ex_erfuellbare_instanz maxime_altruistischer_fortschritt welt ha", simp)
-  (*maxime_und_handlungsabsicht_generalisieren und MaximeDisj gehen nicht zam!*)
-  using mhg_katimp_maxime_altruistischer_fortschritt 
-  oops (*stuck*)
+  apply(elim disjE)
+  using mhg_katimp_maxime_altruistischer_fortschritt apply simp
+  using mhg_katimp_maxime_hatte_konsens apply simp
+  done
 end
