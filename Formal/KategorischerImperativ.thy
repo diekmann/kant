@@ -39,7 +39,7 @@ Ich behaupte, der kategorischer Imperativ lässt sich wie folgt umformulieren:
   \<^item> Wenn es jemanden gibt der nach einer Maxime handeln will,
     dann muss diese Handlung nach der Maxime moralisch sein.
   \<^item> Für jede Handlungsabsicht muss gelten:
-    Wenn jemand einer Handlungsabsicht handeln würde (getestet durch die Maxime),
+    Wenn jemand nach einer Handlungsabsicht handeln würde (getestet durch die Maxime),
     dann muss diese Handlung moralisch sein (getestet durch die Maxime).
 
 Daraus ergibt sich diese Formalisierung:
@@ -68,7 +68,10 @@ where
     \<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<longrightarrow>
           kategorischer_imperativ_auf ha welt m\<close>
 
-text\<open>Wir führen die interne Hilfsdefinition \<^const>\<open>kategorischer_imperativ_auf\<close> ein
+text\<open>Damit hat \<^term_type>\<open>kategorischer_imperativ wps :: 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+die gewünschte Typsignatur.
+
+Wir haben die interne Hilfsdefinition \<^const>\<open>kategorischer_imperativ_auf\<close> eingeführt
 um den kategorischen Imperativ nur für eine Teilmenge aller Handlungen besser
 diskutieren zu können.
 

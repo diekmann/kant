@@ -294,7 +294,7 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
   (*>*)
 
 
-  subsubsection\<open>Einzellbeispiele\<close>
+  subsubsection\<open>Einzelbeispiele\<close>
     text\<open>In jeder Welt ist die \<^term>\<open>Handlungsabsicht (erschaffen n)\<close> \<^const>\<open>moralisch\<close>:\<close>
     lemma \<open>moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (erschaffen n))\<close>
       apply(cases \<open>welt\<close>)
@@ -391,8 +391,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     apply(case_tac \<open>welt\<close>, simp)
       apply(auto simp add: swap_def split: option.split option.split_asm)
     done
-  
-  
+
   lemma wfm_maxime_altruistischer_fortschritt:
     \<open>wohlgeformte_maxime zahlenwps maxime_altruistischer_fortschritt\<close>
     apply(simp add: maxime_altruistischer_fortschritt_def wohlgeformte_maxime_def wohlgeformte_maxime_auf_def handeln_def nachher_handeln.simps, intro allI, rename_tac h p1 p2)
@@ -400,6 +399,16 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
     apply(simp add: swap_forall)
     done
+
+  lemma individueller_fortschritt_map_handlung_zahlenwps:
+    "individueller_fortschritt pX (map_handlung (zahlenwps p1 p2) ha)
+      = individueller_fortschritt (swap p1 p2 id pX) ha"
+    apply(cases ha, simp)
+    apply(cases "pX = p1")
+     apply(simp add: hlp1  swap_a; fail)
+    apply(cases "pX = p2")
+     apply(simp add: hlp2 swap_b; fail)
+    by (metis hlp3 id_apply swap_nothing zahlenwps_id)
 (*>*)
 
   
@@ -421,6 +430,33 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
 
   text\<open>Allgemein scheint dies eine sehr gute Maxime zu sein
   (für dieses sehr beschränkte Weltenmodell).\<close>
+
+
+(*
+  text\<open>todo. wenn das klappt haetten wir einen ket imp bewiesen.\<close>
+lemma "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt"
+  unfolding maxime_altruistischer_fortschritt_def
+  apply(rule kategorischer_imperativ_aufI)
+  apply(clarsimp)
+  apply(subgoal_tac
+      "\<forall>pX. individueller_fortschritt pX (map_handlung (zahlenwps p2 ich) (handeln p2 (zahlenwps ich p2 welt) ha))")
+   prefer 2
+  subgoal using wohlgeformte_handlungsabsicht_mit_wpsid by (metis wps_id_def zahlenwps_twice(2))
+(* einmal im Kreis drehen:
+  apply(simp add: individueller_fortschritt_map_handlung_zahlenwps)
+  apply(subst(asm) zahlenwps_sym)
+  apply(subst(asm) wohlgeformte_handlungsabsicht_wpsid_wpssym_komm[where wps=zahlenwps])
+     apply (metis wps_id_def zahlenwps_twice(2))
+    apply (simp add: zahlenwps_sym)
+   defer
+  apply(simp add: individueller_fortschritt_map_handlung_zahlenwps)
+
+brauchen etwas in die Richtung:
+handeln p2 (zahlenwps ich p2 welt) ha) = zahlenwps ich p2 (handeln p2 welt ha)
+*)
+  oops
+*)
 
 subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
