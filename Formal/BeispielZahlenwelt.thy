@@ -602,6 +602,11 @@ lemma swap_unrelated_im_kreis:
     swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt"
   by(simp add: swap_def)
 
+lemma "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+  zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt)) = zahlenwps p1 p2 welt"
+  apply(cases welt, simp add: swap_def)
+  by auto
+
 lemma zahlenwps_unrelated_im_kreis:
   "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
     zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) = welt"
@@ -720,6 +725,18 @@ lemma wfh_pullout_wps_move_to_unrelated:
   apply(simp add: zahlenwps_funny_permutation zahlenwps_funny_permutation_map_handlung_helper)
   done
 
+
+
+lemma "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
+  zahlenwps p p1 (zahlenwps p2 p welt) = zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt))"
+  apply(cases welt, simp add: swap_def)
+  oops
+
+lemma obtain_fresh_person:
+  "\<exists>p::person. p \<noteq> p1 \<and> p \<noteq> p2"
+  apply(cases p1, case_tac [!] p2)
+  by(auto)
+
 lemma
   "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
   maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
@@ -733,7 +750,17 @@ lemma
    apply(simp add: zahlenwps_id; fail)
   apply(elim disjE)
    apply(simp)
-    
+   apply(subgoal_tac "\<exists>p. p \<noteq> p1 \<and> p \<noteq> p2")
+    prefer 2 using obtain_fresh_person apply blast
+   apply(elim exE, rename_tac p1 p2 pOther)
+  thm wfh_pullout_wps_move_to_unrelated
+   apply(subgoal_tac "handeln p1 (zahlenwps p1 p2 welt) ha =
+map_handlung (zahlenwps p2 pOther) (handeln p1 (zahlenwps pOther p1 (zahlenwps p2 pOther welt)) ha)")
+    prefer 2 using wfh_pullout_wps_move_to_unrelated apply simp
+   apply(simp)
+   apply(thin_tac "handeln p1 _ ha = _")
+  apply(simp add: individueller_fortschritt_map_handlung_zahlenwps)
+
   oops
 
 lemma
