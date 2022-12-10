@@ -594,15 +594,21 @@ lemma zahlenwps_unrelated_im_kreis:
   apply(cases welt, simp)
   by(simp add: swap_def)
   
+lemma zahlenwps_unrelated_im_kreis_map_handlung_helper:
+  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+  map_handlung (zahlenwps p1 p) (map_handlung (zahlenwps p2 p1) (map_handlung (zahlenwps p p2) h))
+  = map_handlung (zahlenwps p2 p1) h"
+  apply(cases h, rename_tac vor nach, simp)
+  apply(case_tac vor, case_tac nach, simp)
+  apply(simp add: swap_def)
+  by auto
 
 (*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalt einer Handlung weg!*)
-(*TODO: das ganze map_handlung vereinfachen*)
 lemma wfh_unrelated_pullout_wps:
-"p \<noteq> p1 \<Longrightarrow>
-p \<noteq> p2 \<Longrightarrow>
-\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-handeln p (zahlenwps p1 p2 welt) ha
-  = map_handlung (zahlenwps p1 p) (map_handlung (zahlenwps p2 p1) (map_handlung (zahlenwps p p2) (handeln p welt ha)))"
+  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+  \<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+    handeln p (zahlenwps p1 p2 welt) ha
+      = map_handlung (zahlenwps p2 p1) (handeln p welt ha)"
   thm wohlgeformte_handlungsabsicht_wpsid_wpssym_komm
   thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p2 welt" ha]
   apply(subgoal_tac "handeln p (zahlenwps p1 p2 welt) ha =
@@ -629,7 +635,7 @@ handeln p (zahlenwps p1 p2 welt) ha
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
     apply(thin_tac "handeln p2 _ ha = _")
-  apply(simp add: zahlenwps_unrelated_im_kreis; fail)
+  apply(simp add: zahlenwps_unrelated_im_kreis zahlenwps_unrelated_im_kreis_map_handlung_helper; fail)
   done
 
 
