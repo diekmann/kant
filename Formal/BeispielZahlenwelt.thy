@@ -545,23 +545,19 @@ lemma
               if w = Zahlenwelt ((\<lambda>x. 0)(theP := - 2))
                 then Some (Zahlenwelt ((\<lambda>x. 0)((if theP = Eve then Carol else Eve) := - 2)))
               else if w = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
-                then Some (Zahlenwelt ((\<lambda>x. 2)))
+                then Some (Zahlenwelt (\<lambda>x. 2))
               else None)
-           (Carol :=
-              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2))
-               ])) \<Longrightarrow>
-  p = Eve \<Longrightarrow>
+           (Carol := (\<lambda>w. Some (Zahlenwelt (\<lambda>x. 2)))
+                      (Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))))) \<Longrightarrow>
   welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
 \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha \<and>
-  \<not>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+  (\<forall>p \<in> {Alice, Bob, Carol, Eve}.
+    \<not>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p)"
   apply(simp)
   apply(thin_tac _)+
   apply(safe)
   apply(code_simp)
-  apply(code_simp)
+  apply(code_simp)+
   done
 
 (*
