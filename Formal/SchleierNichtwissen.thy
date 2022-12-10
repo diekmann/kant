@@ -90,6 +90,7 @@ lemma wohlgeformte_handlungsabsicht_ausfuehrbar:
   by (metis ausfuehrbar.simps option.map_disc_iff)
 
 
+(*rueckrichtung gilt nicht*)
 lemma wohlgeformte_handlungsabsicht_mit_wpsid:
   \<open>wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>
    wps_id wps welt \<Longrightarrow>
@@ -108,6 +109,7 @@ lemma wohlgeformte_handlungsabsicht_mit_wpsid:
 (*>*)
 
 
+(*TODO: gilt die rueckrichting?*)
 text\<open>Folgende Folgerung erklärt die Definition vermutlich besser:\<close>
 lemma wohlgeformte_handlungsabsicht_wpsid_imp_handeln:
   \<open>wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow> wps_id wps welt \<Longrightarrow>

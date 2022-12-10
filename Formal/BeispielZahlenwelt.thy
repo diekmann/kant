@@ -538,21 +538,26 @@ Brauche ich \<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha
 *)
   oops
 
-  text\<open>Gegenbeispiel. Handlungsabsicht is wohlgeformt aber generalisiert nicht.\<close>
+
+
+
+  text\<open>Gegenbeispiel. Handlungsabsicht is wohlgeformt (in welt aber nicht wps welt) aber generalisiert nicht.\<close>
 lemma
 "ha = Handlungsabsicht
           ((\<lambda>theP w.
               if w = Zahlenwelt ((\<lambda>x. 0)(theP := - 2))
                 then Some (Zahlenwelt ((\<lambda>x. 0)((if theP = Eve then Carol else Eve) := - 2)))
               else if w = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
-                then Some (Zahlenwelt (\<lambda>x. 2))
+                then Some (Zahlenwelt (\<lambda>x. 8))
               else None)
-           (Carol := (\<lambda>w. Some (Zahlenwelt (\<lambda>x. 2)))
+           (Carol := (\<lambda>w. Some (Zahlenwelt (\<lambda>x. 8)))
                       (Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))))) \<Longrightarrow>
   welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
 \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha \<and>
   (\<forall>p \<in> {Alice, Bob, Carol, Eve}.
-    \<not>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p)"
+    \<not>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p)
+\<and>   okay maxime_altruistischer_fortschritt Alice (handeln Alice welt ha)
+\<and> \<not> okay maxime_altruistischer_fortschritt Alice (handeln Alice (zahlenwps Alice Carol welt) ha)" (*achja, die generalisieren ja nicht*)
   apply(simp)
   apply(thin_tac _)+
   apply(safe)
@@ -560,14 +565,72 @@ lemma
   apply(code_simp)+
   done
 
+
 (*
-lemma "p \<noteq> p1 \<Longrightarrow>
-p \<noteq> p2 \<Longrightarrow>
-wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha \<Longrightarrow>
-handeln p (zahlenwps p1 p2 welt) ha = map_handlung (zahlenwps p1 p2) (handeln p welt ha)"
-  nitpick
+lemma wohlgeformte_handlungsabsicht_wpsid_wpssym_komm:
+  assumes wpsid: \<open>\<forall>welt. wps_id wps welt\<close>
+    and wps_sym: \<open>\<forall>welt. wps p1 p2 welt = wps p2 p1 welt\<close>
+  shows \<open>wohlgeformte_handlungsabsicht wps (wps p1 p2 welt) ha \<Longrightarrow>
+    handeln p (wps p1 p2 welt) ha =
+            map_handlung (wps p1 p2) (handeln (swap p1 p2 id p) welt ha)\<close>
+  apply(frule wohlgeformte_handlungsabsicht_mit_wpsid)
+  subgoal using wpsid by simp
+  apply(case_tac "p=p1")
+   apply(simp add: swap_a)
+   apply (metis handlung.exhaust handlung.map wps_id_def wps_sym wpsid)
+  apply(case_tac "p=p2")
+   apply(simp add: swap_b)
+   apply (metis handlung.exhaust handlung.map wps_id_def wps_sym wpsid)
+  apply(simp add: swap_nothing)
+
+
+  apply(thin_tac _) back
+  oops
 *)
+
+lemma zahlenwps_unrelated_im_kreis:
+  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+    zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) = welt"
+  apply(cases welt, simp)
+  by(simp add: swap_def)
+  
+
+(*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalt einer Handlung weg!*)
+lemma wfh_unrelated_pullout_wps:
+"p \<noteq> p1 \<Longrightarrow>
+p \<noteq> p2 \<Longrightarrow>
+\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+handeln p (zahlenwps p1 p2 welt) ha
+  = map_handlung (zahlenwps p1 p) (map_handlung (zahlenwps p2 p1) (map_handlung (zahlenwps p p2) (handeln p welt ha)))"
+  thm wohlgeformte_handlungsabsicht_wpsid_wpssym_komm
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p2 welt" ha]
+  apply(subgoal_tac "handeln p (zahlenwps p1 p2 welt) ha =
+     map_handlung (zahlenwps p1 p) (handeln p1 (zahlenwps p p1 (zahlenwps p1 p2 welt)) ha)")
+   prefer 2
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p2 welt" ha]
+   apply (simp add: wps_id_def zahlenwps_twice(2); fail)
+  apply(simp)
+  apply(thin_tac "handeln p (zahlenwps p1 p2 welt) ha = _")
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p p1 (zahlenwps p1 p2 welt)" ha]
+  apply(subgoal_tac "handeln p1 (zahlenwps p p1 (zahlenwps p1 p2 welt)) ha =
+     map_handlung (zahlenwps p2 p1) (handeln p2 (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) ha)")
+   prefer 2
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p p1 (zahlenwps p1 p2 welt))" ha]
+   apply (simp add: wps_id_def zahlenwps_twice(2); fail)
+  apply(simp)
+  apply(thin_tac "handeln p1 _ ha = _")
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))" ha]
+  apply(subgoal_tac "handeln p2 (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) ha =
+     map_handlung (zahlenwps p p2)
+      (handeln p (zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))) ha)")
+   prefer 2
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))" ha]
+   apply (simp add: wps_id_def zahlenwps_twice(2); fail)
+  apply(simp)
+    apply(thin_tac "handeln p2 _ ha = _")
+  apply(simp add: zahlenwps_unrelated_im_kreis; fail)
+  done
+
 
 (*sollte ich das p in maxime_und_handlungsabsicht_generalisieren abhaenging machen duerfen von p1 und p2
 im allquantor da drinnen?
@@ -577,6 +640,15 @@ swap p1 p2 id p <- im zweiten call
 lemma
   "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
   maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
+  apply(clarsimp)
+  oops
+
+lemma
+  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+   \<forall>p1 p2. wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha \<Longrightarrow>
+   maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+  (* nitpick findet kein gegenbeispiel! *)
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
   apply(clarsimp)
   oops
