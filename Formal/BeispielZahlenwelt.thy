@@ -221,7 +221,8 @@ definition \<open>handlungsabsichten \<equiv> [
   Handlungsabsicht unmoeglich
 ]\<close>
 
-lemma \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
+lemma wfh_handlungsabsichten:
+  \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
   apply(simp add: handlungsabsichten_def)
   apply(safe)
   apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4 wohlgeformte_handlungsabsicht_alles_kaputt_machen)
@@ -376,7 +377,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   
   lemma mhg_maxime_altruistischer_fortschritt_stehlen4:
       \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
-      maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 1 10)) p\<close>
+      maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 5 10)) p\<close>
     apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
     apply(simp add: ausfuehrbar.simps)
     apply(case_tac \<open>welt\<close>, simp)
@@ -387,6 +388,14 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   lemma maxime_altruistischer_fortschritt_reset:
       \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
       maxime_altruistischer_fortschritt (Handlungsabsicht (reset)) p\<close>
+      apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
+    apply(case_tac \<open>welt\<close>, simp)
+      apply(auto simp add: swap_def split: option.split option.split_asm)
+      done
+
+  lemma maxime_altruistischer_fortschritt_alles_kaputt_machen:
+      \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
+      maxime_altruistischer_fortschritt (Handlungsabsicht (alles_kaputt_machen)) p\<close>
       apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
     apply(case_tac \<open>welt\<close>, simp)
       apply(auto simp add: swap_def split: option.split option.split_asm)
@@ -409,6 +418,18 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     apply(cases "pX = p2")
      apply(simp add: hlp2 swap_b; fail)
     by (metis hlp3 id_apply swap_nothing zahlenwps_id)
+
+  lemma maxime_altruistischer_fortschritt_mhg_handlungsabsichten:
+    "ha \<in> set handlungsabsichten \<Longrightarrow>
+    maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+    apply(simp add: handlungsabsichten_def)
+    apply(safe)
+        apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def; fail)
+       apply (simp add: mhg_maxime_altruistischer_fortschritt_stehlen4; fail)
+      apply(simp add: maxime_altruistischer_fortschritt_reset; fail)
+     apply(simp add: maxime_altruistischer_fortschritt_alles_kaputt_machen; fail)
+    apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
+    done
 (*>*)
 
   
@@ -416,7 +437,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   für bestimmte Handlungsabsichten und Welten erfüllt generalisiert noch weiter.
   Für alle Welten und alle wohlgeformten Handlungsabsichten welche mit der Maxime generalisieren
   erfüllt die Maxime den kategorischen Imperativ.\<close>
-  theorem \<open>
+  theorem kapimp_maxime_altruistischer_fortschritt: \<open>
     \<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
     wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
@@ -431,7 +452,149 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
   text\<open>Allgemein scheint dies eine sehr gute Maxime zu sein
   (für dieses sehr beschränkte Weltenmodell).\<close>
 
+  corollary \<open>ha \<in> set handlungsabsichten \<Longrightarrow>
+    kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
+    apply(rule kapimp_maxime_altruistischer_fortschritt)
+     using maxime_altruistischer_fortschritt_mhg_handlungsabsichten apply simp
+    using wfh_handlungsabsichten apply simp
+    done
 
+
+(*<*)
+lemma
+  "okay maxime_altruistischer_fortschritt p1 (handeln p2 welt ha) \<longleftrightarrow> 
+    okay maxime_altruistischer_fortschritt p2 (map_handlung (zahlenwps p1 p2) (handeln p2 welt ha))"
+  using wfm_maxime_altruistischer_fortschritt
+  by (simp add: wohlgeformte_maxime_auf_def wohlgeformte_maxime_def)
+
+lemma
+  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+   okay maxime_altruistischer_fortschritt p1 (handeln p2 welt ha) \<longleftrightarrow> 
+    okay maxime_altruistischer_fortschritt p2 (map_handlung (zahlenwps p1 p2) (handeln p1 welt ha))"
+  oops
+
+(*welche handlungsabsicht generalisiert denn nicht?*)
+lemma
+  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+  maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+(*
+Nitpick found a counterexample:
+  Free variables:
+    ha = Handlungsabsicht
+          ((\<lambda>x. _)
+           (p\<^sub>1 :=
+              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2))],
+            p\<^sub>2 :=
+              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2))],
+            p\<^sub>3 :=
+              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2))],
+            p\<^sub>4 :=
+              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)),
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0))]))
+    p = p\<^sub>4
+    welt = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0))
+  Skolem constants:
+    ??.maxime_und_handlungsabsicht_generalisieren.p1 = p\<^sub>2
+    ??.maxime_und_handlungsabsicht_generalisieren.p2 = p\<^sub>3
+*)
+  oops
+
+  text\<open>Gegenbeispiel. Handlungsabsicht is wohlgeformt aber generalisiert nicht.\<close>
+lemma
+"ha = Handlungsabsicht
+          ((\<lambda>x. Map.empty)
+           (Alice :=
+              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))],
+            Bob :=
+              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))],
+            Carol :=
+              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))],
+            Eve :=
+              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))])) \<Longrightarrow>
+  p = Eve \<Longrightarrow>
+  welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
+\<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha \<and>
+  \<not>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+  apply(simp)
+  apply(thin_tac _)+
+  apply(safe)
+  apply(code_simp)
+  apply(code_simp)
+  done
+
+
+(*>*)
 (*
   text\<open>todo. wenn das klappt haetten wir einen kat imp bewiesen. Wird aber nicht klappen.\<close>
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
