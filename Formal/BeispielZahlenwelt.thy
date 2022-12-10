@@ -535,34 +535,28 @@ Nitpick found a counterexample:
   oops
 
   text\<open>Gegenbeispiel. Handlungsabsicht is wohlgeformt aber generalisiert nicht.\<close>
+(*
+(\<lambda>theP. (\<lambda>w. case w of Zahlenwelt besitz \<Rightarrow>
+              (if besitz = ((\<lambda>x. 0)(theP := - 2)) then Some (Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))) else None))
+*)
 lemma
 "ha = Handlungsabsicht
-          ((\<lambda>x. Map.empty)
-           (Alice :=
-              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2))],
-            Bob :=
-              [Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2))],
-            Carol :=
-              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2))
+          ((\<lambda>theP w.
+              if w = Zahlenwelt ((\<lambda>x. 0)(theP := - 2))
+              then Some (Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)))
+              else if w = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
+              then Some (Zahlenwelt ((\<lambda>x. 2)))
+              else None)
+           (Carol :=
+              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2))
                ],
             Eve :=
-              [Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))])) \<Longrightarrow>
+              [Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
+               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
+              ])) \<Longrightarrow>
   p = Eve \<Longrightarrow>
   welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
 \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha \<and>
