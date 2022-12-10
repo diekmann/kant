@@ -419,6 +419,27 @@ lemma \<open>wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<
   by (metis swap_a swap_symmetric)
   
 
+(*
+aus wpsm_kommutiert koennen wir FAST wohlgeformte_maxime_auf ableiten.
+Leider muss pX=p2.
+lemma
+  assumes wpsid: \<open>wps_id wps welt\<close>
+    and wps_sym: \<open>\<forall>p1 p2. wps p1 p2 = wps p2 p1\<close>
+  shows \<open>(\<forall>p1 p2::'person. wpsm_kommutiert m wps (wps p1 p2 welt)) \<Longrightarrow>
+    wohlgeformte_maxime_auf (handeln (pX::'person) welt ha) wps m\<close>
+  apply(simp add: wohlgeformte_maxime_auf_def)
+  apply(clarsimp)
+  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=p1 in allE)
+  apply(subgoal_tac "wps p2 p1 welt = wps p1 p2 welt")
+  prefer 2 subgoal using wps_sym by simp
+  apply(drule(1) wpsm_kommutiert_map_handlung[OF wpsid, where ha=ha])
+  apply(case_tac "pX=p2")
+   apply(simp add: wps_sym; fail)
+  apply(simp)
+  oops
+*)
+
 (*<*)
 subsection\<open>Generische Lemmata\<close>
 

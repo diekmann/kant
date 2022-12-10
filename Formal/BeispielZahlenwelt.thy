@@ -433,7 +433,7 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
 
 
 (*
-  text\<open>todo. wenn das klappt haetten wir einen ket imp bewiesen.\<close>
+  text\<open>todo. wenn das klappt haetten wir einen kat imp bewiesen. Wird aber nicht klappen.\<close>
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt"
   unfolding maxime_altruistischer_fortschritt_def
@@ -454,6 +454,13 @@ lemma "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
 
 brauchen etwas in die Richtung:
 handeln p2 (zahlenwps ich p2 welt) ha) = zahlenwps ich p2 (handeln p2 welt ha)
+Warum das nicht gelte wird.
+Handlungsabsicht: erschaffen 5 Alice
+Welt: Alice=0, Bob=3
+wps Alice Bob
+links: Alice=8, Bob=0
+rechts: Alice=5, Bob=3
+da laesst sich auch dann nachtraeglich nichts mehr swappen.
 *)
   oops
 *)
