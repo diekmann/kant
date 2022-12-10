@@ -585,14 +585,27 @@ lemma wohlgeformte_handlungsabsicht_wpsid_wpssym_komm:
 
 
   apply(thin_tac _) back
+  mit wfh_unrelated_pullout_wps sollte das gehen, aber halt nur fuer zahlenwps
   oops
 *)
+
+(*TODO: move to swap*)
+lemma "distinct [p1,p2,p3,p4] \<Longrightarrow> swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
+  by(auto simp add: swap_def)
+
+lemma swap_comm: "p1 \<noteq> p3 \<Longrightarrow> p1 \<noteq> p4 \<Longrightarrow> p2 \<noteq> p3 \<Longrightarrow> p2 \<noteq> p4 \<Longrightarrow>
+  swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
+  by(auto simp add: swap_def)
+
+lemma swap_unrelated_im_kreis:
+  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+    swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt"
+  by(simp add: swap_def)
 
 lemma zahlenwps_unrelated_im_kreis:
   "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
     zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) = welt"
-  apply(cases welt, simp)
-  by(simp add: swap_def)
+  by(cases welt, simp add: swap_unrelated_im_kreis)
   
 lemma zahlenwps_unrelated_im_kreis_map_handlung_helper:
   "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
@@ -603,7 +616,7 @@ lemma zahlenwps_unrelated_im_kreis_map_handlung_helper:
   apply(simp add: swap_def)
   by auto
 
-(*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalt einer Handlung weg!*)
+(*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalb einer Handlung weg!*)
 lemma wfh_unrelated_pullout_wps:
   "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   \<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
@@ -649,6 +662,13 @@ lemma
   maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
   apply(clarsimp)
+  apply(case_tac "p\<noteq>p1 \<and> p\<noteq>p2")
+    using wfh_unrelated_pullout_wps
+     apply (metis individueller_fortschritt_map_handlung_zahlenwps zahlenwps_twice(1))
+    apply(simp)
+    apply(elim disjE)
+    apply(simp)
+  
   oops
 
 lemma
