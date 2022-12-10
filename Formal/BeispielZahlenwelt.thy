@@ -541,25 +541,13 @@ lemma
            (Alice :=
               [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
                Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
                Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))],
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2))],
             Bob :=
-              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
+              [Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
                Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
                Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))],
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2))],
             Carol :=
               [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
                Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
@@ -568,19 +556,12 @@ lemma
                Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
                Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
                Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))],
+               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2))
+               ],
             Eve :=
-              [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
+              [Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto>
                Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)),
                Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Alice := 2, Bob := 2, Carol := 2, Eve := 2)) \<mapsto>
                Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))])) \<Longrightarrow>
   p = Eve \<Longrightarrow>
   welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
