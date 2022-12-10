@@ -531,14 +531,14 @@ Nitpick found a counterexample:
   Skolem constants:
     ??.maxime_und_handlungsabsicht_generalisieren.p1 = p\<^sub>2
     ??.maxime_und_handlungsabsicht_generalisieren.p2 = p\<^sub>3
+
+
+Brauche ich \<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha
+?
 *)
   oops
 
   text\<open>Gegenbeispiel. Handlungsabsicht is wohlgeformt aber generalisiert nicht.\<close>
-(*
-(\<lambda>theP. (\<lambda>w. case w of Zahlenwelt besitz \<Rightarrow>
-              (if besitz = ((\<lambda>x. 0)(theP := - 2)) then Some (Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))) else None))
-*)
 lemma
 "ha = Handlungsabsicht
           ((\<lambda>theP w.
@@ -564,6 +564,26 @@ lemma
   apply(code_simp)
   done
 
+(*
+lemma "p \<noteq> p1 \<Longrightarrow>
+p \<noteq> p2 \<Longrightarrow>
+wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha \<Longrightarrow>
+handeln p (zahlenwps p1 p2 welt) ha = map_handlung (zahlenwps p1 p2) (handeln p welt ha)"
+  nitpick
+*)
+
+(*sollte ich das p in maxime_und_handlungsabsicht_generalisieren abhaenging machen duerfen von p1 und p2
+im allquantor da drinnen?
+oder 
+swap p1 p2 id p <- im zweiten call
+*)
+lemma
+  "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+  maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
+  apply(clarsimp)
+  oops
 
 (*>*)
 (*
