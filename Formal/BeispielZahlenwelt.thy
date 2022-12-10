@@ -543,20 +543,16 @@ lemma
 "ha = Handlungsabsicht
           ((\<lambda>theP w.
               if w = Zahlenwelt ((\<lambda>x. 0)(theP := - 2))
-              then Some (Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)))
+                then Some (Zahlenwelt ((\<lambda>x. 0)((if theP = Eve then Carol else Eve) := - 2)))
               else if w = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
-              then Some (Zahlenwelt ((\<lambda>x. 2)))
+                then Some (Zahlenwelt ((\<lambda>x. 2)))
               else None)
            (Carol :=
               [Zahlenwelt ((\<lambda>x. 0)(Alice := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
                Zahlenwelt ((\<lambda>x. 0)(Bob := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
                Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)),
                Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2))
-               ],
-            Eve :=
-              [Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 2)),
-               Zahlenwelt ((\<lambda>x. 0)(Eve := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
-              ])) \<Longrightarrow>
+               ])) \<Longrightarrow>
   p = Eve \<Longrightarrow>
   welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
 \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha \<and>
