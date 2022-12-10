@@ -231,9 +231,9 @@ definition maxime_und_handlungsabsicht_generalisieren
   :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> 
       ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
-  \<open>maxime_und_handlungsabsicht_generalisieren wps welt m h p =
-    (\<forall>p1 p2. (ausfuehrbar p welt h \<and> ausfuehrbar p (wps p1 p2 welt) h)
-              \<longrightarrow> okay m p (handeln p welt h) \<longleftrightarrow> okay m p (handeln p (wps p1 p2 welt) h))\<close>
+  \<open>maxime_und_handlungsabsicht_generalisieren wps welt m ha p =
+    (\<forall>p1 p2. (ausfuehrbar p welt ha \<and> ausfuehrbar p (wps p1 p2 welt) ha)
+              \<longrightarrow> okay m p (handeln p welt ha) \<longleftrightarrow> okay m p (handeln p (wps p1 p2 welt) ha))\<close>
 text\<open>Die Vorbedingungen in obiger Definition,
 nämlich dass die Handlungsabsicht \<^const>\<open>ausfuehrbar\<close> ist,
 ist nötig, um z.B. Handlungsabsichten wie das Stehlen zu ermöglichen;
