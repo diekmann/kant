@@ -596,6 +596,7 @@ lemma zahlenwps_unrelated_im_kreis:
   
 
 (*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalt einer Handlung weg!*)
+(*TODO: das ganze map_handlung vereinfachen*)
 lemma wfh_unrelated_pullout_wps:
 "p \<noteq> p1 \<Longrightarrow>
 p \<noteq> p2 \<Longrightarrow>
