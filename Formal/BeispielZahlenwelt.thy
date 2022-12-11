@@ -212,7 +212,31 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
   fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>unmoeglich _ _ = None\<close>
 
-text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
+
+
+  text\<open>\<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>\<close>
+  fun collatz:: \<open>int \<Rightarrow> int\<close> where
+      \<open>collatz n = (if n mod 2 = 0 then n div 2 else 3*n + 1)\<close>
+  lemma \<open>collatz 19 = 58\<close> by eval
+
+  text\<open>Eine Handlungsabsicht, basierend auf dem Collatz-Problem.
+  Das eigentliche Collatz-Problem ist an dieser stelle nicht relevant,
+  da wir nur eine Iteration machen.
+  Allerdings ist das eine spannende Handlungsabsicht,
+  da diese sowohl den Besitz erhöhen kann, aber auch verringern kann.\<close>
+  fun collatzh:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+      \<open>collatzh ich (Zahlenwelt besitz) = Some (Zahlenwelt (besitz( ich := collatz (besitz ich))))\<close>
+
+  text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> ist tatsächlich wohlgeformt.\<close>
+  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht collatzh)\<close>
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
+      apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+    done
+
+  text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.
+    Wir lassen \<^const>\<open>collatzh\<close> mal aus.
+  \<close>
+(*TODO: erklaeren warum collatzh ausgelassen. Der kategorische imperativ kann nicht drueber urteilen.*)
 definition \<open>handlungsabsichten \<equiv> [
   Handlungsabsicht (erschaffen 5),
   Handlungsabsicht (stehlen4 5 10),
@@ -269,11 +293,17 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
     done
 
-  text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
+  text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> und \<^const>\<open>collatzh\<close> nicht:\<close>
   lemma
       \<open>\<not> maxime_und_handlungsabsicht_generalisieren
          zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-         maxime_zahlenfortschritt (Handlungsabsicht (reset)) Alice\<close>
+         maxime_zahlenfortschritt (Handlungsabsicht reset) Alice\<close>
+    by eval
+
+  lemma
+      \<open>\<not> maxime_und_handlungsabsicht_generalisieren
+         zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
+         maxime_zahlenfortschritt (Handlungsabsicht collatzh) Alice\<close>
     by eval
 
 
