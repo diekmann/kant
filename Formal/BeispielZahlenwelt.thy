@@ -154,13 +154,11 @@ subsection\<open>Wohlgeformte Handlungen\<close>
     done
 
 
-  text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlung wohlgeformt.
+  text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlungsabsicht "Stehlen" wohlgeformt.
   Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
   fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
         map_option Zahlenwelt (stehlen beute opfer_nach_besitz dieb besitz)\<close>
-
-
 
 (*<*)
   lemma wohlgeformte_handlungsabsicht_stehlen4:
@@ -197,9 +195,7 @@ subsection\<open>Wohlgeformte Handlungen\<close>
     apply(case_tac \<open>welt\<close>, simp add: fun_eq_iff)
     apply(simp add: min_list_swap_int_enum)
     by (simp add: swap_def)
-
 (*>*)
-
 
 lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
   = Some (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
@@ -208,18 +204,18 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
   (*TODO: Handlung alles_besser_machen.*)
 
 
-
+  text\<open>Auch die unmögliche (niemals ausführbare) Handlung lässt sich modellieren.\<close>
   fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>unmoeglich _ _ = None\<close>
 
 
 
-  text\<open>\<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>\<close>
+  text\<open>Folgende Funktion ist inspiriert durch das \<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>.\<close>
   fun collatz:: \<open>int \<Rightarrow> int\<close> where
       \<open>collatz n = (if n mod 2 = 0 then n div 2 else 3*n + 1)\<close>
   lemma \<open>collatz 19 = 58\<close> by eval
 
-  text\<open>Eine Handlungsabsicht, basierend auf dem Collatz-Problem.
+  text\<open>Es folgt eine Handlungsabsicht, basierend auf dem Collatz-Problem.
   Das eigentliche Collatz-Problem ist an dieser stelle nicht relevant,
   da wir nur eine Iteration machen.
   Allerdings ist das eine spannende Handlungsabsicht,
@@ -227,16 +223,38 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
   fun collatzh:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
       \<open>collatzh ich (Zahlenwelt besitz) = Some (Zahlenwelt (besitz( ich := collatz (besitz ich))))\<close>
 
-  text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> ist tatsächlich wohlgeformt.\<close>
+  text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> ist tatsächlich immer wohlgeformt.\<close>
   lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht collatzh)\<close>
     apply(simp add: wohlgeformte_handlungsabsicht.simps)
-      apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+    apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
     done
+
+  text\<open>Allerdings werden wir \<^const>\<open>collatzh\<close> nicht weiter betrachten.
+  Das Ergebnis vorweg:
+  Ein kategorischer Imperativ, egal welche vielversprechende Maxime,
+  gilt nicht für die Handlungsabsicht \<^const>\<open>collatzh\<close>.
+  Der Grund ist, oberflächlich gesprochen, dass diese Handlungsabsicht
+  keinen eindeutigen Charakter hat.
+  Die Handlungsabsicht kann sowohl Besitz verringern als auch vermehren.
+  In vielen Welten wird es Leute geben, für die \<^const>\<open>collatzh\<close> eine positive
+  Wirkung hat.
+  Jedoch ist \<^const>\<open>collatzh\<close> wohl allgemein nicht \<^const>\<open>moralisch\<close>,
+  da es normalerweise auch Leute gibt, für die \<^const>\<open>collatzh\<close> eine
+  negative Auswirkung hat.
+  Daher kann eine Maxime \<^const>\<open>collatzh\<close> nicht allgemein beurteilen.
+  Jedoch ist auch diese Meta-Aussage eine spannende Aussage:
+  Der kategorische Imperativ sagt (dadurch, dass er nicht erfüllt ist),
+  dass die Handlungsabsicht \<^const>\<open>collatz\<close> nicht durch eine unserer Maximen
+  beurteilt werden sollte, bzw. sollten wir ein allgemeines Gesetz bauen wollen,
+  so können wir weder \<^const>\<open>collatzh\<close> uneingeschränkt in die Liste erlaubter Handlungsabsichten
+  aufnehmen,
+  noch können wir uneingeschränkt \<^const>\<open>collatzh\<close> uneingeschränkt in die Liste verbotener
+  Handlungsabsichten aufnehmen.\<close>
+
 
   text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.
     Wir lassen \<^const>\<open>collatzh\<close> mal aus.
   \<close>
-(*TODO: erklaeren warum collatzh ausgelassen. Der kategorische imperativ kann nicht drueber urteilen.*)
 definition \<open>handlungsabsichten \<equiv> [
   Handlungsabsicht (erschaffen 5),
   Handlungsabsicht (stehlen4 5 10),
@@ -490,147 +508,24 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     done
 
 
+  text \<open>Dies wirft die Frage auf:
+  "gibt es überhaupt wohlgeformte Handlungsabsichten, welche nicht mit
+  \<^const>\<open>maxime_altruistischer_fortschritt\<close> generalisieren?"
+  Die Antwort liefert \<^const>\<open>collatzh\<close>.\<close>
+  lemma
+      \<open>\<not> maxime_und_handlungsabsicht_generalisieren
+         zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
+         maxime_altruistischer_fortschritt (Handlungsabsicht collatzh) Alice\<close>
+    by eval
+
+
 (*<*)
+(*Interessante Sachen. Die sollten in die jeweiligen thys upgestremed werden.*)
 lemma
   "okay maxime_altruistischer_fortschritt p1 (handeln p2 welt ha) \<longleftrightarrow> 
     okay maxime_altruistischer_fortschritt p2 (map_handlung (zahlenwps p1 p2) (handeln p2 welt ha))"
   using wfm_maxime_altruistischer_fortschritt
   by (simp add: wohlgeformte_maxime_auf_def wohlgeformte_maxime_def)
-
-lemma
-  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-   okay maxime_altruistischer_fortschritt p1 (handeln p2 welt ha) \<longleftrightarrow> 
-    okay maxime_altruistischer_fortschritt p2 (map_handlung (zahlenwps p1 p2) (handeln p1 welt ha))"
-  oops
-
-(*welche handlungsabsicht generalisiert denn nicht?*)
-lemma
-  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-  maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
-(*
-Nitpick found a counterexample:
-  Free variables:
-    ha = Handlungsabsicht
-          ((\<lambda>x. _)
-           (p\<^sub>1 :=
-              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2))],
-            p\<^sub>2 :=
-              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2))],
-            p\<^sub>3 :=
-              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2))],
-            p\<^sub>4 :=
-              [Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := - 2, p\<^sub>3 := 0, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := - 2, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := 0)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := 0, p\<^sub>4 := - 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0)),
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 2, p\<^sub>2 := 2, p\<^sub>3 := 2, p\<^sub>4 := 2)) \<mapsto>
-               Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0))]))
-    p = p\<^sub>4
-    welt = Zahlenwelt ((\<lambda>x. _)(p\<^sub>1 := 0, p\<^sub>2 := 0, p\<^sub>3 := - 2, p\<^sub>4 := 0))
-  Skolem constants:
-    ??.maxime_und_handlungsabsicht_generalisieren.p1 = p\<^sub>2
-    ??.maxime_und_handlungsabsicht_generalisieren.p2 = p\<^sub>3
-
-
-Brauche ich \<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha
-?
-*)
-  oops
-
-
-
-
-  text\<open>Gegenbeispiel. Handlungsabsicht is wohlgeformt (in welt aber nicht wps welt) aber generalisiert nicht.\<close>
-lemma
-"ha = Handlungsabsicht
-          ((\<lambda>theP w.
-              if w = Zahlenwelt ((\<lambda>x. 0)(theP := - 2))
-                then Some (Zahlenwelt ((\<lambda>x. 0)((if theP = Eve then Carol else Eve) := - 2)))
-              else if w = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
-                then Some (Zahlenwelt (\<lambda>x. 8))
-              else None)
-           (Carol := (\<lambda>w. Some (Zahlenwelt (\<lambda>x. 8)))
-                      (Zahlenwelt ((\<lambda>x. 0)(Carol := - 2)) \<mapsto> Zahlenwelt ((\<lambda>x. 0)(Eve := - 2))))) \<Longrightarrow>
-  welt = Zahlenwelt ((\<lambda>x. 0)(Carol := - 2))
-\<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha \<and>
-  (\<forall>p \<in> {Alice, Bob, Carol, Eve}.
-    \<not>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p)
-\<and>   okay maxime_altruistischer_fortschritt Alice (handeln Alice welt ha)
-\<and> \<not> okay maxime_altruistischer_fortschritt Alice (handeln Alice (zahlenwps Alice Carol welt) ha)" (*achja, die generalisieren ja nicht*)
-  apply(simp)
-  apply(thin_tac _)+
-  apply(safe)
-  apply(code_simp)
-  apply(code_simp)+
-  done
-
-
-(*
-lemma wohlgeformte_handlungsabsicht_wpsid_wpssym_komm:
-  assumes wpsid: \<open>\<forall>welt. wps_id wps welt\<close>
-    and wps_sym: \<open>\<forall>welt. wps p1 p2 welt = wps p2 p1 welt\<close>
-  shows \<open>wohlgeformte_handlungsabsicht wps (wps p1 p2 welt) ha \<Longrightarrow>
-    handeln p (wps p1 p2 welt) ha =
-            map_handlung (wps p1 p2) (handeln (swap p1 p2 id p) welt ha)\<close>
-  apply(frule wohlgeformte_handlungsabsicht_mit_wpsid)
-  subgoal using wpsid by simp
-  apply(case_tac "p=p1")
-   apply(simp add: swap_a)
-   apply (metis handlung.exhaust handlung.map wps_id_def wps_sym wpsid)
-  apply(case_tac "p=p2")
-   apply(simp add: swap_b)
-   apply (metis handlung.exhaust handlung.map wps_id_def wps_sym wpsid)
-  apply(simp add: swap_nothing)
-
-
-  apply(thin_tac _) back
-  mit wfh_unrelated_pullout_wps sollte das gehen, aber halt nur fuer zahlenwps
-  oops
-*)
-
-(*TODO: move to swap*)
-lemma "distinct [p1,p2,p3,p4] \<Longrightarrow> swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
-  by(auto simp add: swap_def)
-
-lemma swap_comm: "p1 \<noteq> p3 \<Longrightarrow> p1 \<noteq> p4 \<Longrightarrow> p2 \<noteq> p3 \<Longrightarrow> p2 \<noteq> p4 \<Longrightarrow>
-  swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
-  by(auto simp add: swap_def)
-
-lemma swap_unrelated_im_kreis:
-  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
-    swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt"
-  by(simp add: swap_def)
 
 lemma "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt)) = zahlenwps p1 p2 welt"
@@ -687,6 +582,27 @@ lemma wfh_unrelated_pullout_wps:
   done
 
 
+(*ziemlich perful, weil das das wps aus der welt rauszieht! Allerdings aendert sich die handelnde Person.
+TODO: kann ich das generalisieren?*)
+lemma wohlgeformte_handlungsabsicht_zahlenwps_komm:
+  \<open>\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+    handeln p (zahlenwps p1 p2 welt) ha =
+            map_handlung (zahlenwps p1 p2) (handeln (swap p1 p2 id p) welt ha)\<close>
+  apply(subgoal_tac "wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha")
+  prefer 2 apply blast
+  apply(drule wohlgeformte_handlungsabsicht_mit_wpsid)
+  subgoal by (simp add: wps_id_def zahlenwps_twice(2)) 
+  apply(case_tac "p=p1")
+   apply(simp add: swap_a)
+   apply (metis handlung.collapse handlung.map_sel(1) handlung.map_sel(2) zahlenwps_sym zahlenwps_twice(1))
+  apply(case_tac "p=p2")
+   apply(simp add: swap_b)
+   apply (metis zahlenwps_twice(2))
+  apply(simp add: swap_nothing)
+  apply(thin_tac " \<forall>p1a p2a. _ p1a p2a")
+  using wfh_unrelated_pullout_wps
+  by (metis zahlenwps_sym)
+
 lemma "pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
   zahlenwps pX p1 (zahlenwps pX p2 (zahlenwps p1 pX (zahlenwps p1 p2 welt))) = welt"
   by(cases welt, simp add: swap_def)
@@ -709,12 +625,6 @@ lemma zahlenwps_funny_permutation_map_handlung_helper:
   apply(case_tac vor, case_tac nach, simp)
   apply(simp add: swap_def)
   by auto
-
-thm zahlenwps_unrelated_im_kreis
-lemma "pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
-  zahlenwps p2 pX (zahlenwps pX p2 (zahlenwps p1 pX (zahlenwps p1 p2 welt))) = welt"
-  apply(cases welt, simp add: swap_def)
-  oops
 
 lemma wfh_pullout_wps_helper_same:
   "p1 = p2 \<Longrightarrow>
@@ -755,87 +665,28 @@ lemma wfh_pullout_wps_move_to_unrelated:
   apply(simp add: zahlenwps_funny_permutation zahlenwps_funny_permutation_map_handlung_helper)
   done
 
-
-
-lemma "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
-  zahlenwps p p1 (zahlenwps p2 p welt) = zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt))"
-  apply(cases welt, simp add: swap_def)
-  oops
-
-lemma obtain_fresh_person:
-  "\<exists>p::person. p \<noteq> p1 \<and> p \<noteq> p2"
-  apply(cases p1, case_tac [!] p2)
-  by(auto)
-
-lemma
-  "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-  maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
-  apply(clarsimp)
-  apply(case_tac "p\<noteq>p1 \<and> p\<noteq>p2")
-  using wfh_unrelated_pullout_wps
-   apply (metis individueller_fortschritt_map_handlung_zahlenwps zahlenwps_twice(1))
-  apply(simp)
-  apply(case_tac "p1=p2")
-   apply(simp add: zahlenwps_id; fail)
-  apply(elim disjE)
-   apply(simp)
-   apply(subgoal_tac "\<exists>p. p \<noteq> p1 \<and> p \<noteq> p2")
-    prefer 2 using obtain_fresh_person apply blast
-   apply(elim exE, rename_tac p1 p2 pOther)
-  thm wfh_pullout_wps_move_to_unrelated
-   apply(subgoal_tac "handeln p1 (zahlenwps p1 p2 welt) ha =
-map_handlung (zahlenwps p2 pOther) (handeln p1 (zahlenwps pOther p1 (zahlenwps p2 pOther welt)) ha)")
-    prefer 2 using wfh_pullout_wps_move_to_unrelated apply simp
-   apply(simp)
-   apply(thin_tac "handeln p1 _ ha = _")
-  apply(simp add: individueller_fortschritt_map_handlung_zahlenwps)
-
-  oops
-
-lemma
-  "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-   \<forall>p1 p2. wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha \<Longrightarrow>
-   maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
-  (* nitpick findet kein gegenbeispiel! *)
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
-  apply(clarsimp)
-  oops
-
-
-(*>*)
 (*
   text\<open>todo. wenn das klappt haetten wir einen kat imp bewiesen. Wird aber nicht klappen.\<close>
 lemma "wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt"
-  unfolding maxime_altruistischer_fortschritt_def
-  apply(rule kategorischer_imperativ_aufI)
-  apply(clarsimp)
-  apply(subgoal_tac
-      "\<forall>pX. individueller_fortschritt pX (map_handlung (zahlenwps p2 ich) (handeln p2 (zahlenwps ich p2 welt) ha))")
-   prefer 2
-  subgoal using wohlgeformte_handlungsabsicht_mit_wpsid by (metis wps_id_def zahlenwps_twice(2))
-(* einmal im Kreis drehen:
-  apply(simp add: individueller_fortschritt_map_handlung_zahlenwps)
-  apply(subst(asm) zahlenwps_sym)
-  apply(subst(asm) wohlgeformte_handlungsabsicht_wpsid_wpssym_komm[where wps=zahlenwps])
-     apply (metis wps_id_def zahlenwps_twice(2))
-    apply (simp add: zahlenwps_sym)
-   defer
-  apply(simp add: individueller_fortschritt_map_handlung_zahlenwps)
 
 brauchen etwas in die Richtung:
 handeln p2 (zahlenwps ich p2 welt) ha) = zahlenwps ich p2 (handeln p2 welt ha)
-Warum das nicht gelte wird.
+Warum das nicht gelte wird:
 Handlungsabsicht: erschaffen 5 Alice
 Welt: Alice=0, Bob=3
 wps Alice Bob
 links: Alice=8, Bob=0
 rechts: Alice=5, Bob=3
 da laesst sich auch dann nachtraeglich nichts mehr swappen.
-*)
-  oops
-*)
+
+
+
+könnte ich eventuell:
+kategorischer Imperativ \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren*)
+
+(*>*)
+
 
 subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
   text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir

@@ -116,4 +116,19 @@ lemma swap_id_in_set:
   by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
 
 
+
+
+(*TODO: baut swap eine Permutation und gibt es darauf lemmata?*)
+lemma "distinct [p1,p2,p3,p4] \<Longrightarrow> swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
+  by(auto simp add: swap_def)
+
+lemma swap_comm: "p1 \<noteq> p3 \<Longrightarrow> p1 \<noteq> p4 \<Longrightarrow> p2 \<noteq> p3 \<Longrightarrow> p2 \<noteq> p4 \<Longrightarrow>
+  swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
+  by(auto simp add: swap_def)
+
+lemma swap_unrelated_im_kreis:
+  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+    swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt"
+  by(simp add: swap_def)
+
 end

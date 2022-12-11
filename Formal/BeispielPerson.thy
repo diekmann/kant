@@ -37,6 +37,12 @@ end
 text\<open>Also makes maps partially executable.\<close>
 lemma \<open>dom [Alice \<mapsto> (3::nat), Carol \<mapsto> 6] = {Alice, Carol}\<close> by eval
 
+
+lemma obtain_fresh_person:
+  "\<exists>p::person. p \<noteq> p1 \<and> p \<noteq> p2"
+  apply(cases p1, case_tac [!] p2)
+  by(auto)
+
 (*TODO: use https://www.isa-afp.org/entries/Generic_Deriving.html to get a linorder?
 value "sorted_list_of_set {Alice, Carol}"
 *)
