@@ -53,6 +53,25 @@ lemma swap_fun_map_comp_id:
 lemma swap_forall: \<open>(\<forall>p. P (swap p1 p2 a p) (swap p1 p2 b p)) \<longleftrightarrow> (\<forall>p. P (a p) (b p))\<close>
   by (metis swap_a swap_b swap_nothing)
 
+
+
+lemma swap_in_set_of_functions:
+  \<open>swap p2 p1 x \<in> A \<longleftrightarrow> x \<in> swap p1 p2 ` A\<close>
+  using image_iff by fastforce
+
+lemma swap_image: "p1 \<in> A \<Longrightarrow> p2 \<in> A \<Longrightarrow> swap p1 p2 f ` A = f ` A"
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  by (metis swap_a swap_b swap_nothing)
+
+lemma swap_id_eq_simp: "swap p1 p2 id a = swap p1 p2 id b \<longleftrightarrow> a = b"
+  by (metis id_apply swap_a swap_nothing swap_symmetric)
+
+lemma swap_id_in_set:
+  \<open>swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A\<close>
+  apply(simp add: image_iff)
+  by (simp add: swap_id_eq_simp swap_symmetric) 
+
 thm sum.remove
 lemma sum_swap_a: \<open>finite P \<Longrightarrow> a \<notin> P \<Longrightarrow> b \<in> P \<Longrightarrow> sum (swap a b f) P = f a + sum f (P - {b})\<close>
   apply(subst sum.remove[of \<open>P\<close> \<open>b\<close>])
@@ -73,7 +92,7 @@ lemma sum_list_swap: \<open>p1 \<in> set P \<Longrightarrow> p2 \<in> set P \<Lo
   apply(rule swap_nothing)
   by auto
 
-
+  
 lemma min_list_swap_int:
   fixes f::\<open>'person \<Rightarrow> int\<close>
   shows \<open>p1 \<in> set ps \<Longrightarrow> p2 \<in> set ps \<Longrightarrow> min_list (map (swap p1 p2 f) ps) = min_list (map f ps)\<close>
@@ -81,8 +100,10 @@ lemma min_list_swap_int:
    apply(simp; fail)
   apply(simp add: min_list_Min)
   apply(cases \<open>p1 = p2\<close>)
-   apply(simp)
-  by (smt (verit, best) List.finite_set Min_in Min_le arg_min_list_in f_arg_min_list_f finite_imageI imageE image_eqI image_is_empty swap2 swap_a swap_b swap_nothing)
+   apply(simp; fail)
+  apply(rule arg_cong[where f=Min])
+  apply(simp add: swap_image)
+  done
 
 lemma min_list_swap_int_enum:
   fixes f::\<open>'person::enum \<Rightarrow> int\<close>
@@ -111,14 +132,6 @@ lemma swap_if_move_inner:
     = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))\<close>
   by(simp add: swap_def fun_eq_iff)
 
-
-lemma swap_in_set_of_functions:
-  \<open>swap p2 p1 x \<in> A \<longleftrightarrow> x \<in> swap p1 p2 ` A\<close>
-  using image_iff by fastforce
-
-lemma swap_id_in_set:
-  \<open>swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A\<close>
-  by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
 
 
 lemma swap_fun_swap_id: "swap p1 p2 konsens (swap p1 p2 id p) = konsens p"

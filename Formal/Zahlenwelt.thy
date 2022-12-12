@@ -184,19 +184,6 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall:
 
 
 (*<*)
-lemma is_singleton_the_elem_as_set: "is_singleton A \<Longrightarrow> the_elem A = a \<longleftrightarrow> A = {a}"
-  apply(rule iffI)
-   apply (simp add: is_singleton_the_elem)
-  apply(simp add: the_elem_def)
-  done
-
-(*the simplifier loops with this one, sometimes. If it loops, apply(elim is_singletonE) first.*)
-lemma singleton_set_to_all: "{a \<in> A. P a} = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A \<and> P a) = (a = b))"
-  by fastforce
-
-lemma singleton_set_to_all2: "A = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A) = (a = b))"
-  by fastforce
-
 lemma "p1 \<in> Ps \<Longrightarrow> p2 \<in> Ps \<Longrightarrow>
   {pa \<in> Ps. swap p1 p2 besitz pa = b} = {p2} \<longleftrightarrow> {pa \<in> Ps. besitz pa = b} = {p1}"
   apply(simp add: singleton_set_to_all)
@@ -240,7 +227,6 @@ lemma is_singleton_swap:
    apply (metis swap_a swap_b swap_nothing)+
   done
 
-
 lemma if_swap_person_help_same: \<open>p1 = a \<Longrightarrow>
        p2 = a \<Longrightarrow>
        (\<lambda>p. if p = a then p2 else if p = p2 then p1 else p) = id\<close>
@@ -269,7 +255,6 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap:
   apply(rule the_elem_singleton_swap_none, simp_all)
   using is_singleton_swap by fast
 
-
 lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_alt:
   \<open>p1 \<in> set ps \<Longrightarrow>
    p2 \<in> set ps \<Longrightarrow>
@@ -280,16 +265,12 @@ opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps =
   using opfer_eindeutig_nach_besitz_auswaehlen_swap[of \<open>p1\<close> \<open>ps\<close> \<open>p2\<close> \<open>p\<close> \<open>(swap p1 p2 besitz)\<close>, simplified swap1]
   by simp
 
-
-
 lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
 \<open>opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) enum_class.enum =
   map_option (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
     (opfer_eindeutig_nach_besitz_auswaehlen p besitz enum_class.enum)\<close>
   apply(rule opfer_eindeutig_nach_besitz_auswaehlen_swap_alt)
   using enum_class.in_enum enum_class.enum_distinct by auto
-
-
 
 
 lemma the_single_elem_None_swap:
@@ -301,23 +282,21 @@ lemma the_single_elem_None_swap:
   apply(simp add: singleton_set_to_all2)
   by (metis swap_a swap_b swap_nothing)
 
-  lemma the_single_elem_Some_Some_swap:
-    \<open>the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
-        the_single_elem {p. swap s1 p2 x p = a} = Some s2 \<Longrightarrow> p2 = s2\<close>
-    by (metis (no_types, lifting) is_singleton_the_elem mem_Collect_eq option.inject option.simps(3) singleton_iff swap_b the_single_elem)
-  lemma the_single_elem_Some_ex_swap:
-    \<open>the_single_elem {p. x p = a} = Some x2 \<Longrightarrow> \<exists>y. the_single_elem {p. swap p1 p2 x p = a} = Some y\<close>
-    apply(case_tac \<open>the_single_elem {p. swap p1 p2 x p = a}\<close>)
-     apply(simp)
-    using the_single_elem_None_swap apply (metis option.distinct(1) swap2)
-    by simp
+lemma the_single_elem_Some_Some_swap:
+  \<open>the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
+      the_single_elem {p. swap s1 p2 x p = a} = Some s2 \<Longrightarrow> p2 = s2\<close>
+  by (metis (no_types, lifting) is_singleton_the_elem mem_Collect_eq option.inject option.simps(3) singleton_iff swap_b the_single_elem)
+lemma the_single_elem_Some_ex_swap:
+  \<open>the_single_elem {p. x p = a} = Some x2 \<Longrightarrow> \<exists>y. the_single_elem {p. swap p1 p2 x p = a} = Some y\<close>
+  apply(case_tac \<open>the_single_elem {p. swap p1 p2 x p = a}\<close>)
+   apply(simp)
+  using the_single_elem_None_swap apply (metis option.distinct(1) swap2)
+  by simp
 
 lemma the_single_elem_Some_swap:
   \<open>the_single_elem {p. x p = a} = Some s \<Longrightarrow>
       the_single_elem {p. swap s p2 x p = a} = Some p2\<close>
   using the_single_elem_Some_ex_swap the_single_elem_Some_Some_swap by fastforce
-
-
 (*>*)
 
 fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> 'person::enum \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> ('person \<Rightarrow> int) option\<close> where

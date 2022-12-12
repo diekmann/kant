@@ -43,6 +43,20 @@ lemma count_list_distinct: \<open>distinct P \<Longrightarrow> x \<in> set P \<L
   by(auto)
 
 
+lemma is_singleton_the_elem_as_set: "is_singleton A \<Longrightarrow> the_elem A = a \<longleftrightarrow> A = {a}"
+  apply(rule iffI)
+   apply (simp add: is_singleton_the_elem)
+  apply(simp add: the_elem_def)
+  done
+
+(*the simplifier loops with this one, sometimes. If it loops, apply(elim is_singletonE) first.*)
+lemma singleton_set_to_all: "{a \<in> A. P a} = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A \<and> P a) = (a = b))"
+  by fastforce
+
+lemma singleton_set_to_all2: "A = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A) = (a = b))"
+  by fastforce
+
+
 
 text\<open>For some reason, I like \<^const>\<open>List.map_filter\<close>. But standard library support is poor.\<close>
 lemma List_map_filter_as_comprehension:
