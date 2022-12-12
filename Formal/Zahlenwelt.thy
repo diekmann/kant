@@ -128,18 +128,12 @@ lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
   by(simp add: the_single_elem_def)
 
 
-thm  option.exhaust_sel
 lemma the_single_elem_exhaust:
   \<open>(the_single_elem S = None \<Longrightarrow> P None) \<Longrightarrow>
         (\<And>x. the_single_elem S = Some x \<Longrightarrow> P (Some x)) \<Longrightarrow> P (the_single_elem S)\<close>
 apply(cases \<open>the_single_elem S\<close>)
 by(auto)
 (*>*)
-
-(*TODO: delete in favor of*)
-thm is_singleton_the_elem[symmetric]
-lemma \<open>A = {the_elem A} \<longleftrightarrow> is_singleton A\<close>
-  by (simp add: is_singleton_the_elem)
 
 lemma opfer_nach_besitz_induct_step_set_simp: \<open>besitz a \<noteq> opfer_nach_besitz \<Longrightarrow>
   {p. (p = a \<or> p \<in> set ps) \<and> besitz p = opfer_nach_besitz} =
@@ -150,29 +144,35 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
   \<open>distinct ps \<Longrightarrow> 
   opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
           the_single_elem {p \<in> set ps. besitz p = opfer_nach_besitz}\<close>
-  apply(simp add: the_single_elem)
-  apply(safe)
-   apply(induction \<open>ps\<close>)
-    apply (simp add: is_singleton_altdef; fail)
-   apply(simp)
-   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
-   apply(simp add: is_singleton_the_elem)
-   apply(simp add: case_filter_empty_some_helper case_filter_empty_some_helper3)
-   apply(safe)
+proof(simp add: the_single_elem, intro conjI impI)
+  show "distinct ps \<Longrightarrow>
+    is_singleton {p \<in> set ps. besitz p = opfer_nach_besitz} \<Longrightarrow>
+    opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
+    Some (the_elem {p \<in> set ps. besitz p = opfer_nach_besitz})"
+    apply(induction \<open>ps\<close>)
+     apply (simp add: is_singleton_altdef; fail)
+    apply(simp)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+    apply(simp add: is_singleton_the_elem)
+    apply(simp add: case_filter_empty_some_helper case_filter_empty_some_helper3)
+    apply(safe)
+      apply (metis (mono_tags, lifting) mem_Collect_eq singleton_iff)
      apply (metis (mono_tags, lifting) mem_Collect_eq singleton_iff)
-    apply (metis (mono_tags, lifting) mem_Collect_eq singleton_iff)
-   apply(simp add: opfer_nach_besitz_induct_step_set_simp; fail)
-
-  apply(induction \<open>ps\<close>)
-   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def; fail)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
-  apply(safe)
-   apply(case_tac \<open>\<not> is_singleton {p \<in> set ps. besitz p = besitz a}\<close>)
-    apply (smt (z3) empty_iff empty_set is_singletonI' list.case_eq_if mem_Collect_eq set_filter)
-   apply(simp)
-   apply (metis One_nat_def card.empty empty_set is_singleton_altdef list.case_eq_if nat.simps(3) set_filter)
-  by(simp add: opfer_nach_besitz_induct_step_set_simp)
-
+    apply(simp add: opfer_nach_besitz_induct_step_set_simp; fail)
+    done
+next
+  show "distinct ps \<Longrightarrow>
+    \<not> is_singleton {p \<in> set ps. besitz p = opfer_nach_besitz} \<Longrightarrow>
+    opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = None"
+    apply(induction \<open>ps\<close>)
+     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def; fail)
+    apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
+    apply(safe)
+     apply(simp split: list.split)
+     apply(simp add: filter_empty_conv is_singleton_def)
+     apply blast
+    by(simp add: opfer_nach_besitz_induct_step_set_simp)
+qed
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall:
   \<open>opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz enum_class.enum =
@@ -184,13 +184,34 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall:
 
 
 (*<*)
+lemma is_singleton_the_elem_as_set: "is_singleton A \<Longrightarrow> the_elem A = a \<longleftrightarrow> A = {a}"
+  apply(rule iffI)
+   apply (simp add: is_singleton_the_elem)
+  apply(simp add: the_elem_def)
+  done
+
+(*the simplifier loops with this one, sometimes. If it loops, apply(elim is_singletonE) first.*)
+lemma singleton_set_to_all: "{a \<in> A. P a} = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A \<and> P a) = (a = b))"
+  by fastforce
+
+lemma singleton_set_to_all2: "A = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A) = (a = b))"
+  by fastforce
+
+lemma "p1 \<in> Ps \<Longrightarrow> p2 \<in> Ps \<Longrightarrow>
+  {pa \<in> Ps. swap p1 p2 besitz pa = b} = {p2} \<longleftrightarrow> {pa \<in> Ps. besitz pa = b} = {p1}"
+  apply(simp add: singleton_set_to_all)
+  by (metis swap_b swap_nothing swap_symmetric)
+
 lemma the_elem_singleton_swap:
-  \<open>p1 \<in> set ps \<Longrightarrow>
-    p2 \<in> set ps \<Longrightarrow>
-    the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} = p2 \<Longrightarrow>
-    is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p} \<Longrightarrow>
-    is_singleton {pa \<in> set ps. besitz pa = p} \<Longrightarrow> the_elem {pa \<in> set ps. besitz pa = p} = p1\<close>
-  by (smt (verit, del_insts) is_singleton_the_elem mem_Collect_eq singleton_iff swap_b)
+  \<open>p1 \<in> Ps \<Longrightarrow>
+    p2 \<in> Ps \<Longrightarrow>
+    the_elem {pa \<in> Ps. swap p1 p2 besitz pa = b} = p2 \<Longrightarrow>
+    is_singleton {pa \<in> Ps. swap p1 p2 besitz pa = b} \<Longrightarrow>
+    is_singleton {pa \<in> Ps. besitz pa = b} \<Longrightarrow> the_elem {pa \<in> Ps. besitz pa = b} = p1\<close>
+  apply(simp add: is_singleton_the_elem_as_set)
+  apply(elim is_singletonE)
+  apply(simp add: singleton_set_to_all)
+  by (metis swap_b)
 
 lemma the_elem_singleton_swap_none:
     \<open>p1 \<in> set ps \<Longrightarrow>
@@ -202,17 +223,21 @@ lemma the_elem_singleton_swap_none:
     the_elem {pa \<in> set ps. swap p1 p2 besitz pa = p} = the_elem {pa \<in> set ps. besitz pa = p}\<close>
   apply(rule arg_cong[of _ _ \<open>the_elem\<close>])
   apply(rule Collect_cong)
-  apply(simp add: is_singleton_the_elem)
-  by (smt (verit) mem_Collect_eq singleton_iff swap_nothing)
+  apply(elim is_singletonE)
+  apply(simp add: is_singleton_the_elem_as_set)
+  apply(simp add: singleton_set_to_all)
+  by (metis swap_nothing)
+  
 
 lemma is_singleton_swap:
   \<open>p1 \<in> set ps \<Longrightarrow>
    p2 \<in> set ps \<Longrightarrow>
     is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p}
     \<longleftrightarrow> is_singleton {pa \<in> set ps. besitz pa = p}\<close>
-  apply(cases \<open>p2 \<noteq> p1\<close>) (*smt lol*)
-  subgoal by (smt (verit) CollectD CollectI insertCI is_singletonI' is_singleton_the_elem singleton_iff swap_a swap_b swap_nothing)
-  apply(simp)
+  apply(simp add: is_singleton_def)
+  apply(simp add: singleton_set_to_all)
+  apply(safe)
+   apply (metis swap_a swap_b swap_nothing)+
   done
 
 
@@ -270,8 +295,11 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
 lemma the_single_elem_None_swap:
   \<open>the_single_elem {p. x p = a} = None \<Longrightarrow>
        the_single_elem {p. swap p1 p2 x p = a} = None\<close>
-  apply(simp add: the_single_elem)
-  by (smt (verit) empty_iff is_singletonI' is_singleton_the_elem mem_Collect_eq option.simps(3) singleton_iff swap_a swap_b swap_nothing)
+  apply(simp add: the_single_elem split: if_split_asm)
+  apply(simp add: is_singleton_def)
+  apply(safe)
+  apply(simp add: singleton_set_to_all2)
+  by (metis swap_a swap_b swap_nothing)
 
   lemma the_single_elem_Some_Some_swap:
     \<open>the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
