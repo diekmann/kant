@@ -215,9 +215,13 @@ lemma wfh_generalize_worldI:
 wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht (zha))\<close>
   apply(simp)
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(clarsimp)
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(simp)
   apply(simp add: option.map_comp)
   apply(simp add: comp_def)
-  by (smt (verit, best) map_option_is_None option.exhaust_sel option.map_sel)
+  done
 (*>*)
 
 
@@ -262,7 +266,7 @@ lemma
       Eve\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def )
   apply(simp add: ist_noop_def fun_eq_iff handeln_def nachher_handeln.simps)
-  by (smt (verit) ausfuehrbar.simps fun_upd_same fun_upd_twist not_numeral_le_zero option.simps(3) person.distinct(5) swap_def)
+  by(code_simp)
 
 (*<*)
 lemma maxime_und_handlungsabsicht_generalisieren_MaximeConj:

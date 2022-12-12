@@ -110,12 +110,23 @@ lemma swap_if_move_inner:
   \<open>swap p2 p1 (\<lambda>p. if P p then A p else B p)
     = (\<lambda>p. if P (swap p2 p1 id p) then A (swap p2 p1 id p) else B (swap p2 p1 id p))\<close>
   by(simp add: swap_def fun_eq_iff)
-  
+
+
+lemma swap_in_set_of_functions:
+  \<open>swap p2 p1 x \<in> A \<longleftrightarrow> x \<in> swap p1 p2 ` A\<close>
+  using image_iff by fastforce
+
 lemma swap_id_in_set:
   \<open>swap p2 p1 id x \<in> swap p1 p2 id ` A \<longleftrightarrow> x \<in> A\<close>
   by (smt (verit, best) id_def image_iff swap_b swap_nothing swap_symmetric)
 
 
+lemma swap_fun_swap_id: "swap p1 p2 konsens (swap p1 p2 id p) = konsens p"
+  apply(cases "p=p1")
+   apply(simp add: swap_a swap_b)
+  apply(cases "p=p2")
+   apply(simp add: swap_a swap_b)
+  by(simp add: swap_nothing)
 
 
 (*TODO: baut swap eine Permutation und gibt es darauf lemmata?*)

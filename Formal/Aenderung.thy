@@ -634,13 +634,22 @@ where
   \<open>enthaelt_konsens abmachung konsens \<equiv> \<forall>betroffene_person \<in> set (abmachungs_betroffene abmachung).
       abmachung \<in> set (konsens betroffene_person)\<close>
 
+(*<*)
+lemma swap_konsensswap_swap:
+  "swap p2 p1 ` set (konsensswap p1 p2 konsens (swap p1 p2 id p)) =
+  (set (konsens p))"
+  apply(simp add: konsensswap_apply)
+  apply(simp add: swap_fun_swap_id)
+  by (simp add: image_comp)
+
 lemma enthaelt_konsens_swap:
   \<open>enthaelt_konsens (swap p1 p2 a) (konsensswap p1 p2 konsens) = enthaelt_konsens a konsens\<close> 
   apply(simp add: enthaelt_konsens_def abmachungs_betroffene_is_dom)
   apply(simp add: abmachung_dom_swap)
-  apply(simp add: konsensswap_def comp_def)
-  by (smt (z3) id_apply image_def list.set_map mem_Collect_eq swap2 swap_a swap_b swap_nothing)
-
+  apply(rule ball_cong)
+   apply(simp; fail)
+  by(simp add: swap_in_set_of_functions swap_konsensswap_swap)
+(*>*)
 
 
 text\<open>Eine (ausgeführte) Abmachung einlösen, bzw. entfernen.\<close>
