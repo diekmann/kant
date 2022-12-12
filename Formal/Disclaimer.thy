@@ -5,12 +5,29 @@ begin
 section\<open>Disclaimer\<close>
 text\<open>
 Ich habe
-  \<^item> wenig Ahnung von Philosophie.
-  \<^item> keine Ahnung von Recht und Jura.
-  \<^item> und schon gar keine Ahnung von Strafrecht oder Steuerrecht.
+  \<^item> mir philosophische Grundlagen nur im Selbststudium beigebracht. Meine Primärquellen sind
+    \<^item> Die deutsche Übersetzung von Bertrand Russells 1946 erstveröffentlichtem
+      "History of Western Philosophy" \cite{russellphi}.
+    \<^item> Eva Böhringers YouTube Kanal "Ethik-Abi by BOE" \<^url>\<open>https://www.youtube.com/@EthikAbibyBOE\<close>.
+    \<^item> Wikipedia im Allgemeinen.
+      Innerhalb des Dokuments versuche ich Definitionen aus Wikipedia zu verwenden,
+      da diese einfach und ohne Paywall zugänglich sind.
+    \<^item> Weitere Bücher oder Internetquellen ohne herausragende Bedeutung für mich.
+      Zu Beispiel stand mein "Kant für die Hand" Würfel ohne große Einsicht sehr lange herum,
+      bis er schließlich dem Kind zum Opfer fiel.
+  \<^item> wenig Ahnung von deutschem Steuerrecht. Das Steuer-Beispiel im hinteren Abschnitt dieses
+    Dokuments ist zwar an das deutsche Einkommensteuerrecht angelehnt (Quelle: Wikipedia),
+    dennoch ist dieses Beispiel nur der Idee nach richtig.
+    Faktisch ist es falsch und ich empfehle niemanden seine Steuererklärung basierend auf dieser
+    Theorie zu machen.
+  \<^item> keine Ahnung von Jura und Strafrecht.
+    Die thys enthalten noch ein fehlgeschlagenes Experiment welches versucht aus dem kategorischen
+    Imperativ ein Gesetz (im rechtlichen Sinne) abzuleiten.
+    Dieses Experiment ist allerdings fehlgeschlagen und ist auch nicht im kompilierten pdf Dokument
+    enthalten.
 
-Und in dieser Session werden ich all das zusammenwerfen.
-Dies ist ein instabiler Development Snapshot.
+Dieses Dokument ist ein instabiler Development Snapshot,
+entwickelt auf \<^url>\<open>https://github.com/diekmann/kant\<close>.
 Er enthält sinnvolles und weniger sinnvolle Experimente!
 
 \<^bigskip>
