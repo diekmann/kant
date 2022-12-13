@@ -438,7 +438,6 @@ lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Handl
     h zahlenwps 
     maxime_hatte_konsens\<close> by eval
 
-
 lemma \<open>wohlgeformte_maxime zahlenwps maxime_hatte_konsens\<close>
   by(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def
                maxime_hatte_konsens_def hat_konsens_swap)

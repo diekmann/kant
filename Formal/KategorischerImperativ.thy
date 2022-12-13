@@ -568,8 +568,9 @@ lemma \<open>(\<exists>bsp. erzeuge_beispiel wps welt has m = Some bsp) \<longle
 (*<*)
 (*thx lars: https://stackoverflow.com/questions/74337244/turning-a-valuesimp-example-into-a-lemma-with-functions-in-them/74394525#74394525*)
 ML\<open>
+val technique = Nbe.dynamic_conv; (*Code_Simp.dynamic_conv is slow*)
 fun beispiel_conv ctxt =
-  Conv.arg_conv (Conv.arg1_conv (Code_Simp.dynamic_conv ctxt) then_conv Conv.arg_conv (Code_Simp.dynamic_conv ctxt))
+  Conv.arg_conv (Conv.arg1_conv (technique ctxt) then_conv Conv.arg_conv (technique ctxt))
 
 fun beispiel_tac ctxt =
   HEADGOAL (CONVERSION (beispiel_conv ctxt) THEN_ALL_NEW (resolve_tac ctxt @{thms refl}))
