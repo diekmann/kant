@@ -545,7 +545,6 @@ lemma abmachung_ausfuehren_aenderung:
   fixes abmachung :: \<open>('person::enum, 'etwas::ordered_ab_group_add) abmachung\<close>
   shows \<open>abmachung_ausfuehren abmachung = aenderung_ausfuehren (abmachung_to_aenderung abmachung)\<close>
   by(simp add: abmachung_ausfuehren_def fun_eq_iff aenderung_ausfuehren_abmachung_to_aenderung)
-
 (*>*)
 
 
@@ -583,7 +582,7 @@ lemma konsensswap_sym: \<open>konsensswap p1 p2 = konsensswap p2 p1\<close>
 lemma konsensswap_apply:
   \<open>konsensswap p1 p2 kons p =  map (swap p1 p2) (swap p1 p2 kons p)\<close>
   apply(simp add: konsensswap_def comp_def)
-  by (metis swap_a swap_b swap_nothing)
+  by(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
 
 
 lemma konsensswap_same[simp]:
@@ -750,6 +749,7 @@ definition reverse_engineer_abmachung
 where
   \<open>reverse_engineer_abmachung h \<equiv>
     fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)\<close>
+
 
 lemma reverse_engineer_abmachung_delta_num_fun:
   \<open>reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)\<close>

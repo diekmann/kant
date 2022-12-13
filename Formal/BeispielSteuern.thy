@@ -138,13 +138,15 @@ Nitpick found a counterexample:
 *)
   oops
 
+
 lemma wfh_steuerberechnung_jeder_zahlt_int:
   \<open>ha = Handlungsabsicht (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w))))
     \<Longrightarrow> wohlgeformte_handlungsabsicht steuerwps welt ha\<close>
   apply(cases \<open>welt\<close>, rename_tac eink, simp)
   apply(simp add: wohlgeformte_handlungsabsicht.simps comp_def fun_eq_iff)
   apply(safe)
-  by (smt (verit, best) swap_a swap_b swap_nothing)
+  apply(rename_tac eink p1 p2 p)
+  by(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
 
 
   text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr

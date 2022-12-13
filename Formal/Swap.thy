@@ -49,11 +49,20 @@ lemma swap_fun_map_comp_id:
   apply(simp add: swap_def swap_id_comp)
   by (simp add: map_idI)
 
-
 lemma swap_forall: \<open>(\<forall>p. P (swap p1 p2 a p) (swap p1 p2 b p)) \<longleftrightarrow> (\<forall>p. P (a p) (b p))\<close>
-  by (metis swap_a swap_b swap_nothing)
+by (metis swap_a swap_b swap_nothing)
 
-
+(*
+whenever a prove can be solved by (metis swap_a swap_b swap_nothing)
+maybe by(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
+can be faster
+*)
+lemma swap_cases:
+  "(p = p1 \<Longrightarrow> P (f p2)) \<Longrightarrow> (p = p2 \<Longrightarrow> P (f p1)) \<Longrightarrow> (p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> P (f p))\<Longrightarrow> P (swap p1 p2 f p)"
+apply(case_tac "p=p1", simp add: swap_a)
+apply(case_tac "p=p2", simp add: swap_b)
+apply(simp add: swap_nothing)
+done
 
 lemma swap_in_set_of_functions:
   \<open>swap p2 p1 x \<in> A \<longleftrightarrow> x \<in> swap p1 p2 ` A\<close>
