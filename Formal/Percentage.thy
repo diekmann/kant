@@ -118,4 +118,8 @@ lemma percentage_nat_diff_mult_right_mono: (*warning: coertion*)
   shows \<open>(a :: nat) \<le> b \<Longrightarrow> a - a * p \<le> b - b * p\<close>
   by (simp add: percentage_real_diff_mult_right_mono)
 
+  
+lemma percentage_add_limit_helper:
+  "a \<ge> 0 \<Longrightarrow> b \<le> c - a \<Longrightarrow> a * real_of_percentage prozent + b \<le> c"
+by (metis add.commute le_diff_eq order_trans percentage_real_pos_mult_right) 
 end

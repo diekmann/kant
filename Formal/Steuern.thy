@@ -17,8 +17,7 @@ lemma floor_minusD:
   fixes a :: \<open>nat\<close> and a' :: \<open>real\<close>
   shows  \<open>a \<le> b \<Longrightarrow> a - a' \<le> b - b' \<Longrightarrow> a - floor a' \<le> b - floor b'\<close>
   apply(simp add: floor_def)
-  by (smt (verit, ccfv_SIG) diff_is_0_eq le_floor_iff nat_0_iff
-        nat_le_real_less of_int_1 of_nat_diff of_nat_nat real_of_int_floor_gt_diff_one)
+  by linarith
 (*>*)
 
 
@@ -158,7 +157,7 @@ lemma zonensteuer_pos: \<open>zonensteuer ls p e \<ge> 0\<close>
   apply(induction \<open>ls\<close>)
    apply(simp add: percentage_range)
   by (metis zero_le zonensteuer_zero zonensteuermono)
-
+  
 text\<open>Steuer kann nicht höher sein als das Einkommen.\<close>
 lemma zonensteuer_limit: \<open>zonensteuer ls spitzensteuer einkommen \<le> einkommen\<close>
   apply(induction \<open>ls\<close> arbitrary: \<open>einkommen\<close>)
@@ -166,8 +165,11 @@ lemma zonensteuer_limit: \<open>zonensteuer ls spitzensteuer einkommen \<le> ein
    apply (simp add: real_of_percentage_mult; fail)
   apply(rename_tac z zs einkommen, case_tac \<open>z\<close>, rename_tac zone prozent)
   apply(simp)
-  by (smt (verit, ccfv_SIG) diff_is_0_eq nle_le of_nat_diff
-      real_of_percentage_mult(1) zonensteuer_zero)
+  apply(case_tac "zone \<le>  einkommen")
+  apply(simp)
+  apply(subst percentage_add_limit_helper, simp_all)
+  apply (metis of_nat_diff)
+  by (simp add: real_of_percentage_mult zonensteuer_zero)
 
 lemma zonensteuer_leistung_lohnt_sich: \<open>e1 \<le> e2
   \<Longrightarrow> e1 - zonensteuer zs spitzensteuer e1 \<le> e2 - zonensteuer zs spitzensteuer e2\<close>
@@ -229,20 +231,6 @@ next
   then show \<open>?case\<close>
     by(simp add: z)
 qed
-
-(*
-lemma "e1 \<le> e2 \<Longrightarrow>
-  steuer_defs.steuersatz (\<lambda>e. floor (zonensteuer zs spitzensteuer e)) e1
-    \<le> steuer_defs.steuersatz (\<lambda>e. floor (zonensteuer zs spitzensteuer e)) e2"
-  thm percentage_code
-  apply(simp add: floor_def steuer_defs.steuersatz_def)
-  apply(induction zs)
-   apply(simp add: percentage_code)
-   apply(intro conjI impI)
-     apply(simp_all add: real_of_percentage_range)
-  apply (smt (verit, best) floor_of_nat le_divide_eq_1 nonzero_mult_div_cancel_left of_int_floor_le of_int_of_nat_eq of_nat_0_le_iff of_nat_mono real_of_percentage_mult(1))
-  apply (smt (verit, best) divide_eq_0_iff divide_nonneg_nonneg divide_nonpos_nonneg floor_mono mult_mono of_int_le_iff of_nat_0_le_iff of_nat_le_iff real_of_percentage_range(1))
-*)
 
 definition steuerzonen2022 :: \<open>(nat \<times> percentage) list\<close> where
   \<open>steuerzonen2022 \<equiv> [
