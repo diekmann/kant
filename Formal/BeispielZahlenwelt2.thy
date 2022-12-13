@@ -412,8 +412,6 @@ definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxi
   \<open>maxime_altruistischer_fortschritt \<equiv>
       Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
 
-
-
 (*existierende_abmachung_einloesen macht, dass die Maxime nicht erfuellt.*)
 value[simp] \<open>erzeuge_beispiel
   zahlenwps initialwelt
@@ -439,7 +437,6 @@ lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Handl
  wohlgeformte_maxime_auf
     h zahlenwps 
     maxime_hatte_konsens\<close> by eval
-
 
 
 lemma \<open>wohlgeformte_maxime zahlenwps maxime_hatte_konsens\<close>

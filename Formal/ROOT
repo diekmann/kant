@@ -30,7 +30,6 @@ session Kant = Cache +
     Gesetze
     AllgemeinesGesetz
     BeispielZahlenweltGesetz
-    FailDraft
   document_files
     "420px-Kant.png"
     "root.tex"
