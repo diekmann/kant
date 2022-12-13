@@ -419,7 +419,7 @@ definition maxime_hatte_konsens :: \<open>(person, zahlenwelt) maxime\<close> wh
   \<open>maxime_hatte_konsens \<equiv> Maxime (\<lambda>ich h. hat_konsens h)\<close>
 
 
-lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt [Handlungsabsicht existierende_abmachung_einloesen]).
+lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Handlungsabsicht existierende_abmachung_einloesen)).
  wohlgeformte_maxime_auf
     h zahlenwps 
     maxime_hatte_konsens\<close> by eval
@@ -433,10 +433,11 @@ lemma \<open>erzeuge_beispiel
   [Handlungsabsicht existierende_abmachung_einloesen]
   maxime_hatte_konsens
 = Some
-  \<lparr>bsp_welt = initialwelt,
-   bsp_erfuellte_maxime = Some maxime_hatte_konsens,
+  \<lparr>
+   bsp_erfuellte_maxime = True,
    bsp_erlaubte_handlungen = [Handlungsabsicht existierende_abmachung_einloesen],
-   bsp_verbotene_handlungen = []\<rparr>\<close>
+   bsp_verbotene_handlungen = [],
+   bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel
 
 lemma \<open>erzeuge_beispiel
@@ -447,10 +448,11 @@ lemma \<open>erzeuge_beispiel
    Handlungsabsicht unmoeglich]
   maxime_altruistischer_fortschritt
 = Some
-  \<lparr>bsp_welt = initialwelt,
-   bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
+  \<lparr>
+   bsp_erfuellte_maxime = True,
    bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
-   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+   bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel
 
 (*TODO: MaximeDisj beweisen.
@@ -469,10 +471,11 @@ lemma \<open>erzeuge_beispiel
    Handlungsabsicht unmoeglich]
   (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
 = Some
-  \<lparr>bsp_welt = initialwelt,
-   bsp_erfuellte_maxime = Some (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens),
+  \<lparr>
+   bsp_erfuellte_maxime = True,
    bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen, Handlungsabsicht unmoeglich],
-   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+   bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel
 
 

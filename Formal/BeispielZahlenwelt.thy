@@ -370,14 +370,15 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
   text\<open>TODO: erklaeren\<close>
 (*bsp_erfuellte_maxime = None. Aber gleiche handlungen erlaubt und verboten*)
   lemma \<open>erzeuge_beispiel
-    zahlenwps initialwelt
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime individueller_fortschritt) =
   Some
-    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
-     bsp_erfuellte_maxime = None,
+    \<lparr>
+     bsp_erfuellte_maxime = False,
      bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
-     bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+     bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen],
+     bsp_uneindeutige_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
     by beispiel
 
 
@@ -399,14 +400,15 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
    \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist  schlecht.
   \<close>
   lemma \<open>erzeuge_beispiel
-    zahlenwps initialwelt
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     maxime_altruistischer_fortschritt =
   Some
-    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
-     bsp_erfuellte_maxime = Some maxime_altruistischer_fortschritt,
+    \<lparr>
+     bsp_erfuellte_maxime = True,
      bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
-     bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+     bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+     bsp_uneindeutige_handlungen = []\<rparr>\<close>
     by beispiel
   text\<open>Das ist ein sehr schönes Beispiel.\<close>
 
@@ -699,14 +701,15 @@ subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
 
   text\<open>TODO: erklaeren. Erfuellt nicht kategorischen imperativ und alles ist verboten\<close>
   lemma \<open>erzeuge_beispiel
-    zahlenwps initialwelt
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime individueller_strikter_fortschritt) =
   Some
-    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
-     bsp_erfuellte_maxime = None,
+    \<lparr>
+     bsp_erfuellte_maxime = False,
      bsp_erlaubte_handlungen = [],
-     bsp_verbotene_handlungen = handlungsabsichten\<rparr>\<close>
+     bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen, Handlungsabsicht unmoeglich],
+     bsp_uneindeutige_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
     by beispiel
 
   text\<open>In keiner Welt ist die Handlung \<^const>\<open>erschaffen\<close> nun \<^const>\<open>moralisch\<close>:\<close>
@@ -762,18 +765,19 @@ subsection\<open>Maxime für globales striktes Optimum\<close>
 
   text\<open>TODO: erklaeren.\<close>
   lemma \<open>erzeuge_beispiel
-    zahlenwps initialwelt
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) =
   Some
-    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
-     bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich. globaler_strikter_fortschritt)),
+    \<lparr>
+     bsp_erfuellte_maxime = True,
      bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
      bsp_verbotene_handlungen = [
       Handlungsabsicht (stehlen4 5 10),
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen,
-      Handlungsabsicht unmoeglich]\<rparr>\<close>
+      Handlungsabsicht unmoeglich],
+     bsp_uneindeutige_handlungen = []\<rparr>\<close>
     by beispiel
 
 
@@ -818,19 +822,20 @@ theorem
 
   text\<open>TODO: erklaeren.\<close>
   lemma \<open>erzeuge_beispiel
-    zahlenwps initialwelt
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime (\<lambda>ich. globaler_fortschritt)) =
   Some
-    \<lparr>bsp_welt = Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3],
-     bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich. globaler_fortschritt)),
+    \<lparr>
+     bsp_erfuellte_maxime = True,
      bsp_erlaubte_handlungen = [
       Handlungsabsicht (erschaffen 5),
       Handlungsabsicht (stehlen4 5 10),
       Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [
       Handlungsabsicht reset,
-      Handlungsabsicht alles_kaputt_machen]\<rparr>\<close>
+      Handlungsabsicht alles_kaputt_machen],
+     bsp_uneindeutige_handlungen = []\<rparr>\<close>
     by beispiel
 
 subsection\<open>Ungültige Maxime\<close>

@@ -325,26 +325,30 @@ und wenn ja, ob die Maxime auf diesen Handlungsabsichten den kategorischen Imper
 und wie die Handlungen bewertet werden.\<close>
 
 (*<*)
+text\<open>List comprehension syntax is sometime hard. Here is an example.\<close>
 value\<open>[(x,y). x \<leftarrow> xs, y \<leftarrow> ys, x \<noteq> y]\<close>
 (*>*)
 
 definition alle_moeglichen_handlungen
-  :: \<open>'world \<Rightarrow> ('person::enum, 'world) handlungsabsicht list \<Rightarrow> 'world handlung list\<close>
+  :: \<open>'world \<Rightarrow> ('person::enum, 'world) handlungsabsicht \<Rightarrow> 'world handlung list\<close>
 where
-  \<open>alle_moeglichen_handlungen welt has \<equiv> [handeln p welt ha. ha \<leftarrow> has, p \<leftarrow> (Enum.enum::'person list)]\<close>
+  \<open>alle_moeglichen_handlungen welt ha \<equiv> [handeln p welt ha. p \<leftarrow> (Enum.enum::'person list)]\<close>
 
 lemma set_alle_moeglichen_handlungen:
-  \<open>set (alle_moeglichen_handlungen welt has) = {handeln p welt ha | ha p. ha\<in>set has}\<close>
+  \<open>set (alle_moeglichen_handlungen welt ha) = {handeln p welt ha | p. True}\<close>
   apply(simp add: alle_moeglichen_handlungen_def)
   apply(simp add: enum_class.enum_UNIV)
   by blast
 
-(*Um den Namespace nicht zu verschmutzen prefixe ich alles mit bsp_*)
+(*TODO: Um den Namespace nicht zu verschmutzen prefixe ich alles mit bsp_*)
+(*TODO: ich habe bsp_world entfernt. Dokumentieren, dass das immer nur fuer eine fixe world ist,
+da sonst nicht ausfuehrbar*)
 record ('person, 'world) beipiel =
-  bsp_welt :: \<open>'world\<close>
-  bsp_erfuellte_maxime :: \<open>('person, 'world) maxime option\<close>
+  bsp_erfuellte_maxime :: \<open>bool\<close>
   bsp_erlaubte_handlungen :: \<open>('person, 'world) handlungsabsicht list\<close>
   bsp_verbotene_handlungen :: \<open>('person, 'world) handlungsabsicht list\<close>
+  bsp_uneindeutige_handlungen :: \<open>('person, 'world) handlungsabsicht list\<close>
+
 
 
 definition erzeuge_beispiel
@@ -353,16 +357,164 @@ definition erzeuge_beispiel
       \<Rightarrow> ('person, 'world) beipiel option\<close>
   where
 \<open>erzeuge_beispiel wps welt has m \<equiv>
-  if (\<exists>h\<in>set (alle_moeglichen_handlungen welt has). \<not>wohlgeformte_maxime_auf h wps m)
+  if (\<exists>h\<in> (\<Union>ha \<in> set has. set (alle_moeglichen_handlungen welt ha)). \<not>wohlgeformte_maxime_auf h wps m)
      \<or> (\<exists>ha\<in>set has. \<not> wohlgeformte_handlungsabsicht wps welt ha)
   then None
   else Some
-   \<lparr> bsp_welt = welt,
-     bsp_erfuellte_maxime = if \<forall>ha\<in>set has. kategorischer_imperativ_auf ha welt m then Some m else None,
-     bsp_erlaubte_handlungen = [ha\<leftarrow>has. moralisch welt m ha],
-     bsp_verbotene_handlungen = [ha\<leftarrow>has. \<not> moralisch welt m ha]
+   \<lparr>
+     bsp_erfuellte_maxime = if \<forall>ha\<in>set has. kategorischer_imperativ_auf ha welt m then True else False,
+     bsp_erlaubte_handlungen = [ha\<leftarrow>has. kategorischer_imperativ_auf ha welt m \<and> moralisch welt m ha],
+     bsp_verbotene_handlungen = [ha\<leftarrow>has. kategorischer_imperativ_auf ha welt m \<and> \<not> moralisch welt m ha],
+     bsp_uneindeutige_handlungen = [ha\<leftarrow>has. \<not> kategorischer_imperativ_auf ha welt m]
    \<rparr>\<close>
 
+(*<*)
+text\<open>I think the following definition leads to more efficient evaluation.
+And it allows reasoning about one \<^typ>\<open>('person, 'world) handlungsabsicht\<close> in isolation.\<close>
+definition erzeuge_beispiel_alt1
+  :: \<open>('person::enum, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow>
+      ('person, 'world) handlungsabsicht \<Rightarrow> ('person, 'world) maxime
+      \<Rightarrow> ('person, 'world) beipiel option\<close>
+  where
+\<open>erzeuge_beispiel_alt1 wps welt ha m \<equiv>
+  if (\<exists>h\<in>set (alle_moeglichen_handlungen welt ha). \<not>wohlgeformte_maxime_auf h wps m)
+     \<or> \<not> wohlgeformte_handlungsabsicht wps welt ha
+  then None
+  else Some
+  (if kategorischer_imperativ_auf ha welt m
+   then
+   \<lparr>
+     bsp_erfuellte_maxime = True,
+     bsp_erlaubte_handlungen = if moralisch welt m ha then [ha] else [],
+     bsp_verbotene_handlungen = if \<not> moralisch welt m ha then [ha] else [],
+     bsp_uneindeutige_handlungen = []
+   \<rparr>
+   else
+   \<lparr>
+     bsp_erfuellte_maxime = False,
+     bsp_erlaubte_handlungen = [],
+     bsp_verbotene_handlungen = [],
+     bsp_uneindeutige_handlungen = [ha]
+   \<rparr>
+  )\<close>
+
+fun beispiel_merge
+  :: "('person, 'world) beipiel \<Rightarrow> ('person, 'world) beipiel \<Rightarrow> ('person, 'world) beipiel"
+where
+  "beispiel_merge
+    \<lparr> bsp_erfuellte_maxime=t1,
+      bsp_erlaubte_handlungen=e1, bsp_verbotene_handlungen=v1, bsp_uneindeutige_handlungen=u1 \<rparr>
+    \<lparr> bsp_erfuellte_maxime=t2,
+      bsp_erlaubte_handlungen=e2, bsp_verbotene_handlungen=v2, bsp_uneindeutige_handlungen=u2 \<rparr>
+  = \<lparr> bsp_erfuellte_maxime = t1 \<and> t2,
+      bsp_erlaubte_handlungen= e1 @ e2,
+      bsp_verbotene_handlungen= v1 @ v2,
+      bsp_uneindeutige_handlungen= u1 @ u2
+    \<rparr>"
+
+lemma beispiel_merge_distrib:
+  "beispiel_merge (beispiel_merge a b) c = beispiel_merge a (beispiel_merge b c)"
+  apply(case_tac a, case_tac b, case_tac c)
+  apply(simp)
+  done
+
+text\<open>Combines \<^typ>\<open>'a option\<close>, but if one of them is \<^const>\<open>None\<close>,
+the whole result is \<^const>\<open>None\<close>. This is different from library's \<^const>\<open>combine_options\<close>.\<close>
+definition merge_options :: "('a \<Rightarrow> 'a \<Rightarrow> 'a) \<Rightarrow> 'a option \<Rightarrow> 'a option \<Rightarrow> 'a option" where
+  "merge_options f x y \<equiv>
+           (case x of None \<Rightarrow> None | Some x \<Rightarrow> (case y of None \<Rightarrow> None | Some y \<Rightarrow> Some (f x y)))"
+
+lemma merge_options_simps:
+  "merge_options f None b = None"
+  "merge_options f a None = None"
+   apply(simp add: merge_options_def)+
+  apply(cases a, simp_all)
+  done
+
+lemma merge_options_distrib:
+  "merge_options beispiel_merge (merge_options beispiel_merge a b) c
+    = merge_options beispiel_merge a (merge_options beispiel_merge b c)"
+  by(simp add: merge_options_def beispiel_merge_distrib split: option.split)
+
+definition erzeuge_beispiel_alt_start :: "('person, 'world) beipiel option" where
+  "erzeuge_beispiel_alt_start \<equiv> Some
+    \<lparr> bsp_erfuellte_maxime=True,
+      bsp_erlaubte_handlungen=[], bsp_verbotene_handlungen=[], bsp_uneindeutige_handlungen=[] \<rparr>"
+
+definition erzeuge_beispiel_alt
+  :: \<open>('person::enum, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow>
+      ('person, 'world) handlungsabsicht list \<Rightarrow> ('person, 'world) maxime
+      \<Rightarrow> ('person, 'world) beipiel option\<close>
+  where
+\<open>erzeuge_beispiel_alt wps welt has m
+  \<equiv> fold
+      (\<lambda>ha acc. merge_options beispiel_merge acc (erzeuge_beispiel_alt1 wps welt ha m))
+      has 
+      erzeuge_beispiel_alt_start
+  \<close>
+
+lemma erzeuge_beispiel_alt_start_neutral:
+  "merge_options beispiel_merge erzeuge_beispiel_alt_start bsp = bsp"
+  apply(cases bsp)
+   apply(simp add: merge_options_def split:option.split)
+  apply(rename_tac bsp2, case_tac bsp2)
+  apply(simp add: merge_options_def erzeuge_beispiel_alt_start_def)
+  done
+
+lemma erzeuge_beispiel1_alt:
+  "erzeuge_beispiel_alt1 wps welt ha m = erzeuge_beispiel wps welt [ha] m"
+  by(simp add: erzeuge_beispiel_def erzeuge_beispiel_alt1_def)
+
+lemma erzeuge_beispiel_cons:
+  "erzeuge_beispiel wps welt (ha # has) m
+    = merge_options beispiel_merge (erzeuge_beispiel wps welt [ha] m) (erzeuge_beispiel wps welt has m)"
+  apply(simp add: erzeuge_beispiel_def) (*slow as hell*)
+  apply(safe) (*312 subgoals! This is an ugly proof!*)
+                      apply(simp_all add: merge_options_simps)
+                 apply(blast, simp add: merge_options_def)+
+  done
+
+lemma fold_merge_options_pullout:
+  "fold (\<lambda>ha acc. merge_options beispiel_merge acc (f ha)) has
+         (merge_options beispiel_merge start start2)
+    = merge_options beispiel_merge start
+          (fold (\<lambda>ha acc. merge_options beispiel_merge acc (f ha)) has start2)"
+  apply(induction has arbitrary: start start2)
+   apply(simp; fail)
+  apply(simp add: merge_options_distrib)
+  done
+
+lemma erzeuge_beispiel_alt_induct_helper:
+  "merge_options beispiel_merge start (erzeuge_beispiel wps welt has m)
+    = fold (\<lambda>ha acc. merge_options beispiel_merge acc (erzeuge_beispiel_alt1 wps welt ha m)) has start"
+  apply(induction has arbitrary: start)
+   apply(simp add: erzeuge_beispiel_def merge_options_def split: option.split)
+   apply(clarsimp, rename_tac bsp)
+   apply(case_tac bsp, simp; fail)
+  apply(rename_tac ha has start)
+  apply(simp)
+  apply(subst erzeuge_beispiel_cons)
+  apply(simp)
+  apply(simp add: erzeuge_beispiel1_alt)
+  apply(simp add: fold_merge_options_pullout)
+  done
+
+lemma erzeuge_beispiel_alt_helper:
+  "erzeuge_beispiel wps welt has m
+    = fold
+      (\<lambda>ha acc. merge_options beispiel_merge acc(erzeuge_beispiel_alt1 wps welt ha m))
+      has
+      erzeuge_beispiel_alt_start"
+  apply(subst erzeuge_beispiel_alt_induct_helper[symmetric])
+  apply(simp add: erzeuge_beispiel_alt_start_neutral)
+  done
+
+lemma erzeuge_beispiel_alt[code]:
+  "erzeuge_beispiel = erzeuge_beispiel_alt"
+  by(simp add: fun_eq_iff erzeuge_beispiel_alt_def erzeuge_beispiel_alt_helper)
+(*>*)
+
+(*TODO*)
 text\<open>
 Das Ergebnis von \<^const>\<open>erzeuge_beispiel\<close> ließt sich wie folgt.
   \<^item> Wenn \<^const>\<open>bsp_erfuellte_maxime\<close> einen \<^const>\<open>Some\<close> term enthält ist der
@@ -371,11 +523,16 @@ Das Ergebnis von \<^const>\<open>erzeuge_beispiel\<close> ließt sich wie folgt.
     quasi dem allgemeinen Gesetz, welches besagt, welche Handlungen erlaubt oder verboten sind.
 \<close>
 
-text\<open>\<^const>\<open>erzeuge_beispiel\<close> erzeugt nur ein Beiespiel wenn alles wohlgeformt ist.\<close>
-lemma \<open>erzeuge_beispiel wps welt has m = Some bsp \<Longrightarrow>
+text\<open>\<^const>\<open>erzeuge_beispiel\<close> erzeugt genau dann ein Beispiel, wenn alles wohlgeformt ist.\<close>
+lemma \<open>(\<exists>bsp. erzeuge_beispiel wps welt has m = Some bsp) \<longleftrightarrow>
   (\<forall> ha \<in> set has. wohlgeformte_handlungsabsicht wps welt ha) \<and>
-  (\<forall> h \<in> set (alle_moeglichen_handlungen welt has). wohlgeformte_maxime_auf h wps m)\<close>
-  by(simp add: erzeuge_beispiel_def split: if_split_asm)
+  (\<forall> h \<in> set [h. ha \<leftarrow> has, h \<leftarrow> alle_moeglichen_handlungen welt ha]. wohlgeformte_maxime_auf h wps m)\<close>
+  apply(rule iffI)
+   apply(simp add: erzeuge_beispiel_def split: if_split_asm; fail)
+  apply(simp add: erzeuge_beispiel_def)
+  done
+  
+  
 
 (*<*)
 (*thx lars: https://stackoverflow.com/questions/74337244/turning-a-valuesimp-example-into-a-lemma-with-functions-in-them/74394525#74394525*)
@@ -393,10 +550,11 @@ method_setup beispiel = \<open>Scan.succeed (SIMPLE_METHOD o beispiel_tac)\<clos
 lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. Some w)] (Maxime (\<lambda>ich w. True))
   =
   Some
-  \<lparr>bsp_welt = (\<lambda>p::person. 0::int),
-   bsp_erfuellte_maxime = Some (Maxime (\<lambda>ich w. True)),
+  \<lparr>
+   bsp_erfuellte_maxime = True,
    bsp_erlaubte_handlungen = [Handlungsabsicht (\<lambda>p w. Some w)],
-   bsp_verbotene_handlungen = []
+   bsp_verbotene_handlungen = [],
+   bsp_uneindeutige_handlungen = []
   \<rparr>\<close>
   by beispiel
 
