@@ -73,6 +73,10 @@ lemma List_map_filter_as_foldr:
 
 
 
+lemma concat_map_if: "concat (map (\<lambda>x. if P x then [x] else []) xs) = filter P xs"
+  by(induction xs) auto
+
+
 lemma fold_fun_update_call_helper:
   \<open>p \<notin> set xs \<Longrightarrow> fold (\<lambda>x acc. acc(x := f x)) xs start p = start p\<close>
   by(induction \<open>xs\<close> arbitrary: \<open>start\<close>) simp+

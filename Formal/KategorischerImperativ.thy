@@ -516,6 +516,33 @@ But for some reasons, the document builds faster when not making this a \<^verba
 lemma erzeuge_beispiel_alt:
   "erzeuge_beispiel = erzeuge_beispiel_alt"
   by(simp add: fun_eq_iff erzeuge_beispiel_alt_def erzeuge_beispiel_alt_helper)
+
+datatype ('person, 'world) erzeuge_beiespiel_cache = ErzeugeBeispielCache
+  (ebc_ha: "('person, 'world) handlungsabsicht")
+  (ebc_katimp: bool)
+  (ebc_moralisch: bool)
+
+definition "erzeuge_beispiel_code wps welt has m \<equiv>
+  if (\<exists>h\<in> (\<Union>ha \<in> set has. set (alle_moeglichen_handlungen welt ha)). \<not>wohlgeformte_maxime_auf h wps m)
+     \<or> (\<exists>ha\<in>set has. \<not> wohlgeformte_handlungsabsicht wps welt ha)
+  then None
+  else Some
+  (let cache = [ErzeugeBeispielCache ha (kategorischer_imperativ_auf ha welt m) (moralisch welt m ha). ha\<leftarrow>has] in
+   \<lparr>
+     bsp_erfuellte_maxime = \<forall>ki\<in>set (map ebc_katimp cache). ki,
+     bsp_erlaubte_handlungen = [ebc_ha c. c\<leftarrow>cache, ebc_katimp c \<and> ebc_moralisch c],
+     bsp_verbotene_handlungen = [ebc_ha c. c\<leftarrow>cache, ebc_katimp c \<and> \<not> ebc_moralisch c],
+     bsp_uneindeutige_handlungen = [ebc_ha c. c\<leftarrow>cache, \<not> ebc_katimp c]
+   \<rparr>)"
+
+
+lemma erzeuge_beispiel_code[code]:
+  "erzeuge_beispiel = erzeuge_beispiel_code"
+  apply(simp add: fun_eq_iff erzeuge_beispiel_def erzeuge_beispiel_code_def)
+  apply(simp add: comp_def)
+  apply(subst erzeuge_beiespiel_cache.sel)+ (*why u no simp*)
+  apply(simp add: concat_map_if)
+  done
 (*>*)
 
 (*TODO*)
