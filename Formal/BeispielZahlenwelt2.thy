@@ -532,7 +532,7 @@ lemma mhg_katimp_maxime_altruistischer_fortschritt:
     by simp
 
 
-theorem 
+theorem
   \<open>ex_erfuellbare_instanz maxime_altruistischer_fortschritt welt ha \<and>
     (\<forall>p. maxime_und_handlungsabsicht_generalisieren
           zahlenwps welt maxime_altruistischer_fortschritt ha p)

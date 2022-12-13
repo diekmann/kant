@@ -468,10 +468,12 @@ lemma erzeuge_beispiel1_alt:
 lemma erzeuge_beispiel_cons:
   "erzeuge_beispiel wps welt (ha # has) m
     = merge_options beispiel_merge (erzeuge_beispiel wps welt [ha] m) (erzeuge_beispiel wps welt has m)"
-  apply(simp add: erzeuge_beispiel_def) (*slow as hell*)
-  apply(safe) (*312 subgoals! This is an ugly proof!*)
-                      apply(simp_all add: merge_options_simps)
-                 apply(blast, simp add: merge_options_def)+
+  unfolding erzeuge_beispiel_def
+  apply(simp only: merge_options_simps split: if_split)
+  apply(intro conjI impI) (*64 subgoals*)
+                      apply(simp_all only:, simp_all) (*slow*)
+             (*12 subgoals left*)
+             apply(blast | simp add: merge_options_def)+
   done
 
 lemma fold_merge_options_pullout:
@@ -509,7 +511,9 @@ lemma erzeuge_beispiel_alt_helper:
   apply(simp add: erzeuge_beispiel_alt_start_neutral)
   done
 
-lemma erzeuge_beispiel_alt[code]:
+text\<open>The following looks like a perfect code equation.
+But for some reasons, the document builds faster when not making this a \<^verbatim>\<open>[code]\<close>.\<close>
+lemma erzeuge_beispiel_alt:
   "erzeuge_beispiel = erzeuge_beispiel_alt"
   by(simp add: fun_eq_iff erzeuge_beispiel_alt_def erzeuge_beispiel_alt_helper)
 (*>*)
