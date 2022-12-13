@@ -67,6 +67,16 @@ lemma zahlenwps_sym: \<open>zahlenwps p1 p2 = zahlenwps p2 p1\<close>
 
 lemma zahlenwps_same: \<open>zahlenwps p p w = w\<close>
   by(cases \<open>w\<close>, simp add: zahlenwps_def)
+
+lemma besitz_zahlenwps: "besitz (zahlenwps p1 p2 welt) p2 = besitz welt p1"
+  apply(cases \<open>welt\<close>, simp add: zahlenwps_def)
+  by (simp add: swap_b)
+
+lemma besitz_zahlenwps_nothing: "pX \<noteq> p1 \<Longrightarrow>
+       pX \<noteq> p2 \<Longrightarrow>
+       besitz (zahlenwps p1 p2 welt) pX = besitz welt pX"
+  apply(cases \<open>welt\<close>, simp add: zahlenwps_def)
+  by (simp add: swap_nothing)
 (*>*)
 
 
@@ -99,6 +109,12 @@ lemma hat_konsens_swap:
   apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp add: zahlenwps_def)
   apply(simp add: reverse_engineer_abmachung_swap)
   by (simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
+
+lemma hat_konsens_swap_nachher_handeln:
+  "hat_konsens (Handlung (zahlenwps p1 p2 welt) (nachher_handeln p1 (zahlenwps p1 p2 welt) ha)) =
+    hat_konsens (Handlung welt (zahlenwps p1 p2 (nachher_handeln p1 (zahlenwps p2 p1 welt) ha)))"
+  apply (metis (no_types, opaque_lifting) handlung.map hat_konsens_swap zahlenwps_id zahlenwps_sym)
+  done
 
 lemma hat_konsens_noop: "hat_konsens (Handlung welt welt)"
   apply(simp add: hat_konsens_def reverse_engineer_abmachung_same)
@@ -480,8 +496,6 @@ lemma \<open>erzeuge_beispiel
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel
 
-
-
   
 
 
@@ -501,24 +515,24 @@ lemma mhg_katimp_maxime_hatte_konsens:
   apply(simp add: maxime_hatte_konsens_def)
   apply(erule globale_maxime_katimp)
       apply (simp add: handeln_def hat_konsens_noop ist_noop_def; fail)
-     apply (smt (verit, del_insts) handlung.map hat_konsens_swap okay.simps wpsm_kommutiert_handlung_raw zahlenwps_id zahlenwps_sym)
-  using zahlenwps_sym apply fastforce
+    subgoal by(simp add: wpsm_kommutiert_handlung_raw hat_konsens_swap_nachher_handeln)  using zahlenwps_sym apply fastforce
    apply (simp add: zahlenwps_id)
   by simp
-
 
 
 lemma wpsm_kommutiert_altruistischer_fortschritt:
   \<open>wpsm_kommutiert maxime_altruistischer_fortschritt zahlenwps welt\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def handeln_def nachher_handeln.simps)
   apply(safe)
-   apply(case_tac \<open>p1 = p2\<close>)
-    apply(simp add: zahlenwps_same; fail)
    apply(case_tac \<open>pX = p1\<close>)
-    apply(simp)
-    apply (metis swap_b zahlenwelt.simps(1) zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def zahlenwps_sym)
-   apply (smt (verit, del_insts) swap_b swap_nothing zahlenwelt.ext_inject zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def zahlenwps_sym)
-  by (smt (z3) swap_b swap_nothing zahlenwelt.select_convs(1) zahlenwelt.surjective zahlenwelt.update_convs(1) zahlenwelt.update_convs(2) zahlenwps_def zahlenwps_sym)
+    apply(erule_tac x=p2 in allE)
+    apply (metis besitz_zahlenwps zahlenwps_sym)
+   apply(case_tac \<open>pX = p2\<close>)
+    apply(erule_tac x=p1 in allE)
+    apply (metis besitz_zahlenwps zahlenwps_sym)
+   apply(erule_tac x=pX in allE)
+   apply(simp add: besitz_zahlenwps_nothing zahlenwps_sym)
+  by (metis besitz_zahlenwps besitz_zahlenwps_nothing zahlenwps_sym)
 
 lemma mhg_katimp_maxime_altruistischer_fortschritt:
   \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
