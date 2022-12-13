@@ -413,14 +413,21 @@ definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxi
       Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
 
 (*existierende_abmachung_einloesen macht, dass die Maxime nicht erfuellt.*)
-value[simp] \<open>erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen,
    Handlungsabsicht unmoeglich]
-  maxime_altruistischer_fortschritt\<close>
+  maxime_altruistischer_fortschritt
+= Some
+  \<lparr>
+   bsp_erfuellte_maxime = False,
+   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+   bsp_uneindeutige_handlungen = [Handlungsabsicht existierende_abmachung_einloesen]
+  \<rparr>\<close> by beispiel
 
 
 (*TODO:
