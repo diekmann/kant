@@ -179,6 +179,14 @@ lemma wohlgeformte_handlungsabsicht_wpsid_simp:
    apply (metis ausfuehrbar.simps)
   apply(simp add: ausfuehrbar.simps)
   by (metis option.simps(5))
+
+lemma wohlgeformte_handlungsabsicht_ifI:
+  "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h1) \<Longrightarrow>
+   wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h2) \<Longrightarrow>
+   (\<And>p1 p2. P p1 welt \<longleftrightarrow> P p2 (wps p1 p2 welt)) \<Longrightarrow>
+   wohlgeformte_handlungsabsicht wps welt
+      (Handlungsabsicht (\<lambda>ich welt. if P ich welt then h1 ich welt else h2 ich welt))"
+  by(simp add: wohlgeformte_handlungsabsicht.simps)
 (*>*)
 
 

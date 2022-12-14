@@ -145,11 +145,10 @@ subsection\<open>Wohlgeformte Handlungen\<close>
   text\<open>Die folgende Handlung erschafft neuen Besitz aus dem Nichts:\<close>
   fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
     \<open>erschaffen i p (Zahlenwelt besitz) = Some (Zahlenwelt \<lbrakk>besitz(p += int i)\<rbrakk>)\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
+
+lemma wohlgeformte_handlungsabsicht_erschaffen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
     apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
-    (*parse tree is
-      \<forall>p1 p2. (x (p1 += n)) = swap p2 p1 ((swap p1 p2 x) (p2 += n))
-     and I don't like this ambiguity*)
     apply(simp add: swap_def)
     done
 
@@ -174,7 +173,8 @@ subsection\<open>Wohlgeformte Handlungen\<close>
 
   text\<open>Der \<^const>\<open>reset\<close> ist im moralischen Sinne vermutlich keine gute Handlung,
   dennoch ist es eine wohlgeformte Handlung, welche wir betrachten können:\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
+lemma wohlgeformte_handlungsabsicht_reset:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
       apply(simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
      by(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)
 
@@ -210,51 +210,8 @@ lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10
 
 
 
-  text\<open>Folgende Funktion ist inspiriert durch das \<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>.\<close>
-  fun collatz:: \<open>int \<Rightarrow> int\<close> where
-      \<open>collatz n = (if n mod 2 = 0 then n div 2 else 3*n + 1)\<close>
-  lemma \<open>collatz 19 = 58\<close> by eval
 
-  text\<open>Es folgt eine Handlungsabsicht, basierend auf dem Collatz-Problem.
-  Das eigentliche Collatz-Problem ist an dieser stelle nicht relevant,
-  da wir nur eine Iteration machen.
-  Allerdings ist das eine spannende Handlungsabsicht,
-  da diese sowohl den Besitz erhöhen kann, aber auch verringern kann.\<close>
-  fun collatzh:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
-      \<open>collatzh ich (Zahlenwelt besitz) = Some (Zahlenwelt (besitz( ich := collatz (besitz ich))))\<close>
-
-  text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> ist tatsächlich immer wohlgeformt.\<close>
-  lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht collatzh)\<close>
-    apply(simp add: wohlgeformte_handlungsabsicht.simps)
-    apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
-    done
-
-  text\<open>Allerdings werden wir \<^const>\<open>collatzh\<close> nicht weiter betrachten.
-  Das Ergebnis vorweg:
-  Ein kategorischer Imperativ, egal welche vielversprechende Maxime,
-  gilt nicht für die Handlungsabsicht \<^const>\<open>collatzh\<close>.
-  Der Grund ist, oberflächlich gesprochen, dass diese Handlungsabsicht
-  keinen eindeutigen Charakter hat.
-  Die Handlungsabsicht kann sowohl Besitz verringern als auch vermehren.
-  In vielen Welten wird es Leute geben, für die \<^const>\<open>collatzh\<close> eine positive
-  Wirkung hat.
-  Jedoch ist \<^const>\<open>collatzh\<close> wohl allgemein nicht \<^const>\<open>moralisch\<close>,
-  da es normalerweise auch Leute gibt, für die \<^const>\<open>collatzh\<close> eine
-  negative Auswirkung hat.
-  Daher kann eine Maxime \<^const>\<open>collatzh\<close> nicht allgemein beurteilen.
-  Jedoch ist auch diese Meta-Aussage eine spannende Aussage:
-  Der kategorische Imperativ sagt (dadurch, dass er nicht erfüllt ist),
-  dass die Handlungsabsicht \<^const>\<open>collatz\<close> nicht durch eine unserer Maximen
-  beurteilt werden sollte, bzw. sollten wir ein allgemeines Gesetz bauen wollen,
-  so können wir weder \<^const>\<open>collatzh\<close> uneingeschränkt in die Liste erlaubter Handlungsabsichten
-  aufnehmen,
-  noch können wir uneingeschränkt \<^const>\<open>collatzh\<close> uneingeschränkt in die Liste verbotener
-  Handlungsabsichten aufnehmen.\<close>
-
-
-  text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.
-    Wir lassen \<^const>\<open>collatzh\<close> mal aus.
-  \<close>
+  text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
 definition \<open>handlungsabsichten \<equiv> [
   Handlungsabsicht (erschaffen 5),
   Handlungsabsicht (stehlen4 5 10),
@@ -267,9 +224,11 @@ lemma wfh_handlungsabsichten:
   \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
   apply(simp add: handlungsabsichten_def)
   apply(safe)
-  apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4 wohlgeformte_handlungsabsicht_alles_kaputt_machen)
-  apply(simp_all add: wohlgeformte_handlungsabsicht.simps)
-    apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+      apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4
+      wohlgeformte_handlungsabsicht_alles_kaputt_machen
+      wohlgeformte_handlungsabsicht_erschaffen
+      wohlgeformte_handlungsabsicht_reset)
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
   done
 
 
@@ -311,17 +270,11 @@ subsection\<open>Maxime für individuellen Fortschritt\<close>
       apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
     done
 
-  text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> und \<^const>\<open>collatzh\<close> nicht:\<close>
+  text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
   lemma
       \<open>\<not> maxime_und_handlungsabsicht_generalisieren
          zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
          maxime_zahlenfortschritt (Handlungsabsicht reset) Alice\<close>
-    by eval
-
-  lemma
-      \<open>\<not> maxime_und_handlungsabsicht_generalisieren
-         zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
-         maxime_zahlenfortschritt (Handlungsabsicht collatzh) Alice\<close>
     by eval
 
 
@@ -509,16 +462,6 @@ subsection\<open>Maxime für allgemeinen Fortschritt\<close>
     using wfh_handlungsabsichten apply simp
     done
 
-
-  text \<open>Dies wirft die Frage auf:
-  "gibt es überhaupt wohlgeformte Handlungsabsichten, welche nicht mit
-  \<^const>\<open>maxime_altruistischer_fortschritt\<close> generalisieren?"
-  Die Antwort liefert \<^const>\<open>collatzh\<close>.\<close>
-  lemma
-      \<open>\<not> maxime_und_handlungsabsicht_generalisieren
-         zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
-         maxime_altruistischer_fortschritt (Handlungsabsicht collatzh) Alice\<close>
-    by eval
 
 
 (*<*)
@@ -866,4 +809,156 @@ subsection\<open>Ungültige Maxime\<close>
     apply(code_simp)
     done
 
+subsection\<open>Uneindeutige Handlungen\<close>
+text\<open>Folgende Funktion ist inspiriert durch das \<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>.\<close>
+fun collatz:: \<open>int \<Rightarrow> int\<close> where
+    \<open>collatz n = (if n mod 2 = 0 then n div 2 else 3*n + 1)\<close>
+lemma \<open>collatz 19 = 58\<close> by eval
+
+text\<open>Es folgt eine Handlungsabsicht, basierend auf dem Collatz-Problem.
+Das eigentliche Collatz-Problem ist an dieser Stelle nicht relevant,
+da wir nur eine Iteration machen.
+Allerdings ist das eine spannende Handlungsabsicht,
+da diese sowohl den Besitz erhöhen kann, aber auch verringern kann.\<close>
+fun collatzh:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>collatzh ich (Zahlenwelt besitz) = Some (Zahlenwelt (besitz( ich := collatz (besitz ich))))\<close>
+
+text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> ist tatsächlich immer wohlgeformt.\<close>
+lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht collatzh)\<close>
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+  done
+
+
+text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> generalisiert nicht mit der
+\<^const>\<open>maxime_zahlenfortschritt\<close>.
+Dies ist keine große Überraschung, da \<^const>\<open>reset\<close> auch nicht mit dieser Maxime generalisiert
+hat und wir die Maxime auch für ungeeignet befunden haben.\<close>
+lemma
+    \<open>\<not> maxime_und_handlungsabsicht_generalisieren
+       zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
+       maxime_zahlenfortschritt (Handlungsabsicht collatzh) Alice\<close>
+  by eval
+
+
+text \<open>Für unsere hochgelobte \<^const>\<open>maxime_altruistischer_fortschritt\<close> hingegen
+haben wir noch kein Beispiel einer Handlungsabsicht gesehen,
+welche nicht mit ihr generalisiert hat.
+Dies wirft die Frage auf:
+"gibt es überhaupt wohlgeformte Handlungsabsichten, welche nicht mit
+\<^const>\<open>maxime_altruistischer_fortschritt\<close> generalisieren?"
+Die Antwort liefert \<^const>\<open>collatzh\<close>.\<close>
+lemma
+    \<open>\<not> maxime_und_handlungsabsicht_generalisieren
+       zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
+       maxime_altruistischer_fortschritt (Handlungsabsicht collatzh) Alice\<close>
+  by eval
+
+text\<open>Wir haben \<^const>\<open>collatzh\<close> bis jetzt immer bei der Bewertung von Maximen ausgeschlossen.
+Das Ergebnis vorweg:
+Ein kategorischer Imperativ, egal welche vielversprechende Maxime,
+gilt nicht für die Handlungsabsicht \<^const>\<open>collatzh\<close>.\<close>
+
+lemma
+  "\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
+        initialwelt maxime_zahlenfortschritt"
+  "\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
+        initialwelt maxime_altruistischer_fortschritt"
+  "\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
+        initialwelt (Maxime (\<lambda>ich. globaler_fortschritt))"
+  by(eval)+
+
+
+text \<open>
+Der Grund ist, oberflächlich gesprochen, dass diese Handlungsabsicht
+keinen eindeutigen Charakter hat.
+Die Handlungsabsicht kann sowohl Besitz verringern als auch vermehren.
+In vielen Welten wird es Leute geben, für die \<^const>\<open>collatzh\<close> eine positive
+Wirkung hat.
+Jedoch ist \<^const>\<open>collatzh\<close> wohl allgemein nicht \<^const>\<open>moralisch\<close>,
+da es normalerweise auch Leute gibt, für die \<^const>\<open>collatzh\<close> eine
+negative Auswirkung hat.
+Daher kann eine Maxime \<^const>\<open>collatzh\<close> nicht allgemein beurteilen.
+Jedoch ist auch diese Meta-Aussage eine spannende Aussage:
+Der kategorische Imperativ sagt (dadurch, dass er nicht erfüllt ist),
+dass die Handlungsabsicht \<^const>\<open>collatz\<close> nicht durch eine unserer Maximen
+beurteilt werden sollte, bzw. sollten wir ein allgemeines Gesetz bauen wollen,
+so können wir weder \<^const>\<open>collatzh\<close> uneingeschränkt in die Liste erlaubter Handlungsabsichten
+aufnehmen,
+noch können wir uneingeschränkt \<^const>\<open>collatzh\<close> uneingeschränkt in die Liste verbotener
+Handlungsabsichten aufnehmen.
+Oder anders ausgedrückt: können wir ein allgemeines Gesetz wollen,
+welches eine Aussage über die Handlungsabsicht \<^const>\<open>collatzh\<close> macht?
+Ich argumentiere, dass wir solch ein Gesetz nicht wollen, da
+
+  \<^item> Würden wir nur die Auswirkung von \<^const>\<open>collatzh\<close> betrachten,
+    (also die resultierende \<^typ>\<open>'world handlung\<close>,
+     nicht die \<^term_type>\<open>Handlungsabsicht collatzh\<close>)
+    so kann diese Auswirkung durchweg positiv sein,
+    und wir möchten etwas positives nicht verbieten.
+  \<^item> Jedoch hat die Handlungsabsicht auch negative Charakterzüge,
+    da wir billigend in Kauf nehmen, dass Besitz vernichtet werden könnte.
+    Daher möchten wir diese Absicht auch nicht uneingeschränkt erlauben.
+    Besonders deutlich wird dies bei folgender zugespitzten Handlungsabsicht,
+    welche billigend die komplette Vernichtung allen Besitzes in Kauf nehmen würde. 
+\<close>
+
+definition uneindeutiger_charakter:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>uneindeutiger_charakter \<equiv>
+      (\<lambda>ich welt. if meins ich welt mod 2 = 0
+                   then alles_kaputt_machen ich welt
+                   else erschaffen 5 ich welt)\<close>
+
+lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht uneindeutiger_charakter)\<close>
+  unfolding uneindeutiger_charakter_def
+  apply(rule wohlgeformte_handlungsabsicht_ifI)
+    apply(simp add: wohlgeformte_handlungsabsicht_alles_kaputt_machen)
+   apply(simp add: wohlgeformte_handlungsabsicht_erschaffen)
+  apply(simp add: hlp1 hlp2)
+  done
+
+lemma
+  "\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
+        initialwelt maxime_zahlenfortschritt"
+  "\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
+        initialwelt maxime_altruistischer_fortschritt"
+  "\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
+        initialwelt (Maxime (\<lambda>ich. globaler_fortschritt))"
+  by(eval)+
+
+text\<open>Mir gefällt, dass der (extensionale) kategorische Imperativ prinzipiell sagt,
+dass wir die Handlungsabsicht \<^const>\<open>uneindeutiger_charakter\<close> nicht in einem allgemeinen
+Gesetz behandeln können,
+da die potenziellen positiven Auswirkungen im starken Gegensatz
+zu der potenziell destruktiven zugrundeliegenden Absicht stehen.\<close>
+
+
+text\<open>Wenn wir allerdings ausnutzen, dass Handlungsabsichten partiell sein können,
+und so den guten und den schlechten Charakter in eigenständige Handlungsabsichten separieren,
+so können wir wieder allgemeines Aussage über die beiden Handlungsabsichten machen.\<close>
+
+definition partiell_guter_charakter:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>partiell_guter_charakter \<equiv>
+      (\<lambda>ich welt. if meins ich welt mod 2 = 0
+                   then None
+                   else erschaffen 5 ich welt)\<close>
+
+definition partiell_schlechter_charakter:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+    \<open>partiell_schlechter_charakter \<equiv>
+      (\<lambda>ich welt. if meins ich welt mod 2 = 0
+                   then alles_kaputt_machen ich welt
+                   else None)\<close>
+
+lemma "erzeuge_beispiel
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    [Handlungsabsicht partiell_guter_charakter, Handlungsabsicht partiell_schlechter_charakter]
+    maxime_altruistischer_fortschritt
+= Some
+  \<lparr>
+   bsp_erfuellte_maxime = True,
+   bsp_erlaubte_handlungen = [Handlungsabsicht partiell_guter_charakter],
+   bsp_verbotene_handlungen = [Handlungsabsicht partiell_schlechter_charakter],
+   bsp_uneindeutige_handlungen = []
+  \<rparr>"
+  by beispiel
 end
