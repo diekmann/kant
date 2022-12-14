@@ -216,17 +216,29 @@ lemma the_elem_singleton_swap_none:
   by (metis swap_nothing)
   
 
+lemma set_swap_image_pullout:
+  "p1 \<in> A \<Longrightarrow>
+   p2 \<in> A \<Longrightarrow>
+    {a \<in> A. swap p1 p2 besitz a = b} = swap p1 p2 id ` {a \<in> A. besitz a = b}"
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  apply(safe)
+    apply(rule swap_cases)
+      apply(rule_tac x=p2 in exI, simp add: swap_a swap_b; fail)
+     apply(rule_tac x=p1 in exI, simp add: swap_a swap_b; fail)
+    apply(rule_tac x=a in exI, simp add: swap_a swap_b swap_nothing; fail)
+   apply(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
+  by (simp add: swap_fun_swap_id)
+
 lemma is_singleton_swap:
   \<open>p1 \<in> set ps \<Longrightarrow>
    p2 \<in> set ps \<Longrightarrow>
     is_singleton {pa \<in> set ps. swap p1 p2 besitz pa = p}
     \<longleftrightarrow> is_singleton {pa \<in> set ps. besitz pa = p}\<close>
-  apply(simp add: is_singleton_def)
-  apply(simp add: singleton_set_to_all)
-  apply(safe)
-   (*apply(rule_tac x="swap p1 p2 id x" in exI)*)
-   apply (metis swap_a swap_b swap_nothing)+ (*slow*)
-  done
+  apply(simp add: set_swap_image_pullout)
+  apply(rule is_singleton_bij_image)
+  by (simp add: involuntory_imp_bij swap_fun_swap_id)
+ 
 
 lemma if_swap_person_help_same: \<open>p1 = a \<Longrightarrow>
        p2 = a \<Longrightarrow>
@@ -280,7 +292,7 @@ lemma the_single_elem_None_swap:
   apply(simp add: the_single_elem split: if_split_asm)
   apply(simp add: is_singleton_def)
   apply(safe)
-  apply(simp add: singleton_set_to_all2)
+  apply(simp add: singleton_set_to_all2 )
   by (metis swap_a swap_b swap_nothing)
 
 lemma the_single_elem_Some_Some_swap:

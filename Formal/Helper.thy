@@ -56,6 +56,9 @@ lemma singleton_set_to_all: "{a \<in> A. P a} = {b} \<longleftrightarrow> (\<for
 lemma singleton_set_to_all2: "A = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A) = (a = b))"
   by fastforce
 
+lemma is_singleton_bij_image: "bij f \<Longrightarrow> is_singleton (f ` A) = is_singleton A"
+  by (metis bij_betw_same_card bij_betw_subset is_singleton_altdef subset_UNIV)
+
 
 
 text\<open>For some reason, I like \<^const>\<open>List.map_filter\<close>. But standard library support is poor.\<close>
