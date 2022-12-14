@@ -809,6 +809,7 @@ subsection\<open>Ungültige Maxime\<close>
     apply(code_simp)
     done
 
+
 subsection\<open>Uneindeutige Handlungen\<close>
 text\<open>Folgende Funktion ist inspiriert durch das \<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>.\<close>
 fun collatz:: \<open>int \<Rightarrow> int\<close> where
