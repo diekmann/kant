@@ -224,7 +224,8 @@ lemma is_singleton_swap:
   apply(simp add: is_singleton_def)
   apply(simp add: singleton_set_to_all)
   apply(safe)
-   apply (metis swap_a swap_b swap_nothing)+
+   (*apply(rule_tac x="swap p1 p2 id x" in exI)*)
+   apply (metis swap_a swap_b swap_nothing)+ (*slow*)
   done
 
 lemma if_swap_person_help_same: \<open>p1 = a \<Longrightarrow>
@@ -285,7 +286,8 @@ lemma the_single_elem_None_swap:
 lemma the_single_elem_Some_Some_swap:
   \<open>the_single_elem {p. x p = a} = Some s1 \<Longrightarrow>
       the_single_elem {p. swap s1 p2 x p = a} = Some s2 \<Longrightarrow> p2 = s2\<close>
-  by (metis (no_types, lifting) is_singleton_the_elem mem_Collect_eq option.inject option.simps(3) singleton_iff swap_b the_single_elem)
+  apply(simp add: the_single_elem is_singleton_the_elem split: if_split_asm)
+  by (metis empty_iff insert_iff mem_Collect_eq swap_a swap_nothing)
 lemma the_single_elem_Some_ex_swap:
   \<open>the_single_elem {p. x p = a} = Some x2 \<Longrightarrow> \<exists>y. the_single_elem {p. swap p1 p2 x p = a} = Some y\<close>
   apply(case_tac \<open>the_single_elem {p. swap p1 p2 x p = a}\<close>)
