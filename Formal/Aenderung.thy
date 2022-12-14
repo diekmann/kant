@@ -523,12 +523,19 @@ lemma aenderung_ausfuehren_abmachung_to_aenderung_induction_helper:
   subgoal
     apply(simp add: abmachung_dom_def)
     by blast
-  apply(subgoal_tac \<open>aenderung_ausfuehren (abmachung_to_aenderung_list ps (abmachung(pa := 0))) welt p =
-           welt p + (abmachung(pa := 0)) p\<close>)
-   prefer 2
-   apply blast
-  by (metis (no_types, lifting) abmachung_to_aenderung_list_not_in_ps add.right_neutral fun_upd_other fun_upd_same)
-  
+(*thank you sledgehammer isar proofs*)
+proof -
+  fix pa :: 'person and psa :: "'person list" and abmachunga :: "'person \<Rightarrow> 'etwas" and welta :: "'person \<Rightarrow> 'etwas"
+  assume a1: "pa \<notin> set psa \<and> distinct psa"
+  assume a2: "abmachung_dom (abmachunga(pa := 0)) \<subseteq> set psa"
+  assume "\<And>abmachung welt. abmachung_dom abmachung \<subseteq> set psa \<Longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachung) welt p = (welt p::'etwas) + abmachung p"
+  then have f3: "\<And>f. f p + (abmachunga(pa := 0)) p = aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) f p"
+    using a2 a1 by (metis (full_types) abmachung_to_aenderung_list_not_in_ps)
+  then have "pa = p \<longrightarrow> (0 < abmachunga pa \<longrightarrow> abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p) \<and> (\<not> 0 < abmachunga pa \<longrightarrow> (abmachunga pa = 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) welta p = welta p + abmachunga p) \<and> (abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p))"
+    by force
+  then show "(0 < abmachunga pa \<longrightarrow> abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p) \<and> (\<not> 0 < abmachunga pa \<longrightarrow> (abmachunga pa = 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) welta p = welta p + abmachunga p) \<and> (abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p))"
+    using f3 by (metis fun_upd_other)
+qed
 
 
 lemma aenderung_ausfuehren_abmachung_to_aenderung:
