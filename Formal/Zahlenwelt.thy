@@ -82,8 +82,7 @@ lemma case_filter_empty_some_helper2:
   apply(simp)
   apply(cases \<open>filter P ps\<close>)
    apply(simp)
-  apply(simp)
-  by (metis list.case_eq_if option.distinct(1) option.inject)
+  by(simp split: list.split)
 
 lemma case_filter_empty_some_helper3:
   \<open>(case filter P ps of [] \<Rightarrow> None | [opfer] \<Rightarrow> Some opfer
@@ -91,8 +90,7 @@ lemma case_filter_empty_some_helper3:
            Some opfer
     \<longleftrightarrow>
     filter P ps = [opfer]\<close>
-  apply(simp add: list.case_eq_if)
-  by (metis list.exhaust_sel list.sel(1) list.sel(3))
+  by(simp split: list.split)
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
   \<open>opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = Some opfer
@@ -292,7 +290,7 @@ lemma the_single_elem_None_swap:
   apply(simp add: the_single_elem split: if_split_asm)
   apply(simp add: is_singleton_def)
   apply(safe)
-  apply(simp add: singleton_set_to_all2 )
+  apply(simp add: singleton_set_to_all2)
   by (metis swap_a swap_b swap_nothing)
 
 lemma the_single_elem_Some_Some_swap:

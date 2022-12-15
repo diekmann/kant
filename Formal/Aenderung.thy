@@ -344,7 +344,7 @@ shows \<open>to_abmachung as = fold (\<lambda>a acc. \<lbrakk>acc(betroffen a +=
 
 lemma to_abmachung_List_map_filter_simp_call:
   fixes f :: \<open>'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option\<close>
-  assumes valid_f: \<open>\<forall>p. (case f p of Some a \<Rightarrow> betroffen a = p | None \<Rightarrow> True)\<close>
+  assumes valid_f: \<open>\<And>p a. f p = Some a \<Longrightarrow> betroffen a = p\<close>
   shows
   \<open>p \<in> set as \<Longrightarrow> distinct as \<Longrightarrow>
    to_abmachung (List.map_filter f as) p =
@@ -354,7 +354,7 @@ proof(induction \<open>as\<close>)
   then show \<open>?case\<close> by simp
 next
   case (Cons a as)
-  from valid_f have filter_not_in_set:
+  have filter_not_in_set:
     \<open>p \<notin> set ps \<Longrightarrow> to_abmachung (List.map_filter f ps) p = 0\<close> for p ps
     apply(induction \<open>ps\<close>)
     apply(simp add: List.map_filter_simps)
@@ -362,7 +362,7 @@ next
     apply(clarsimp, rename_tac a ps a2)
     apply(subgoal_tac \<open>betroffen a2 = a\<close>)
      apply simp
-    by (metis (mono_tags, lifting) option.simps(5))
+    by(auto dest: valid_f)
 
   from Cons show \<open>?case\<close>
     apply(simp add: List.map_filter_simps)
@@ -375,12 +375,12 @@ next
      apply(case_tac \<open>f a\<close>)
       apply(simp add: filter_not_in_set; fail)
     apply(simp add: filter_not_in_set)
-    by (metis (mono_tags, lifting) option.simps(5) valid_f)
+    by(auto dest: valid_f)
 qed
 
 lemma to_abmachung_List_map_filter_enum_simp_call:
 fixes f :: \<open>'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option\<close>
-  assumes valid_f: \<open>\<forall>p. (case f p of Some a \<Rightarrow> betroffen a = p | None \<Rightarrow> True)\<close>
+  assumes valid_f: \<open>\<And>p a. f p = Some a \<Longrightarrow> betroffen a = p\<close>
   shows
   \<open>to_abmachung (List.map_filter f Enum.enum) p =
     (case f p of Some a \<Rightarrow> to_abmachung [a] p | None \<Rightarrow> 0)\<close>
@@ -745,7 +745,7 @@ lemma to_abmachung_delta_num_fun_simp_call:
   shows \<open>to_abmachung (delta_num_fun (Handlung vor nach)) p = nach p - vor p\<close>
   apply(simp)
   apply(subst to_abmachung_List_map_filter_enum_simp_call)
-  subgoal by(simp add: delta_num_def)
+  subgoal by(auto simp add: delta_num_def split: if_split_asm)
   by(simp add: delta_num_def)
 (*>*)
 

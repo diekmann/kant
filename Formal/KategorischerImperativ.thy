@@ -654,7 +654,7 @@ lemma MaximeConj:
   \<open>ex_erfuellbare_instanz (MaximeConj m1 m2) welt ha \<Longrightarrow>
     kategorischer_imperativ_auf ha welt (MaximeConj m1 m2) \<longleftrightarrow>
     kategorischer_imperativ_auf ha welt m1 \<and> kategorischer_imperativ_auf ha welt m2\<close>
-  using MaximeConjI MaximeConjD by metis
+  by(auto intro: MaximeConjI dest: MaximeConjD)
 
 lemma kategorischer_imperativ_auf_MaximeConj_comm:
   \<open>kategorischer_imperativ_auf ha welt (MaximeConj m1 m2)
@@ -686,7 +686,7 @@ lemma kategorischer_imperativ_auf_MaximeDisjI:
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)\<close>
   apply(simp add: ex_erfuellbare_instanz_def kategorischer_imperativ_auf_def okay_MaximeDisj)
   apply(erule disjE)
-  apply (metis moralisch_MaximeDisjI)+
+   apply(auto intro: moralisch_MaximeDisjI)
   done
 text\<open>Die Rückrichtung gilt leider nicht.\<close>
 
@@ -717,10 +717,8 @@ lemma kategorischer_imperativ_auf_MaximeDisjI2:
   kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)\<close>
   apply(simp add: ex_erfuellbare_instanz_def kategorischer_imperativ_auf_def okay_MaximeDisj)
   apply(elim disjE)
-    apply (metis moralisch_MaximeDisjI)
-   apply (metis moralisch_MaximeDisjI)
-   apply blast
-  done
+  by(auto intro: moralisch_MaximeDisjI)
+
 text\<open>Die vorherige Introduction Rule lässt sich wie folgt erklären.
 Mindestens eine der \<^const>\<open>ex_erfuellbare_instanz\<close>Fälle muss immer zutreffen:\<close>
 lemma

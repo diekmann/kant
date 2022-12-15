@@ -178,7 +178,13 @@ lemma wohlgeformte_handlungsabsicht_wpsid_simp:
    apply(simp)
    apply (metis ausfuehrbar.simps)
   apply(simp add: ausfuehrbar.simps)
-  by (metis option.simps(5))
+  apply(clarsimp)
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p1 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=p2 in allE)
+  apply(simp split: option.split_asm)
+  done
 
 lemma wohlgeformte_handlungsabsicht_ifI:
   "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h1) \<Longrightarrow>
