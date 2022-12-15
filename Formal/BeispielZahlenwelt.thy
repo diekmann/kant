@@ -317,9 +317,13 @@ lemma \<open>erzeuge_beispiel
   Some
     \<lparr>
      bsp_erfuellte_maxime = False,
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
+     bsp_erlaubte_handlungen = [
+        Handlungsabsicht (erschaffen 5),
+        Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen],
-     bsp_uneindeutige_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
+     bsp_uneindeutige_handlungen = [
+        Handlungsabsicht (stehlen4 5 10),
+        Handlungsabsicht reset]\<rparr>\<close>
   by beispiel
 
 
@@ -369,8 +373,13 @@ lemma \<open>erzeuge_beispiel
   Some
     \<lparr>
      bsp_erfuellte_maxime = True,
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
-     bsp_verbotene_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+     bsp_erlaubte_handlungen = [
+        Handlungsabsicht (erschaffen 5),
+        Handlungsabsicht unmoeglich],
+     bsp_verbotene_handlungen = [
+        Handlungsabsicht (stehlen4 5 10),
+        Handlungsabsicht reset,
+        Handlungsabsicht alles_kaputt_machen],
      bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel
 text\<open>Das ist ein sehr schönes Beispiel.\<close>
@@ -647,12 +656,15 @@ subsection\<open>Maxime für strikten individuellen Fortschritt\<close>
 text\<open>In der Maxime \<^const>\<open>individueller_fortschritt\<close> hatten wir
    \<^term>\<open>(meins p nach) \<ge> (meins p vor)\<close>.
   Was wenn wir nun echten Fortschritt fordern:
-   \<^term>\<open>(meins p nach) > (meins p vor)\<close>.\<close>
+   \<^term>\<open>(meins p nach) > (meins p vor)\<close>?\<close>
 
 fun individueller_strikter_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung \<Rightarrow> bool\<close> where
   \<open>individueller_strikter_fortschritt p (Handlung vor nach) \<longleftrightarrow> (meins p vor) < (meins p nach)\<close>
 
-text\<open>TODO: erklaeren. Erfuellt nicht kategorischen imperativ und alles ist verboten\<close>
+text\<open>Folgendes ernüchterndes Beispiel zeigt,
+die Maxime \<^const>\<open>individueller_strikter_fortschritt\<close> erfüllt nicht den kategorischen Imperativ.
+Entweder erlaubt die Maxime keine Assuage über eine Handlungsabsicht,
+oder die Handlungsabsicht ist verboten.\<close>
 lemma \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
@@ -661,8 +673,14 @@ lemma \<open>erzeuge_beispiel
     \<lparr>
      bsp_erfuellte_maxime = False,
      bsp_erlaubte_handlungen = [],
-     bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen, Handlungsabsicht unmoeglich],
-     bsp_uneindeutige_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
+     bsp_verbotene_handlungen = [
+        Handlungsabsicht alles_kaputt_machen,
+        Handlungsabsicht unmoeglich],
+     bsp_uneindeutige_handlungen = [
+        Handlungsabsicht (erschaffen 5),
+        Handlungsabsicht (stehlen4 5 10),
+        Handlungsabsicht reset]
+    \<rparr>\<close>
   by beispiel
 
 text\<open>In keiner Welt ist die Handlung \<^const>\<open>erschaffen\<close> nun \<^const>\<open>moralisch\<close>:\<close>
@@ -672,40 +690,39 @@ lemma \<open>\<not> moralisch welt
   by(auto simp add: maxime_zahlenfortschritt_def moralisch_simp handeln_def nachher_handeln.simps)
 
 text\<open> Der Grund ist, dass der Rest der Bevölkerung keine \<^emph>\<open>strikte\<close> Erhöhung des
-  eigenen Wohlstands erlebt.
-  Effektiv führt diese Maxime zu einem Gesetz, welches es einem Individuum nicht erlaubt
-  mehr Besitz zu erschaffen, obwohl niemand dadurch einen Nachteil hat.
-  Diese Maxime kann meiner Meinung nach nicht gewollt sein.
-  
-  
-  Beispielsweise ist \<^const>\<open>Bob\<close> das Opfer wenn \<^const>\<open>Alice\<close> sich
-  5 Wohlstand erschafft, aber \<^const>\<open>Bob\<close>'s Wohlstand sich nicht erhöht:\<close>
+eigenen Wohlstands erlebt.
+Effektiv führt diese Maxime zu einem Gesetz, welches es einem Individuum nicht erlaubt
+mehr Besitz zu erschaffen, obwohl niemand dadurch einen Nachteil hat.
+Diese Maxime kann meiner Meinung nach nicht gewollt sein.
+
+Beispielsweise ist \<^const>\<open>Bob\<close> das Opfer wenn \<^const>\<open>Alice\<close> sich 5 Wohlstand erschafft,
+aber \<^const>\<open>Bob\<close>'s Wohlstand sich dabei nicht erhöht:\<close>
 lemma
   \<open>\<lparr>
       dbg_opfer = Bob, dbg_taeter = Alice,
-      dbg_handlung = Handlung [(Alice, 5), (Bob, 10), (Carol, -3)] [(Alice, 10), (Bob, 10), (Carol, -3)]
+      dbg_handlung = handeln Alice initialwelt (Handlungsabsicht (erschaffen 5))
      \<rparr>
-          \<in> debug_maxime show_zahlenwelt initialwelt
+          \<in> debug_maxime id initialwelt
             (Maxime (\<lambda>ich. individueller_strikter_fortschritt ich)) (Handlungsabsicht (erschaffen 5)) \<close>
   by eval
 
 
 subsection\<open>Maxime für globales striktes Optimum\<close>
 text\<open>Wir bauen nun eine Maxime, die das Individuum vernachlässigt und nur nach dem
-  globalen Optimum strebt:\<close>
+globalen Optimum strebt:\<close>
 fun globaler_strikter_fortschritt :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close> where
   \<open>globaler_strikter_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) < (gesamtbesitz nach)\<close>
 
 text\<open>Die Maxime ignoriert das \<^term>\<open>ich :: person\<close> komplett.
   
-  Nun ist es \<^const>\<open>Alice\<close> wieder erlaubt, Wohlstand für sich selbst zu erzeugen,
-  da sich dadurch auch der Gesamtwohlstand erhöht:\<close>
+Nun ist es \<^const>\<open>Alice\<close> wieder erlaubt, Wohlstand für sich selbst zu erzeugen,
+da sich dadurch auch der Gesamtwohlstand erhöht:\<close>
 lemma \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (Handlungsabsicht (erschaffen 5))\<close>
   by(eval)    
 
 text\<open>Allerdings ist auch diese Maxime auch sehr grausam, da sie Untätigkeit verbietet:\<close>
-lemma \<open>\<not>moralisch initialwelt
+lemma \<open>\<not> moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (Handlungsabsicht (erschaffen 0))\<close>
   by(eval)
 
@@ -716,7 +733,14 @@ lemma \<open>moralisch initialwelt
   by(eval)
 
 
-text\<open>TODO: erklaeren.\<close>
+text\<open>Folgendes Beispiel zeigt, dass die Maxime \<^const>\<open>globaler_strikter_fortschritt\<close>
+den kategorischen Imperativ erfüllen kann.
+Die Handlungsabsichten sind fast intuitiv in erlaubt und verboten eingeordnet.
+  \<^item> \<^term>\<open>erschaffen 5\<close> ist erlaubt.
+  \<^item> \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
+    Allerdings ist auch \<^const>\<open>unmoeglich\<close> verboten, da die Maxime Untätigkeit verbietet.
+    Dieser letzte Fall ist unschön.
+\<close>
 lemma \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
@@ -736,7 +760,7 @@ lemma \<open>erzeuge_beispiel
 
 
 subsection\<open>Maxime für globales Optimum\<close>
-text\<open>Wir können die Maxime für globalen Fortschritt etwas lockern:\<close>
+text\<open>Wir können die Maxime für globalen Fortschritt etwas lockern.\<close>
 fun globaler_fortschritt :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close> where
   \<open>globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) \<le> (gesamtbesitz nach)\<close>
 
@@ -745,25 +769,11 @@ lemma \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (erschaffen 0))\<close>
   by(eval)
 
-
 (*<*)
 lemma globaler_fortschritt_kommutiert:
   \<open>wpsm_kommutiert (Maxime (\<lambda>ich::person. globaler_fortschritt)) zahlenwps welt\<close>
   by(simp add: wpsm_kommutiert_def gesamtbesitz_swap zahlenwps_sym handeln_def nachher_handeln.simps)
 (*>*)
-
-theorem 
-  \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt
-     (Maxime (\<lambda>ich. globaler_fortschritt)) ha p \<Longrightarrow>
- wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::person. globaler_fortschritt))\<close>
-  apply(erule globale_maxime_katimp)
-      apply(cases \<open>welt\<close>, cases \<open>ha\<close>, simp add: ist_noop_def handeln_def nachher_handeln.simps; fail)
-     apply(simp add: globaler_fortschritt_kommutiert; fail)
-    apply(simp add: zahlenwps_sym)
-   apply (simp add: zahlenwps_twice; fail)
-  by(simp; fail)
-
 
 text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
 lemma \<open>moralisch initialwelt
@@ -773,7 +783,15 @@ lemma \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen4 5 10))\<close>
   by(eval)
 
-text\<open>TODO: erklaeren.\<close>
+text\<open>Folgendes Beispiel zeigt, dass die Maxime \<^const>\<open>globaler_fortschritt\<close>
+den kategorischen Imperativ erfüllen kann.
+Die Handlungsabsichten sind meiner Meinung nach intuitiv
+(basierend auf der globalen Betrachtung der Maxime) in erlaubt und verboten eingeordnet.
+  \<^item> \<^term>\<open>erschaffen\<close> ist erlaubt.
+    Auch \<^const>\<open>stehlen4\<close> ist erlaubt, da dabei "dem Kollektiv" kein Besitz verloren geht.
+    Untätigkeit wird wieder über \<^const>\<open>unmoeglich\<close> erlaubt.
+  \<^item> \<^const>\<open>reset\<close> und \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
+\<close>
 lemma \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
@@ -791,20 +809,45 @@ lemma \<open>erzeuge_beispiel
      bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel
 
+text\<open>Auch allgemein lässt ich beweisen,
+dass diese Maxime für sehr viele Handlungsabsichten den kategorischen Imperativ erfüllt.\<close>
+theorem 
+  \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt
+     (Maxime (\<lambda>ich. globaler_fortschritt)) ha p \<Longrightarrow>
+ wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt (Maxime (\<lambda>ich::person. globaler_fortschritt))\<close>
+  apply(erule globale_maxime_katimp)
+      apply(cases \<open>welt\<close>, cases \<open>ha\<close>, simp add: ist_noop_def handeln_def nachher_handeln.simps; fail)
+     apply(simp add: globaler_fortschritt_kommutiert; fail)
+    apply(simp add: zahlenwps_sym)
+   apply (simp add: zahlenwps_twice; fail)
+  by(simp; fail)
+
+text\<open>Sollte man das Kollektiv höher stellen als das Individuum
+und damit effektiv das Recht auf Privateigentum ablehnen (was ich persönlich nicht unterstütze),
+so ist \<^const>\<open>globaler_fortschritt\<close> eine Maxime mit schönen Eigenschaften.\<close>
+
+
+
 subsection\<open>Ungültige Maxime\<close>
 text\<open>Es ist verboten, in einer Maxime eine spezielle Person hardzucoden.
-  Da dies gegen die Gleichbehandlung aller Menschen verstoßen würde.
+Technisch könnte so eine Maxime den \<^const>\<open>kategorischer_imperativ_auf\<close> erfüllen.
+Dies wollen wir aber nicht, da dies gegen die Gleichbehandlung aller Menschen verstoßen würde.
+Das Ergebnis wären verdrehte Moralbewertungen,
+welche moralische Entscheidungen ausschließlich basierend auf egoistischen Bedürfnissen
+der hardgecodeten Personen basieren.
   
-  Beispielsweise könnten wir \<^const>\<open>individueller_fortschritt\<close> nicht mehr parametrisiert verwenden,
-  sondern einfach \<^const>\<open>Alice\<close> reinschreiben:
-  \<close>
+Beispielsweise könnten wir \<^const>\<open>individueller_fortschritt\<close> nicht mehr parametrisiert verwenden,
+sondern einfach \<^const>\<open>Alice\<close> reinschreiben:\<close>
 lemma \<open>individueller_fortschritt Alice
     = (\<lambda>h. case h of Handlung vor nach \<Rightarrow> (meins Alice vor) \<le> (meins Alice nach))\<close>
   apply(simp add: fun_eq_iff)
   apply(intro allI, rename_tac h, case_tac \<open>h\<close>)
   apply(simp)
   done
-lemma \<open>\<not>wohlgeformte_maxime_auf
+
+text\<open>Solch eine Maxime ist allerdings nicht wohlgeformt.\<close>
+lemma \<open>\<not> wohlgeformte_maxime_auf
     (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
     (Maxime (\<lambda>ich. individueller_fortschritt Alice))\<close>
   apply(simp add: wohlgeformte_maxime_auf_def)
@@ -812,6 +855,8 @@ lemma \<open>\<not>wohlgeformte_maxime_auf
   apply(rule_tac x=\<open>Bob\<close> in exI)
   apply(code_simp)
   done
+
+text\<open>Sobald wir aufhören \<^const>\<open>Alice\<close> hardzucoden, wird die Maxime wohlgeformt.\<close>
 lemma \<open>wohlgeformte_maxime_auf
     (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
     (Maxime (\<lambda>ich. individueller_fortschritt ich))\<close>
@@ -819,8 +864,16 @@ lemma \<open>wohlgeformte_maxime_auf
   apply(code_simp)
   done
 
+text\<open>Unser \<^const>\<open>erzeuge_beispiel\<close> verweigert die Arbeit auf nicht-wohlgeformten Maximen.\<close>
+
 
 subsection\<open>Uneindeutige Handlungen\<close>
+text\<open>Bis jetzt haben wir den Schuldigen immer bei der Maxime gesucht,
+wenn der kategorische Imperativ nicht erfüllt war und wir somit über bestimmte Handlungsabsichten
+keine Aussage treffen konnten.
+Gibt es jedoch auch Handlungsabsichten welche vermutlich unabhängig von jeder durchdachten Maxime
+keine Bewertung im Sinne des kategorischen Imperativs erlauben?\<close>
+
 text\<open>Folgende Funktion ist inspiriert durch das \<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>.\<close>
 fun collatz:: \<open>int \<Rightarrow> int\<close> where
   \<open>collatz n = (if n mod 2 = 0 then n div 2 else 3*n + 1)\<close>
