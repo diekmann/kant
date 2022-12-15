@@ -242,9 +242,6 @@ fun individueller_fortschritt :: \<open>person \<Rightarrow> zahlenwelt handlung
 definition maxime_zahlenfortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
   \<open>maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)\<close>
 
-text\<open>Die Eigenschaft \<^const>\<open>maxime_und_handlungsabsicht_generalisieren\<close>
-wird nicht von \<^const>\<open>reset\<close> erfüllt,
-aber das nicht-wohlgeformte \<^const>\<open>stehlen_nichtwf\<close> erfüllt sie schon.\<close>
 (*<*)
 lemma mhg_maxime_zahlenfortschritt_stehlen4:
   \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 5 10)) p\<close>
@@ -255,6 +252,10 @@ lemma mhg_maxime_zahlenfortschritt_stehlen4:
   done
 (*>*)
 
+text\<open>Die Eigenschaft \<^const>\<open>maxime_und_handlungsabsicht_generalisieren\<close> wird von den meisten
+Handlungsabsichten erfüllt.
+Jedoch nicht von \<^const>\<open>reset\<close>.
+Das nicht-wohlgeformte \<^const>\<open>stehlen_nichtwf\<close> erfüllt sie allerdings schon.\<close>
 lemma \<open>ha \<in> {
     Handlungsabsicht (erschaffen 5),
     Handlungsabsicht (stehlen_nichtwf 5 Bob),
@@ -280,8 +281,9 @@ lemma
   by eval
 
 
-text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt \<^bold>\<open>nicht\<close> den \<^const>\<open>kategorischer_imperativ\<close>
-  da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
+text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt allgemein \<^bold>\<open>nicht\<close>
+den \<^const>\<open>kategorischer_imperativ\<close>,
+da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
 lemma \<open>kategorischer_imperativ_gegenbeispiel
   zahlenwps initialwelt maxime_zahlenfortschritt
   (Handlungsabsicht (stehlen4 1 10))
@@ -293,9 +295,32 @@ lemma \<open>kategorischer_imperativ_gegenbeispiel
   by(eval)
 
 (*<*)
-lemma \<open>wpsm_kommutiert (Maxime individueller_fortschritt) zahlenwps welt\<close>
-  by(simp add: handeln_def nachher_handeln.simps wpsm_kommutiert_def hlp1 hlp2 zahlenwps_sym)
+lemma \<open>wpsm_kommutiert (maxime_zahlenfortschritt) zahlenwps welt\<close>
+  by(simp add: maxime_zahlenfortschritt_def handeln_def
+               nachher_handeln.simps wpsm_kommutiert_def hlp1 hlp2 zahlenwps_sym)
 (*>*)
+
+
+text\<open>Folgendes Beispiel zeigt, dass die \<^const>\<open>maxime_zahlenfortschritt\<close> den
+kategorischen Imperativ auf unseren \<^const>\<open>handlungsabsichten\<close> nicht erfüllt
+(zu sehen an dem \<^const>\<open>False\<close> im \<^const>\<open>bsp_erfuellte_maxime\<close>.).
+Die Handlungsabsichten \<^const>\<open>stehlen4\<close> als auch \<^const>\<open>reset\<close> sind nicht mit der Maxime vereinbar.
+Für die übrigen Handlungsabsichten ist das Ergebnis aber intuitiv:
+  \<^item> \<^const>\<open>erschaffen\<close> ist erlaubt.
+  \<^item> da \<^const>\<open>unmoeglich\<close> im Nichtstuen endet, ist dies auch erlaubt.
+  \<^item> \<^const>\<open>alles_kaputt_machen\<close> ist verboten.
+\<close>
+lemma \<open>erzeuge_beispiel
+    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    handlungsabsichten
+    maxime_zahlenfortschritt =
+  Some
+    \<lparr>
+     bsp_erfuellte_maxime = False,
+     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
+     bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen],
+     bsp_uneindeutige_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
+  by beispiel
 
 
 subsubsection\<open>Einzelbeispiele\<close>
@@ -321,38 +346,21 @@ lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (s
 
 
 
-
-text\<open>TODO: erklaeren\<close>
-  (*bsp_erfuellte_maxime = None. Aber gleiche handlungen erlaubt und verboten*)
-lemma \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-    handlungsabsichten
-    (Maxime individueller_fortschritt) =
-  Some
-    \<lparr>
-     bsp_erfuellte_maxime = False,
-     bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5), Handlungsabsicht unmoeglich],
-     bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen],
-     bsp_uneindeutige_handlungen = [Handlungsabsicht (stehlen4 5 10), Handlungsabsicht reset]\<rparr>\<close>
-  by beispiel
-
-
-
-
 subsection\<open>Maxime für allgemeinen Fortschritt\<close>
-text\<open>Allerdings können wir die Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
-  für jeden fordern. Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
+text\<open>Wir können die vorherige Maxime generalisieren, indem wir \<^const>\<open>individueller_fortschritt\<close>
+für jeden fordern.
+Effektiv wird dabei das \<^term>\<open>ich::person\<close> ignoriert.\<close>
 
 definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxime\<close> where
   \<open>maxime_altruistischer_fortschritt \<equiv> Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
 
 text\<open>Folgendes Beispiel zeigt, dass die \<^const>\<open>maxime_altruistischer_fortschritt\<close>
-  den kategorischen Imperativ (für diese \<^const>\<open>initialwelt\<close> und \<^const>\<open>handlungsabsichten\<close>)
-  erfüllt; zu sehen an dem \<^const>\<open>Some\<close> Term im \<^const>\<open>bsp_erfuellte_maxime\<close>.
+den kategorischen Imperativ (für diese \<^const>\<open>initialwelt\<close> und \<^const>\<open>handlungsabsichten\<close>)
+erfüllt; zu sehen an dem \<^const>\<open>True\<close> im \<^const>\<open>bsp_erfuellte_maxime\<close>.
 
-  Die Handlungsabsichten werden eingeordnet wie erwartet:
-   \<^const>\<open>erschaffen\<close> ist gut,
-   \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist  schlecht.
+Die Handlungsabsichten werden eingeordnet wie erwartet:
+  \<^item> \<^const>\<open>erschaffen\<close> ist gut, \<^const>\<open>unmoeglich\<close> (bedeutet: Nichtstun) ist auch okay.
+  \<^item> \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist schlecht.
   \<close>
 lemma \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
