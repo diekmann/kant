@@ -186,6 +186,11 @@ lemma nicht_ausfuehrbar_nachher_handeln:
 
 subsection\<open>Interpretation: Gesinnungsethik vs. Verantwortungethik \label{sec:gesinnungsverantwortungsethik}\<close>
 text\<open>
+Nur basierend auf unserem Modell einer \<^const>\<open>Handlung\<close> und \<^const>\<open>Handlungsabsicht\<close> können
+wir bereits erste Aussagen über moralische Bewertungen treffen.
+
+
+
 Sei eine Ethik eine Funktion, welche einem beliebigen \<^typ>\<open>'\<alpha>\<close> eine
 Bewertung Gut = \<^const>\<open>True\<close>, Schlecht = \<^const>\<open>False\<close> zuordnet.
 
@@ -219,15 +224,16 @@ genau dann wenn für jede Handlungsabsicht, die
 Gesinnungsethik die Handlungsabsicht genau so bewertet,
 wie die Verantwortungsethik die Handlungsabsicht bewerten würde,
 wenn die die Handlungsabsicht in jeder möglichen Welt und
-als jede mögliche handelnde Person tatsächlich ausführt wird und die Folgen betrachtet werden:
+als jede mögliche handelnde Person tatsächlich ausgeführt wird und die Folgen betrachtet werden:
 \<close>
 
 definition gesinnungsethik_verantwortungsethik_konsistent
-  :: \<open>(('person, 'welt) handlungsabsicht \<Rightarrow> bool) \<Rightarrow> ('welt handlung \<Rightarrow> bool) \<Rightarrow> bool\<close> where
-\<open>gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
-  \<forall>handlungsabsicht.
-    gesinnungsethik handlungsabsicht \<longleftrightarrow>
-      (\<forall>person welt. verantwortungsethik (handeln person welt handlungsabsicht))\<close>
+  :: \<open>(('person, 'welt) handlungsabsicht \<Rightarrow> bool) \<Rightarrow> ('welt handlung \<Rightarrow> bool) \<Rightarrow> bool\<close>
+where
+  \<open>gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
+    \<forall>handlungsabsicht.
+      gesinnungsethik handlungsabsicht \<longleftrightarrow>
+        (\<forall>person welt. verantwortungsethik (handeln person welt handlungsabsicht))\<close>
 
 
 text\<open>Ich habe aktuell kein Beispiel für eine Gesinnungsethik
