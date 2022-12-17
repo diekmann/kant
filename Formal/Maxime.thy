@@ -46,6 +46,19 @@ Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'welt h
 die nur durch ihre Folgen gegeben ist.
 Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'welt) handlungsabsicht\<close>.
 
+>>Zweifellos hat Immanuel Kant eine Art von Gesinnungsethik vertreten<<
+\<^url>\<open>https://de.wikipedia.org/wiki/Gesinnungsethik#Gesinnungsethik_bei_Kant\<close>.
+Wie wir bereits im Abschnitt \ref{sec:gesinnungsverantwortungsethik} gesehen haben,
+sollte eine Maxime demnach eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> und
+keine \<^typ>\<open>'welt handlung\<close> betrachten.
+Dennoch haben wir uns für unsere \<^emph>\<open>extensionale\<close> Interpretation für
+eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> entschieden.
+Und auch wenn wir das Zitat der
+\<^url>\<open>https://de.wikipedia.org/w/index.php?title=Gesinnungsethik&oldid=218409490#Gesinnungsethik_bei_Kant\<close>
+weiterlesen, sehen wir, dass unser Modell zumindest nicht komplett inkonsistent ist:
+>>Zweifellos hat Immanuel Kant eine Art von Gesinnungsethik vertreten,
+die allerdings nicht im Gegensatz zu einer Verantwortungsethik,
+sondern allenfalls zu einer bloßen „Erfolgsethik“ steht.<<
 
 Kant unterscheidet unter Anderem
 "zwischen >>apriorischen<< und >>empirischen<< Urteilen" \cite{russellphi}.
