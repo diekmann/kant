@@ -11,7 +11,7 @@ Eine Handlung ist genau dann moralisch richtig,
 wenn sie den aggregierten Gesamtnutzen,
 d.h. die Summe des Wohlergehens aller Betroffenen, maximiert wird.\<close>
 
-type_synonym 'world glueck_messen = \<open>'world handlung \<Rightarrow> ereal\<close>
+type_synonym 'welt glueck_messen = \<open>'welt handlung \<Rightarrow> ereal\<close>
 
 text\<open>Wir messen Glück im Typen \<^typ>\<open>ereal\<close>, also reelle Zahlen mit \<^term>\<open>\<infinity>::ereal\<close>
 und \<^term>\<open>-\<infinity>::ereal\<close>, so dass auch "den höchsten Preis zahlen" modelliert werden kann.\<close>
@@ -26,7 +26,7 @@ lemma \<open>(\<lambda>h::ereal handlung. case h of Handlung vor nach \<Rightarr
 
 text\<open>Eine Handlung ist genau dann moralisch richtig,
 wenn die Gesamtbilanz einen positiven Nutzen aufweist.\<close>
-definition moralisch_richtig :: \<open>'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool\<close> where
+definition moralisch_richtig :: \<open>'welt glueck_messen \<Rightarrow> 'welt handlung \<Rightarrow> bool\<close> where
   \<open>moralisch_richtig glueck_messen handlung \<equiv> (glueck_messen handlung) \<ge> 0\<close>
 
 subsection\<open>Goldene Regel und Utilitarismus im Einklang \label{sec:golregelutilkonsistent}\<close>
@@ -41,13 +41,13 @@ in die Verantwortungsethik des Utilitarismus übersetzen lässt.
 
 text\<open>Wir modellieren die goldene Regel als Gesinnungsethik.\<close>
 definition goldene_regel_als_gesinnungsethik
-  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) maxime \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close>
 where
   \<open>goldene_regel_als_gesinnungsethik maxime handlungsabsicht \<equiv>
     \<forall>welt. moralisch welt maxime handlungsabsicht\<close>
 
 definition utilitarismus_als_verantwortungsethik
-  :: \<open>'world glueck_messen \<Rightarrow> 'world handlung \<Rightarrow> bool\<close>
+  :: \<open>'welt glueck_messen \<Rightarrow> 'welt handlung \<Rightarrow> bool\<close>
 where
   \<open>utilitarismus_als_verantwortungsethik glueck_messen handlung \<equiv>
     moralisch_richtig glueck_messen handlung\<close>
@@ -65,15 +65,15 @@ fordern wir einfach, dass die Maxime für aller Personen erfüllt sein muss.\<cl
 und erklaeren! Warum \<forall>
 Macht eine maxime unabhängig von der person*)
 (*TODO: upstream nach Maxime und katImp beweis!*)
-fun maximeNeutralisieren :: \<open>('person, 'world) maxime \<Rightarrow> ('world handlung \<Rightarrow> bool)\<close> where
+fun maximeNeutralisieren :: \<open>('person, 'welt) maxime \<Rightarrow> ('welt handlung \<Rightarrow> bool)\<close> where
   \<open>maximeNeutralisieren (Maxime m) = (\<lambda>welt. \<forall>p::'person. m p welt)\<close>
 
 
 text\<open>
-Nun übersetzen wir eine Maxime in die \<^typ>\<open>'world glueck_messen\<close> Funktion des Utilitarismus.
+Nun übersetzen wir eine Maxime in die \<^typ>\<open>'welt glueck_messen\<close> Funktion des Utilitarismus.
 Der Trick: eine verletzte Maxime wird als unendliches Leid übersetzt.\<close>
 definition maxime_als_nutzenkalkuel
-  :: \<open>('person, 'world) maxime \<Rightarrow> 'world glueck_messen\<close>
+  :: \<open>('person, 'welt) maxime \<Rightarrow> 'welt glueck_messen\<close>
 where
   \<open>maxime_als_nutzenkalkuel maxime \<equiv>
     (\<lambda>welt. case (maximeNeutralisieren maxime) welt
@@ -116,7 +116,7 @@ dann funktioniert das auch:
 
 
 fun maxime_als_summe_wohlergehen
-  :: \<open>('person, 'world) maxime \<Rightarrow> 'world glueck_messen\<close>
+  :: \<open>('person, 'welt) maxime \<Rightarrow> 'welt glueck_messen\<close>
 where
   \<open>maxime_als_summe_wohlergehen (Maxime m) =
     (\<lambda>welt. \<Sum>p\<in>bevoelkerung. (case m p welt
@@ -198,7 +198,7 @@ lemma helper_wohlergehen_sum_cases_iff:
 (*>*)
 
 theorem
-  fixes maxime :: \<open>('person, 'world) maxime\<close>
+  fixes maxime :: \<open>('person, 'welt) maxime\<close>
   assumes \<open>finite (bevoelkerung:: 'person set)\<close>
   shows 
     \<open>gesinnungsethik_verantwortungsethik_konsistent
@@ -223,8 +223,8 @@ Die eben bewiesene Konsitenz von Gesinnungsethik und Verantwortungsethik zeigt,
 das unsere Grunddefinitionen bereits eine Formalisierung des Kategorischen Imperativs
 komplett im strengen Sinne Kants ausschließen.
 Dennoch finde ich unsere Interpretation bis jetzt nicht abwegig.
-Der große Trick besteht darin, dass wir eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close>
-sehr einfach in eine \<^typ>\<open>'world handlung\<close> in unserem theoretischen Modell überführen können.
+Der große Trick besteht darin, dass wir eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close>
+sehr einfach in eine \<^typ>\<open>'welt handlung\<close> in unserem theoretischen Modell überführen können.
 Die widerspricht Kants Grundannahme, dass die Folgen einer Handlungsabsicht unvorhersehbar sind.
 \<close>
 

@@ -7,10 +7,10 @@ text\<open>Gegeben eine handelnde Person und eine Maxime,
 wir wollen simulieren was für ein allgemeines Gesetz abgeleitet werden könnte.\<close>
 
 
-datatype ('person, 'world, 'a, 'b) simulation_constants = SimConsts
+datatype ('person, 'welt, 'a, 'b) simulation_constants = SimConsts
     \<open>'person\<close> \<comment> \<open>handelnde Person\<close>
-    \<open>('person, 'world) maxime\<close>
-    \<open>('world, 'a, 'b) allgemeines_gesetz_ableiten\<close>
+    \<open>('person, 'welt) maxime\<close>
+    \<open>('welt, 'a, 'b) allgemeines_gesetz_ableiten\<close>
 
     (*moeglich :: H.Handlung world -> Bool, -- brauch ich das oder geht das mit typen?*)
 
@@ -18,11 +18,11 @@ datatype ('person, 'world, 'a, 'b) simulation_constants = SimConsts
 text\<open>...\<close>
 (*<*)
 
-text\<open>Simulate one \<^typ>\<open>('person, 'world) handlungsabsicht\<close> once:\<close>
+text\<open>Simulate one \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> once:\<close>
 fun simulate_handlungsabsicht
-    :: \<open>('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
-        ('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
-        \<Rightarrow> ('world \<times> (nat, 'a, 'b) gesetz)\<close>
+    :: \<open>('person, 'welt, 'a, 'b) simulation_constants \<Rightarrow>
+        ('person, 'welt) handlungsabsicht \<Rightarrow> 'welt \<Rightarrow> (nat, 'a, 'b) gesetz
+        \<Rightarrow> ('welt \<times> (nat, 'a, 'b) gesetz)\<close>
   where
     \<open>simulate_handlungsabsicht (SimConsts person maxime aga) ha welt g =
     (let (sollensanordnung, g') = moarlisch_gesetz_ableiten person welt maxime ha aga g in
@@ -56,7 +56,7 @@ Parameter
  \<^item> Initialgesetz
 \<close>
 fun converge
-    :: \<open>('world \<Rightarrow> 'gesetz \<Rightarrow> ('world \<times> 'gesetz)) \<Rightarrow> nat \<Rightarrow> 'world \<Rightarrow> 'gesetz \<Rightarrow> ('world \<times> 'gesetz)\<close>
+    :: \<open>('welt \<Rightarrow> 'gesetz \<Rightarrow> ('welt \<times> 'gesetz)) \<Rightarrow> nat \<Rightarrow> 'welt \<Rightarrow> 'gesetz \<Rightarrow> ('welt \<times> 'gesetz)\<close>
   where
       \<open>converge _ 0         w g = (w, g)\<close>
     | \<open>converge f (Suc its) w g =
@@ -71,10 +71,10 @@ text\<open>Example: Count 32..42,
 lemma \<open>converge (\<lambda>w g. (w+1, w#g)) 10 (32::int) ([]) =
         (42, [41, 40, 39, 38, 37, 36, 35, 34, 33, 32])\<close> by eval
 
-text\<open>simulate one \<^typ>\<open>('person, 'world) handlungsabsicht\<close> a few times\<close>
+text\<open>simulate one \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> a few times\<close>
 definition simulateOne
-    :: \<open>('person, 'world, 'a, 'b) simulation_constants \<Rightarrow>
-        nat \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> (nat, 'a, 'b) gesetz
+    :: \<open>('person, 'welt, 'a, 'b) simulation_constants \<Rightarrow>
+        nat \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> 'welt \<Rightarrow> (nat, 'a, 'b) gesetz
         \<Rightarrow> (nat, 'a, 'b) gesetz\<close>
     where
     \<open>simulateOne simconsts i ha w g \<equiv>
@@ -83,7 +83,7 @@ definition simulateOne
 (*>*)
 text\<open>...
 Die Funktion \<^const>\<open>simulateOne\<close> nimmt
-eine Konfiguration \<^typ>\<open>('person, 'world, 'a, 'b) simulation_constants\<close>,
+eine Konfiguration \<^typ>\<open>('person, 'welt, 'a, 'b) simulation_constants\<close>,
 eine Anzahl an Iterationen die durchgeführt werden sollen,
 eine Handlung,
 eine Initialwelt,

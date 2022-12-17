@@ -956,7 +956,7 @@ welches eine Aussage über die Handlungsabsicht \<^const>\<open>collatzh\<close>
 Ich argumentiere, dass wir solch ein Gesetz nicht wollen, da
 
   \<^item> Würden wir nur die Auswirkung von \<^const>\<open>collatzh\<close> betrachten,
-    (also die resultierende \<^typ>\<open>'world handlung\<close>,
+    (also die resultierende \<^typ>\<open>'welt handlung\<close>,
      nicht die \<^term_type>\<open>Handlungsabsicht collatzh\<close>)
     so kann diese Auswirkung durchweg positiv sein,
     und wir möchten etwas positives nicht verbieten.

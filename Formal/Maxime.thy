@@ -14,24 +14,24 @@ Eine Maxime in diesem Modell beschreibt ob eine Handlung in einer gegebenen Welt
 
 Faktisch bruachen wir um eine Maxime zu modellieren
   \<^item> \<^typ>\<open>'person\<close>: die handelnde Person, i.e., \<^emph>\<open>ich\<close>.
-  \<^item> \<^typ>\<open>'world handlung\<close>: die zu betrachtende Handlung.
+  \<^item> \<^typ>\<open>'welt handlung\<close>: die zu betrachtende Handlung.
   \<^item> \<^typ>\<open>bool\<close>: Das Ergebnis der Betrachtung. \<^const>\<open>True\<close> = Gut; \<^const>\<open>False\<close> = Schlecht.
 
-Wir brauchen sowohl die \<^typ>\<open>'world handlung\<close> als auch die \<^typ>\<open>'person\<close> aus deren Sicht die Maxime
+Wir brauchen sowohl die \<^typ>\<open>'welt handlung\<close> als auch die \<^typ>\<open>'person\<close> aus deren Sicht die Maxime
 definiert ist,
 da es einen großen Unterschied machen kann ob ich selber handel,
 ob ich Betroffener einer fremden Handlung bin, oder nur Außenstehender.
 \<close>
-datatype ('person, 'world) maxime = Maxime \<open>'person \<Rightarrow> 'world handlung \<Rightarrow> bool\<close>
+datatype ('person, 'welt) maxime = Maxime \<open>'person \<Rightarrow> 'welt handlung \<Rightarrow> bool\<close>
                                  (*          ich    -> Auswirkung      -> gut/schlecht  *)
 
 text\<open>Auswertung einer Maxime:\<close>
-fun okay :: \<open>('person, 'world) maxime \<Rightarrow> 'person \<Rightarrow> 'world handlung \<Rightarrow> bool\<close> where
+fun okay :: \<open>('person, 'welt) maxime \<Rightarrow> 'person \<Rightarrow> 'welt handlung \<Rightarrow> bool\<close> where
   \<open>okay (Maxime m) p h = m p h\<close>
 
 
 text\<open>Beispiel\<close>
-definition maxime_mir_ist_alles_recht :: \<open>('person, 'world) maxime\<close> where
+definition maxime_mir_ist_alles_recht :: \<open>('person, 'welt) maxime\<close> where
   \<open>maxime_mir_ist_alles_recht \<equiv> Maxime (\<lambda>_ _. True)\<close>
 
 subsection\<open>Maxime in Sinne Kants?\<close>
@@ -42,14 +42,14 @@ d.h.,
 
 Wenn wir Kants kategorischen Imperativ bauen wollen, dürfen wir also nicht die Folgen einer
 Handlung betrachten, sondern nur die Absicht dahinter.
-Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'world handlung\<close>, also eine konkrete Handlung,
+Doch unsere \<^const>\<open>Maxime\<close> betrachtet eine \<^typ>\<open>'welt handlung\<close>, also eine konkrete Handlung,
 die nur durch ihre Folgen gegeben ist.
-Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungsabsicht\<close>.
+Die Maxime betrachtet keine Handlungsabsicht \<^typ>\<open>('person, 'welt) handlungsabsicht\<close>.
 
 
 Kant unterscheidet unter Anderem
 "zwischen >>apriorischen<< und >>empirischen<< Urteilen" \cite{russellphi}.
-Wenn wir uns den Typ \<^typ>\<open>'world handlung\<close> als Beobachtung der Welt \<^const>\<open>vorher\<close> und \<^const>\<open>nachher\<close> anschauen,
+Wenn wir uns den Typ \<^typ>\<open>'welt handlung\<close> als Beobachtung der Welt \<^const>\<open>vorher\<close> und \<^const>\<open>nachher\<close> anschauen,
 dann könnte man sagen, unser Moralbegriff der \<^const>\<open>Maxime\<close> sei empirisch.
 Für Kant gilt jedoch:
 "Alle Moralbegriffe [...] haben \<^emph>\<open>a priori\<close> ihren Sitz und Ursprung ausschließlich in der Vernunft" \cite{russellphi}.
@@ -82,7 +82,7 @@ text\<open>Die Goldene Regel nach \<^url>\<open>https://de.wikipedia.org/wiki/Go
   „Was du nicht willst, dass man dir tu, das füg auch keinem andern zu.“
 
 
-So wie wir behandelt werden wollen ist modelliert durch eine \<^typ>\<open>('person, 'world) maxime\<close>.
+So wie wir behandelt werden wollen ist modelliert durch eine \<^typ>\<open>('person, 'welt) maxime\<close>.
 
 Die goldene Regel testet ob eine Handlung, bzw. Handlungsabsicht moralisch ist.
 Um eine Handlung gegen eine Maxime zu testen fragen wir uns:
@@ -95,13 +95,13 @@ jedoch wird sie von Täter und Opfer grundverschieden wahrgenommen.
 definition bevoelkerung :: \<open>'person set\<close> where \<open>bevoelkerung \<equiv> UNIV\<close>
 
 definition wenn_jeder_so_handelt
-    :: \<open>'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> ('world handlung) set\<close>
+    :: \<open>'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> ('welt handlung) set\<close>
   where
     \<open>wenn_jeder_so_handelt welt handlungsabsicht \<equiv>
       (\<lambda>handelnde_person. handeln handelnde_person welt handlungsabsicht) ` bevoelkerung\<close>
 
 fun was_wenn_jeder_so_handelt_aus_sicht_von
-    :: \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
+    :: \<open>'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
   where
     \<open>was_wenn_jeder_so_handelt_aus_sicht_von welt m handlungsabsicht betroffene_person =
         (\<forall> h \<in> wenn_jeder_so_handelt welt handlungsabsicht. okay m betroffene_person h)\<close>
@@ -111,7 +111,7 @@ text\<open>Für eine gegebene Welt und eine gegebene Maxime nennen wir eine Hand
 genau dann moralisch, wenn die Handlung auch die eigene Maxime erfüllt,
 wenn die Handlung von anderen durchgeführt würde.\<close>
 definition moralisch ::
-  \<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close> where
+  \<open>'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close> where
 \<open>moralisch welt handlungsabsicht maxime \<equiv>
   \<forall>p \<in> bevoelkerung. was_wenn_jeder_so_handelt_aus_sicht_von welt handlungsabsicht maxime p\<close>
 
@@ -204,18 +204,18 @@ subsection\<open>Maximen Debugging\<close>
 text\<open>Der folgende Datentyp modelliert ein Beispiel in welcher Konstellation eine gegebene
 Maxime verletzt ist:\<close>
 
-record ('person, 'world) dbg_verletzte_maxime =
+record ('person, 'welt) dbg_verletzte_maxime =
   dbg_opfer :: \<open>'person\<close> \<comment>\<open>verletzt für; das Opfer\<close>
   dbg_taeter :: \<open>'person\<close> \<comment>\<open>handelnde Person; der Täter\<close>
-  dbg_handlung :: \<open>'world handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
+  dbg_handlung :: \<open>'welt handlung\<close> \<comment>\<open>Die verletzende Handlung\<close>
 
 text\<open>Alle Feldnamen bekommen das Präfix "dbg" für Debug um den Namensraum nicht zu verunreinigen.\<close>
     
 
 text\<open>Die folgende Funktion liefert alle Gegebenheiten welche eine Maxime verletzen:\<close>
 fun debug_maxime
-  :: \<open>('world \<Rightarrow> 'printable_world) \<Rightarrow> 'world \<Rightarrow>
-      ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht
+  :: \<open>('welt \<Rightarrow> 'printable_world) \<Rightarrow> 'welt \<Rightarrow>
+      ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) handlungsabsicht
       \<Rightarrow> (('person, 'printable_world) dbg_verletzte_maxime) set\<close>
 where
   \<open>debug_maxime print_world welt m handlungsabsicht =

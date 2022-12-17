@@ -9,7 +9,7 @@ Wir haben mit der goldenen Regel bereits definiert,
 wann für eine gegebene Welt und eine gegebene Maxime, eine Handlungsabsicht moralisch ist:
 
  \<^item> \<^term_type>\<open>moralisch :: 
-     'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
+     'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close>
 
 Effektiv testet die goldene Regel eine Handlungsabsicht.
 
@@ -19,7 +19,7 @@ sondern die Maxime selbst getestet wird.
 Sei die Welt weiterhin gegeben,
 dann müsste der kategorische Imperativ folgende Typsignatur haben:
 
-  \<^item> \<^typ>\<open>'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  \<^item> \<^typ>\<open>'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> bool\<close>
 
 
 Eine Implementierung muss dann über alle möglichen Handlungsabsichten allquantifizieren.
@@ -49,7 +49,7 @@ Wenn es eine Person gibt für die diese Handlungsabsicht moralisch ist,
 dann muss diese Handlungsabsicht auch für alle moralisch (im Sinne der goldenen Regel) sein.
 \<close>
 definition kategorischer_imperativ_auf
-  :: \<open>('person, 'world) handlungsabsicht \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) handlungsabsicht \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> bool\<close>
 where
   \<open>kategorischer_imperativ_auf ha welt m \<equiv>
      (\<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)) \<longrightarrow> moralisch welt m ha\<close>
@@ -62,13 +62,13 @@ Grenzfälle (welche keinen Rückschluss auf moralische Gesinnung lassen) auszusc
 Für alle möglichen (wohlgeformten) Handlungsabsichten muss dies nun gelten:
 \<close>
 definition kategorischer_imperativ
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> bool\<close>
 where
   \<open>kategorischer_imperativ wps welt m \<equiv>
     \<forall>ha. wohlgeformte_handlungsabsicht wps welt ha \<longrightarrow>
           kategorischer_imperativ_auf ha welt m\<close>
 
-text\<open>Damit hat \<^term_type>\<open>kategorischer_imperativ wps :: 'world \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+text\<open>Damit hat \<^term_type>\<open>kategorischer_imperativ wps :: 'welt \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> bool\<close>
 die gewünschte Typsignatur.
 
 Wir haben die interne Hilfsdefinition \<^const>\<open>kategorischer_imperativ_auf\<close> eingeführt
@@ -272,7 +272,7 @@ text\<open>Eine Maxime welche das \<^term>\<open>ich::'person\<close> ignoriert,
 also nur die Handlung global betrachtet, erfüllt den kategorischen Imperativ
 (mit einigen weiteren Annahmen).\<close>
 theorem globale_maxime_katimp:
-  fixes P :: \<open>'world handlung \<Rightarrow> bool\<close>
+  fixes P :: \<open>'welt handlung \<Rightarrow> bool\<close>
   assumes mhg: \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren wps welt (Maxime (\<lambda>ich::'person. P)) ha p\<close>
     and maxime_erlaubt_untaetigkeit: \<open>\<forall>p. ist_noop (handeln p welt ha) \<longrightarrow> okay (Maxime (\<lambda>ich::'person. P)) p (handeln p welt ha)\<close>
     and kom: \<open>wpsm_kommutiert (Maxime (\<lambda>ich::'person. P)) wps welt\<close>
@@ -330,7 +330,7 @@ value\<open>[(x,y). x \<leftarrow> xs, y \<leftarrow> ys, x \<noteq> y]\<close>
 (*>*)
 
 definition alle_moeglichen_handlungen
-  :: \<open>'world \<Rightarrow> ('person::enum, 'world) handlungsabsicht \<Rightarrow> 'world handlung list\<close>
+  :: \<open>'welt \<Rightarrow> ('person::enum, 'welt) handlungsabsicht \<Rightarrow> 'welt handlung list\<close>
 where
   \<open>alle_moeglichen_handlungen welt ha \<equiv> [handeln p welt ha. p \<leftarrow> (Enum.enum::'person list)]\<close>
 
@@ -343,18 +343,18 @@ lemma set_alle_moeglichen_handlungen:
 (*TODO: Um den Namespace nicht zu verschmutzen prefixe ich alles mit bsp_*)
 (*TODO: ich habe bsp_world entfernt. Dokumentieren, dass das immer nur fuer eine fixe world ist,
 da sonst nicht ausfuehrbar*)
-record ('person, 'world) beipiel =
+record ('person, 'welt) beipiel =
   bsp_erfuellte_maxime :: \<open>bool\<close>
-  bsp_erlaubte_handlungen :: \<open>('person, 'world) handlungsabsicht list\<close>
-  bsp_verbotene_handlungen :: \<open>('person, 'world) handlungsabsicht list\<close>
-  bsp_uneindeutige_handlungen :: \<open>('person, 'world) handlungsabsicht list\<close>
+  bsp_erlaubte_handlungen :: \<open>('person, 'welt) handlungsabsicht list\<close>
+  bsp_verbotene_handlungen :: \<open>('person, 'welt) handlungsabsicht list\<close>
+  bsp_uneindeutige_handlungen :: \<open>('person, 'welt) handlungsabsicht list\<close>
 
 
 
 definition erzeuge_beispiel
-  :: \<open>('person::enum, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow>
-      ('person, 'world) handlungsabsicht list \<Rightarrow> ('person, 'world) maxime
-      \<Rightarrow> ('person, 'world) beipiel option\<close>
+  :: \<open>('person::enum, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow>
+      ('person, 'welt) handlungsabsicht list \<Rightarrow> ('person, 'welt) maxime
+      \<Rightarrow> ('person, 'welt) beipiel option\<close>
   where
 \<open>erzeuge_beispiel wps welt has m \<equiv>
   if (\<exists>h\<in> (\<Union>ha \<in> set has. set (alle_moeglichen_handlungen welt ha)). \<not>wohlgeformte_maxime_auf h wps m)
@@ -370,11 +370,11 @@ definition erzeuge_beispiel
 
 (*<*)
 text\<open>I think the following definition leads to more efficient evaluation.
-And it allows reasoning about one \<^typ>\<open>('person, 'world) handlungsabsicht\<close> in isolation.\<close>
+And it allows reasoning about one \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> in isolation.\<close>
 definition erzeuge_beispiel_alt1
-  :: \<open>('person::enum, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow>
-      ('person, 'world) handlungsabsicht \<Rightarrow> ('person, 'world) maxime
-      \<Rightarrow> ('person, 'world) beipiel option\<close>
+  :: \<open>('person::enum, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow>
+      ('person, 'welt) handlungsabsicht \<Rightarrow> ('person, 'welt) maxime
+      \<Rightarrow> ('person, 'welt) beipiel option\<close>
   where
 \<open>erzeuge_beispiel_alt1 wps welt ha m \<equiv>
   if (\<exists>h\<in>set (alle_moeglichen_handlungen welt ha). \<not>wohlgeformte_maxime_auf h wps m)
@@ -399,7 +399,7 @@ definition erzeuge_beispiel_alt1
   )\<close>
 
 fun beispiel_merge
-  :: "('person, 'world) beipiel \<Rightarrow> ('person, 'world) beipiel \<Rightarrow> ('person, 'world) beipiel"
+  :: "('person, 'welt) beipiel \<Rightarrow> ('person, 'welt) beipiel \<Rightarrow> ('person, 'welt) beipiel"
 where
   "beispiel_merge
     \<lparr> bsp_erfuellte_maxime=t1,
@@ -436,15 +436,15 @@ lemma merge_options_distrib:
     = merge_options beispiel_merge a (merge_options beispiel_merge b c)"
   by(simp add: merge_options_def beispiel_merge_distrib split: option.split)
 
-definition erzeuge_beispiel_alt_start :: "('person, 'world) beipiel option" where
+definition erzeuge_beispiel_alt_start :: "('person, 'welt) beipiel option" where
   "erzeuge_beispiel_alt_start \<equiv> Some
     \<lparr> bsp_erfuellte_maxime=True,
       bsp_erlaubte_handlungen=[], bsp_verbotene_handlungen=[], bsp_uneindeutige_handlungen=[] \<rparr>"
 
 definition erzeuge_beispiel_alt
-  :: \<open>('person::enum, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow>
-      ('person, 'world) handlungsabsicht list \<Rightarrow> ('person, 'world) maxime
-      \<Rightarrow> ('person, 'world) beipiel option\<close>
+  :: \<open>('person::enum, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow>
+      ('person, 'welt) handlungsabsicht list \<Rightarrow> ('person, 'welt) maxime
+      \<Rightarrow> ('person, 'welt) beipiel option\<close>
   where
 \<open>erzeuge_beispiel_alt wps welt has m
   \<equiv> fold
@@ -517,8 +517,8 @@ lemma erzeuge_beispiel_alt:
   "erzeuge_beispiel = erzeuge_beispiel_alt"
   by(simp add: fun_eq_iff erzeuge_beispiel_alt_def erzeuge_beispiel_alt_helper)
 
-datatype ('person, 'world) erzeuge_beiespiel_cache = ErzeugeBeispielCache
-  (ebc_ha: "('person, 'world) handlungsabsicht")
+datatype ('person, 'welt) erzeuge_beiespiel_cache = ErzeugeBeispielCache
+  (ebc_ha: "('person, 'welt) handlungsabsicht")
   (ebc_katimp: bool)
   (ebc_moralisch: bool)
 
@@ -596,9 +596,9 @@ welche eigentlich nicht geprintet werden können.
 Allerdings ist dies vermutlich die einzige (sinnvolle, einfache) Art eine Handlungsabsicht 
 darzustellen.
 
-Es wäre einfacher, nur die Handlung (also die \<^typ>\<open>'world handlung\<close>,
+Es wäre einfacher, nur die Handlung (also die \<^typ>\<open>'welt handlung\<close>,
 nur die Welt vorher und nachher, ohne Absicht) aufzuschreiben.
-Allerdings erzeugt das ohne die Absicht (i.e. \<^typ>\<open> ('person, 'world) handlungsabsicht\<close>)
+Allerdings erzeugt das ohne die Absicht (i.e. \<^typ>\<open> ('person, 'welt) handlungsabsicht\<close>)
 sehr viel Unfug, da z.B. pathologische Grenzfälle
 (wie z.B. sich-selsbt-bestehlen, oder die-welt-die-zufällig-im-ausgangszustand-ist-resetten)
 dazu, dass diese no-op Handlungen verboten sind, da die dahinterliegende Absicht schlecht ist.
@@ -622,7 +622,7 @@ Dabei werden gezielt die pathologischen Grenzfälle ausgeklammert,
 in denen die Handlungsabsicht nicht ausführbar ist und in einer No-Op resultieren würde.\<close>
 (*TODO: in die kat imp definition folden!*)
 definition ex_erfuellbare_instanz
-  :: \<open>('person, 'world) maxime \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) maxime \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close>
 where
   \<open>ex_erfuellbare_instanz m welt ha \<equiv>
       \<exists>ich. ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)\<close>

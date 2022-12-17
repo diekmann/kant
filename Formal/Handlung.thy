@@ -2,22 +2,20 @@ theory Handlung
 imports Main
 begin
 
-(*TODO: rename 'world nach 'welt*)
-
 section\<open>Handlung\<close>
 text\<open>In diesem Abschnitt werden wir Handlungen und Handlungsabsichten modellieren.\<close>
 
 text\<open>Wir beschreiben Handlungen als ein Änderung der Welt.
-Das Modell eine Handlung ist rein auf die extern beobachtbare Änderung der Welt beschränkt.
+Das Modell einer Handlung ist rein auf die extern beobachtbare Änderung der Welt beschränkt.
 Die handelnden Person ist dabei Nebensache.
-Wir beschreiben nur vergangene bzw. hypothetische Handlungen und deren Auswirkung.
+Wir beschreiben nur vergangene bzw. hypothetische Handlungen und deren Auswirkungen.
 \<close>
-datatype 'world handlung = Handlung (vorher: \<open>'world\<close>) (nachher: \<open>'world\<close>)
+datatype 'welt handlung = Handlung (vorher: \<open>'welt\<close>) (nachher: \<open>'welt\<close>)
 
 text\<open>
 Eine Handlung ist reduziert auf die beobachtbaren Auswirkungen der Handlung.
 Die dahinterliegende Handlungsabsicht, bzw. Intention oder "Wollen" sind
-in einer \<^typ>\<open>'world handlung\<close> nicht modelliert.
+in einer \<^typ>\<open>'welt handlung\<close> nicht modelliert.
 Dies liegt daran,
 dass wir irgendwie die geistige Welt mit der physischen Welt verbinden müssen und wir daher
 am Anfang nur messbare Tatsachen betrachten können.
@@ -27,7 +25,7 @@ ist essentiell für diese Theorie.
 
 Handlungen können Leute betreffen.
 Handlungen können aus Sicht Anderer wahrgenommen werden.
-Unser Modell einer Handlung entält jedoch nur die Welt vorher und Welt nachher.
+Unser Modell einer Handlung enthält jedoch nur die Welt vorher und Welt nachher.
 So können wir handelnde Person und beobachtende Person trennen.\<close>
 
 (*<*)
@@ -38,7 +36,7 @@ lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 
 text\<open>Folgende Funktion beschreibt ob eine Handlung eine No-Op ist,
 also eine Handlung welche die Welt nicht verändert.\<close>
-definition ist_noop :: \<open>'world handlung \<Rightarrow> bool\<close> where
+definition ist_noop :: \<open>'welt handlung \<Rightarrow> bool\<close> where
   \<open>ist_noop h \<equiv> vorher h = nachher h\<close>
 
 (*<*)
@@ -56,19 +54,19 @@ Folgende Definition ist eine Handlung als Funktion gewrapped.
 Diese abstrakte Art eine Handlung darzustellen erlaubt es nun,
 die Absicht oder Intention hinter einer Handlung zu modellieren.
 \<close>
-datatype ('person, 'world) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world option\<close>
+datatype ('person, 'welt) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'welt \<Rightarrow> 'welt option\<close>
 
-text\<open>Im Vergleich zu unserer \<^typ>\<open>'world handlung\<close> sehen wir bereits am Typen,
-dass eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> nicht nur eine einfache Aussage über die
-\<^typ>\<open>'world\<close> trifft, sondern auch die Absicht der handelnden \<^typ>\<open>'person\<close> beinhaltet.
+text\<open>Im Vergleich zu unserer \<^typ>\<open>'welt handlung\<close> sehen wir bereits am Typen,
+dass eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> nicht nur eine einfache Aussage über die
+\<^typ>\<open>'welt\<close> trifft, sondern auch die Absicht der handelnden \<^typ>\<open>'person\<close> beinhaltet.
 
-Die Idee ist, dass eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> eine generische Handlungsabsicht
+Die Idee ist, dass eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> eine generische Handlungsabsicht
 modelliert. Beispielsweise \<^term>\<open>Handlungsabsicht (\<lambda>ich welt. brezen_kaufen welt ich)\<close>.
 \<close>
 
 
-text\<open>Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> gibt eine \<^typ>\<open>'world option\<close> zurück,
-anstatt einer \<^typ>\<open>'world\<close>.
+text\<open>Eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> gibt eine \<^typ>\<open>'welt option\<close> zurück,
+anstatt einer \<^typ>\<open>'welt\<close>.
 Handlungsabsichten sind damit partielle Funktionen, was modelliert,
 dass die Ausführung einer Handlungsabsicht scheitern kann.
 Beispielsweise könnte ein Dieb versuchen ein Opfer zu bestehlen;
@@ -82,28 +80,40 @@ ob die Handlungsabsicht ein gescheiterter Diebstahl war,
 oder ob die Handlungsabsicht einfach Nichtstun war.
 Dadurch dass Handlungsabsichten partiell sind, können wir unterscheiden ob die Handlung
 wie geplant ausgeführt wurde oder gescheitert ist.
-Moralisch sind Stehlen und Nichtstun sehr verschieden.\<close>
+Denn moralisch sind Stehlen und Nichtstun sehr verschieden.\<close>
 
+
+text\<open>Folgende Funktion modelliert die Ausführung einer Handlungsabsicht.\<close>
 fun nachher_handeln
-  :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world\<close>
+  :: \<open>'person \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> 'welt\<close>
 where
   \<open>nachher_handeln handelnde_person welt (Handlungsabsicht h) = 
     (case h handelnde_person welt of Some welt' \<Rightarrow> welt'
                                   | None \<Rightarrow> welt)\<close>
 
-text\<open>Die Funktion \<^const>\<open>nachher_handeln\<close> besagt, dass eine gescheiterte Handlung
+text\<open>Gegeben die \<^term_type>\<open>handelnde_person :: 'person\<close>,
+die \<^term_type>\<open>welt :: 'welt\<close> in ihrem aktuellen Zustand,
+und eine \<^term_type>\<open>ha :: ('person, 'welt) handlungsabsicht\<close>, so liefert
+\<^term_type>\<open>(nachher_handeln handelnde_person welt ha) :: 'welt\<close> die potenziell veränderte Welt zurück,
+nachdem die Handlungsabsicht ausgeführt wurde.
+
+Die Funktion \<^const>\<open>nachher_handeln\<close> besagt, dass eine gescheiterte Handlung
 die Welt nicht verändert.
 Ab diesem Punkt sind also die Handlungen "sich selbst bestehlen" und "Nichtstun"
 von außen ununterscheidbar, da beide die Welt nicht verändern.\<close>
 
+text\<open>Dank der Hilfsdefinition \<^const>\<open>nachher_handeln\<close> können wir nun "Handeln"
+allgemein definieren.
+Folgende Funktion überführt effektiv eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> in
+eine \<^typ>\<open>'welt handlung\<close>.\<close>
 definition handeln
-  :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'world handlung\<close>
+  :: \<open>'person \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> 'welt handlung\<close>
 where
   \<open>handeln handelnde_person welt ha \<equiv> Handlung welt (nachher_handeln handelnde_person welt ha)\<close>
 
 
 text\<open>Die Funktion \<^const>\<open>nachher_handeln\<close> liefert die Welt nach der Handlung.
-Die Funktion \<^const>\<open>handeln\<close> liefert eine \<^typ>\<open>'world handlung\<close>,
+Die Funktion \<^const>\<open>handeln\<close> liefert eine \<^typ>\<open>'welt handlung\<close>,
 welche die Welt vor und nach der Handlung darstellt.\<close>
 
 
@@ -122,7 +132,7 @@ text \<open>
 Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.
 Die Absicht die sich in einer Funktion verstecken kann ist schwer zu erkennen.
 Dies deckt sich ganz gut damit, dass Isabelle standardmäßig Funktionen nicht printet.
-Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> kann nicht geprinted werden!
+Eine \<^typ>\<open>('person, 'welt) handlungsabsicht\<close> kann nicht geprinted werden!
 \<close>
 
 text\<open>Da Funktionen nicht geprintet werden können, sieht \<^const>\<open>beispiel_handlungsabsicht\<close> so aus:
@@ -147,7 +157,7 @@ text\<open>Um eine gescheiterte Handlung von einer Handlung welche die Welt nich
 zu unterscheiden, sagen wir, dass eine Handlungsabsicht ausführbar ist,
 wenn die ausgeführte Handlungsabsicht nicht gescheitert ist:\<close>
 
-fun ausfuehrbar :: \<open>'person \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
+fun ausfuehrbar :: \<open>'person \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close>
 where
   \<open>ausfuehrbar p welt (Handlungsabsicht h) = (h p welt \<noteq> None)\<close>
 
@@ -188,7 +198,7 @@ Laut \<^url>\<open>https://de.wikipedia.org/wiki/Gesinnungsethik\<close> ist ein
  die Handlungen nach der Handlungsabsicht [...]  bewertet,
  und zwar ungeachtet der nach erfolgter Handlung eingetretenen Handlungsfolgen."
 
-  \<^item> Demnach ist eine Gesinnungsethik: \<^typ>\<open>('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>.
+  \<^item> Demnach ist eine Gesinnungsethik: \<^typ>\<open>('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close>.
 
 \<^smallskip>
 
@@ -196,13 +206,13 @@ Nach \<^url>\<open>https://de.wikipedia.org/wiki/Verantwortungsethik\<close> ste
 dazu im strikten Gegensatz, da die Verantwortungsethik
 "in der Bewertung des Handelns die Verantwortbarkeit der \<^emph>\<open>tatsächlichen Ergebnisse\<close> betont."
 
-  \<^item> Demnach ist eine Verantwortungsethik: \<^typ>\<open>'world handlung \<Rightarrow> bool\<close>.
+  \<^item> Demnach ist eine Verantwortungsethik: \<^typ>\<open>'welt handlung \<Rightarrow> bool\<close>.
 
 
 \<^medskip>
 
-Da \<^const>\<open>handeln\<close> eine Handlungsabsicht \<^typ>\<open>('person, 'world) handlungsabsicht\<close>
-in eine konkrete Änderung der Welt \<^typ>\<open>'world handlung\<close> überführt,
+Da \<^const>\<open>handeln\<close> eine Handlungsabsicht \<^typ>\<open>('person, 'welt) handlungsabsicht\<close>
+in eine konkrete Änderung der Welt \<^typ>\<open>'welt handlung\<close> überführt,
 können wie die beiden Ethiktypen miteinander in Verbindung setzen.
 Wir sagen, eine Gesinnungsethik und eine Verantwortungsethik sind konsistent,
 genau dann wenn für jede Handlungsabsicht, die
@@ -213,7 +223,7 @@ als jede mögliche handelnde Person tatsächlich ausführt wird und die Folgen b
 \<close>
 
 definition gesinnungsethik_verantwortungsethik_konsistent
-  :: \<open>(('person, 'world) handlungsabsicht \<Rightarrow> bool) \<Rightarrow> ('world handlung \<Rightarrow> bool) \<Rightarrow> bool\<close> where
+  :: \<open>(('person, 'welt) handlungsabsicht \<Rightarrow> bool) \<Rightarrow> ('welt handlung \<Rightarrow> bool) \<Rightarrow> bool\<close> where
 \<open>gesinnungsethik_verantwortungsethik_konsistent gesinnungsethik verantwortungsethik \<equiv>
   \<forall>handlungsabsicht.
     gesinnungsethik handlungsabsicht \<longleftrightarrow>

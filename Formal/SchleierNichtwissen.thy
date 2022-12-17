@@ -43,10 +43,10 @@ bei denen bei der Definition noch nicht feststeht, auf we sie später zutreffen.
 
 text\<open>Für jede Welt muss eine Welt-Personen Swap (wps) Funktion bereit gestellt werden,
 die alle Weltlichen Eigenschaften von 2 Personen vertauscht:\<close>
-type_synonym ('person, 'world) wp_swap = \<open>'person \<Rightarrow> 'person \<Rightarrow> 'world \<Rightarrow> 'world\<close>
+type_synonym ('person, 'welt) wp_swap = \<open>'person \<Rightarrow> 'person \<Rightarrow> 'welt \<Rightarrow> 'welt\<close>
 
-text\<open>Ein jeder \<^typ>\<open>('person, 'world) wp_swap\<close> sollte mindestens folgendes erfüllen:\<close>
-definition wps_id :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
+text\<open>Ein jeder \<^typ>\<open>('person, 'welt) wp_swap\<close> sollte mindestens folgendes erfüllen:\<close>
+definition wps_id :: \<open>('person, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow> bool\<close>
 where
   \<open>wps_id wps welt \<equiv> \<forall>p1 p2. wps p2 p1 (wps p1 p2 welt) = welt\<close>
 
@@ -75,7 +75,7 @@ d.h. wenn folgendes equivalent ist
     und die beiden Personen wieder zurück tauschen.\<close>
 
 fun wohlgeformte_handlungsabsicht
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h) =
    (\<forall>p1 p2. h p1 welt = map_option (wps p2 p1) (h p2 (wps p1 p2 welt)))\<close>
@@ -199,7 +199,7 @@ lemma wohlgeformte_handlungsabsicht_ifI:
 text\<open>In einigen späteren Beispielen möchten wir zeigen, dass bestimmte Handlungsabsichten
 nicht wohlgeformt sind.\<close>
 fun wohlgeformte_handlungsabsicht_gegenbeispiel
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt (Handlungsabsicht h) taeter opfer \<longleftrightarrow>
   h taeter welt \<noteq> map_option (wps opfer taeter) (h opfer (wps taeter opfer welt))\<close>
@@ -248,8 +248,8 @@ dass sie in allen Welten zum gleichen Ergebnis kommen.
 Dies gilt jedoch nicht immer.
 Wenn dieser Sonderfall eintritt sagen wir, Maxime und Handlungsabsicht generalisieren.\<close>
 definition maxime_und_handlungsabsicht_generalisieren
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> 
-      ('person, 'world) maxime \<Rightarrow> ('person, 'world) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow> 
+      ('person, 'welt) maxime \<Rightarrow> ('person, 'welt) handlungsabsicht \<Rightarrow> 'person \<Rightarrow> bool\<close>
 where
   \<open>maxime_und_handlungsabsicht_generalisieren wps welt m ha p =
     (\<forall>p1 p2. (ausfuehrbar p welt ha \<and> ausfuehrbar p (wps p1 p2 welt) ha)
@@ -304,14 +304,14 @@ lemma maxime_und_handlungsabsicht_generalisieren_MaximeDisj_Conj:
   
 
 
-text\<open>Die Maxime und \<^typ>\<open>('person, 'world) wp_swap\<close> können einige Eigenschaften erfüllen.
+text\<open>Die Maxime und \<^typ>\<open>('person, 'welt) wp_swap\<close> können einige Eigenschaften erfüllen.
 
-Wir kürzen das ab mit \<^term>\<open>wpsm :: ('person, 'world) wp_swap\<close>: Welt Person Swap Maxime.\<close>
+Wir kürzen das ab mit \<^term>\<open>wpsm :: ('person, 'welt) wp_swap\<close>: Welt Person Swap Maxime.\<close>
 
 text\<open>Die Person für die Maxime ausgewertet wird und swappen der Personen in der Welt
 kann equivalent sein:\<close>
 definition wpsm_kommutiert
-  :: \<open>('person, 'world) maxime \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> 'world \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) maxime \<Rightarrow> ('person, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow> bool\<close>
 where
   \<open>wpsm_kommutiert m wps welt \<equiv>
   \<forall> p1 p2 ha.
@@ -411,7 +411,7 @@ definieren wir, was es bedeutet für eine Maxime wohlgeformt zu sein.\<close>
 (*Eigentlich sollte das fuer alle Handlungen gelten, aber wenn ich ausfuehrbaren code will
 habe ich ein Problem, dass Handlungen nicht enumerable sind.*)
 definition wohlgeformte_maxime_auf
-  :: \<open>'world handlung \<Rightarrow> ('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  :: \<open>'welt handlung \<Rightarrow> ('person, 'welt) wp_swap \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_maxime_auf h wps m \<equiv>
     \<forall>p1 p2. okay m p1 h \<longleftrightarrow> okay m p2 (map_handlung (wps p1 p2) h)\<close>
@@ -426,7 +426,7 @@ von Handlungsabsichten beschränken.
 Die eigentlich schönere (jedoch schwer zu beweisende) Forderung lautet:\<close>
 
 definition wohlgeformte_maxime
-  :: \<open>('person, 'world) wp_swap \<Rightarrow> ('person, 'world) maxime \<Rightarrow> bool\<close>
+  :: \<open>('person, 'welt) wp_swap \<Rightarrow> ('person, 'welt) maxime \<Rightarrow> bool\<close>
 where
   \<open>wohlgeformte_maxime wps m \<equiv>
     \<forall>h. wohlgeformte_maxime_auf h wps m\<close>

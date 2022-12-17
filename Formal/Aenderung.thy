@@ -69,8 +69,8 @@ text\<open>Deltas, d.h. Unterschiede zwischen Welten.\<close>
   :: welt -> welt -> [Aenderung person etwas]
 Diese Klasse würde dann Welten mit Personen und Etwas in Relation setzen.
 Dafür bräuchte es MultiParamTypeClasses. Eine simple Funktion ist da einfacher.*)
-type_synonym ('world, 'person, 'etwas) delta =
-    \<open>'world handlung \<Rightarrow> (('person, 'etwas) aenderung) list\<close>
+type_synonym ('welt, 'person, 'etwas) delta =
+    \<open>'welt handlung \<Rightarrow> (('person, 'etwas) aenderung) list\<close>
 
 text\<open>Von einer \<^typ>\<open>('person, 'etwas) aenderung\<close> betroffene.\<close>
 definition betroffen :: \<open>('person, 'etwas) aenderung \<Rightarrow> 'person\<close>
