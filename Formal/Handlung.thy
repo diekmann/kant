@@ -2,23 +2,33 @@ theory Handlung
 imports Main
 begin
 
+(*TODO: rename 'world nach 'welt*)
+
 section\<open>Handlung\<close>
+text\<open>In diesem Abschnitt werden wir Handlungen und Handlungsabsichten modellieren.\<close>
+
+text\<open>Wir beschreiben Handlungen als ein Änderung der Welt.
+Das Modell eine Handlung ist rein auf die extern beobachtbare Änderung der Welt beschränkt.
+Die handelnden Person ist dabei Nebensache.
+Wir beschreiben nur vergangene bzw. hypothetische Handlungen und deren Auswirkung.
+\<close>
+datatype 'world handlung = Handlung (vorher: \<open>'world\<close>) (nachher: \<open>'world\<close>)
 
 text\<open>
-Beschreibt Handlungen als Änderung der Welt. Unabhängig von der handelnden Person.
-Wir beschreiben nur vergangene bzw. mögliche Handlungen und deren Auswirkung.
-
-Eine Handlung ist reduziert auf deren Auswirkung.
-Intention oder Wollen ist nicht modelliert,
-da wir irgendwie die geistige Welt mit der physischen Welt verbinden müssen und wir daher nur
-messbare Tatsachen betrachten können.
+Eine Handlung ist reduziert auf die beobachtbaren Auswirkungen der Handlung.
+Die dahinterliegende Handlungsabsicht, bzw. Intention oder "Wollen" sind
+in einer \<^typ>\<open>'world handlung\<close> nicht modelliert.
+Dies liegt daran,
+dass wir irgendwie die geistige Welt mit der physischen Welt verbinden müssen und wir daher
+am Anfang nur messbare Tatsachen betrachten können.
+Diese initiale Entscheidung,
+eine Handlung rein auf ihre beobachtbaren und messbaren Auswirkungen zu reduzieren,
+ist essentiell für diese Theorie.
 
 Handlungen können Leute betreffen.
 Handlungen können aus Sicht Anderer wahrgenommen werden.
-Ich brauche nur Welt vorher und Welt nachher.
-So kann ich handelnde Person und beobachtende Person trennen.
-\<close>
-datatype 'world handlung = Handlung (vorher: \<open>'world\<close>) (nachher: \<open>'world\<close>)
+Unser Modell einer Handlung entält jedoch nur die Welt vorher und Welt nachher.
+So können wir handelnde Person und beobachtende Person trennen.\<close>
 
 (*<*)
 text\<open>The datatype-generated functions are really cool:\<close>
@@ -42,10 +52,19 @@ lemma ist_noop_map_handlung:
 
 
 text \<open>
-Handlung als Funktion gewrapped.
-Diese abstrakte Art eine Handlung zu modelliert so ein bisschen die Absicht oder Intention.
+Folgende Definition ist eine Handlung als Funktion gewrapped.
+Diese abstrakte Art eine Handlung darzustellen erlaubt es nun,
+die Absicht oder Intention hinter einer Handlung zu modellieren.
 \<close>
 datatype ('person, 'world) handlungsabsicht = Handlungsabsicht \<open>'person \<Rightarrow> 'world \<Rightarrow> 'world option\<close>
+
+text\<open>Im Vergleich zu unserer \<^typ>\<open>'world handlung\<close> sehen wir bereits am Typen,
+dass eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> nicht nur eine einfache Aussage über die
+\<^typ>\<open>'world\<close> trifft, sondern auch die Absicht der handelnden \<^typ>\<open>'person\<close> beinhaltet.
+
+Die Idee ist, dass eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> eine generische Handlungsabsicht
+modelliert. Beispielsweise \<^term>\<open>Handlungsabsicht (\<lambda>ich welt. brezen_kaufen welt ich)\<close>.
+\<close>
 
 
 text\<open>Eine \<^typ>\<open>('person, 'world) handlungsabsicht\<close> gibt eine \<^typ>\<open>'world option\<close> zurück,

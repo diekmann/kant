@@ -17,8 +17,8 @@ session Kant = Cache +
   theories [show_question_marks = false]
     Disclaimer
     SchnelleinstiegHOL
-    Handlung
     Kant
+    Handlung
     Maxime
     KategorischerImperativ
     Utilitarismus
