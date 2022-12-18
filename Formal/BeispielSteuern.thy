@@ -159,17 +159,17 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
 
 text\<open>Wenn die Steuerfunktion monoton ist,
 dann können wir auch einen sehr eingeschränkten kategorischen Imperativ zeigen.\<close>
-lemma \<open>
-  (\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
-  ha = Handlungsabsicht (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))) \<Longrightarrow>
+lemma katimp_auf_handlungsabsicht_monoton:
+  \<open>(\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
+  ha = Handlungsabsicht
+          (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))) \<Longrightarrow>
   kategorischer_imperativ_auf ha welt
     (Maxime 
       (\<lambda>ich handlung.
            (\<forall>p\<in>mehrverdiener ich handlung.
                 steuerlast ich handlung \<le> steuerlast p handlung)))\<close>
-  apply(cases \<open>welt\<close>, rename_tac eink, simp add:)
+  apply(cases \<open>welt\<close>, rename_tac eink, simp)
   apply(rule kategorischer_imperativ_aufI, rename_tac eink ich p1 p2)
-  apply(case_tac \<open>ha\<close>, rename_tac h, simp)
   apply(simp add: handeln_def nachher_handeln.simps)
   done
 
@@ -210,6 +210,12 @@ definition jeder_zahlt :: \<open>(nat \<Rightarrow> nat) \<Rightarrow> 'a \<Righ
   \<open>jeder_zahlt steuerberechnung ich welt \<equiv>
     Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> nat \<circ> (get_einkommen welt))\<close>
 
+(*<*)
+lemma jeder_zahlt_ignoriert_person:
+  "jeder_zahlt steuersystem_impl p w = jeder_zahlt steuersystem_impl p' w"
+  by(simp add: jeder_zahlt_def)
+(*>*)
+
 definition \<open>jeder_zahlt_einkommenssteuer p w \<equiv> Some (jeder_zahlt einkommenssteuer p w)\<close>
 
 
@@ -234,6 +240,20 @@ lemma \<open>moralisch
   maxime_steuern
   (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
+text\<open>Unser Beispiel erfüllt auch den kategorischen Imperativ.\<close>
+lemma \<open>erzeuge_beispiel
+    steuerwps (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
+    [Handlungsabsicht jeder_zahlt_einkommenssteuer]
+    maxime_steuern
+  =
+  Some
+    \<lparr>
+     bsp_erfuellte_maxime = True,
+     bsp_erlaubte_handlungen = [Handlungsabsicht jeder_zahlt_einkommenssteuer],
+     bsp_verbotene_handlungen = [],
+     bsp_uneindeutige_handlungen = []
+    \<rparr>\<close>
+  by beispiel
 
 subsection\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
 text\<open>Die Anforderungen für ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
@@ -345,18 +365,46 @@ und die Wirkung der Handlungen in Betracht ziehen" \cite{russellphi}.
 
 text\<open>
 Für jedes \<^term_type>\<open>steuersystem_impl :: nat \<Rightarrow> nat\<close>,
-mit zwei weiteren Annahmen,
-gilt das \<^locale>\<open>steuersystem\<close> und \<^const>\<open>maxime_steuern\<close> in der \<^const>\<open>jeder_zahlt\<close> Implementierung
-äquivalent sind.
-\<close>
+mit zwei weiteren Annahmen
+gilt, dass \<^locale>\<open>steuersystem\<close> und \<^const>\<open>maxime_steuern\<close> in der \<^const>\<open>jeder_zahlt\<close> Implementierung
+äquivalent sind.\<close>
+
 theorem
   fixes steuersystem_impl :: \<open>nat \<Rightarrow> nat\<close>
   assumes steuer_kleiner_einkommen: \<open>\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen\<close>
       and existenzminimum: \<open>\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0\<close>
     shows
-   \<open>(\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w))))
-        \<longleftrightarrow> steuersystem steuersystem_impl\<close>
+     \<open>(\<forall>welt. moralisch welt maxime_steuern
+                (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w))))
+      \<longleftrightarrow>
+      steuersystem steuersystem_impl\<close>
   using steuersystem_imp_maxime maxime_imp_steuersystem
   using assms by blast 
+
+(*TODO: only print lemma name, not full contents*)
+text\<open>Da jede Steuersystemimplementierung welche \<^locale>\<open>steuersystem\<close> erfüllt auch
+moralisch ist (@{thm steuersystem_imp_maxime}),
+erfüllt damit auch jedes solche System den kategorischen Imperativ.\<close>
+corollary steuersystem_imp_kaptimp:
+ \<open>steuersystem steuersystem_impl \<Longrightarrow>
+     kategorischer_imperativ_auf
+        (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))
+        welt
+        maxime_steuern\<close>
+  apply(drule steuersystem_imp_maxime)
+  by (simp add: kategorischer_imperativ_auf_def)
+
+text\<open>Und daraus folgt, dass auch \<^const>\<open>jeder_zahlt_einkommenssteuer\<close>
+den kategorischen Imperativ erfüllt.\<close>
+corollary
+ \<open>steuersystem steuersystem_impl \<Longrightarrow>
+     kategorischer_imperativ_auf
+        (Handlungsabsicht jeder_zahlt_einkommenssteuer)
+        welt
+        maxime_steuern\<close>
+  unfolding jeder_zahlt_einkommenssteuer_def
+  apply(rule steuersystem_imp_kaptimp)
+  by (simp add: steuersystem_axioms)
+
 
 end
