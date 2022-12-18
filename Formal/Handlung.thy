@@ -180,7 +180,7 @@ lemma ausfuehrbar_nachher_handeln:
 lemma nicht_ausfuehrbar_nachher_handeln:
   \<open>\<not>ausfuehrbar p welt ha \<Longrightarrow>
     nachher_handeln p welt ha = welt\<close>
-  by(cases ha, simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
+  by(cases \<open>ha\<close>, simp add: ausfuehrbar.simps nachher_handeln.simps split:option.split)
 (*>*)
 
 

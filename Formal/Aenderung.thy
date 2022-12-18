@@ -527,15 +527,15 @@ lemma aenderung_ausfuehren_abmachung_to_aenderung_induction_helper:
     by blast
 (*thank you sledgehammer isar proofs*)
 proof -
-  fix pa :: 'person and psa :: "'person list" and abmachunga :: "'person \<Rightarrow> 'etwas" and welta :: "'person \<Rightarrow> 'etwas"
-  assume a1: "pa \<notin> set psa \<and> distinct psa"
-  assume a2: "abmachung_dom (abmachunga(pa := 0)) \<subseteq> set psa"
-  assume "\<And>abmachung welt. abmachung_dom abmachung \<subseteq> set psa \<Longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachung) welt p = (welt p::'etwas) + abmachung p"
-  then have f3: "\<And>f. f p + (abmachunga(pa := 0)) p = aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) f p"
+  fix pa :: \<open>'person\<close> and psa :: \<open>'person list\<close> and abmachunga :: \<open>'person \<Rightarrow> 'etwas\<close> and welta :: \<open>'person \<Rightarrow> 'etwas\<close>
+  assume a1: \<open>pa \<notin> set psa \<and> distinct psa\<close>
+  assume a2: \<open>abmachung_dom (abmachunga(pa := 0)) \<subseteq> set psa\<close>
+  assume \<open>\<And>abmachung welt. abmachung_dom abmachung \<subseteq> set psa \<Longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachung) welt p = (welt p::'etwas) + abmachung p\<close>
+  then have f3: \<open>\<And>f. f p + (abmachunga(pa := 0)) p = aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) f p\<close>
     using a2 a1 by (metis (full_types) abmachung_to_aenderung_list_not_in_ps)
-  then have "pa = p \<longrightarrow> (0 < abmachunga pa \<longrightarrow> abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p) \<and> (\<not> 0 < abmachunga pa \<longrightarrow> (abmachunga pa = 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) welta p = welta p + abmachunga p) \<and> (abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p))"
+  then have \<open>pa = p \<longrightarrow> (0 < abmachunga pa \<longrightarrow> abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p) \<and> (\<not> 0 < abmachunga pa \<longrightarrow> (abmachunga pa = 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) welta p = welta p + abmachunga p) \<and> (abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p))\<close>
     by force
-  then show "(0 < abmachunga pa \<longrightarrow> abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p) \<and> (\<not> 0 < abmachunga pa \<longrightarrow> (abmachunga pa = 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) welta p = welta p + abmachunga p) \<and> (abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p))"
+  then show \<open>(0 < abmachunga pa \<longrightarrow> abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p) \<and> (\<not> 0 < abmachunga pa \<longrightarrow> (abmachunga pa = 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) welta p = welta p + abmachunga p) \<and> (abmachunga pa \<noteq> 0 \<longrightarrow> aenderung_ausfuehren (abmachung_to_aenderung_list psa abmachunga) \<lbrakk>welta (pa += abmachunga pa)\<rbrakk> p = welta p + abmachunga p))\<close>
     using f3 by (metis fun_upd_other)
 qed
 
@@ -595,7 +595,7 @@ lemma konsensswap_apply:
 
 
 lemma konsensswap_same[simp]:
-  "konsensswap p p konsens = konsens"
+  \<open>konsensswap p p konsens = konsens\<close>
   by(simp add: konsensswap_def swap_id_comp)
 (*>*)
 
@@ -644,8 +644,8 @@ where
 
 (*<*)
 lemma swap_konsensswap_swap:
-  "swap p2 p1 ` set (konsensswap p1 p2 konsens (swap p1 p2 id p)) =
-  (set (konsens p))"
+  \<open>swap p2 p1 ` set (konsensswap p1 p2 konsens (swap p1 p2 id p)) =
+  (set (konsens p))\<close>
   apply(simp add: konsensswap_apply)
   apply(simp add: swap_fun_swap_id)
   by (simp add: image_comp)
@@ -780,7 +780,7 @@ lemma reverse_engineer_abmachung_swap:
 (*>*)
 
 lemma reverse_engineer_abmachung:
-  "reverse_engineer_abmachung (Handlung welt welt') = a \<longleftrightarrow> abmachung_ausfuehren a welt = welt'"
+  \<open>reverse_engineer_abmachung (Handlung welt welt') = a \<longleftrightarrow> abmachung_ausfuehren a welt = welt'\<close>
   apply(simp add: abmachung_ausfuehren_def fun_eq_iff)
   apply(simp add: reverse_engineer_abmachung_def fold_enum_fun_update_call)
   by (metis add_diff_cancel diff_add_cancel)

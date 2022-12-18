@@ -145,10 +145,10 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem:
   opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
           the_single_elem {p \<in> set ps. besitz p = opfer_nach_besitz}\<close>
 proof(simp add: the_single_elem, intro conjI impI)
-  show "distinct ps \<Longrightarrow>
+  show \<open>distinct ps \<Longrightarrow>
     is_singleton {p \<in> set ps. besitz p = opfer_nach_besitz} \<Longrightarrow>
     opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps =
-    Some (the_elem {p \<in> set ps. besitz p = opfer_nach_besitz})"
+    Some (the_elem {p \<in> set ps. besitz p = opfer_nach_besitz})\<close>
     apply(induction \<open>ps\<close>)
      apply (simp add: is_singleton_altdef; fail)
     apply(simp)
@@ -161,9 +161,9 @@ proof(simp add: the_single_elem, intro conjI impI)
     apply(simp add: opfer_nach_besitz_induct_step_set_simp; fail)
     done
 next
-  show "distinct ps \<Longrightarrow>
+  show \<open>distinct ps \<Longrightarrow>
     \<not> is_singleton {p \<in> set ps. besitz p = opfer_nach_besitz} \<Longrightarrow>
-    opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = None"
+    opfer_eindeutig_nach_besitz_auswaehlen opfer_nach_besitz besitz ps = None\<close>
     apply(induction \<open>ps\<close>)
      apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def; fail)
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_def)
@@ -184,8 +184,8 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall:
 
 
 (*<*)
-lemma "p1 \<in> Ps \<Longrightarrow> p2 \<in> Ps \<Longrightarrow>
-  {pa \<in> Ps. swap p1 p2 besitz pa = b} = {p2} \<longleftrightarrow> {pa \<in> Ps. besitz pa = b} = {p1}"
+lemma \<open>p1 \<in> Ps \<Longrightarrow> p2 \<in> Ps \<Longrightarrow>
+  {pa \<in> Ps. swap p1 p2 besitz pa = b} = {p2} \<longleftrightarrow> {pa \<in> Ps. besitz pa = b} = {p1}\<close>
   apply(simp add: singleton_set_to_all)
   by (metis swap_b swap_nothing swap_symmetric)
 
@@ -217,16 +217,16 @@ lemma the_elem_singleton_swap_none:
   
 
 lemma set_swap_image_pullout:
-  "p1 \<in> A \<Longrightarrow>
+  \<open>p1 \<in> A \<Longrightarrow>
    p2 \<in> A \<Longrightarrow>
-    {a \<in> A. swap p1 p2 besitz a = b} = swap p1 p2 id ` {a \<in> A. besitz a = b}"
+    {a \<in> A. swap p1 p2 besitz a = b} = swap p1 p2 id ` {a \<in> A. besitz a = b}\<close>
   apply(simp add: image_def)
   apply(rule Collect_cong)
   apply(safe)
     apply(rule swap_cases)
-      apply(rule_tac x=p2 in exI, simp add: swap_a swap_b; fail)
-     apply(rule_tac x=p1 in exI, simp add: swap_a swap_b; fail)
-    apply(rule_tac x=a in exI, simp add: swap_a swap_b swap_nothing; fail)
+      apply(rule_tac x=\<open>p2\<close> in exI, simp add: swap_a swap_b; fail)
+     apply(rule_tac x=\<open>p1\<close> in exI, simp add: swap_a swap_b; fail)
+    apply(rule_tac x=\<open>a\<close> in exI, simp add: swap_a swap_b swap_nothing; fail)
    apply(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
   by (simp add: swap_fun_swap_id)
 

@@ -135,13 +135,13 @@ lemma wohlgeformte_handlungsabsicht_wpsid_wpssym_komm:
             map_handlung (wps p1 p2) (handeln p2 welt ha)\<close>
   apply(drule wohlgeformte_handlungsabsicht_mit_wpsid)
   subgoal using wpsid by simp
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
-  apply(subgoal_tac "wps p1 p2 (wps p1 p2 welt) = welt")
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
+  apply(subgoal_tac \<open>wps p1 p2 (wps p1 p2 welt) = welt\<close>)
    prefer 2
    apply (metis wps_id_def wps_sym wpsid)
   apply(simp add: )
-  apply(subgoal_tac "wps p2 p1 = wps p1 p2")
+  apply(subgoal_tac \<open>wps p2 p1 = wps p1 p2\<close>)
    prefer 2 using wps_sym apply presburger
   by simp
 
@@ -184,19 +184,19 @@ lemma wohlgeformte_handlungsabsicht_wpsid_simp:
    apply (metis ausfuehrbar.simps)
   apply(simp add: ausfuehrbar.simps)
   apply(clarsimp)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
-  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
   apply(simp split: option.split_asm)
   done
 
 lemma wohlgeformte_handlungsabsicht_ifI:
-  "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h1) \<Longrightarrow>
+  \<open>wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h1) \<Longrightarrow>
    wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht h2) \<Longrightarrow>
    (\<And>p1 p2. P p1 welt \<longleftrightarrow> P p2 (wps p1 p2 welt)) \<Longrightarrow>
    wohlgeformte_handlungsabsicht wps welt
-      (Handlungsabsicht (\<lambda>ich welt. if P ich welt then h1 ich welt else h2 ich welt))"
+      (Handlungsabsicht (\<lambda>ich welt. if P ich welt then h1 ich welt else h2 ich welt))\<close>
   by(simp add: wohlgeformte_handlungsabsicht.simps)
 (*>*)
 
@@ -235,8 +235,8 @@ wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht (zha))\<close>
   apply(simp)
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
   apply(clarsimp)
-  apply(erule_tac x=p1 in allE)
-  apply(erule_tac x=p2 in allE)
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
   apply(simp)
   apply(simp add: option.map_comp)
   apply(simp add: comp_def)
@@ -289,18 +289,18 @@ lemma
 
 (*<*)
 lemma maxime_und_handlungsabsicht_generalisieren_MaximeConj:
-  "maxime_und_handlungsabsicht_generalisieren wps welt m1 ha p
+  \<open>maxime_und_handlungsabsicht_generalisieren wps welt m1 ha p
     \<and> maxime_und_handlungsabsicht_generalisieren wps welt m2 ha p
-  \<Longrightarrow>maxime_und_handlungsabsicht_generalisieren wps welt (MaximeConj m1 m2) ha p"
+  \<Longrightarrow>maxime_und_handlungsabsicht_generalisieren wps welt (MaximeConj m1 m2) ha p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def okay_MaximeConj)
   apply(clarsimp)
   done
 
 (*there is an \<and> in there, not an \<or>*)
 lemma maxime_und_handlungsabsicht_generalisieren_MaximeDisj_Conj:
-  "maxime_und_handlungsabsicht_generalisieren wps welt m1 ha p
+  \<open>maxime_und_handlungsabsicht_generalisieren wps welt m1 ha p
     \<and> maxime_und_handlungsabsicht_generalisieren wps welt m2 ha p
-    \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren wps welt (MaximeDisj m1 m2) ha p"
+    \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren wps welt (MaximeDisj m1 m2) ha p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def okay_MaximeDisj)
   apply(clarsimp)
   done

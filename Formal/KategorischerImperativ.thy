@@ -400,9 +400,9 @@ definition erzeuge_beispiel_alt1
   )\<close>
 
 fun beispiel_merge
-  :: "('person, 'welt) beipiel \<Rightarrow> ('person, 'welt) beipiel \<Rightarrow> ('person, 'welt) beipiel"
+  :: \<open>('person, 'welt) beipiel \<Rightarrow> ('person, 'welt) beipiel \<Rightarrow> ('person, 'welt) beipiel\<close>
 where
-  "beispiel_merge
+  \<open>beispiel_merge
     \<lparr> bsp_erfuellte_maxime=t1,
       bsp_erlaubte_handlungen=e1, bsp_verbotene_handlungen=v1, bsp_uneindeutige_handlungen=u1 \<rparr>
     \<lparr> bsp_erfuellte_maxime=t2,
@@ -411,36 +411,36 @@ where
       bsp_erlaubte_handlungen= e1 @ e2,
       bsp_verbotene_handlungen= v1 @ v2,
       bsp_uneindeutige_handlungen= u1 @ u2
-    \<rparr>"
+    \<rparr>\<close>
 
 lemma beispiel_merge_distrib:
-  "beispiel_merge (beispiel_merge a b) c = beispiel_merge a (beispiel_merge b c)"
-  apply(case_tac a, case_tac b, case_tac c)
+  \<open>beispiel_merge (beispiel_merge a b) c = beispiel_merge a (beispiel_merge b c)\<close>
+  apply(case_tac \<open>a\<close>, case_tac \<open>b\<close>, case_tac \<open>c\<close>)
   apply(simp)
   done
 
 text\<open>Combines \<^typ>\<open>'a option\<close>, but if one of them is \<^const>\<open>None\<close>,
 the whole result is \<^const>\<open>None\<close>. This is different from library's \<^const>\<open>combine_options\<close>.\<close>
-definition merge_options :: "('a \<Rightarrow> 'a \<Rightarrow> 'a) \<Rightarrow> 'a option \<Rightarrow> 'a option \<Rightarrow> 'a option" where
-  "merge_options f x y \<equiv>
-           (case x of None \<Rightarrow> None | Some x \<Rightarrow> (case y of None \<Rightarrow> None | Some y \<Rightarrow> Some (f x y)))"
+definition merge_options :: \<open>('a \<Rightarrow> 'a \<Rightarrow> 'a) \<Rightarrow> 'a option \<Rightarrow> 'a option \<Rightarrow> 'a option\<close> where
+  \<open>merge_options f x y \<equiv>
+           (case x of None \<Rightarrow> None | Some x \<Rightarrow> (case y of None \<Rightarrow> None | Some y \<Rightarrow> Some (f x y)))\<close>
 
 lemma merge_options_simps:
-  "merge_options f None b = None"
-  "merge_options f a None = None"
+  \<open>merge_options f None b = None\<close>
+  \<open>merge_options f a None = None\<close>
    apply(simp add: merge_options_def)+
-  apply(cases a, simp_all)
+  apply(cases \<open>a\<close>, simp_all)
   done
 
 lemma merge_options_distrib:
-  "merge_options beispiel_merge (merge_options beispiel_merge a b) c
-    = merge_options beispiel_merge a (merge_options beispiel_merge b c)"
+  \<open>merge_options beispiel_merge (merge_options beispiel_merge a b) c
+    = merge_options beispiel_merge a (merge_options beispiel_merge b c)\<close>
   by(simp add: merge_options_def beispiel_merge_distrib split: option.split)
 
-definition erzeuge_beispiel_alt_start :: "('person, 'welt) beipiel option" where
-  "erzeuge_beispiel_alt_start \<equiv> Some
+definition erzeuge_beispiel_alt_start :: \<open>('person, 'welt) beipiel option\<close> where
+  \<open>erzeuge_beispiel_alt_start \<equiv> Some
     \<lparr> bsp_erfuellte_maxime=True,
-      bsp_erlaubte_handlungen=[], bsp_verbotene_handlungen=[], bsp_uneindeutige_handlungen=[] \<rparr>"
+      bsp_erlaubte_handlungen=[], bsp_verbotene_handlungen=[], bsp_uneindeutige_handlungen=[] \<rparr>\<close>
 
 definition erzeuge_beispiel_alt
   :: \<open>('person::enum, 'welt) wp_swap \<Rightarrow> 'welt \<Rightarrow>
@@ -455,20 +455,20 @@ definition erzeuge_beispiel_alt
   \<close>
 
 lemma erzeuge_beispiel_alt_start_neutral:
-  "merge_options beispiel_merge erzeuge_beispiel_alt_start bsp = bsp"
-  apply(cases bsp)
+  \<open>merge_options beispiel_merge erzeuge_beispiel_alt_start bsp = bsp\<close>
+  apply(cases \<open>bsp\<close>)
    apply(simp add: merge_options_def split:option.split)
-  apply(rename_tac bsp2, case_tac bsp2)
+  apply(rename_tac bsp2, case_tac \<open>bsp2\<close>)
   apply(simp add: merge_options_def erzeuge_beispiel_alt_start_def)
   done
 
 lemma erzeuge_beispiel1_alt:
-  "erzeuge_beispiel_alt1 wps welt ha m = erzeuge_beispiel wps welt [ha] m"
+  \<open>erzeuge_beispiel_alt1 wps welt ha m = erzeuge_beispiel wps welt [ha] m\<close>
   by(simp add: erzeuge_beispiel_def erzeuge_beispiel_alt1_def)
 
 lemma erzeuge_beispiel_cons:
-  "erzeuge_beispiel wps welt (ha # has) m
-    = merge_options beispiel_merge (erzeuge_beispiel wps welt [ha] m) (erzeuge_beispiel wps welt has m)"
+  \<open>erzeuge_beispiel wps welt (ha # has) m
+    = merge_options beispiel_merge (erzeuge_beispiel wps welt [ha] m) (erzeuge_beispiel wps welt has m)\<close>
   unfolding erzeuge_beispiel_def
   apply(simp only: merge_options_simps split: if_split)
   apply(intro conjI impI) (*64 subgoals*)
@@ -478,22 +478,22 @@ lemma erzeuge_beispiel_cons:
   done
 
 lemma fold_merge_options_pullout:
-  "fold (\<lambda>ha acc. merge_options beispiel_merge acc (f ha)) has
+  \<open>fold (\<lambda>ha acc. merge_options beispiel_merge acc (f ha)) has
          (merge_options beispiel_merge start start2)
     = merge_options beispiel_merge start
-          (fold (\<lambda>ha acc. merge_options beispiel_merge acc (f ha)) has start2)"
-  apply(induction has arbitrary: start start2)
+          (fold (\<lambda>ha acc. merge_options beispiel_merge acc (f ha)) has start2)\<close>
+  apply(induction \<open>has\<close> arbitrary: \<open>start\<close> \<open>start2\<close>)
    apply(simp; fail)
   apply(simp add: merge_options_distrib)
   done
 
 lemma erzeuge_beispiel_alt_induct_helper:
-  "merge_options beispiel_merge start (erzeuge_beispiel wps welt has m)
-    = fold (\<lambda>ha acc. merge_options beispiel_merge acc (erzeuge_beispiel_alt1 wps welt ha m)) has start"
-  apply(induction has arbitrary: start)
+  \<open>merge_options beispiel_merge start (erzeuge_beispiel wps welt has m)
+    = fold (\<lambda>ha acc. merge_options beispiel_merge acc (erzeuge_beispiel_alt1 wps welt ha m)) has start\<close>
+  apply(induction \<open>has\<close> arbitrary: \<open>start\<close>)
    apply(simp add: erzeuge_beispiel_def merge_options_def split: option.split)
    apply(clarsimp, rename_tac bsp)
-   apply(case_tac bsp, simp; fail)
+   apply(case_tac \<open>bsp\<close>, simp; fail)
   apply(rename_tac ha has start)
   apply(simp)
   apply(subst erzeuge_beispiel_cons)
@@ -503,11 +503,11 @@ lemma erzeuge_beispiel_alt_induct_helper:
   done
 
 lemma erzeuge_beispiel_alt_helper:
-  "erzeuge_beispiel wps welt has m
+  \<open>erzeuge_beispiel wps welt has m
     = fold
       (\<lambda>ha acc. merge_options beispiel_merge acc(erzeuge_beispiel_alt1 wps welt ha m))
       has
-      erzeuge_beispiel_alt_start"
+      erzeuge_beispiel_alt_start\<close>
   apply(subst erzeuge_beispiel_alt_induct_helper[symmetric])
   apply(simp add: erzeuge_beispiel_alt_start_neutral)
   done
@@ -515,15 +515,15 @@ lemma erzeuge_beispiel_alt_helper:
 text\<open>The following looks like a perfect code equation.
 But for some reasons, the document builds faster when not making this a \<^verbatim>\<open>[code]\<close>.\<close>
 lemma erzeuge_beispiel_alt:
-  "erzeuge_beispiel = erzeuge_beispiel_alt"
+  \<open>erzeuge_beispiel = erzeuge_beispiel_alt\<close>
   by(simp add: fun_eq_iff erzeuge_beispiel_alt_def erzeuge_beispiel_alt_helper)
 
 datatype ('person, 'welt) erzeuge_beiespiel_cache = ErzeugeBeispielCache
-  (ebc_ha: "('person, 'welt) handlungsabsicht")
-  (ebc_katimp: bool)
-  (ebc_moralisch: bool)
+  (ebc_ha: \<open>('person, 'welt) handlungsabsicht\<close>)
+  (ebc_katimp: \<open>bool\<close>)
+  (ebc_moralisch: \<open>bool\<close>)
 
-definition "erzeuge_beispiel_code wps welt has m \<equiv>
+definition \<open>erzeuge_beispiel_code wps welt has m \<equiv>
   if (\<exists>h\<in> (\<Union>ha \<in> set has. set (alle_moeglichen_handlungen welt ha)). \<not>wohlgeformte_maxime_auf h wps m)
      \<or> (\<exists>ha\<in>set has. \<not> wohlgeformte_handlungsabsicht wps welt ha)
   then None
@@ -534,11 +534,11 @@ definition "erzeuge_beispiel_code wps welt has m \<equiv>
      bsp_erlaubte_handlungen = [ebc_ha c. c\<leftarrow>cache, ebc_katimp c \<and> ebc_moralisch c],
      bsp_verbotene_handlungen = [ebc_ha c. c\<leftarrow>cache, ebc_katimp c \<and> \<not> ebc_moralisch c],
      bsp_uneindeutige_handlungen = [ebc_ha c. c\<leftarrow>cache, \<not> ebc_katimp c]
-   \<rparr>)"
+   \<rparr>)\<close>
 
 
 lemma erzeuge_beispiel_code[code]:
-  "erzeuge_beispiel = erzeuge_beispiel_code"
+  \<open>erzeuge_beispiel = erzeuge_beispiel_code\<close>
   apply(simp add: fun_eq_iff erzeuge_beispiel_def erzeuge_beispiel_code_def)
   apply(simp add: comp_def)
   apply(subst erzeuge_beiespiel_cache.sel)+ (*why u no simp*)

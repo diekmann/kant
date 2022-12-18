@@ -169,7 +169,7 @@ lemma zonensteuer_limit: \<open>zonensteuer ls spitzensteuer einkommen \<le> ein
    apply (simp add: real_of_percentage_mult; fail)
   apply(rename_tac z zs einkommen, case_tac \<open>z\<close>, rename_tac zone prozent)
   apply(simp)
-  apply(case_tac "zone \<le>  einkommen")
+  apply(case_tac \<open>zone \<le>  einkommen\<close>)
   apply(simp)
   apply(subst percentage_add_limit_helper, simp_all)
   apply (metis of_nat_diff)

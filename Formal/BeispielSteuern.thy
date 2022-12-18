@@ -176,7 +176,7 @@ lemma \<open>
 
 subsection\<open>Beispiel: Keiner Zahlt Steuern\<close>
 
-text\<open>Die Maxime ist erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
+text\<open>Die Maxime ist im Beispiel erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
 lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
                   maxime_steuern (Handlungsabsicht (\<lambda>ich welt. Some welt))\<close> by eval
 
@@ -194,10 +194,9 @@ ohne dass wir soewtas jemals explizit gefordert haben.
 \<close>
 
 subsection\<open>Beiepiel: Jeder zahle 1 Steuer\<close>
-text\<open>Jeder muss steuern zahlen:
-  funktioniert, ist aber doof, denn am Ende sind alle im Minus.
+text\<open>Jeder muss steuern zahlen: funktioniert.
 
-Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
+Das \<^term>\<open>ich\<close> wird gar nicht verwendet, da jeder Steuern zahlt.\<close>
 definition \<open>jeder_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))\<close>
 lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
@@ -215,23 +214,28 @@ definition \<open>jeder_zahlt_einkommenssteuer p w \<equiv> Some (jeder_zahlt ei
 
 
 text\<open>Bei dem geringen Einkommen der \<^term>\<open>Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]\<close> zahlt keiner Steuern.\<close>
+
+lemma \<open>ist_noop 
+  (handeln Alice(Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+             (Handlungsabsicht jeder_zahlt_einkommenssteuer))\<close> by eval
+
 lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
                   maxime_steuern (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 
 text\<open>Für höhere Einkommen erhalten wir plausible Werte und niemand rutscht ins negative:\<close>
-lemma \<open>moralisch
-  (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
-  maxime_steuern
-  (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 lemma \<open>delta_steuerwelt
       (handeln
       Alice (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
       (Handlungsabsicht jeder_zahlt_einkommenssteuer))
   = [Verliert Bob 511, Verliert Eve 1857]\<close> by eval
+lemma \<open>moralisch
+  (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
+  maxime_steuern
+  (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 
-section\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
+subsection\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
 text\<open>Die Anforderungen für ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>
 lemma steuersystem_imp_maxime:
   \<open>steuersystem steuersystem_impl \<Longrightarrow>
@@ -269,13 +273,15 @@ lemma steuern_kleiner_einkommen_nat:
 
 text\<open>Mit genug zusätzlichen Annahmen gilt auch die Rückrichtung:\<close>
 lemma maxime_imp_steuersystem:
-    \<open>(\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen) \<Longrightarrow>
-       (\<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0) \<Longrightarrow>
-        \<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))
-        \<Longrightarrow> steuersystem steuersystem_impl\<close>
+  \<open>\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen \<Longrightarrow>
+   \<forall>einkommen. einkommen \<le> 9888 \<longrightarrow> steuersystem_impl einkommen = 0 \<Longrightarrow>
+   \<forall>welt. moralisch welt maxime_steuern
+             (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))
+    \<Longrightarrow> steuersystem steuersystem_impl\<close>
 proof
   fix einkommen_b einkommen_a :: \<open>nat\<close>
-  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))\<close>
+  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern
+                      (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))\<close>
      and a: \<open>einkommen_b \<le> einkommen_a\<close>
      and bezahlbar: \<open>\<forall>einkommen. steuersystem_impl einkommen \<le> einkommen\<close>
   from m have m':
@@ -285,7 +291,8 @@ proof
              \<le> get_einkommen welt pB -
                 int (nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB)))\<close>
     for welt :: \<open>steuerwelt\<close> and pA pB :: \<open>person\<close>
-    by(simp add: handeln_def nachher_handeln.simps maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
+    by(simp add: handeln_def nachher_handeln.simps
+                 maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
   from m'[where welt=\<open>Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)\<close>
                 and pA=\<open>Bob\<close> and pB=\<open>Alice\<close>] a
   have almost:
@@ -297,14 +304,16 @@ proof
     by simp
 next
   fix einkommen_b einkommen_a :: \<open>nat\<close>
-  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))\<close>
+  assume m: \<open>\<forall>welt. moralisch welt maxime_steuern
+                        (Handlungsabsicht (\<lambda>p w. Some (jeder_zahlt steuersystem_impl p w)))\<close>
      and a: \<open>einkommen_b \<le> einkommen_a\<close>
   from m have m':
     \<open>get_einkommen welt pA \<le> get_einkommen welt pB \<Longrightarrow>
        nat (get_einkommen welt pA) - steuersystem_impl (nat (get_einkommen welt pA))
        \<le> nat (get_einkommen welt pB) - steuersystem_impl (nat (get_einkommen welt pB))\<close>
     for welt :: \<open>steuerwelt\<close> and pA pB :: \<open>person\<close>
-    by(simp add: handeln_def nachher_handeln.simps maxime_steuern_def moralisch_unfold jeder_zahlt_def bevoelkerung_def)
+    by(simp add: handeln_def nachher_handeln.simps maxime_steuern_def moralisch_unfold
+                 jeder_zahlt_def bevoelkerung_def)
   from m'[where welt=\<open>Steuerwelt (\<lambda>p. if p = Bob then einkommen_b else einkommen_a)\<close>
                 and pA=\<open>Bob\<close> and pB=\<open>Alice\<close>] a
   have \<open>einkommen_b - steuersystem_impl einkommen_b \<le> einkommen_a - steuersystem_impl einkommen_a\<close>
@@ -325,7 +334,7 @@ Dass die eine Richtung gilt (Maxime impliziert \<^const>\<open>steuersystem\<clo
 die andere Richtung (\<^const>\<open>steuersystem\<close> impliziert Maxime) jedoch nicht ohne weiter Annahmen,
 stimmt auch mit Russels Beobachtung überein:
 "Kants Maxime [das allgemeine Konzept, nicht meine Implementierung]
-scheint tatsächlich ein notwendiges, jedoch nicht \<^emph>\<open>ausreichendes\<close> Kriterium der Tugens zu geben"
+scheint tatsächlich ein notwendiges, jedoch nicht \<^emph>\<open>ausreichendes\<close> Kriterium der Tugend zu geben"
 \cite{russellphi}.
 Insbesondere Russels Folgesatz freut mich, da er mir bestätigt, dass unsere extensionale
 Betrachtung von Handlungen vielversprechend ist:

@@ -43,20 +43,20 @@ lemma count_list_distinct: \<open>distinct P \<Longrightarrow> x \<in> set P \<L
   by(auto)
 
 
-lemma is_singleton_the_elem_as_set: "is_singleton A \<Longrightarrow> the_elem A = a \<longleftrightarrow> A = {a}"
+lemma is_singleton_the_elem_as_set: \<open>is_singleton A \<Longrightarrow> the_elem A = a \<longleftrightarrow> A = {a}\<close>
   apply(rule iffI)
    apply (simp add: is_singleton_the_elem)
   apply(simp add: the_elem_def)
   done
 
 (*the simplifier loops with this one, sometimes. If it loops, apply(elim is_singletonE) first.*)
-lemma singleton_set_to_all: "{a \<in> A. P a} = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A \<and> P a) = (a = b))"
+lemma singleton_set_to_all: \<open>{a \<in> A. P a} = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A \<and> P a) = (a = b))\<close>
   by fastforce
 
-lemma singleton_set_to_all2: "A = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A) = (a = b))"
+lemma singleton_set_to_all2: \<open>A = {b} \<longleftrightarrow> (\<forall>a. (a \<in> A) = (a = b))\<close>
   by fastforce
 
-lemma is_singleton_bij_image: "bij f \<Longrightarrow> is_singleton (f ` A) = is_singleton A"
+lemma is_singleton_bij_image: \<open>bij f \<Longrightarrow> is_singleton (f ` A) = is_singleton A\<close>
   by (metis bij_betw_same_card bij_betw_subset is_singleton_altdef subset_UNIV)
 
 
@@ -76,8 +76,8 @@ lemma List_map_filter_as_foldr:
 
 
 
-lemma concat_map_if: "concat (map (\<lambda>x. if P x then [x] else []) xs) = filter P xs"
-  by(induction xs) auto
+lemma concat_map_if: \<open>concat (map (\<lambda>x. if P x then [x] else []) xs) = filter P xs\<close>
+  by(induction \<open>xs\<close>) auto
 
 
 lemma fold_fun_update_call_helper:

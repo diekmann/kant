@@ -433,18 +433,18 @@ lemma wfm_maxime_altruistischer_fortschritt:
   done
 
 lemma individueller_fortschritt_map_handlung_zahlenwps:
-  "individueller_fortschritt pX (map_handlung (zahlenwps p1 p2) ha)
-      = individueller_fortschritt (swap p1 p2 id pX) ha"
-  apply(cases ha, simp)
-  apply(cases "pX = p1")
+  \<open>individueller_fortschritt pX (map_handlung (zahlenwps p1 p2) ha)
+      = individueller_fortschritt (swap p1 p2 id pX) ha\<close>
+  apply(cases \<open>ha\<close>, simp)
+  apply(cases \<open>pX = p1\<close>)
    apply(simp add: hlp1  swap_a; fail)
-  apply(cases "pX = p2")
+  apply(cases \<open>pX = p2\<close>)
    apply(simp add: hlp2 swap_b; fail)
   by (metis hlp3 id_apply swap_nothing zahlenwps_id)
 
 lemma maxime_altruistischer_fortschritt_mhg_handlungsabsichten:
-  "ha \<in> set handlungsabsichten \<Longrightarrow>
-    maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p"
+  \<open>ha \<in> set handlungsabsichten \<Longrightarrow>
+    maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p\<close>
   apply(simp add: handlungsabsichten_def)
   apply(safe)
       apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def; fail)
@@ -487,62 +487,62 @@ corollary \<open>ha \<in> set handlungsabsichten \<Longrightarrow>
 (*<*)
 (*Interessante Sachen. Die sollten in die jeweiligen thys upgestremed werden.*)
 lemma
-  "okay maxime_altruistischer_fortschritt p1 (handeln p2 welt ha) \<longleftrightarrow> 
-    okay maxime_altruistischer_fortschritt p2 (map_handlung (zahlenwps p1 p2) (handeln p2 welt ha))"
+  \<open>okay maxime_altruistischer_fortschritt p1 (handeln p2 welt ha) \<longleftrightarrow> 
+    okay maxime_altruistischer_fortschritt p2 (map_handlung (zahlenwps p1 p2) (handeln p2 welt ha))\<close>
   using wfm_maxime_altruistischer_fortschritt
   by (simp add: wohlgeformte_maxime_auf_def wohlgeformte_maxime_def)
 
-lemma "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
-  zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt)) = zahlenwps p1 p2 welt"
-  apply(cases welt, simp add: swap_def)
+lemma \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+  zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt)) = zahlenwps p1 p2 welt\<close>
+  apply(cases \<open>welt\<close>, simp add: swap_def)
   by auto
 
 lemma zahlenwps_unrelated_im_kreis:
-  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
-    zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) = welt"
-  by(cases welt, simp add: swap_unrelated_im_kreis)
+  \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+    zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) = welt\<close>
+  by(cases \<open>welt\<close>, simp add: swap_unrelated_im_kreis)
 
 lemma zahlenwps_unrelated_im_kreis_map_handlung_helper:
-  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+  \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   map_handlung (zahlenwps p1 p) (map_handlung (zahlenwps p2 p1) (map_handlung (zahlenwps p p2) h))
-  = map_handlung (zahlenwps p2 p1) h"
-  apply(cases h, rename_tac vor nach, simp)
-  apply(case_tac vor, case_tac nach, simp)
+  = map_handlung (zahlenwps p2 p1) h\<close>
+  apply(cases \<open>h\<close>, rename_tac vor nach, simp)
+  apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
   apply(simp add: swap_def)
   by auto
 
 (*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalb einer Handlung weg!*)
 lemma wfh_unrelated_pullout_wps:
-  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+  \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   \<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     handeln p (zahlenwps p1 p2 welt) ha
-      = map_handlung (zahlenwps p2 p1) (handeln p welt ha)"
+      = map_handlung (zahlenwps p2 p1) (handeln p welt ha)\<close>
   thm wohlgeformte_handlungsabsicht_wpsid_wpssym_komm
-  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p2 welt" ha]
-  apply(subgoal_tac "handeln p (zahlenwps p1 p2 welt) ha =
-     map_handlung (zahlenwps p1 p) (handeln p1 (zahlenwps p p1 (zahlenwps p1 p2 welt)) ha)")
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p1 p2 welt\<close> \<open>ha\<close>]
+  apply(subgoal_tac \<open>handeln p (zahlenwps p1 p2 welt) ha =
+     map_handlung (zahlenwps p1 p) (handeln p1 (zahlenwps p p1 (zahlenwps p1 p2 welt)) ha)\<close>)
    prefer 2
-  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p2 welt" ha]
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p1 p2 welt\<close> \<open>ha\<close>]
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
-  apply(thin_tac "handeln p (zahlenwps p1 p2 welt) ha = _")
-  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p p1 (zahlenwps p1 p2 welt)" ha]
-  apply(subgoal_tac "handeln p1 (zahlenwps p p1 (zahlenwps p1 p2 welt)) ha =
-     map_handlung (zahlenwps p2 p1) (handeln p2 (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) ha)")
+  apply(thin_tac \<open>handeln p (zahlenwps p1 p2 welt) ha = _\<close>)
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p p1 (zahlenwps p1 p2 welt)\<close> \<open>ha\<close>]
+  apply(subgoal_tac \<open>handeln p1 (zahlenwps p p1 (zahlenwps p1 p2 welt)) ha =
+     map_handlung (zahlenwps p2 p1) (handeln p2 (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) ha)\<close>)
    prefer 2
-  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p p1 (zahlenwps p1 p2 welt))" ha]
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>(zahlenwps p p1 (zahlenwps p1 p2 welt))\<close> \<open>ha\<close>]
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
-  apply(thin_tac "handeln p1 _ ha = _")
-  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))" ha]
-  apply(subgoal_tac "handeln p2 (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) ha =
+  apply(thin_tac \<open>handeln p1 _ ha = _\<close>)
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>(zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))\<close> \<open>ha\<close>]
+  apply(subgoal_tac \<open>handeln p2 (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt))) ha =
      map_handlung (zahlenwps p p2)
-      (handeln p (zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))) ha)")
+      (handeln p (zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))) ha)\<close>)
    prefer 2
-  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))" ha]
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>(zahlenwps p1 p2 (zahlenwps p p1 (zahlenwps p1 p2 welt)))\<close> \<open>ha\<close>]
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
-  apply(thin_tac "handeln p2 _ ha = _")
+  apply(thin_tac \<open>handeln p2 _ ha = _\<close>)
   apply(simp add: zahlenwps_unrelated_im_kreis zahlenwps_unrelated_im_kreis_map_handlung_helper; fail)
   done
 
@@ -553,80 +553,80 @@ lemma wohlgeformte_handlungsabsicht_zahlenwps_komm:
   \<open>\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     handeln p (zahlenwps p1 p2 welt) ha =
             map_handlung (zahlenwps p1 p2) (handeln (swap p1 p2 id p) welt ha)\<close>
-  apply(subgoal_tac "wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha")
+  apply(subgoal_tac \<open>wohlgeformte_handlungsabsicht zahlenwps (zahlenwps p1 p2 welt) ha\<close>)
    prefer 2 apply blast
   apply(drule wohlgeformte_handlungsabsicht_mit_wpsid)
   subgoal by (simp add: wps_id_def zahlenwps_twice(2)) 
-  apply(case_tac "p=p1")
+  apply(case_tac \<open>p=p1\<close>)
    apply(simp add: swap_a)
    apply (metis handlung.collapse handlung.map_sel(1) handlung.map_sel(2) zahlenwps_sym zahlenwps_twice(1))
-  apply(case_tac "p=p2")
+  apply(case_tac \<open>p=p2\<close>)
    apply(simp add: swap_b)
    apply (metis zahlenwps_twice(2))
   apply(simp add: swap_nothing)
-  apply(thin_tac " \<forall>p1a p2a. _ p1a p2a")
+  apply(thin_tac \<open> \<forall>p1a p2a. _ p1a p2a\<close>)
   using wfh_unrelated_pullout_wps
   by (metis zahlenwps_sym)
 
-lemma "pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
-  zahlenwps pX p1 (zahlenwps pX p2 (zahlenwps p1 pX (zahlenwps p1 p2 welt))) = welt"
-  by(cases welt, simp add: swap_def)
+lemma \<open>pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
+  zahlenwps pX p1 (zahlenwps pX p2 (zahlenwps p1 pX (zahlenwps p1 p2 welt))) = welt\<close>
+  by(cases \<open>welt\<close>, simp add: swap_def)
 
-lemma "pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
-  zahlenwps pX p2 (zahlenwps pX p1 (zahlenwps p2 pX (zahlenwps p1 p2 welt))) = welt"
-  by(cases welt, simp add: swap_def)
+lemma \<open>pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
+  zahlenwps pX p2 (zahlenwps pX p1 (zahlenwps p2 pX (zahlenwps p1 p2 welt))) = welt\<close>
+  by(cases \<open>welt\<close>, simp add: swap_def)
 
-lemma zahlenwps_funny_permutation: "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+lemma zahlenwps_funny_permutation: \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   zahlenwps p2 p1 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt)))
-    = zahlenwps p p1 (zahlenwps p2 p welt)"
-  apply(cases welt, simp add: swap_def)
+    = zahlenwps p p1 (zahlenwps p2 p welt)\<close>
+  apply(cases \<open>welt\<close>, simp add: swap_def)
   by auto
 
 lemma zahlenwps_funny_permutation_map_handlung_helper:
-  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
+  \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
   map_handlung (zahlenwps p p1) (map_handlung (zahlenwps p2 p) (map_handlung (zahlenwps p1 p2) h))
-    = map_handlung (zahlenwps p2 p) ( ( h))"
-  apply(cases h, rename_tac vor nach, simp)
-  apply(case_tac vor, case_tac nach, simp)
+    = map_handlung (zahlenwps p2 p) ( ( h))\<close>
+  apply(cases \<open>h\<close>, rename_tac vor nach, simp)
+  apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
   apply(simp add: swap_def)
   by auto
 
 lemma wfh_pullout_wps_helper_same:
-  "p1 = p2 \<Longrightarrow>
-    handeln p1 (zahlenwps p1 p2 welt) ha = handeln p1 welt ha"
+  \<open>p1 = p2 \<Longrightarrow>
+    handeln p1 (zahlenwps p1 p2 welt) ha = handeln p1 welt ha\<close>
   apply(simp add: zahlenwps_id)
   done
 
 text\<open>Umschreiben mit einem unrelated p. Bin mir noch nicht sicher, ob das was bringt.\<close>
 lemma wfh_pullout_wps_move_to_unrelated:
-  "\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
+  \<open>\<forall>welt. wohlgeformte_handlungsabsicht zahlenwps welt ha \<Longrightarrow>
     p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
     handeln p1 (zahlenwps p1 p2 welt) ha
-      = map_handlung (zahlenwps p2 p) (handeln p1 (zahlenwps p p1 (zahlenwps p2 p welt)) ha)"
-  apply(subgoal_tac "handeln p1 (zahlenwps p1 p2 welt) ha =
-     map_handlung (zahlenwps p p1) (handeln p (zahlenwps p1 p (zahlenwps p1 p2 welt)) ha)")
+      = map_handlung (zahlenwps p2 p) (handeln p1 (zahlenwps p p1 (zahlenwps p2 p welt)) ha)\<close>
+  apply(subgoal_tac \<open>handeln p1 (zahlenwps p1 p2 welt) ha =
+     map_handlung (zahlenwps p p1) (handeln p (zahlenwps p1 p (zahlenwps p1 p2 welt)) ha)\<close>)
    prefer 2
-  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p2 welt" ha]
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p1 p2 welt\<close> \<open>ha\<close>]
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
-  apply(thin_tac "handeln p1 _ ha = _")
-  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p1 p (zahlenwps p1 p2 welt)" ha]
-  apply(subgoal_tac "handeln p (zahlenwps p1 p (zahlenwps p1 p2 welt)) ha =
-     map_handlung (zahlenwps p2 p) (handeln p2 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))) ha)")
+  apply(thin_tac \<open>handeln p1 _ ha = _\<close>)
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p1 p (zahlenwps p1 p2 welt)\<close> \<open>ha\<close>]
+  apply(subgoal_tac \<open>handeln p (zahlenwps p1 p (zahlenwps p1 p2 welt)) ha =
+     map_handlung (zahlenwps p2 p) (handeln p2 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))) ha)\<close>)
    prefer 2
-  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "(zahlenwps p1 p (zahlenwps p1 p2 welt))" ha]
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>(zahlenwps p1 p (zahlenwps p1 p2 welt))\<close> \<open>ha\<close>]
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
-  apply(thin_tac "handeln p _ ha = _")
-  thm wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))" ha]
-  apply(subgoal_tac "handeln p2 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))) ha =
+  apply(thin_tac \<open>handeln p _ ha = _\<close>)
+  thm wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))\<close> \<open>ha\<close>]
+  apply(subgoal_tac \<open>handeln p2 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))) ha =
      map_handlung (zahlenwps p1 p2)
-      (handeln p1 (zahlenwps p2 p1 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt)))) ha)")
+      (handeln p1 (zahlenwps p2 p1 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt)))) ha)\<close>)
    prefer 2
-  using wohlgeformte_handlungsabsicht_wpsid_simp[of zahlenwps "zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))" ha]
+  using wohlgeformte_handlungsabsicht_wpsid_simp[of \<open>zahlenwps\<close> \<open>zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt))\<close> \<open>ha\<close>]
    apply (simp add: wps_id_def zahlenwps_twice(2); fail)
   apply(simp)
-  apply(thin_tac "handeln p2 _ ha = _")
+  apply(thin_tac \<open>handeln p2 _ ha = _\<close>)
   apply(simp add: zahlenwps_funny_permutation zahlenwps_funny_permutation_map_handlung_helper)
   done
 
@@ -925,12 +925,12 @@ Ein kategorischer Imperativ, egal welche vielversprechende Maxime,
 gilt nicht für die Handlungsabsicht \<^const>\<open>collatzh\<close>.\<close>
 
 lemma
-  "\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
-        initialwelt maxime_zahlenfortschritt"
-  "\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
-        initialwelt maxime_altruistischer_fortschritt"
-  "\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
-        initialwelt (Maxime (\<lambda>ich. globaler_fortschritt))"
+  \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
+        initialwelt maxime_zahlenfortschritt\<close>
+  \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
+        initialwelt maxime_altruistischer_fortschritt\<close>
+  \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
+        initialwelt (Maxime (\<lambda>ich. globaler_fortschritt))\<close>
   by(eval)+
 
 
@@ -983,12 +983,12 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht unei
   done
 
 lemma
-  "\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
-        initialwelt maxime_zahlenfortschritt"
-  "\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
-        initialwelt maxime_altruistischer_fortschritt"
-  "\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
-        initialwelt (Maxime (\<lambda>ich. globaler_fortschritt))"
+  \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
+        initialwelt maxime_zahlenfortschritt\<close>
+  \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
+        initialwelt maxime_altruistischer_fortschritt\<close>
+  \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
+        initialwelt (Maxime (\<lambda>ich. globaler_fortschritt))\<close>
   by(eval)+
 
 text\<open>Mir gefällt, dass der (extensionale) kategorische Imperativ prinzipiell sagt,
@@ -1014,7 +1014,7 @@ definition partiell_schlechter_charakter:: \<open>person \<Rightarrow> zahlenwel
                    then alles_kaputt_machen ich welt
                    else None)\<close>
 
-lemma "erzeuge_beispiel
+lemma \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     [Handlungsabsicht partiell_guter_charakter, Handlungsabsicht partiell_schlechter_charakter]
     maxime_altruistischer_fortschritt
@@ -1024,7 +1024,7 @@ lemma "erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht partiell_guter_charakter],
    bsp_verbotene_handlungen = [Handlungsabsicht partiell_schlechter_charakter],
    bsp_uneindeutige_handlungen = []
-  \<rparr>"
+  \<rparr>\<close>
   by beispiel
 
 end

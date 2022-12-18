@@ -86,13 +86,13 @@ lemma zahlenwps_sym: \<open>zahlenwps p1 p2 = zahlenwps p2 p1\<close>
 lemma zahlenwps_same: \<open>zahlenwps p p w = w\<close>
   by(cases \<open>w\<close>, simp add: zahlenwps_def)
 
-lemma besitz_zahlenwps: "besitz (zahlenwps p1 p2 welt) p2 = besitz welt p1"
+lemma besitz_zahlenwps: \<open>besitz (zahlenwps p1 p2 welt) p2 = besitz welt p1\<close>
   apply(cases \<open>welt\<close>, simp add: zahlenwps_def)
   by (simp add: swap_b)
 
-lemma besitz_zahlenwps_nothing: "pX \<noteq> p1 \<Longrightarrow>
+lemma besitz_zahlenwps_nothing: \<open>pX \<noteq> p1 \<Longrightarrow>
        pX \<noteq> p2 \<Longrightarrow>
-       besitz (zahlenwps p1 p2 welt) pX = besitz welt pX"
+       besitz (zahlenwps p1 p2 welt) pX = besitz welt pX\<close>
   apply(cases \<open>welt\<close>, simp add: zahlenwps_def)
   by (simp add: swap_nothing)
 (*>*)
@@ -129,17 +129,17 @@ lemma hat_konsens_swap:
   by (simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
 
 lemma hat_konsens_swap_nachher_handeln:
-  "hat_konsens (Handlung (zahlenwps p1 p2 welt) (nachher_handeln p1 (zahlenwps p1 p2 welt) ha)) =
-    hat_konsens (Handlung welt (zahlenwps p1 p2 (nachher_handeln p1 (zahlenwps p2 p1 welt) ha)))"
+  \<open>hat_konsens (Handlung (zahlenwps p1 p2 welt) (nachher_handeln p1 (zahlenwps p1 p2 welt) ha)) =
+    hat_konsens (Handlung welt (zahlenwps p1 p2 (nachher_handeln p1 (zahlenwps p2 p1 welt) ha)))\<close>
   apply (metis (no_types, opaque_lifting) handlung.map hat_konsens_swap zahlenwps_id zahlenwps_sym)
   done
 
-lemma hat_konsens_noop: "hat_konsens (Handlung welt welt)"
+lemma hat_konsens_noop: \<open>hat_konsens (Handlung welt welt)\<close>
   apply(simp add: hat_konsens_def reverse_engineer_abmachung_same)
   by(code_simp)
 
 lemma nicht_ausfuehrbar_hat_konsens:
-  "\<not> ausfuehrbar p welt ha \<Longrightarrow> hat_konsens (handeln p welt ha)"
+  \<open>\<not> ausfuehrbar p welt ha \<Longrightarrow> hat_konsens (handeln p welt ha)\<close>
   apply(simp add: handeln_def nicht_ausfuehrbar_nachher_handeln hat_konsens_noop)
   done
 (*>*)
@@ -211,12 +211,12 @@ lemma\<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = No
 
 (*<*)
 lemma abmachung_einloesen_some_entahelt_konsens:
-  "abmachung_einloesen a welt = Some welt' \<Longrightarrow> enthaelt_konsens a welt"
+  \<open>abmachung_einloesen a welt = Some welt' \<Longrightarrow> enthaelt_konsens a welt\<close>
   by(simp add: abmachung_einloesen_def split: if_split_asm)
 
 lemma abmachung_einloesen_reverse_engineer:
-  "abmachung_einloesen a welt = Some welt'
-    \<Longrightarrow> reverse_engineer_abmachung (Handlung (besitz welt) (besitz welt')) = a"
+  \<open>abmachung_einloesen a welt = Some welt'
+    \<Longrightarrow> reverse_engineer_abmachung (Handlung (besitz welt) (besitz welt')) = a\<close>
   apply(simp add: abmachung_einloesen_def split: if_split_asm)
   apply(simp add: abmachung_ausfuehren_def)
   apply(simp add: reverse_engineer_abmachung)
@@ -229,8 +229,8 @@ lemma zahlenwelt_abmachung_ausfuehren_swap:
   by(simp add: zahlenwps_def abmachung_ausfuehren_swap konsensswap_sym)
 
 lemma abmachung_einloesen_zahlenwps_pullout:
-  "abmachung_einloesen (swap p1 p2 a) (zahlenwps p1 p2 welt)
-    = map_option (zahlenwps p2 p1) (abmachung_einloesen a welt)"
+  \<open>abmachung_einloesen (swap p1 p2 a) (zahlenwps p1 p2 welt)
+    = map_option (zahlenwps p2 p1) (abmachung_einloesen a welt)\<close>
   apply(simp add: abmachung_einloesen_def enthaelt_konsens_swap)
   apply(clarsimp)
   apply(simp add: zahlenwelt_abmachung_ausfuehren_swap)
@@ -277,10 +277,10 @@ lemma existierende_abmachung_einloesen_map_zahlenwps:
 lemma existierende_abmachung_einloesen_zahlenwps_pullout:
   \<open>existierende_abmachung_einloesen p (zahlenwps p1 p2 welt)
     = map_option (zahlenwps p2 p1) (existierende_abmachung_einloesen (swap p1 p2 id p) welt)\<close>
-  apply(cases "p = p1")
+  apply(cases \<open>p = p1\<close>)
   apply(simp add: swap_a)
   apply (metis existierende_abmachung_einloesen_map_zahlenwps zahlenwps_id)
-  apply(cases "p = p2")
+  apply(cases \<open>p = p2\<close>)
   apply(simp add: swap_b)
    apply (metis existierende_abmachung_einloesen_map_zahlenwps zahlenwps_id zahlenwps_sym)
   apply(simp add: swap_nothing)
@@ -359,9 +359,9 @@ lemma \<open>nachher_handeln Alice
 text\<open>Für\<^const>\<open>existierende_abmachung_einloesen\<close> gilt immer \<^const>\<open>hat_konsens\<close>.
 Das \<^const>\<open>reverse_engineer_abmachung\<close> macht also das Richtige.\<close>
 lemma hat_konsens_existierende_abmachung_einloesen:
-  "hat_konsens (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))"
+  \<open>hat_konsens (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))\<close>
   apply(simp add: hat_konsens_def handeln_def nachher_handeln.simps)
-  apply(cases "existierende_abmachung_einloesen p welt")
+  apply(cases \<open>existierende_abmachung_einloesen p welt\<close>)
   apply(simp)
   using hat_konsens_def hat_konsens_noop apply fastforce
   apply(simp)
@@ -522,8 +522,8 @@ lemma \<open>erzeuge_beispiel
 
 
 
-lemma "maxime_und_handlungsabsicht_generalisieren zahlenwps welt
-     maxime_hatte_konsens (Handlungsabsicht existierende_abmachung_einloesen) p"
+lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
+     maxime_hatte_konsens (Handlungsabsicht existierende_abmachung_einloesen) p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_hatte_konsens_def)
   apply(clarsimp)
   apply(simp add: hat_konsens_existierende_abmachung_einloesen)
@@ -546,12 +546,12 @@ lemma wpsm_kommutiert_altruistischer_fortschritt:
   apply(simp add: maxime_altruistischer_fortschritt_def wpsm_kommutiert_def handeln_def nachher_handeln.simps)
   apply(safe)
    apply(case_tac \<open>pX = p1\<close>)
-    apply(erule_tac x=p2 in allE)
+    apply(erule_tac x=\<open>p2\<close> in allE)
     apply (metis besitz_zahlenwps zahlenwps_sym)
    apply(case_tac \<open>pX = p2\<close>)
-    apply(erule_tac x=p1 in allE)
+    apply(erule_tac x=\<open>p1\<close> in allE)
     apply (metis besitz_zahlenwps zahlenwps_sym)
-   apply(erule_tac x=pX in allE)
+   apply(erule_tac x=\<open>pX\<close> in allE)
    apply(simp add: besitz_zahlenwps_nothing zahlenwps_sym)
   by (metis besitz_zahlenwps besitz_zahlenwps_nothing zahlenwps_sym)
 

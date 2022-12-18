@@ -39,8 +39,8 @@ lemma \<open>dom [Alice \<mapsto> (3::nat), Carol \<mapsto> 6] = {Alice, Carol}\
 
 
 lemma obtain_fresh_person:
-  "\<exists>p::person. p \<noteq> p1 \<and> p \<noteq> p2"
-  apply(cases p1, case_tac [!] p2)
+  \<open>\<exists>p::person. p \<noteq> p1 \<and> p \<noteq> p2\<close>
+  apply(cases \<open>p1\<close>, case_tac [!] \<open>p2\<close>)
   by(auto)
 
 (*TODO: use https://www.isa-afp.org/entries/Generic_Deriving.html to get a linorder?

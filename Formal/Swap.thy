@@ -68,9 +68,9 @@ maybe by(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
 can be faster
 *)
 lemma swap_cases:
-  "(p = p1 \<Longrightarrow> P (f p2)) \<Longrightarrow> (p = p2 \<Longrightarrow> P (f p1)) \<Longrightarrow> (p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> P (f p))\<Longrightarrow> P (swap p1 p2 f p)"
-apply(case_tac "p=p1", simp add: swap_a)
-apply(case_tac "p=p2", simp add: swap_b)
+  \<open>(p = p1 \<Longrightarrow> P (f p2)) \<Longrightarrow> (p = p2 \<Longrightarrow> P (f p1)) \<Longrightarrow> (p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow> P (f p))\<Longrightarrow> P (swap p1 p2 f p)\<close>
+apply(case_tac \<open>p=p1\<close>, simp add: swap_a)
+apply(case_tac \<open>p=p2\<close>, simp add: swap_b)
 apply(simp add: swap_nothing)
 done
 
@@ -78,12 +78,12 @@ lemma swap_in_set_of_functions:
   \<open>swap p2 p1 x \<in> A \<longleftrightarrow> x \<in> swap p1 p2 ` A\<close>
   using image_iff by fastforce
 
-lemma swap_image: "p1 \<in> A \<Longrightarrow> p2 \<in> A \<Longrightarrow> swap p1 p2 f ` A = f ` A"
+lemma swap_image: \<open>p1 \<in> A \<Longrightarrow> p2 \<in> A \<Longrightarrow> swap p1 p2 f ` A = f ` A\<close>
   apply(simp add: image_def)
   apply(rule Collect_cong)
   by (metis swap_a swap_b swap_nothing)
 
-lemma swap_id_eq_simp: "swap p1 p2 id a = swap p1 p2 id b \<longleftrightarrow> a = b"
+lemma swap_id_eq_simp: \<open>swap p1 p2 id a = swap p1 p2 id b \<longleftrightarrow> a = b\<close>
   by (metis id_apply swap_a swap_nothing swap_symmetric)
 
 lemma swap_id_in_set:
@@ -120,7 +120,7 @@ lemma min_list_swap_int:
   apply(simp add: min_list_Min)
   apply(cases \<open>p1 = p2\<close>)
    apply(simp; fail)
-  apply(rule arg_cong[where f=Min])
+  apply(rule arg_cong[where f=\<open>Min\<close>])
   apply(simp add: swap_image)
   done
 
@@ -153,25 +153,25 @@ lemma swap_if_move_inner:
 
 
 
-lemma swap_fun_swap_id: "swap p1 p2 konsens (swap p1 p2 id p) = konsens p"
-  apply(cases "p=p1")
+lemma swap_fun_swap_id: \<open>swap p1 p2 konsens (swap p1 p2 id p) = konsens p\<close>
+  apply(cases \<open>p=p1\<close>)
    apply(simp add: swap_a swap_b)
-  apply(cases "p=p2")
+  apply(cases \<open>p=p2\<close>)
    apply(simp add: swap_a swap_b)
   by(simp add: swap_nothing)
 
 
 (*TODO: baut swap eine Permutation und gibt es darauf lemmata?*)
-lemma "distinct [p1,p2,p3,p4] \<Longrightarrow> swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
+lemma \<open>distinct [p1,p2,p3,p4] \<Longrightarrow> swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)\<close>
   by(auto simp add: swap_def)
 
-lemma swap_comm: "p1 \<noteq> p3 \<Longrightarrow> p1 \<noteq> p4 \<Longrightarrow> p2 \<noteq> p3 \<Longrightarrow> p2 \<noteq> p4 \<Longrightarrow>
-  swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)"
+lemma swap_comm: \<open>p1 \<noteq> p3 \<Longrightarrow> p1 \<noteq> p4 \<Longrightarrow> p2 \<noteq> p3 \<Longrightarrow> p2 \<noteq> p4 \<Longrightarrow>
+  swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)\<close>
   by(auto simp add: swap_def)
 
 lemma swap_unrelated_im_kreis:
-  "p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
-    swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt"
+  \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+    swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt\<close>
   by(simp add: swap_def)
 
 end
