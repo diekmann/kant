@@ -215,7 +215,8 @@ definition \<open>jeder_zahlt_einkommenssteuer p w \<equiv> Some (jeder_zahlt ei
 
 
 text\<open>Bei dem geringen Einkommen der \<^term>\<open>Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]\<close> zahlt keiner Steuern.\<close>
-lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
+lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+                  maxime_steuern (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 
 text\<open>Für höhere Einkommen erhalten wir plausible Werte und niemand rutscht ins negative:\<close>
