@@ -4,6 +4,8 @@ begin
 
 
 section\<open>Beispiel: Steuern\<close>
+text\<open>In diesem Abschnitt kombinieren wir das vorhergehende Modell der Einkommensteuergesetzgebung
+mit dem kategorischen Imperativ um ein Beispiel über moralische Aussagen über Steuern zu schaffen.\<close>
 
 text\<open>Wir nehmen eine einfach Welt an, in der jeder Person ihr Einkommen zugeordnet wird.
 
@@ -11,23 +13,26 @@ Achtung: Im Unterschied zum BeispielZahlenwelt.thy modellieren wir hier nicht de
 sondern das Jahreseinkommen. Besitz wird ignoriert.
 \<close>
 datatype steuerwelt = Steuerwelt
-        (get_einkommen: \<open>person \<Rightarrow> int\<close>) \<comment> \<open>einkommen jeder Person (im Zweifel 0).\<close>
+        (get_einkommen: \<open>person \<Rightarrow> int\<close>) \<comment> \<open>Einkommen jeder Person (im Zweifel 0).\<close>
 
-
-(*TODO: copy from zahlenwelt*)
+(*<*)
 fun steuerwps :: \<open>person \<Rightarrow> person \<Rightarrow> steuerwelt \<Rightarrow> steuerwelt\<close> where
   \<open>steuerwps p1 p2 (Steuerwelt besitz) = Steuerwelt (swap p1 p2 besitz)\<close>
+(*>*)
 
-
+text\<open>Die Steuerlast sagt, wie viel Steuern gezahlt werden.\<close>
 fun steuerlast :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
   \<open>steuerlast p (Handlung vor nach) = ((get_einkommen vor) p) - ((get_einkommen nach) p)\<close>
 
+text\<open>Das Einkommen vor Steuer wird brutto genannt.\<close>
 fun brutto :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
   \<open>brutto p (Handlung vor nach) = (get_einkommen vor) p\<close>
+text\<open>Das Einkommen nach Steuer wird netto genannt.\<close>
 fun netto :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<close> where
   \<open>netto p (Handlung vor nach) = (get_einkommen nach) p\<close>
 
 
+text\<open>Beispiele\<close>
 lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 3\<close>
   by eval
 lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=0])) = 8\<close>
@@ -39,6 +44,8 @@ lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=-3]) (Steuerw
 lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=1]) (Steuerwelt \<^url>[Alice:=-1])) = 2\<close>
   by eval
 
+
+text\<open>Folgende Menge beinhaltet alle Personen die mehr verdienen als ich.\<close>
 fun mehrverdiener :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> person set\<close> where
   \<open>mehrverdiener ich (Handlung vor nach) = {p. (get_einkommen vor) p \<ge> (get_einkommen vor) ich}\<close>
 
@@ -46,9 +53,11 @@ lemma \<open>mehrverdiener Alice
         (Handlung (Steuerwelt \<^url>[Alice:=8, Bob:=12, Eve:=7]) (Steuerwelt \<^url>[Alice:=5]))
        = {Alice, Bob}\<close> by eval
 
+(*<*)
 lemma mehrverdiener_betrachtet_nur_ausgangszustand:
   \<open>mehrverdiener p (handeln p' welt h) = mehrverdiener p (Handlung welt welt)\<close>
   by (metis handlung.collapse mehrverdiener.simps vorher_handeln)
+(*>*)
 
 text\<open>Folgende Maxime versucht Steuergerechtigkeit festzuschreiben:\<close>
 (*TODO: eine andere test maxime sollte sein,
@@ -72,12 +81,10 @@ Diese Handlung kann ich aber nicht auf andere projezieren, da
     Die Handlung die die maxime erfuellen wuerde waere "JEDER zahle 10 Steuer".
 *)
 
-
-
+(*<*)
 fun delta_steuerwelt :: \<open>(steuerwelt, person, int) delta\<close> where
   \<open>delta_steuerwelt (Handlung vor nach) =
       Aenderung.delta_num_fun (Handlung (get_einkommen vor) (get_einkommen nach))\<close>
-
 
 
 (*(Maxime 
@@ -147,10 +154,11 @@ lemma wfh_steuerberechnung_jeder_zahlt_int:
   apply(safe)
   apply(rename_tac eink p1 p2 p)
   by(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
+(*>*)
 
 
-  text\<open>Wenn die Steuerfunktion monoton ist, dann kann ich auch einen sehr
-eingeschraenkten kat imp zeigen.\<close>
+text\<open>Wenn die Steuerfunktion monoton ist,
+dann können wir auch einen sehr eingeschränkten kategorischen Imperativ zeigen.\<close>
 lemma \<open>
   (\<And>e1 e2. e1 \<le> e2 \<Longrightarrow> steuerberechnung e1 \<le> steuerberechnung e2) \<Longrightarrow>
   ha = Handlungsabsicht (\<lambda>ich w. Some (Steuerwelt ((\<lambda>e. e - steuerberechnung e) \<circ> (get_einkommen w)))) \<Longrightarrow>
@@ -166,22 +174,19 @@ lemma \<open>
   done
 
 
-subsection\<open>Setup für Beispiele\<close>
-
-definition \<open>initialwelt \<equiv> Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]\<close>
-
-
 subsection\<open>Beispiel: Keiner Zahlt Steuern\<close>
 
 text\<open>Die Maxime ist erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
-lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht (\<lambda>ich welt. Some welt))\<close> by eval
+lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+                  maxime_steuern (Handlungsabsicht (\<lambda>ich welt. Some welt))\<close> by eval
 
 
 subsection\<open>Beispiel: Ich zahle 1 Steuer\<close>
 text\<open>Das funktioniert nicht:\<close>
 definition \<open>ich_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt \<lbrakk>(get_einkommen welt)(ich -= 1)\<rbrakk>)\<close>
-lemma \<open>\<not> moralisch initialwelt maxime_steuern (Handlungsabsicht ich_zahle_1_steuer)\<close> by eval
+lemma \<open>\<not> moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+                    maxime_steuern (Handlungsabsicht ich_zahle_1_steuer)\<close> by eval
 
 text\<open>Denn jeder muss Steuer zahlen!
 Ich finde es super spannend, dass hier faktisch ein Gleichbehandlungsgrundsatz rausfällt,
@@ -195,7 +200,8 @@ text\<open>Jeder muss steuern zahlen:
 Das \<^term>\<open>ich\<close> wird garnicht verwendet, da jeder Steuern zahlt.\<close>
 definition \<open>jeder_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))\<close>
-lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht jeder_zahle_1_steuer)\<close> by eval
+lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+                 maxime_steuern (Handlungsabsicht jeder_zahle_1_steuer)\<close> by eval
 
 
 subsection\<open>Beispiel: Vereinfachtes Deutsches Steuersystem\<close>
@@ -208,7 +214,7 @@ definition jeder_zahlt :: \<open>(nat \<Rightarrow> nat) \<Rightarrow> 'a \<Righ
 definition \<open>jeder_zahlt_einkommenssteuer p w \<equiv> Some (jeder_zahlt einkommenssteuer p w)\<close>
 
 
-text\<open>Bei dem geringen Einkommen der \<^const>\<open>initialwelt\<close> zahlt keiner Steuern.\<close>
+text\<open>Bei dem geringen Einkommen der \<^term>\<open>Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]\<close> zahlt keiner Steuern.\<close>
 lemma \<open>moralisch initialwelt maxime_steuern (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 
