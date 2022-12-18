@@ -3,6 +3,8 @@ imports Main ExecutableHelper BeispielPerson Handlung Zahlenwelt
 begin
 
 section\<open>Änderungen in Welten\<close>
+text\<open>In diesem Abschnitt werden wir Änderungen in Welten,
+und darauf basierend, Abmachungen modellieren.\<close>
 
 datatype ('person, 'etwas) aenderung = Verliert \<open>'person\<close> \<open>'etwas\<close> | Gewinnt \<open>'person\<close> \<open>'etwas\<close>
 

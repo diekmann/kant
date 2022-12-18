@@ -3,6 +3,8 @@ imports BeispielPerson ExecutableHelper Swap SchleierNichtwissen
 begin
 
 section\<open>Zahlenwelt Helper\<close>
+text\<open>In diesem Abschnitt definieren wir Hilfsfunktionen für kommende "Zahlenwelt" Beispiele.\<close>
+
 text\<open>Wir werden Beispiele betrachten, in denen wir Welten modellieren, in denen jeder Person eine
 Zahl zugewiesen wird: \<^typ>\<open>person \<Rightarrow> int\<close>.
 Diese Zahl kann zum Beispiel der Besitz oder Wohlstand einer Person sein, oder das Einkommen.

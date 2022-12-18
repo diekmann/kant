@@ -3,6 +3,24 @@ imports Zahlenwelt BeispielPerson Aenderung KategorischerImperativ
 begin
 
 section\<open>Beispiel: Zahlenwelt2\<close>
+text\<open>In diesem Abschnitt werden wir ein weiteres Beispiel sehen.\<close>
+
+text\<open>Dieses Beispiel ist ähnlich zum Beispiel Zahlenwelt in Abschnitt \ref{sec:bspzahlenwelt}.
+Allerdings führen wir einige Erweiterungen ein:
+  \<^item> Jeder Person wird weiterhin ihr Besitz zugeordnet.
+  \<^item> Neben dem Besitz gibt es auch ein Modell von Konsens.
+    Dabei soll Konsens die Liste aller bereits getroffenen Abmachungen darstellen,
+    bzw modellieren, zu was die Leute bereit wären.
+    So lässt sich beispielsweise Schenken (Besitzübergang mit Konsens)
+    von Stehlen (Besitzübergang ohne Konsens) unterscheiden.
+  \<^item> Es gibt eine spezielle Entität, nämlich den Staat.
+    Diese Entität ist nicht in der Menge der natürlichen Personen enthalten.
+    Dies erlaubt es z.B. den Staat in Handlungsabsichten hardzucoden und
+    gleichzeitig eine wohlgeformte Handlungsabsicht zu haben.
+    TODO: machen
+  \<^item> Als weitere spezielle Entität wird die Umwelt eingeführt.
+    TODO: auch ein Beispiel damit.
+\<close>
 
 record zahlenwelt =
   besitz :: \<open>person \<Rightarrow> int\<close>

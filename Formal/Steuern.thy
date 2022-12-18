@@ -4,6 +4,10 @@ begin
 
 section\<open>Einkommensteuergesetzgebung\<close>
 
+
+text\<open>In diesem Abschnitt werden wir eine versuchen die Grundlagen der
+Einkommenssteuergesetzgebung zu modellieren.\<close>
+
 (*<*)
 text\<open>Helper\<close>
 definition floor :: \<open>real \<Rightarrow> nat\<close> where
@@ -21,7 +25,7 @@ lemma floor_minusD:
 (*>*)
 
 
-text\<open>Basierend auf einer stark vereinfachten Version des deutschen Steuerrechts.
+text\<open>Folgendes Modell basiert auf einer stark vereinfachten Version des deutschen Steuerrechts.
 Wenn ich Wikipedia richtig verstanden habe, habe ich sogar aus Versehen einen Teil des 
 österreichischen Steuersystem gebaut mit deutschen Konstanten.
 \<close>
@@ -41,7 +45,7 @@ Eine konkrete \<^term>\<open>steuer\<close> Funktion wird noch nicht gegeben.
 \<close>
 
 locale steuer_defs =
-  fixes steuer :: \<open>nat \<Rightarrow> nat\<close> \<comment> \<open>Einkommen -> Steuer\<close>
+  fixes steuer :: \<open>nat \<Rightarrow> nat\<close> \<comment> \<open>Funktion: Einkommen -> Steuer\<close>
 begin
   definition brutto :: \<open>nat \<Rightarrow> nat\<close> where
     \<open>brutto einkommen \<equiv> einkommen\<close>

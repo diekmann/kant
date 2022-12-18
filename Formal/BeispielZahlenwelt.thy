@@ -2,12 +2,13 @@ theory BeispielZahlenwelt
   imports Zahlenwelt BeispielPerson KategorischerImperativ
 begin
 
-section\<open>Beispiel: Zahlenwelt\<close>
+section\<open>Beispiel: Zahlenwelt\label{sec:bspzahlenwelt}\<close>
+text\<open>In diesem Abschnitt werden wir ein Beispiel sehen.\<close>
 
 text\<open>Wir nehmen an, die Welt lässt sich durch eine Zahl darstellen,
-  die den Besitz einer Person modelliert.
-  
-  Der Besitz ist als ganze Zahl \<^typ>\<open>int\<close> modelliert und kann auch beliebig negativ werden.\<close>
+die den Besitz einer Person modelliert.
+
+Der Besitz ist als ganze Zahl \<^typ>\<open>int\<close> modelliert und kann auch beliebig negativ werden.\<close>
 datatype zahlenwelt = Zahlenwelt
   \<open>person \<Rightarrow> int \<comment> \<open>besitz: Besitz jeder Person.\<close>\<close>
 

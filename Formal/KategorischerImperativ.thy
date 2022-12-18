@@ -3,6 +3,7 @@ imports Maxime SchleierNichtwissen
 begin
 
 section\<open>Kategorischer Imperativ\<close>
+text\<open>In diesem Abschnitt werden wir den kategorischen Imperativ modellieren.\<close>
 
 text\<open>
 Wir haben mit der goldenen Regel bereits definiert, 

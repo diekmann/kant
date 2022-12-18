@@ -3,6 +3,7 @@ imports Handlung BeispielPerson ExecutableHelper
 begin
 
 section\<open>Maxime\<close>
+text\<open>In diesem Abschnitt werden wir das Konzept einer Maxime modellieren.\<close>
 
 text\<open>
 Nach \<^url>\<open>https://de.wikipedia.org/wiki/Maxime\<close> ist eine Maxime ein

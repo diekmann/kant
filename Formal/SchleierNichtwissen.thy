@@ -3,6 +3,11 @@ imports BeispielPerson Handlung Maxime Swap
 begin
 
 section\<open>Schleier des Nichtwissens\<close>
+text\<open>In diesem Abschnitt werden wir,
+basierend auf der Idee von Rawls Schleier des Nitchwissens,
+definieren, was eine wohlgeformte Handlungsabsicht und eine wohlgeformte Maxime sind.\<close>
+
+
 text\<open>
 Rawls' Schleier des Nichtwissens \<^url>\<open>https://de.wikipedia.org/wiki/Schleier_des_Nichtwissens\<close>
 ist ein fiktives Modell, in der Personen

@@ -3,6 +3,16 @@ imports Helper
 begin
 
 section\<open>Swap\<close>
+text\<open>In diesem Abschnitt werden wir eine swap Funktion bauen,
+welche es erlaubt Eigenschaften von Personen auszutauschen.
+Wenn wir beispielsweise eine Funktion haben welche Personen ihren Besitz zuordnet,
+beispielsweise \<^term_type>\<open>besitz :: 'person \<Rightarrow> int\<close>,
+so soll die swap Funktion es erlauben, den Besitz von zwei Personen \<^term_type>\<open>p1::'person\<close> und
+\<^term_type>\<open>p2::'person\<close> zu vertauschen.
+So soll \<^term>\<open>swap (p1::'person) (p2::'person) (besitz :: 'person \<Rightarrow> int)\<close>
+die \<^term>\<open>besitz :: 'person \<Rightarrow> int\<close> Funktion zurückgeben,
+allerdings mit dem Besitz von \<^term>\<open>p1::'person\<close> und \<^term>\<open>p2::'person\<close> vertauscht.
+\<close>
 
 definition swap :: \<open>'a \<Rightarrow> 'a \<Rightarrow> ('a \<Rightarrow> 'b) \<Rightarrow> 'a \<Rightarrow> 'b\<close> where
   \<open>swap a b f \<equiv> f(a:=f b, b:= f a)\<close>
