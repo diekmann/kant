@@ -384,9 +384,8 @@ theorem
   using steuersystem_imp_maxime maxime_imp_steuersystem
   using assms by blast 
 
-(*TODO: only print lemma name, not full contents*)
 text\<open>Da jede Steuersystemimplementierung welche \<^locale>\<open>steuersystem\<close> erfüllt auch
-moralisch ist (@{thm steuersystem_imp_maxime}),
+moralisch ist (lemma @{thm [source] steuersystem_imp_maxime}),
 erfüllt damit auch jedes solche System den kategorischen Imperativ.\<close>
 corollary steuersystem_imp_kaptimp:
  \<open>steuersystem steuersystem_impl \<Longrightarrow>
