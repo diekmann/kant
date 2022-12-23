@@ -10,6 +10,7 @@ session Kant = Cache +
   options [document_output="output", document_build = "pdflatex", document_variants="outline=-proof,-ML"]
   sessions "HOL-Library"
   theories [document = false]
+    BeispielTac
     ExecutableHelper
     Percentage
     Swap

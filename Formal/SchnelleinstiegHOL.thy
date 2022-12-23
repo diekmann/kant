@@ -1,5 +1,5 @@
 theory SchnelleinstiegHOL
-imports Main
+  imports Main BeispielTac
 begin
 
 section\<open>Schnelleinstieg Isabelle/HOL\<close>
@@ -23,7 +23,19 @@ Würde der Beweis nicht gelten, würde das PDF garnicht compilieren.
 Ich wurde schon für meine furchtbaren Beweise zitiert.
 Ist also ganz gut, dass wir nur Ergebnisse im PDF sehen und der eigentliche Beweis ausgelassen ist.
 Am besten kann man Beweise sowieso im Isabelle Editor anschauen und nicht im PDF.
+
+Wir werden die meisten Hilfsfakten als @{command lemma} kennzeichnen.
+Wichtige Fakten werden wir @{command theorem} nennen.
+Zusätzlich führen wir noch das @{command beispiel} Kommando ein,
+um Lemmata von Beispielen zu unterscheiden.
+
+Folgende drei Aussagen sind alle equivalent und maschinengeprüft korrekt:
 \<close>
+
+
+lemma \<open>3 = 2+1\<close> by simp
+theorem \<open>3 = 2+1\<close> by simp
+beispiel \<open>3 = 2+1\<close> by simp
 
 subsection\<open>Mehr Typen\<close>
 text\<open>Jeder Typ der mit einem einfachen Anführungszeichen anfängt ist ein polymorpher Typ.
