@@ -60,7 +60,7 @@ text\<open>Beispiel. Die \<^term>\<open>steuer\<close> Funktion sagt, man muss 2
 definition beispiel_25prozent_steuer :: \<open>nat \<Rightarrow> nat\<close> where
   \<open>beispiel_25prozent_steuer e \<equiv> nat \<lfloor>real e * (percentage 0.25)\<rfloor>\<close>
 
-lemma
+beispiel
   \<open>beispiel_25prozent_steuer 100 = 25\<close>
   \<open>steuer_defs.brutto 100 = 100\<close>
   \<open>steuer_defs.netto beispiel_25prozent_steuer 100 = 75\<close>
@@ -119,7 +119,7 @@ jemand mit 100 EUR Einkommen genau 25 Prozent Steuer zahlt,
 jemand mit 103 EUR Einkommen aber nur ca 24,3 Prozent Steuer zahlt. 
 \<close>
 
-lemma
+beispiel
   \<open>steuer_defs.steuersatz beispiel_25prozent_steuer 100 = percentage 0.25\<close>
   \<open>steuer_defs.steuersatz beispiel_25prozent_steuer 103 = percentage (25 / 103)\<close>
   \<open>percentage (25 / 103) < percentage 0.25\<close>
@@ -335,24 +335,24 @@ definition einkommenssteuer :: \<open>nat \<Rightarrow> nat\<close> where
     floor (bucketsteuerAbs steuerbuckets2022 (percentage  0.45) einkommen)\<close>
 
 text\<open>Beispiel. Alles unter dem Existenzminimum ist steuerfrei:\<close>
-lemma \<open>einkommenssteuer 10 = 0\<close> by eval
-lemma \<open>einkommenssteuer 10000 = 0\<close> by eval
+beispiel \<open>einkommenssteuer 10 = 0\<close> by eval
+beispiel \<open>einkommenssteuer 10000 = 0\<close> by eval
 
 text\<open>Für ein Einkommen nur knapp über dem Existenzminimum fällt sehr wenig Steuer an:\<close>
-lemma \<open>einkommenssteuer 14000 = floor ((14000-10347)*0.14)\<close> by eval
-lemma \<open>einkommenssteuer 14000 = 511\<close> by eval
+beispiel \<open>einkommenssteuer 14000 = floor ((14000-10347)*0.14)\<close> by eval
+beispiel \<open>einkommenssteuer 14000 = 511\<close> by eval
 
 
 text\<open>Bei einem Einkommen von 20000 EUR wird ein Teil bereits mit den höheren Steuersatz der
 3. Zone besteuert:\<close>
-lemma \<open>einkommenssteuer 20000 = 1857\<close> by eval
-lemma \<open>einkommenssteuer 20000 =
+beispiel \<open>einkommenssteuer 20000 = 1857\<close> by eval
+beispiel \<open>einkommenssteuer 20000 =
         floor ((14926-10347)*0.14 + (20000-14926)*0.2397)\<close> by eval
 
 
 text\<open>Höhere Einkommen führen zu einer höheren Steuer:\<close>
-lemma \<open>einkommenssteuer 40000 = 6651\<close> by eval
-lemma \<open>einkommenssteuer 60000 = 11698\<close> by eval
+beispiel \<open>einkommenssteuer 40000 = 6651\<close> by eval
+beispiel \<open>einkommenssteuer 60000 = 11698\<close> by eval
 
 (*<*)
 lemma einkommenssteuer:

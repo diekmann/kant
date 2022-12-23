@@ -132,9 +132,10 @@ lemma \<open>moralisch welt m ha \<Longrightarrow>
 
 text\<open>Die andere Richtung gilt nicht,
 z.B. ist die Maxime die immer False zurückgibt ein Gegenbeispiel.\<close>
-lemma \<open>m = Maxime (\<lambda>_ _. False) \<Longrightarrow>
-        kategorischer_imperativ_auf ha welt m \<longrightarrow> moralisch welt m ha
-          \<Longrightarrow> False\<close>
+beispiel
+  \<open>m = Maxime (\<lambda>_ _. False) \<Longrightarrow>
+   kategorischer_imperativ_auf ha welt m \<longrightarrow> moralisch welt m ha
+     \<Longrightarrow> False\<close>
   by(simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
 
@@ -199,20 +200,20 @@ subsection\<open>Triviale Maximen die den Kategorischen Imperativ immer Erfülle
 text\<open>
 Die Maxime die keine Handlung erlaubt (weil immer False) erfüllt den kategorischen
 Imperativ:\<close>
-lemma \<open>kategorischer_imperativ wps welt (Maxime (\<lambda>ich h. False))\<close>
+beispiel \<open>kategorischer_imperativ wps welt (Maxime (\<lambda>ich h. False))\<close>
   by(simp add: kategorischer_imperativ_simp)
 
 text\<open>Allerdings kann mit so einer Maxime nie etwas moralisch sein.\<close>
-lemma \<open>\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h\<close>
+beispiel \<open>\<not> moralisch welt (Maxime (\<lambda>ich h. False)) h\<close>
   by(simp add: moralisch_simp)
 
 text\<open>Die Maxime die jede Handlung erlaubt (weil immer True) erfüllt den kategorischen
 Imperativ:\<close>
-lemma \<open>kategorischer_imperativ wps welt (Maxime (\<lambda>ich h. True))\<close>
+beispiel \<open>kategorischer_imperativ wps welt (Maxime (\<lambda>ich h. True))\<close>
   by(simp add: kategorischer_imperativ_simp)
 
 text\<open>Allerdings ist mit so einer Maxime alles moralisch.\<close>
-lemma \<open>moralisch welt (Maxime (\<lambda>ich h. True)) h\<close>
+beispiel \<open>moralisch welt (Maxime (\<lambda>ich h. True)) h\<close>
   by(simp add: moralisch_simp)
 
 
@@ -577,10 +578,11 @@ fun beispiel_tac ctxt =
   HEADGOAL (CONVERSION (beispiel_conv ctxt) THEN_ALL_NEW (resolve_tac ctxt @{thms refl}))
 \<close>
 
-method_setup beispiel = \<open>Scan.succeed (SIMPLE_METHOD o beispiel_tac)\<close>
+method_setup beispiel_tac = \<open>Scan.succeed (SIMPLE_METHOD o beispiel_tac)\<close>
 (*>*)
 
-lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. Some w)] (Maxime (\<lambda>ich w. True))
+beispiel
+  \<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht (\<lambda>p w. Some w)] (Maxime (\<lambda>ich w. True))
   =
   Some
   \<lparr>
@@ -589,7 +591,7 @@ lemma\<open>erzeuge_beispiel swap (\<lambda>p::person. 0::int) [Handlungsabsicht
    bsp_verbotene_handlungen = [],
    bsp_uneindeutige_handlungen = []
   \<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 text\<open>Der Nachteil von \<^const>\<open>erzeuge_beispiel\<close> ist,
 dass der resultierende Record viele Funktionen enthält,
@@ -739,12 +741,12 @@ gepaart auftreten muss.
 
 text\<open>Eine gewöhnliche Introduction Rule (ohne die \<^const>\<open>ex_erfuellbare_instanz\<close> Teile)
 gilt leider nicht.\<close>
-lemma
+beispiel
   \<open>ha = Handlungsabsicht (\<lambda>p w. Some w) \<Longrightarrow>
    m1 = Maxime ((\<lambda>p h. False)(Bob := \<lambda>h. True)) \<Longrightarrow>
    welt = (0::int) \<Longrightarrow>
-kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
-  \<not> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)\<close>
+   kategorischer_imperativ_auf ha welt m1 \<Longrightarrow>
+    \<not> kategorischer_imperativ_auf ha welt (MaximeDisj m1 m2)\<close>
   apply(simp)
   apply(thin_tac \<open>_ = _\<close>)+
   apply(code_simp)

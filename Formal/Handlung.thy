@@ -1,5 +1,5 @@
 theory Handlung
-imports Main
+imports Main BeispielTac
 begin
 
 section\<open>Handlung\<close>
@@ -30,7 +30,7 @@ So können wir handelnde Person und beobachtende Person trennen.\<close>
 
 (*<*)
 text\<open>The datatype-generated functions are really cool:\<close>
-lemma \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
+beispiel \<open>map_handlung Suc (Handlung 1 2) = Handlung 2 3\<close> by eval
 (*>*)
 
 
@@ -44,8 +44,6 @@ definition ist_noop :: \<open>'welt handlung \<Rightarrow> bool\<close> where
 lemma ist_noop_map_handlung:
   shows \<open>ist_noop h \<Longrightarrow> ist_noop (map_handlung f h)\<close>
   by(cases \<open>h\<close>, rename_tac vor nach, simp add: ist_noop_def)
-
-
 (*>*)
 
 
@@ -123,10 +121,10 @@ Wenn die Zahl kleiner als 9000 ist erhöhe ich sie, ansonsten schlägt die Handl
 \<close>
 definition \<open>beispiel_handlungsabsicht \<equiv> Handlungsabsicht (\<lambda>_ n. if n < 9000 then Some (n+1) else None)\<close>
 
-lemma \<open>nachher_handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = 43\<close> by eval
-lemma \<open>handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = Handlung 42 43\<close> by eval
-lemma \<open>nachher_handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht = 9000\<close> by eval
-lemma \<open>ist_noop (handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht)\<close> by eval
+beispiel \<open>nachher_handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = 43\<close> by eval
+beispiel \<open>handeln ''Peter'' (42::nat) beispiel_handlungsabsicht = Handlung 42 43\<close> by eval
+beispiel \<open>nachher_handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht = 9000\<close> by eval
+beispiel \<open>ist_noop (handeln ''Peter'' (9000::nat) beispiel_handlungsabsicht)\<close> by eval
 
 text \<open>
 Von Außen können wir Funktionen nur extensional betrachten, d.h. Eingabe und Ausgabe anschauen.

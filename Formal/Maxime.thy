@@ -273,7 +273,7 @@ text\<open>Beispiel:
 Die Welt sei nur eine Zahl und die zu betrachtende Handlungsabsicht sei,
 dass wir diese Zahl erhöhen.
 Die Mir-ist-alles-Recht Maxime ist hier erfüllt:\<close>
-lemma \<open>moralisch
+beispiel \<open>moralisch
             (42::nat)
              maxime_mir_ist_alles_recht
             (Handlungsabsicht (\<lambda>(person::person) welt. Some (welt + 1)))\<close> by eval
@@ -283,13 +283,13 @@ Die Welt ist modelliert als eine Abbildung von Person auf Besitz.
 Die Maxime sagt, dass Leute immer mehr oder gleich viel wollen, aber nie etwas verlieren wollen.
 In einer Welt in der keiner etwas hat, erfüllt die Handlung jemanden 3 zu geben die Maxime.
 \<close>
-lemma \<open>moralisch
+beispiel \<open>moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
             (Handlungsabsicht (\<lambda>person welt. Some (welt(person \<mapsto> 3))))\<close>
   by eval
-lemma \<open>debug_maxime show_map
+beispiel \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 0, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
@@ -300,13 +300,13 @@ lemma \<open>debug_maxime show_map
 
 text\<open>Wenn nun \<^const>\<open>Bob\<close> allerdings bereits 4 hat, würde die obige Handlung ein Verlust
 für ihn bedeuten und die Maxime ist nicht erfüllt.\<close>
-lemma \<open>\<not> moralisch
+beispiel \<open>\<not> moralisch
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))
             (Handlungsabsicht (\<lambda>person welt. Some (welt(person \<mapsto> 3))))\<close>
   by eval
-lemma \<open>debug_maxime show_map
+beispiel \<open>debug_maxime show_map
             [Alice \<mapsto> (0::nat), Bob \<mapsto> 4, Carol \<mapsto> 0, Eve \<mapsto> 0]
             (Maxime (\<lambda>person handlung.
                 (the ((vorher handlung) person)) \<le> (the ((nachher handlung) person))))

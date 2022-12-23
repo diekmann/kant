@@ -45,7 +45,7 @@ text\<open>Mein persönlicher Besitz:\<close>
 fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> where
   \<open>meins p welt = (besitz welt) p\<close>
 
-lemma \<open>meins Carol initialwelt = -3\<close> by eval
+beispiel \<open>meins Carol initialwelt = -3\<close> by eval
 
 (*<*)
 definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt\<close> where
@@ -54,7 +54,7 @@ definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenw
             konsens := konsensswap p1 p2 (konsens welt) \<rparr>\<close>
 
 
-lemma \<open>zahlenwps Alice Bob initialwelt
+beispiel \<open>zahlenwps Alice Bob initialwelt
 = \<lparr>
   besitz = \<^url>[Alice := 10, Bob := 5, Carol := -3],
   konsens = (\<lambda>_. [])(
@@ -65,7 +65,7 @@ lemma \<open>zahlenwps Alice Bob initialwelt
  \<rparr>\<close> by eval
 
 
-lemma \<open>zahlenwps Alice Carol initialwelt
+beispiel \<open>zahlenwps Alice Carol initialwelt
 = \<lparr>
   besitz = \<^url>[Alice := -3, Bob := 10, Carol := 5],
   konsens = (\<lambda>_. [])(
@@ -152,10 +152,10 @@ lemma \<open>hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w
   apply(code_simp)
   done
   
-lemma \<open>hat_konsens (handeln Alice initialwelt
+beispiel \<open>hat_konsens (handeln Alice initialwelt
         (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk> \<rparr>))))\<close>
   by eval
-lemma \<open>\<not> hat_konsens (handeln Alice initialwelt
+beispiel \<open>\<not> hat_konsens (handeln Alice initialwelt
           (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 4)\<rbrakk>(Bob -= 4)\<rbrakk> \<rparr>))))\<close>
   by eval
 
@@ -167,7 +167,7 @@ where
   \<open>abmachung_ausfuehren abmachung welt \<equiv>
     welt\<lparr> besitz := Aenderung.abmachung_ausfuehren abmachung (besitz welt) \<rparr>\<close>
 
-lemma \<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
+beispiel \<open>abmachung_ausfuehren (to_abmachung [Gewinnt Alice 3]) initialwelt
   = initialwelt\<lparr> besitz := \<lbrakk>(besitz initialwelt)(Alice += 3)\<rbrakk>\<rparr>\<close>
   by eval
 
@@ -182,7 +182,7 @@ definition abmachung_einloesen :: \<open>(person, int) abmachung \<Rightarrow> z
   else None\<close>
 
 
-lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
+beispiel \<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
  = Some
   \<lparr>
     besitz = \<^url>[Alice := 8, Bob := 7, Carol := -3],
@@ -194,7 +194,7 @@ lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3])
    \<rparr>\<close>
   by eval
 
-lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
+beispiel \<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
  = Some
   \<lparr>
     besitz = \<^url>[Alice := 8, Bob := 10, Carol := -3],
@@ -206,7 +206,7 @@ lemma\<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
    \<rparr>\<close>
   by eval
 
-lemma\<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = None\<close>
+beispiel \<open>abmachung_einloesen (to_abmachung [Verliert Bob 3]) initialwelt = None\<close>
   by eval
 
 (*<*)
@@ -243,7 +243,7 @@ text\<open>Die Handlungsabsicht \<^const>\<open>abmachung_einloesen\<close> stel
 \<^const>\<open>wohlgeformte_handlungsabsicht\<close> dar, da in der Abmachung Personen
 hardcedoded sind.
 \<close>
-lemma \<open>\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
+beispiel \<open>\<not> wohlgeformte_handlungsabsicht zahlenwps initialwelt
          (Handlungsabsicht (\<lambda>p w. abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) w))\<close>
   by eval
 
@@ -306,7 +306,7 @@ text\<open>Es ist nur möglich eine \<^const>\<open>existierende_abmachung_einlo
 wenn alle Betroffenen auch zustimmen.
 Es is beispielsweise nicht möglich, dass \<^const>\<open>Alice\<close> eine Handlung
 ausführt, die \<^const>\<open>Carol\<close> betrifft, ohne deren Zustimmung.\<close>
-lemma \<open>\<not> ausfuehrbar Alice
+beispiel \<open>\<not> ausfuehrbar Alice
   \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
@@ -318,7 +318,7 @@ lemma \<open>\<not> ausfuehrbar Alice
   (Handlungsabsicht existierende_abmachung_einloesen)\<close>
   by eval
 text\<open>Nur wenn \<^const>\<open>Carol\<close> zustimmt wird die Handlung möglich.\<close>
-lemma \<open>ausfuehrbar Alice
+beispiel \<open>ausfuehrbar Alice
   \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
@@ -333,7 +333,7 @@ lemma \<open>ausfuehrbar Alice
 
 (*bissal doof:*)
 text\<open>Da \<^const>\<open>Alice\<close> nicht betroffen is, bleibt \<^term>\<open>[Verliert Carol 3]\<close> bei \<^const>\<open>Alice\<close> übrig.\<close>
-lemma \<open>nachher_handeln Alice
+beispiel \<open>nachher_handeln Alice
   \<lparr>
     besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
     konsens = (\<lambda>_. [])(
@@ -431,7 +431,7 @@ definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxi
       Maxime (\<lambda>ich h. \<forall>pX. individueller_fortschritt pX h)\<close>
 
 (*existierende_abmachung_einloesen macht, dass die Maxime nicht erfuellt.*)
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
@@ -445,7 +445,7 @@ lemma \<open>erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = [Handlungsabsicht existierende_abmachung_einloesen]
-  \<rparr>\<close> by beispiel
+  \<rparr>\<close> by beispiel_tac
 
 
 (*TODO:
@@ -458,7 +458,7 @@ definition maxime_hatte_konsens :: \<open>(person, zahlenwelt) maxime\<close> wh
   \<open>maxime_hatte_konsens \<equiv> Maxime (\<lambda>ich h. hat_konsens h)\<close>
 
 
-lemma \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Handlungsabsicht existierende_abmachung_einloesen)).
+beispiel \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Handlungsabsicht existierende_abmachung_einloesen)).
  wohlgeformte_maxime_auf
     h zahlenwps 
     maxime_hatte_konsens\<close> by eval
@@ -467,7 +467,7 @@ lemma \<open>wohlgeformte_maxime zahlenwps maxime_hatte_konsens\<close>
   by(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def
                maxime_hatte_konsens_def hat_konsens_swap)
 
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht existierende_abmachung_einloesen]
   maxime_hatte_konsens
@@ -477,9 +477,9 @@ lemma \<open>erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht existierende_abmachung_einloesen],
    bsp_verbotene_handlungen = [],
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht reset,
@@ -492,7 +492,7 @@ lemma \<open>erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 (*TODO: MaximeDisj beweisen.
 
@@ -501,7 +501,7 @@ Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed
 Ich frage mich ja, ob MaximeDisj hier wirklich funktioniert
 oder nur in dieser einen Welt.
 *)
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
    Handlungsabsicht existierende_abmachung_einloesen,
@@ -515,7 +515,7 @@ lemma \<open>erzeuge_beispiel
    bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen, Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
   
 

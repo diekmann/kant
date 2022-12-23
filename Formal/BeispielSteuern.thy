@@ -33,15 +33,15 @@ fun netto :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> int\<
 
 
 text\<open>Beispiele\<close>
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 3\<close>
+beispiel \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 3\<close>
   by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=0])) = 8\<close>
+beispiel \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=0])) = 8\<close>
   by eval
-lemma \<open>steuerlast Bob   (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 0\<close>
+beispiel \<open>steuerlast Bob   (Handlung (Steuerwelt \<^url>[Alice:=8]) (Steuerwelt \<^url>[Alice:=5])) = 0\<close>
   by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=-3]) (Steuerwelt \<^url>[Alice:=-4])) = 1\<close>
+beispiel \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=-3]) (Steuerwelt \<^url>[Alice:=-4])) = 1\<close>
   by eval
-lemma \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=1]) (Steuerwelt \<^url>[Alice:=-1])) = 2\<close>
+beispiel \<open>steuerlast Alice (Handlung (Steuerwelt \<^url>[Alice:=1]) (Steuerwelt \<^url>[Alice:=-1])) = 2\<close>
   by eval
 
 
@@ -49,7 +49,7 @@ text\<open>Folgende Menge beinhaltet alle Personen die mehr verdienen als ich.\<
 fun mehrverdiener :: \<open>person \<Rightarrow> steuerwelt handlung \<Rightarrow> person set\<close> where
   \<open>mehrverdiener ich (Handlung vor nach) = {p. (get_einkommen vor) p \<ge> (get_einkommen vor) ich}\<close>
 
-lemma \<open>mehrverdiener Alice
+beispiel \<open>mehrverdiener Alice
         (Handlung (Steuerwelt \<^url>[Alice:=8, Bob:=12, Eve:=7]) (Steuerwelt \<^url>[Alice:=5]))
        = {Alice, Bob}\<close> by eval
 
@@ -180,7 +180,7 @@ lemma katimp_auf_handlungsabsicht_monoton:
 subsection\<open>Beispiel: Keiner Zahlt Steuern\<close>
 
 text\<open>Die Maxime ist im Beispiel erfüllt, da wir immer nur kleiner-gleich fordern!\<close>
-lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+beispiel \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
                   maxime_steuern (Handlungsabsicht (\<lambda>ich welt. Some welt))\<close> by eval
 
 
@@ -188,7 +188,7 @@ subsection\<open>Beispiel: Ich zahle 1 Steuer\<close>
 text\<open>Das funktioniert nicht:\<close>
 definition \<open>ich_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt \<lbrakk>(get_einkommen welt)(ich -= 1)\<rbrakk>)\<close>
-lemma \<open>\<not> moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+beispiel \<open>\<not> moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
                     maxime_steuern (Handlungsabsicht ich_zahle_1_steuer)\<close> by eval
 
 text\<open>Denn jeder muss Steuer zahlen!
@@ -202,7 +202,7 @@ text\<open>Jeder muss steuern zahlen: funktioniert.
 Das \<^term>\<open>ich\<close> wird gar nicht verwendet, da jeder Steuern zahlt.\<close>
 definition \<open>jeder_zahle_1_steuer ich welt \<equiv>
   Some (Steuerwelt ((\<lambda>e. e - 1) \<circ> (get_einkommen welt)))\<close>
-lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+beispiel \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
                  maxime_steuern (Handlungsabsicht jeder_zahle_1_steuer)\<close> by eval
 
 
@@ -224,27 +224,27 @@ definition \<open>jeder_zahlt_einkommenssteuer p w \<equiv> Some (jeder_zahlt ei
 
 text\<open>Bei dem geringen Einkommen der \<^term>\<open>Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5]\<close> zahlt keiner Steuern.\<close>
 
-lemma \<open>ist_noop 
+beispiel \<open>ist_noop 
   (handeln Alice(Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
              (Handlungsabsicht jeder_zahlt_einkommenssteuer))\<close> by eval
 
-lemma \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
+beispiel \<open>moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
                   maxime_steuern (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 
 text\<open>Für höhere Einkommen erhalten wir plausible Werte und niemand rutscht ins negative:\<close>
-lemma \<open>delta_steuerwelt
+beispiel \<open>delta_steuerwelt
       (handeln
       Alice (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
       (Handlungsabsicht jeder_zahlt_einkommenssteuer))
   = [Verliert Bob 511, Verliert Eve 1857]\<close> by eval
-lemma \<open>moralisch
+beispiel \<open>moralisch
   (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
   maxime_steuern
   (Handlungsabsicht jeder_zahlt_einkommenssteuer)\<close> by eval
 
 text\<open>Unser Beispiel erfüllt auch den kategorischen Imperativ.\<close>
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     steuerwps (Steuerwelt \<^url>[Alice:=10000, Bob:=14000, Eve:= 20000])
     [Handlungsabsicht jeder_zahlt_einkommenssteuer]
     maxime_steuern
@@ -256,7 +256,7 @@ lemma \<open>erzeuge_beispiel
      bsp_verbotene_handlungen = [],
      bsp_uneindeutige_handlungen = []
     \<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 subsection\<open>Vereinfachtes Deutsches Steuersystem vs. die Steuermaxime\<close>
 text\<open>Die Anforderungen für ein \<^locale>\<open>steuersystem\<close> und die \<^const>\<open>maxime_steuern\<close> sind vereinbar.\<close>

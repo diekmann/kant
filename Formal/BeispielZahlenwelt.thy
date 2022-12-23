@@ -20,15 +20,15 @@ fun gesamtbesitz :: \<open>zahlenwelt \<Rightarrow> int\<close> where
   \<open>gesamtbesitz (Zahlenwelt besitz) = aufsummieren besitz\<close>
 
 text\<open>Beispiel:\<close>
-lemma \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12\<close> by eval
-lemma \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8\<close> by eval
+beispiel \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12\<close> by eval
+beispiel \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8\<close> by eval
 
 text\<open>Mein persönlicher Besitz:\<close>
 fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> where
   \<open>meins p (Zahlenwelt besitz) = besitz p\<close>
 
 text\<open>Beispiel:\<close>
-lemma \<open>meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4\<close> by eval
+beispiel \<open>meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4\<close> by eval
 
 
 text\<open>Um den \<^file>\<open>SchleierNichtwissen.thy\<close> zu implementieren:\<close>
@@ -36,7 +36,7 @@ fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<R
   \<open>zahlenwps p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)\<close>
 
 text\<open>Beispiel:\<close>
-lemma \<open>zahlenwps Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
+beispiel \<open>zahlenwps Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
     = (Zahlenwelt \<^url>[Alice := 8, Bob := 6, Carol := 4])\<close>
   by eval
 
@@ -78,7 +78,7 @@ subsection\<open>Ungültige Handlung\<close>
 text\<open>Sobald ich eine konkrete Person in einer Handlungsabsicht hardcode,
   ist diese nicht mehr wohlgeformt.\<close>
 
-lemma \<open>\<not>wohlgeformte_handlungsabsicht
+beispiel \<open>\<not>wohlgeformte_handlungsabsicht
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     (Handlungsabsicht (\<lambda>ich w. if ich = Alice then Some w else Some (Zahlenwelt (\<lambda>_. 0))))\<close>
   apply(simp add: wohlgeformte_handlungsabsicht.simps swap_def)
@@ -114,19 +114,19 @@ text\<open>Leider ist diese Funktion auch diskriminierend:
   Wenn es mehrere potenzielle Opfer mit dem gleichen Besitz gibt,
   dann bestimmt die Reihenfolge in \<^term>\<open>Enum.enum\<close> wer bestohlen wird.
   Diese Reihenfolge ist wieder eine Eigenschaft von \<^typ>\<open>person\<close> und nicht \<^typ>\<open>zahlenwelt\<close>.\<close>
-lemma\<open>handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+beispiel\<open>handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
                 (Handlungsabsicht (stehlen_nichtwf2 5 10))
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
                (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])\<close> by eval
-lemma\<open>handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+beispiel\<open>handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
               (Handlungsabsicht (stehlen_nichtwf2 5 10))
   = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
              (Zahlenwelt \<^url>[Alice := 5, Bob := 15, Carol := - 3])\<close> by eval
-lemma \<open>wohlgeformte_handlungsabsicht_gegenbeispiel
+beispiel \<open>wohlgeformte_handlungsabsicht_gegenbeispiel
       zahlenwps
       (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (Handlungsabsicht (stehlen_nichtwf2 5 10))
       Alice Bob\<close>
-  by(eval)
+  by eval
 
 fun schenken :: \<open>int \<Rightarrow> person \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>schenken betrag empfaenger schenker (Zahlenwelt besitz) =
@@ -198,7 +198,7 @@ lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
   by (simp add: swap_def)
 (*>*)
 
-lemma \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+beispiel \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
   = Some (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
   by(code_simp)
 
@@ -275,7 +275,7 @@ lemma \<open>ha \<in> {
   done
 
 text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
-lemma
+beispiel
   \<open>\<not> maxime_und_handlungsabsicht_generalisieren
          zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
          maxime_zahlenfortschritt (Handlungsabsicht reset) Alice\<close>
@@ -285,7 +285,7 @@ lemma
 text\<open>Die \<^const>\<open>maxime_zahlenfortschritt\<close> erfüllt allgemein \<^bold>\<open>nicht\<close>
 den \<^const>\<open>kategorischer_imperativ\<close>,
 da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
-lemma \<open>kategorischer_imperativ_gegenbeispiel
+beispiel \<open>kategorischer_imperativ_gegenbeispiel
   zahlenwps initialwelt maxime_zahlenfortschritt
   (Handlungsabsicht (stehlen4 1 10))
   Alice
@@ -311,7 +311,7 @@ Für die übrigen Handlungsabsichten ist das Ergebnis aber intuitiv:
   \<^item> da \<^const>\<open>unmoeglich\<close> im Nichtstuen endet, ist dies auch erlaubt.
   \<^item> \<^const>\<open>alles_kaputt_machen\<close> ist verboten.
 \<close>
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     maxime_zahlenfortschritt =
@@ -325,7 +325,7 @@ lemma \<open>erzeuge_beispiel
      bsp_uneindeutige_handlungen = [
         Handlungsabsicht (stehlen4 5 10),
         Handlungsabsicht reset]\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 
 subsubsection\<open>Einzelbeispiele\<close>
@@ -367,7 +367,7 @@ Die Handlungsabsichten werden eingeordnet wie erwartet:
   \<^item> \<^const>\<open>erschaffen\<close> ist gut, \<^const>\<open>unmoeglich\<close> (bedeutet: Nichtstun) ist auch okay.
   \<^item> \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist schlecht.
   \<close>
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     maxime_altruistischer_fortschritt =
@@ -382,7 +382,7 @@ lemma \<open>erzeuge_beispiel
         Handlungsabsicht reset,
         Handlungsabsicht alles_kaputt_machen],
      bsp_uneindeutige_handlungen = []\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 text\<open>Das ist ein sehr schönes Beispiel.\<close>
 
 (*<*)
@@ -492,7 +492,7 @@ lemma
   using wfm_maxime_altruistischer_fortschritt
   by (simp add: wohlgeformte_maxime_auf_def wohlgeformte_maxime_def)
 
-lemma \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
+beispiel \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt)) = zahlenwps p1 p2 welt\<close>
   apply(cases \<open>welt\<close>, simp add: swap_def)
   by auto
@@ -666,7 +666,7 @@ text\<open>Folgendes ernüchterndes Beispiel zeigt,
 die Maxime \<^const>\<open>individueller_strikter_fortschritt\<close> erfüllt nicht den kategorischen Imperativ.
 Entweder erlaubt die Maxime keine Assuage über eine Handlungsabsicht,
 oder die Handlungsabsicht ist verboten.\<close>
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime individueller_strikter_fortschritt) =
@@ -682,7 +682,7 @@ lemma \<open>erzeuge_beispiel
         Handlungsabsicht (stehlen4 5 10),
         Handlungsabsicht reset]
     \<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 text\<open>In keiner Welt ist die Handlung \<^const>\<open>erschaffen\<close> nun \<^const>\<open>moralisch\<close>:\<close>
 lemma \<open>\<not> moralisch welt
@@ -698,7 +698,7 @@ Diese Maxime kann meiner Meinung nach nicht gewollt sein.
 
 Beispielsweise ist \<^const>\<open>Bob\<close> das Opfer wenn \<^const>\<open>Alice\<close> sich 5 Wohlstand erschafft,
 aber \<^const>\<open>Bob\<close>'s Wohlstand sich dabei nicht erhöht:\<close>
-lemma
+beispiel
   \<open>\<lparr>
       dbg_opfer = Bob, dbg_taeter = Alice,
       dbg_handlung = handeln Alice initialwelt (Handlungsabsicht (erschaffen 5))
@@ -718,18 +718,18 @@ text\<open>Die Maxime ignoriert das \<^term>\<open>ich :: person\<close> komplet
   
 Nun ist es \<^const>\<open>Alice\<close> wieder erlaubt, Wohlstand für sich selbst zu erzeugen,
 da sich dadurch auch der Gesamtwohlstand erhöht:\<close>
-lemma \<open>moralisch initialwelt
+beispiel \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (Handlungsabsicht (erschaffen 5))\<close>
   by(eval)    
 
 text\<open>Allerdings ist auch diese Maxime auch sehr grausam, da sie Untätigkeit verbietet:\<close>
-lemma \<open>\<not> moralisch initialwelt
+beispiel \<open>\<not> moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) (Handlungsabsicht (erschaffen 0))\<close>
   by(eval)
 
 
 text\<open>Unsere initiale einfache \<^const>\<open>maxime_zahlenfortschritt\<close> würde Untätigkeit hier erlauben:\<close>
-lemma \<open>moralisch initialwelt
+beispiel \<open>moralisch initialwelt
           maxime_zahlenfortschritt (Handlungsabsicht (erschaffen 0))\<close>
   by(eval)
 
@@ -742,7 +742,7 @@ Die Handlungsabsichten sind fast intuitiv in erlaubt und verboten eingeordnet.
     Allerdings ist auch \<^const>\<open>unmoeglich\<close> verboten, da die Maxime Untätigkeit verbietet.
     Dieser letzte Fall ist unschön.
 \<close>
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) =
@@ -756,7 +756,7 @@ lemma \<open>erzeuge_beispiel
       Handlungsabsicht alles_kaputt_machen,
       Handlungsabsicht unmoeglich],
      bsp_uneindeutige_handlungen = []\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 
 
@@ -766,7 +766,7 @@ fun globaler_fortschritt :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close
   \<open>globaler_fortschritt (Handlung vor nach) \<longleftrightarrow> (gesamtbesitz vor) \<le> (gesamtbesitz nach)\<close>
 
 text\<open>Untätigkeit ist nun auch hier erlaubt:\<close>
-lemma \<open>moralisch initialwelt
+beispiel \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (erschaffen 0))\<close>
   by(eval)
 
@@ -777,10 +777,10 @@ lemma globaler_fortschritt_kommutiert:
 (*>*)
 
 text\<open>Allerdings ist auch Stehlen erlaubt, da global gesehen, kein Besitz vernichtet wird:\<close>
-lemma \<open>moralisch initialwelt
+beispiel \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen_nichtwf 5 Bob))\<close>
   by(eval)
-lemma \<open>moralisch initialwelt
+beispiel \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen4 5 10))\<close>
   by(eval)
 
@@ -793,7 +793,7 @@ Die Handlungsabsichten sind meiner Meinung nach intuitiv
     Untätigkeit wird wieder über \<^const>\<open>unmoeglich\<close> erlaubt.
   \<^item> \<^const>\<open>reset\<close> und \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
 \<close>
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     handlungsabsichten
     (Maxime (\<lambda>ich. globaler_fortschritt)) =
@@ -808,7 +808,7 @@ lemma \<open>erzeuge_beispiel
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen],
      bsp_uneindeutige_handlungen = []\<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 text\<open>Auch allgemein lässt ich beweisen,
 dass diese Maxime für sehr viele Handlungsabsichten den kategorischen Imperativ erfüllt.\<close>
@@ -840,7 +840,7 @@ der hardgecodeten Personen basieren.
   
 Beispielsweise könnten wir \<^const>\<open>individueller_fortschritt\<close> nicht mehr parametrisiert verwenden,
 sondern einfach \<^const>\<open>Alice\<close> reinschreiben:\<close>
-lemma \<open>individueller_fortschritt Alice
+beispiel \<open>individueller_fortschritt Alice
     = (\<lambda>h. case h of Handlung vor nach \<Rightarrow> (meins Alice vor) \<le> (meins Alice nach))\<close>
   apply(simp add: fun_eq_iff)
   apply(intro allI, rename_tac h, case_tac \<open>h\<close>)
@@ -848,7 +848,7 @@ lemma \<open>individueller_fortschritt Alice
   done
 
 text\<open>Solch eine Maxime ist allerdings nicht wohlgeformt.\<close>
-lemma \<open>\<not> wohlgeformte_maxime_auf
+beispiel \<open>\<not> wohlgeformte_maxime_auf
     (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
     (Maxime (\<lambda>ich. individueller_fortschritt Alice))\<close>
   apply(simp add: wohlgeformte_maxime_auf_def)
@@ -858,7 +858,7 @@ lemma \<open>\<not> wohlgeformte_maxime_auf
   done
 
 text\<open>Sobald wir aufhören \<^const>\<open>Alice\<close> hardzucoden, wird die Maxime wohlgeformt.\<close>
-lemma \<open>wohlgeformte_maxime_auf
+beispiel \<open>wohlgeformte_maxime_auf
     (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
     (Maxime (\<lambda>ich. individueller_fortschritt ich))\<close>
   apply(simp add: wohlgeformte_maxime_auf_def)
@@ -878,7 +878,7 @@ keine Bewertung im Sinne des kategorischen Imperativs erlauben?\<close>
 text\<open>Folgende Funktion ist inspiriert durch das \<^url>\<open>https://de.wikipedia.org/wiki/Collatz-Problem\<close>.\<close>
 fun collatz:: \<open>int \<Rightarrow> int\<close> where
   \<open>collatz n = (if n mod 2 = 0 then n div 2 else 3*n + 1)\<close>
-lemma \<open>collatz 19 = 58\<close> by eval
+beispiel \<open>collatz 19 = 58\<close> by eval
 
 text\<open>Es folgt eine Handlungsabsicht, basierend auf dem Collatz-Problem.
 Das eigentliche Collatz-Problem ist an dieser Stelle nicht relevant,
@@ -899,7 +899,7 @@ text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> generalisiert n
 \<^const>\<open>maxime_zahlenfortschritt\<close>.
 Dies ist keine große Überraschung, da \<^const>\<open>reset\<close> auch nicht mit dieser Maxime generalisiert
 hat und wir die Maxime auch für ungeeignet befunden haben.\<close>
-lemma
+beispiel
   \<open>\<not> maxime_und_handlungsabsicht_generalisieren
        zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
        maxime_zahlenfortschritt (Handlungsabsicht collatzh) Alice\<close>
@@ -913,7 +913,7 @@ Dies wirft die Frage auf:
 "gibt es überhaupt wohlgeformte Handlungsabsichten, welche nicht mit
 \<^const>\<open>maxime_altruistischer_fortschritt\<close> generalisieren?"
 Die Antwort liefert \<^const>\<open>collatzh\<close>.\<close>
-lemma
+beispiel
   \<open>\<not> maxime_und_handlungsabsicht_generalisieren
        zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
        maxime_altruistischer_fortschritt (Handlungsabsicht collatzh) Alice\<close>
@@ -924,7 +924,7 @@ Das Ergebnis vorweg:
 Ein kategorischer Imperativ, egal welche vielversprechende Maxime,
 gilt nicht für die Handlungsabsicht \<^const>\<open>collatzh\<close>.\<close>
 
-lemma
+beispiel
   \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
         initialwelt maxime_zahlenfortschritt\<close>
   \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht collatzh)
@@ -982,7 +982,7 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht unei
   apply(simp add: hlp1 hlp2)
   done
 
-lemma
+beispiel
   \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
         initialwelt maxime_zahlenfortschritt\<close>
   \<open>\<not> kategorischer_imperativ_auf (Handlungsabsicht uneindeutiger_charakter)
@@ -1014,7 +1014,7 @@ definition partiell_schlechter_charakter:: \<open>person \<Rightarrow> zahlenwel
                    then alles_kaputt_machen ich welt
                    else None)\<close>
 
-lemma \<open>erzeuge_beispiel
+beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
     [Handlungsabsicht partiell_guter_charakter, Handlungsabsicht partiell_schlechter_charakter]
     maxime_altruistischer_fortschritt
@@ -1025,6 +1025,6 @@ lemma \<open>erzeuge_beispiel
    bsp_verbotene_handlungen = [Handlungsabsicht partiell_schlechter_charakter],
    bsp_uneindeutige_handlungen = []
   \<rparr>\<close>
-  by beispiel
+  by beispiel_tac
 
 end

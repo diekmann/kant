@@ -1,5 +1,5 @@
 theory ExecutableHelper
-imports Main "HOL-Library.Code_Target_Numeral"
+imports Main BeispielTac "HOL-Library.Code_Target_Numeral"
 begin
 
 (*is this helpful?*)
@@ -45,7 +45,7 @@ text\<open>Isabelle does not allow printing functions, but it allows printing li
 definition show_map :: \<open>('a::enum \<rightharpoonup> 'b) \<Rightarrow> ('a \<times> 'b) list\<close> where
   \<open>show_map m \<equiv> List.map_filter (\<lambda>p. map_option (\<lambda>i. (p, i)) (m p)) (enum_class.enum)\<close>
 
-lemma \<open>show_map [True \<mapsto> (8::int), False \<mapsto> 12] = [(False, 12), (True, 8)]\<close> by eval
+beispiel \<open>show_map [True \<mapsto> (8::int), False \<mapsto> 12] = [(False, 12), (True, 8)]\<close> by eval
 
 lemma List_map_filter_map_some_cons: \<open>m x = Some y \<Longrightarrow>
   (List.map_filter (\<lambda>p. map_option (Pair p) (m p)) (x # xs)) =

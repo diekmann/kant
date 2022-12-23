@@ -209,7 +209,8 @@ where
   \<open>wohlgeformte_handlungsabsicht_gegenbeispiel wps welt (Handlungsabsicht h) taeter opfer \<longleftrightarrow>
   h taeter welt \<noteq> map_option (wps opfer taeter) (h opfer (wps taeter opfer welt))\<close>
 
-lemma \<open>\<exists>p1 p2. wohlgeformte_handlungsabsicht_gegenbeispiel wps welt ha p1 p2 \<longleftrightarrow>
+lemma
+  \<open>\<exists>p1 p2. wohlgeformte_handlungsabsicht_gegenbeispiel wps welt ha p1 p2 \<longleftrightarrow>
         \<not>wohlgeformte_handlungsabsicht wps welt ha\<close>
   apply(cases \<open>ha\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
   by blast
@@ -276,7 +277,7 @@ Die Handlung sei ein globaler reset, bei dem jeden ein Besitz von 0 zugeordnet w
 Leider generalisiert diese Handlung nicht, da \<^const>\<open>Eve\<close> die Handlung gut findet,
 \<^const>\<open>Alice\<close> allerdings nicht.
 \<close>
-lemma
+beispiel
    \<open>\<not> maxime_und_handlungsabsicht_generalisieren
       swap
       ((\<lambda>x. 0)(Alice := (2::int), Eve := - 1))
@@ -438,7 +439,7 @@ where
 
 
 text\<open>Beispiel:\<close>
-lemma \<open>wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<le> (nachher h) ich))\<close>
+beispiel \<open>wohlgeformte_maxime swap (Maxime (\<lambda>ich h. (vorher h) ich \<le> (nachher h) ich))\<close>
   apply(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def)
   apply(intro allI, case_tac \<open>h\<close>, simp)
   by (metis swap_a swap_symmetric)

@@ -65,14 +65,14 @@ fun beispielfunktion :: \<open>nat \<Rightarrow> nat\<close> where
 
 text\<open>Funktionsaufrufe funktionieren ohne Klammern.\<close>
 
-lemma \<open>beispielfunktion 32 = 42\<close> by eval
+beispiel \<open>beispielfunktion 32 = 42\<close> by eval
 
 text\<open>Funktionen sind gecurried. Hier ist eine Funktion welche 2 natürliche Zahlen nimmt
 und eine natürliche Zahl zurück gibt (\<^typ>\<open>nat \<Rightarrow> nat \<Rightarrow> nat\<close>):\<close>
 fun addieren :: \<open>nat \<Rightarrow> nat \<Rightarrow> nat\<close> where
   \<open>addieren a b = a + b\<close>
 
-lemma \<open>addieren 32 10 = 42\<close> by eval
+beispiel \<open>addieren 32 10 = 42\<close> by eval
 
 text\<open>Currying bedeutet auch, wenn wir \<^const>\<open>addieren\<close> nur mit einem Argument aufrufen
 (welches eine natürliche Zahl \<^typ>\<open>nat\<close> sein muss),
@@ -83,16 +83,16 @@ Beispiel: \<^term_type>\<open>(addieren 10) :: (nat \<Rightarrow> nat)\<close>
 
 Zufälligerweise ist \<^term>\<open>addieren 10\<close> equivalent zu \<^term>\<open>beispielfunktion\<close>:
 \<close>
-lemma \<open>addieren 10 = beispielfunktion\<close>
+beispiel \<open>addieren 10 = beispielfunktion\<close>
   by(simp add: fun_eq_iff)
 
 
 text\<open>Zusätzlich lassen sich Funktionen im Lambda Calculus darstellen.
 Beispiel:\<close>
 
-lemma \<open>(\<lambda>n::nat. n+10) 3 = 13\<close> by eval
+beispiel \<open>(\<lambda>n::nat. n+10) 3 = 13\<close> by eval
 
-lemma \<open>beispielfunktion = (\<lambda>n. n+10)\<close>
+beispiel \<open>beispielfunktion = (\<lambda>n. n+10)\<close>
   by(simp add: fun_eq_iff)
 
 subsection\<open>Mengen\<close>
@@ -100,10 +100,10 @@ text\<open>Mengen funktionieren wie normale mathematische Mengen.
 
 Beispiel. Die Menge der geraden Zahlen:
 \<close>
-lemma \<open>{0,2,4,6,8,10,12} \<subseteq> {n::nat. n mod 2 = 0}\<close>
+beispiel \<open>{0,2,4,6,8,10,12} \<subseteq> {n::nat. n mod 2 = 0}\<close>
   by(simp)
 
-lemma \<open>{0,2,4,6,8,10} = {n::nat. n mod 2 = 0 \<and> n \<le> 10}\<close>
+beispiel \<open>{0,2,4,6,8,10} = {n::nat. n mod 2 = 0 \<and> n \<le> 10}\<close>
   by fastforce
 
 text\<open>Bei vorherigen Beispiel können wir das Prinzip der (mathematischen) \<^emph>\<open>Extensionalität\<close> sehen:
