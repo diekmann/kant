@@ -54,6 +54,9 @@ mit allen wohlbekannten Rechenoperationen.
 Im Beweis obigen \<^theory_text>\<open>lemma\<open>3 = 2+1\<close>\<close> hat Isabelle die Typen automatisch inferiert.
 \<close>
 
+subsection\<open>Noch mehr Typen\<close>
+text\<open>TODO @{command datatype} @{datatype list}\<close>
+
 subsection\<open>Funktionen\<close>
 text\<open>Beispiel:
 Eine Funktionen welche eine natürliche Zahl nimmt und
@@ -94,6 +97,11 @@ beispiel \<open>(\<lambda>n::nat. n+10) 3 = 13\<close> by eval
 
 beispiel \<open>beispielfunktion = (\<lambda>n. n+10)\<close>
   by(simp add: fun_eq_iff)
+
+text\<open>Im vorhergehenden Beispiel wurden zwei Funktionen
+(die \<^const>\<open>beispielfunktion\<close> die wir oben definiert haben und ein lambda-Ausdruck)
+als equivalent bewiesen.
+Dafür wurde die Extensionalität verwendet.\<close>
 
 subsection\<open>Mengen\<close>
 text\<open>Mengen funktionieren wie normale mathematische Mengen.
