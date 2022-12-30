@@ -215,7 +215,7 @@ definition jeder_zahlt :: \<open>(nat \<Rightarrow> nat) \<Rightarrow> 'a \<Righ
 
 (*<*)
 lemma jeder_zahlt_ignoriert_person:
-  "jeder_zahlt steuersystem_impl p w = jeder_zahlt steuersystem_impl p' w"
+  \<open>jeder_zahlt steuersystem_impl p w = jeder_zahlt steuersystem_impl p' w\<close>
   by(simp add: jeder_zahlt_def)
 (*>*)
 

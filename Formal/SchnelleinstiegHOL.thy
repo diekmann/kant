@@ -55,7 +55,7 @@ Im Beweis obigen \<^theory_text>\<open>lemma\<open>3 = 2+1\<close>\<close> hat I
 \<close>
 
 subsection\<open>Noch mehr Typen\<close>
-text\<open>TODO @{command datatype} @{datatype list}\<close>
+text\<open>TODO @{command datatype} \<^datatype>\<open>list\<close>\<close>
 
 subsection\<open>Funktionen\<close>
 text\<open>Beispiel:
@@ -133,7 +133,7 @@ text\<open>First-Order Logic, oder auch Prädikatenlogik erster Stufe, besteht a
   \<^item> Implikation. Der Term \<^term>\<open>A \<longrightarrow> B\<close> besagt, dass wenn \<^term>\<open>A\<close> gilt dann gilt auch \<^term>\<open>B\<close>.
     Dies entspricht dem logischen "Wenn-Dann".
     Unsere Mathematik ist hardcore klassisch und es gilt
-    @{lemma [break=true] "A \<longrightarrow> B \<longleftrightarrow> \<not>A \<or> B" by blast}.
+    @{lemma [break=true] \<open>A \<longrightarrow> B \<longleftrightarrow> \<not>A \<or> B\<close> by blast}.
   \<^item> All-Quantifier. Der Term \<^term>\<open>\<forall>x. P x\<close> besagt, dass \<^term>\<open>P x\<close> wahr ist für alle \<^term>\<open>x\<close>.
     Dies entspricht dem logischen "Für-Alle".
   \<^item> Existenz-Quantifier. Der Term \<^term>\<open>\<exists>x. P x\<close> besagt, dass es ein \<^term>\<open>x\<close> gibt,
@@ -144,7 +144,7 @@ text\<open>First-Order Logic, oder auch Prädikatenlogik erster Stufe, besteht a
     Dies entspricht dem logischen "Genau-Dann-Wenn".
     Genau genommen ist @{term [source=true] \<open>A \<longleftrightarrow> B\<close>} eine Abkürzung für \<^term>\<open>A = B\<close>.
     Oft ist @{term [source=true] \<open>A \<longleftrightarrow> B\<close>} praktischer zu schreiben, da es schwächer bindet.
-    Genau genommen gilt @{lemma [source=true] "(A \<longleftrightarrow> B) = ((A) = (B))" by blast}.
+    Genau genommen gilt @{lemma [source=true] \<open>(A \<longleftrightarrow> B) = ((A) = (B))\<close> by blast}.
     Die schwache Bindung von @{term [source=true] \<open>A \<longleftrightarrow> B\<close>} wird dann relevant,
     wenn \<^term>\<open>A\<close> und \<^term>\<open>B\<close> komplizierte Ausdrücke sind,
     da wir uns im Gegensatz zu @{term [source=true] \<open>(A) = (B)\<close>} Klammern sparen können.
