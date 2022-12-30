@@ -113,4 +113,52 @@ Extensional betrachtet, sind die beiden Mengen jedoch gleich,
 da sie genau die gleichen äußeren Eigenschaften haben,
 d.h. da sie genau die gleichen Elemente enthalten.\<close>
 
+subsection \<open>Über Isabelle/HOL\<close>
+text\<open>Isabelle/HOL ist ein interaktiver Beweisassistent und kann
+von \<^url>\<open>https://isabelle.in.tum.de/\<close> bezogen werden.
+
+Isabelle stammt aus der Tradition der LCF (Logic for Computable Functions) Theorembeweiser.
+Die Standardlogik ist Higher-Order Logic (HOL), welche auf der klassischen Mathematik basiert.
+
+Isabelle basiert auf einem mathematischen Microkernel.
+Zum aktuellen Zeitpunkt mit Isabelle2022 befindet sich das Herzstück dieses mathematischen
+Microkernels in der Datei \<^file>\<open>~~/src/Pure/thm.ML\<close>, welche aus nur ca 2500 Zeilen ML Code besteht.
+Dies ist relativ wenig Code welchem wir vertrauen müssen.
+Die Korrektheit aller Ergebnisse und Beweise dieser Theory hängen nur von der Korrektheit dieses
+Microkernels ab.
+
+Isabelle/HOL ist ein interaktiver Beweisassistent, was bedeutet,
+Isabelle hilft einem Benutzer dabei Beweise zu schreiben.
+Alle Beweise müssen von Isabelles Microkernel akzeptiert werden, welcher die Korrektheit garantiert.
+Im Gegensatz zu interaktiven Beweisassistenten gibt es auch automatische Theorembeweiser,
+wie z.B. Z3.
+Z3 besteht aus mehreren hunderttausend Zeilen C Code (\<^url>\<open>https://github.com/Z3Prover/z3\<close>)
+und ist damit im Vergleich zu Isabelles Microkernel riesig.
+Dies bedeutet auch, dass einer riesige Menge an Code vertraut werden muss,
+um einem Beweis von Z3 zu vertrauen.
+Glücklicherweise arbeiten Isabelle und z.B. Z3 sehr gut zusammen:
+Z3 kann losgeschickt werden um einen Beweis zu suchen.
+Sobald Z3 meldet, dass ein Beweis gefunden wurde,
+akzeptiert Isabelle diesen jedoch nicht blind,
+sondern Isabelle akzeptiert den gefundenen Beweis nur,
+wenn der Beweis sich gegen Isabelles Microkernel wiedergeben lässt.
+Somit kombiniert Isabelle das Beste aus vielen Welten:
+Die starke Korrektheitsgarantie eines mathematischen Microkernels der LCF Reihe
+mit der Automatisierung der neuesten Generationen von automatischen Theorembeweisern.
+
+Der Unterschied zwischen z.B. Z3 und Isabelle/HOL zeigt sich auch in einigen Beispielen:
+Während der Z3 Bugtracker sehr viele Soundness Issues zeigt,
+d.h. Fälle in denen Z3 etwas falsches beweisen hat,
+hat es meines Wissens nach im Isabelle/HOL Kernel in über 30 Jahren keinen logischen Fehler gegeben,
+welcher normale Benutzer betroffen hat.
+Natürlich gab es auch in Isabelle/HOL Bugs und in künstlich geschaffenen Grenzfällen
+konnte Isabelle überzeugt werden einen falschen Fakt zu akzeptieren,
+jedoch handelt es sich hier um wenige Einzelfälle welche speziell konstruiert wurden
+um Isabelle anzugreifen -- kein einziger Bug hat unter normalen Umständen zu logischer
+Inkonsistenz geführt.
+Umgekehrt ist Z3 schnell und automatisch.
+Während Isabelle vom Benutzer verlangt, dass Beweise manuell gefunden und formalisiert
+werden müssen kann Z3 teils extrem komplizierte Probleme schnell und automatisch lösen.
+\<close>
+
 end

@@ -8,6 +8,8 @@ Ich habe
   \<^item> mir philosophische Grundlagen nur im Selbststudium beigebracht. Meine Primärquellen sind
     \<^item> Die deutsche Übersetzung von Bertrand Russells 1946 erstveröffentlichtem
       "History of Western Philosophy" \cite{russellphi}.
+      Von diesem Buch existiert auch eine Onlinefassung
+      \<^url>\<open>https://archive.org/details/PHILOSOPHIEDESABENDLANDESVONBERTRANDRUSSEL\<close>.
     \<^item> Eva Böhringers YouTube Kanal "Ethik-Abi by BOE" \<^url>\<open>https://www.youtube.com/@EthikAbibyBOE\<close>.
     \<^item> Wikipedia im Allgemeinen.
       Innerhalb des Dokuments versuche ich Definitionen aus Wikipedia zu verwenden,
