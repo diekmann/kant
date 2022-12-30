@@ -177,7 +177,7 @@ denn
 \cite{russellphi}.
 Und da alle Fakten welche wir ultimativ als wahr behaupten wollen durch den mathematischen
 Microkernel müssen, sind logische Flüchtigkeitsfehler in unserer Argumentation ausgeschlossen.
-Allerdgings können wir immer noch falsche Annahmen aufstellen,
+Allerdings können wir immer noch falsche Annahmen aufstellen,
 auf welche wir unsere Ergebnisse stützen.
 Jedoch müssen wir diese Annahmen explizit treffen und aufschreiben,
 denn sonst ließe sich nichts beweisen.
