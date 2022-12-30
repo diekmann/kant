@@ -113,7 +113,70 @@ Extensional betrachtet, sind die beiden Mengen jedoch gleich,
 da sie genau die gleichen äußeren Eigenschaften haben,
 d.h. da sie genau die gleichen Elemente enthalten.\<close>
 
-subsection \<open>Über Isabelle/HOL\<close>
+subsection\<open>First-Order Logic\<close>
+text\<open>First-Order Logic, oder auch Prädikatenlogik erster Stufe, besteht aus folgenden Symbolen.
+
+  \<^item> Konjunktion. Der Term \<^term>\<open>A \<and> B\<close> besagt, dass sowohl \<^term>\<open>A\<close> als auch \<^term>\<open>B\<close> wahr sind.
+    Dies entspricht dem logischen "Und".
+  \<^item> Disjunktion. Der Term \<^term>\<open>A \<or> B\<close> besagt, dass \<^term>\<open>A\<close> oder \<^term>\<open>B\<close> (oder beide) wahr sind.
+    Dies entspricht dem logischen "Oder".
+  \<^item> Negation. Der Term \<^term>\<open>\<not> A\<close> besagt, dass \<^term>\<open>A\<close> nicht wahr ist.
+    Dies entspricht dem logischen "Nicht".
+  \<^item> Implikation. Der Term \<^term>\<open>A \<longrightarrow> B\<close> besagt, dass wenn \<^term>\<open>A\<close> gilt dann gilt auch \<^term>\<open>B\<close>.
+    Dies entspricht dem logischen "Wenn-Dann".
+    Unsere Mathematik ist hardcore klassisch und es gilt
+    @{lemma [break=true] "A \<longrightarrow> B \<longleftrightarrow> \<not>A \<or> B" by blast}.
+  \<^item> All-Quantifier. Der Term \<^term>\<open>\<forall>x. P x\<close> besagt, dass \<^term>\<open>P x\<close> wahr ist für alle \<^term>\<open>x\<close>.
+    Dies entspricht dem logischen "Für-Alle".
+  \<^item> Existenz-Quantifier. Der Term \<^term>\<open>\<exists>x. P x\<close> besagt, dass es ein \<^term>\<open>x\<close> gibt,
+    für das \<^term>\<open>P x\<close> gilt.
+    Dies entspricht dem logischen "Es-Existiert".
+  \<^item> Des Weiteren gibt es noch die Abkürzung @{term [source=true] \<open>A \<longleftrightarrow> B\<close>}, welche bedeutet,
+    dass \<^term>\<open>A\<close> genau dann gilt wenn \<^term>\<open>B\<close> gilt.
+    Dies entspricht dem logischen "Genau-Dann-Wenn".
+    Genau genommen ist @{term [source=true] \<open>A \<longleftrightarrow> B\<close>} eine Abkürzung für \<^term>\<open>A = B\<close>.
+    Oft ist @{term [source=true] \<open>A \<longleftrightarrow> B\<close>} praktischer zu schreiben, da es schwächer bindet.
+    Genau genommen gilt @{lemma [source=true] "(A \<longleftrightarrow> B) = ((A) = (B))" by blast}.
+    Die schwache Bindung von @{term [source=true] \<open>A \<longleftrightarrow> B\<close>} wird dann relevant,
+    wenn \<^term>\<open>A\<close> und \<^term>\<open>B\<close> komplizierte Ausdrücke sind,
+    da wir uns im Gegensatz zu @{term [source=true] \<open>(A) = (B)\<close>} Klammern sparen können.
+\<close>
+
+subsection\<open>Higher-Order Logic (HOL)\<close>
+text\<open>First-Order Logic ist in Higher-Order Logic eingebettet.
+Higher-Order Logic (HOL) ist die native Sprache von Isabelle/HOL.
+Im Vergleich zur First-Order Logic besteht HOL nur aus zwei essentiellen Symbolen:
+
+  \<^item> All-Quantifier. Der Term \<^term>\<open>\<And>x. P x\<close> besagt \<^term>\<open>\<forall>x. P x\<close>.
+    Eigentlich ist zwischen dem First-Order und dem Higher-Order All-Quantifier kein
+    wesentlicher Unterschied.
+    Genau genommen lässt sich der First-Order All-Quantifier via HOL einführen wie folgt:
+    @{thm allI}.
+    
+    Da mathematisch der Ausdruck \<^term>\<open>P x\<close> besagt, dass \<^term>\<open>P\<close> für
+    beliebiges \<^term>\<open>x\<close>---sprich: alle \<^term>\<open>x\<close>---
+    gilt, ist folgendes equivalent:
+      \<^item> \<^term>\<open>\<And>x. P x\<close>
+      \<^item> \<^term>\<open>\<forall>x. P x\<close>
+      \<^item> \<^term>\<open>P x\<close>
+  \<^item> Implikation. Der Term \<^term>\<open>A \<Longrightarrow> B\<close> besagt \<^term>\<open>A \<longrightarrow> B\<close>.
+    Eigentlich ist zwischen der First-Order und der Higher-Order Implikation kein
+    wesentlicher Unterschied.
+
+    Die Implikation assoziiert nach rechts.
+    Dies bedeutet @{lemma [source=true] \<open>A \<longrightarrow> B \<longrightarrow> C \<longleftrightarrow> (A \<longrightarrow> (B \<longrightarrow> C))\<close> by blast}.
+
+    Logisch gilt damit auch folgendes:
+    @{lemma [source=true] \<open>A \<longrightarrow> B \<longrightarrow> C \<longleftrightarrow> A \<and> B \<longrightarrow> C\<close> by blast}.
+
+    In Isabelle/HOL werden wir viele Lemmata der Form @{term [source=true] \<open>A \<Longrightarrow> B \<Longrightarrow> C\<close>} sehen,
+    welche zu lesen sind als: Aus \<^term>\<open>A\<close> und \<^term>\<open>B\<close> folgt \<^term>\<open>C\<close>.
+    Dies ist gleichbedeutend mit \<^term>\<open>A \<and> B \<Longrightarrow> C\<close>.
+    Da die Higher-Order Implikation einer der Kernbausteine von HOL sind ist die Formulierung
+    welche nur die Implikation verwendet sehr praktisch für Isabelle.
+\<close>
+
+subsection\<open>Über Isabelle/HOL\<close>
 text\<open>Isabelle/HOL ist ein interaktiver Beweisassistent und kann
 von \<^url>\<open>https://isabelle.in.tum.de/\<close> bezogen werden.
 
