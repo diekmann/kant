@@ -159,6 +159,28 @@ Inkonsistenz geführt.
 Umgekehrt ist Z3 schnell und automatisch.
 Während Isabelle vom Benutzer verlangt, dass Beweise manuell gefunden und formalisiert
 werden müssen kann Z3 teils extrem komplizierte Probleme schnell und automatisch lösen.
+
+Isabelle integriert nicht nur mit automatischen Beweisern wie Z3,
+Isabelle integriert auch mit automatischen Gegenbeispielsfindern,
+wie z.B. @{command quickcheck} oder @{command nitpick}.
+Dies bedeutet, sobald der Benutzer einen vermeintlichen Fakt in Isabelle eintippt,
+schickt Isabelle Prozesse los um ein Gegenbeispiel zu finden.
+Diese so gefundenen Gegenbeispiele sind oft unintuitiv.
+Allerdings sind es echte Gegenbeispiele und der Computer erweist sich als
+grausamer unnachgiebiger Diskussionspartner.
+Dies führt dazu, dass wir nicht mit halbgaren oberflächlichen Argumenten durchkommen.
+Oft eröffnen diese automatischen Gegenbeispiele auch eine neue Sicht auf die Dinge
+und helfen, die eigenen impliziten Annahmen zu erkennen und zu hinterfragen.
+Der Computer erweist sich hier als perfekter logischer geduldiger Diskussionspartner,
+denn
+"der wahre Philosoph ist gewillt, alle vorgefaßten Meinungen einer Prüfung zu unterziehen"
+\cite{russellphi}.
+Und da alle Fakten welche wir ultimativ als wahr behaupten wollen durch den mathematischen
+Microkernel müssen, sind logische Flüchtigkeitsfehler in unserer Argumentation ausgeschlossen.
+Allerdgings können wir immer noch falsche Annahmen aufstellen,
+auf welche wir unsere Ergebnisse stützen.
+Jedoch müssen wir diese Annahmen explizit treffen und aufschreiben,
+denn sonst ließe sich nichts beweisen.
 \<close>
 
 end
