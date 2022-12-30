@@ -127,6 +127,76 @@
 </span><span>da sie genau die gleichen äußeren Eigenschaften haben,
 </span><span>d.h. da sie genau die gleichen Elemente enthalten.</span><span>›</span></span></span><span>
 
+</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span> </span><span class="quoted"><span class="plain_text"><span>‹</span><span>Über Isabelle/HOL</span><span>›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Isabelle/HOL ist ein interaktiver Beweisassistent und kann
+</span><span>von </span><span class="antiquoted"><span class="operator"><span>🌐</span></span><a href="https://isabelle.in.tum.de/"><span>‹https://isabelle.in.tum.de/›</span></a></span><span> bezogen werden.
+</span><span>
+</span><span>Isabelle stammt aus der Tradition der LCF (Logic for Computable Functions) Theorembeweiser.
+</span><span>Die Standardlogik ist Higher-Order Logic (HOL), welche auf der klassischen Mathematik basiert.
+</span><span>
+</span><span>Isabelle basiert auf einem mathematischen Microkernel.
+</span><span>Zum aktuellen Zeitpunkt mit Isabelle2022 befindet sich das Herzstück dieses mathematischen
+</span><span>Microkernels in der Datei </span><span class="antiquoted"><span class="operator"><span>🗏</span></span><span>‹~~/src/Pure/thm.ML›</span></span><span>, welche aus nur ca 2500 Zeilen ML Code besteht.
+</span><span>Dies ist relativ wenig Code welchem wir vertrauen müssen.
+</span><span>Die Korrektheit aller Ergebnisse und Beweise dieser Theory hängen nur von der Korrektheit dieses
+</span><span>Microkernels ab.
+</span><span>
+</span><span>Isabelle/HOL ist ein interaktiver Beweisassistent, was bedeutet,
+</span><span>Isabelle hilft einem Benutzer dabei Beweise zu schreiben.
+</span><span>Alle Beweise müssen von Isabelles Microkernel akzeptiert werden, welcher die Korrektheit garantiert.
+</span><span>Im Gegensatz zu interaktiven Beweisassistenten gibt es auch automatische Theorembeweiser,
+</span><span>wie z.B. Z3.
+</span><span>Z3 besteht aus mehreren hunderttausend Zeilen C Code (</span><span class="antiquoted"><span class="operator"><span>🌐</span></span><a href="https://github.com/Z3Prover/z3"><span>‹https://github.com/Z3Prover/z3›</span></a></span><span>)
+</span><span>und ist damit im Vergleich zu Isabelles Microkernel riesig.
+</span><span>Dies bedeutet auch, dass einer riesige Menge an Code vertraut werden muss,
+</span><span>um einem Beweis von Z3 zu vertrauen.
+</span><span>Glücklicherweise arbeiten Isabelle und z.B. Z3 sehr gut zusammen:
+</span><span>Z3 kann losgeschickt werden um einen Beweis zu suchen.
+</span><span>Sobald Z3 meldet, dass ein Beweis gefunden wurde,
+</span><span>akzeptiert Isabelle diesen jedoch nicht blind,
+</span><span>sondern Isabelle akzeptiert den gefundenen Beweis nur,
+</span><span>wenn der Beweis sich gegen Isabelles Microkernel wiedergeben lässt.
+</span><span>Somit kombiniert Isabelle das Beste aus vielen Welten:
+</span><span>Die starke Korrektheitsgarantie eines mathematischen Microkernels der LCF Reihe
+</span><span>mit der Automatisierung der neuesten Generationen von automatischen Theorembeweisern.
+</span><span>
+</span><span>Der Unterschied zwischen z.B. Z3 und Isabelle/HOL zeigt sich auch in einigen Beispielen:
+</span><span>Während der Z3 Bugtracker sehr viele Soundness Issues zeigt,
+</span><span>d.h. Fälle in denen Z3 etwas falsches beweisen hat,
+</span><span>hat es meines Wissens nach im Isabelle/HOL Kernel in über 30 Jahren keinen logischen Fehler gegeben,
+</span><span>welcher normale Benutzer betroffen hat.
+</span><span>Natürlich gab es auch in Isabelle/HOL Bugs und in künstlich geschaffenen Grenzfällen
+</span><span>konnte Isabelle überzeugt werden einen falschen Fakt zu akzeptieren,
+</span><span>jedoch handelt es sich hier um wenige Einzelfälle welche speziell konstruiert wurden
+</span><span>um Isabelle anzugreifen -- kein einziger Bug hat unter normalen Umständen zu logischer
+</span><span>Inkonsistenz geführt.
+</span><span>Umgekehrt ist Z3 schnell und automatisch.
+</span><span>Während Isabelle vom Benutzer verlangt, dass Beweise manuell gefunden und formalisiert
+</span><span>werden müssen kann Z3 teils extrem komplizierte Probleme schnell und automatisch lösen.
+</span><span>
+</span><span>Isabelle integriert nicht nur mit automatischen Beweisern wie Z3,
+</span><span>Isabelle integriert auch mit automatischen Gegenbeispielsfindern,
+</span><span>wie z.B. </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>quickcheck</span><span class="antiquote"><span>}</span></span></span><span> oder </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>nitpick</span><span class="antiquote"><span>}</span></span></span><span>.
+</span><span>Dies bedeutet, sobald der Benutzer einen vermeintlichen Fakt in Isabelle eintippt,
+</span><span>schickt Isabelle Prozesse los um ein Gegenbeispiel zu finden.
+</span><span>Diese so gefundenen Gegenbeispiele sind oft unintuitiv.
+</span><span>Allerdings sind es echte Gegenbeispiele und der Computer erweist sich als
+</span><span>grausamer unnachgiebiger Diskussionspartner.
+</span><span>Dies führt dazu, dass wir nicht mit halbgaren oberflächlichen Argumenten durchkommen.
+</span><span>Oft eröffnen diese automatischen Gegenbeispiele auch eine neue Sicht auf die Dinge
+</span><span>und helfen, die eigenen impliziten Annahmen zu erkennen und zu hinterfragen.
+</span><span>Der Computer erweist sich hier als perfekter logischer geduldiger Diskussionspartner,
+</span><span>denn
+</span><span>"der wahre Philosoph ist gewillt, alle vorgefaßten Meinungen einer Prüfung zu unterziehen"
+</span><span>\cite{russellphi}.
+</span><span>Und da alle Fakten welche wir ultimativ als wahr behaupten wollen durch den mathematischen
+</span><span>Microkernel müssen, sind logische Flüchtigkeitsfehler in unserer Argumentation ausgeschlossen.
+</span><span>Allerdgings können wir immer noch falsche Annahmen aufstellen,
+</span><span>auf welche wir unsere Ergebnisse stützen.
+</span><span>Jedoch müssen wir diese Annahmen explizit treffen und aufschreiben,
+</span><span>denn sonst ließe sich nichts beweisen.</span><span>
+</span><span>›</span></span></span><span>
+
 </span><span class="keyword2"><span class="keyword"><span>end</span></span></span></pre>
 </body>
 
