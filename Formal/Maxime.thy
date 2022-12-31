@@ -62,11 +62,11 @@ die allerdings nicht im Gegensatz zu einer Verantwortungsethik,
 sondern allenfalls zu einer bloßen „Erfolgsethik“ steht.<<
 
 Kant unterscheidet unter Anderem
-"zwischen >>apriorischen<< und >>empirischen<< Urteilen" \cite{russellphi}.
+"zwischen >>apriorischen<< und >>empirischen<< Urteilen" @{cite russellphi}.
 Wenn wir uns den Typ \<^typ>\<open>'welt handlung\<close> als Beobachtung der Welt \<^const>\<open>vorher\<close> und \<^const>\<open>nachher\<close> anschauen,
 dann könnte man sagen, unser Moralbegriff der \<^const>\<open>Maxime\<close> sei empirisch.
 Für Kant gilt jedoch:
-"Alle Moralbegriffe [...] haben \<^emph>\<open>a priori\<close> ihren Sitz und Ursprung ausschließlich in der Vernunft" \cite{russellphi}.
+"Alle Moralbegriffe [...] haben \<^emph>\<open>a priori\<close> ihren Sitz und Ursprung ausschließlich in der Vernunft" @{cite russellphi}.
 Hier widerspricht unser Modell wieder Kant, da unser Modell empirisch ist und nicht apriorisch.
 
 
@@ -76,10 +76,10 @@ Nur von Handlungsabsichten zu reden, ohne dass die beabsichtigten Folgen betrach
 ist mir einfach zu abstrakt und nicht greifbar.
 
 
-Alles ist jedoch nicht verloren, denn "Alle rein mathematischen Sätze sind [...] apriorisch" \cite{russellphi}.
+Alles ist jedoch nicht verloren, denn "Alle rein mathematischen Sätze sind [...] apriorisch" @{cite russellphi}.
 Und auch Russel schlussfolgert:
 "Um ein ausreichendes Kriterium zu gewinnen, müßten wir Kants rein formalen Standpunkt aufgeben
-und die Wirkung der Handlungen in Betracht ziehen" \cite{russellphi}.
+und die Wirkung der Handlungen in Betracht ziehen" @{cite russellphi}.
 
 Auch Kants kategorischer Imperativ und die Goldene Regel sind grundverschieden:
 \<^url>\<open>https://web.archive.org/web/20220123174117/https://www.goethegymnasium-hildesheim.de/index.php/faecher/faecher/gesellschaftswissenschaften/philosophie\<close>

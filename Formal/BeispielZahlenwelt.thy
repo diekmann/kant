@@ -789,7 +789,7 @@ den kategorischen Imperativ erfüllen kann.
 Die Handlungsabsichten sind meiner Meinung nach intuitiv
 (basierend auf der globalen Betrachtung der Maxime) in erlaubt und verboten eingeordnet.
   \<^item> \<^term>\<open>erschaffen\<close> ist erlaubt.
-    Auch \<^const>\<open>stehlen4\<close> ist erlaubt, da dabei "dem Kollektiv" kein Besitz verloren geht.
+    Auch \<^const>\<open>stehlen4\<close> ist erlaubt, da dabei "doem Kollektiv" kein Besitz verloren geht.
     Untätigkeit wird wieder über \<^const>\<open>unmoeglich\<close> erlaubt.
   \<^item> \<^const>\<open>reset\<close> und \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
 \<close>

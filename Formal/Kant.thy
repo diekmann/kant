@@ -2,7 +2,7 @@ theory Kant
 imports Main
 begin
 
-section\<open>Kant's Kategorischer Imperativ\<close>
+section\<open>Kants Kategorischer Imperativ\<close>
 
 (*https://commons.wikimedia.org/wiki/File:Kant%27s_Prolegomena_-_Frontispiece.png*)
 text_raw\<open>

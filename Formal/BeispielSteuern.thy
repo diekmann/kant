@@ -358,11 +358,11 @@ die andere Richtung (\<^const>\<open>steuersystem\<close> impliziert Maxime) jed
 stimmt auch mit Russels Beobachtung überein:
 "Kants Maxime [das allgemeine Konzept, nicht meine Implementierung]
 scheint tatsächlich ein notwendiges, jedoch nicht \<^emph>\<open>ausreichendes\<close> Kriterium der Tugend zu geben"
-\cite{russellphi}.
+@{cite russellphi}.
 Insbesondere Russels Folgesatz freut mich, da er mir bestätigt, dass unsere extensionale
 Betrachtung von Handlungen vielversprechend ist:
 "Um ein ausreichendes Kriterium zu gewinnen, müßten wir Kants rein formalen Standpunkt aufgeben
-und die Wirkung der Handlungen in Betracht ziehen" \cite{russellphi}.
+und die Wirkung der Handlungen in Betracht ziehen" @{cite russellphi}.
 \<close>
 
 

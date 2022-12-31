@@ -442,9 +442,14 @@ beispiel \<open>erzeuge_beispiel
 = Some
   \<lparr>
    bsp_erfuellte_maxime = False,
-   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
-   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
-   bsp_uneindeutige_handlungen = [Handlungsabsicht existierende_abmachung_einloesen]
+   bsp_erlaubte_handlungen = [
+      Handlungsabsicht (abbauen 5),
+      Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [
+      Handlungsabsicht reset,
+      Handlungsabsicht alles_kaputt_machen],
+   bsp_uneindeutige_handlungen = [
+      Handlungsabsicht existierende_abmachung_einloesen]
   \<rparr>\<close> by beispiel_tac
 
 
@@ -489,8 +494,12 @@ beispiel \<open>erzeuge_beispiel
 = Some
   \<lparr>
    bsp_erfuellte_maxime = True,
-   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht unmoeglich],
-   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+   bsp_erlaubte_handlungen = [
+      Handlungsabsicht (abbauen 5),
+      Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [
+      Handlungsabsicht reset,
+      Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel_tac
 
@@ -512,8 +521,13 @@ beispiel \<open>erzeuge_beispiel
 = Some
   \<lparr>
    bsp_erfuellte_maxime = True,
-   bsp_erlaubte_handlungen = [Handlungsabsicht (abbauen 5), Handlungsabsicht existierende_abmachung_einloesen, Handlungsabsicht unmoeglich],
-   bsp_verbotene_handlungen = [Handlungsabsicht reset, Handlungsabsicht alles_kaputt_machen],
+   bsp_erlaubte_handlungen = [
+      Handlungsabsicht (abbauen 5),
+      Handlungsabsicht existierende_abmachung_einloesen,
+      Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [
+      Handlungsabsicht reset,
+      Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel_tac
 

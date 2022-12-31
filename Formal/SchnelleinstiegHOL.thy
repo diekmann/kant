@@ -365,7 +365,7 @@ und helfen, die eigenen impliziten Annahmen zu erkennen und zu hinterfragen.
 Der Computer erweist sich hier als perfekter logischer geduldiger Diskussionspartner,
 denn
 "der wahre Philosoph ist gewillt, alle vorgefaßten Meinungen einer Prüfung zu unterziehen"
-\cite{russellphi}.
+@{cite russellphi}.
 Und da alle Fakten welche wir ultimativ als wahr behaupten wollen durch den mathematischen
 Microkernel müssen, sind logische Flüchtigkeitsfehler in unserer Argumentation ausgeschlossen.
 Allerdings können wir immer noch falsche Annahmen aufstellen,

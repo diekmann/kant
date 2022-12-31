@@ -218,7 +218,7 @@ theorem
 
 text\<open>
 "Wie zu erwarten, will Kant nichts vom Utilitarismus oder sonstigen Lehren wissen,
-die der Moral einen außerhalb ihrer selbst liegenden Zweck zuschreiben" \cite{russellphi}.
+die der Moral einen außerhalb ihrer selbst liegenden Zweck zuschreiben" @{cite russellphi}.
 Die eben bewiesene Konsitenz von Gesinnungsethik und Verantwortungsethik zeigt,
 das unsere Grunddefinitionen bereits eine Formalisierung des Kategorischen Imperativs
 komplett im strengen Sinne Kants ausschließen.
