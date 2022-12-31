@@ -4,10 +4,6 @@ begin
 
 section\<open>Schnelleinstieg Isabelle/HOL\<close>
 
-subsection\<open>Typen\<close>
-text\<open>Typen werden per \<^verbatim>\<open>::\<close> annotiert.
-Beispielsweise sagt \<^theory_text>\<open>3::nat\<close>, dass \<^term>\<open>3::nat\<close> eine natürliche Zahl (\<^typ>\<open>nat\<close>) ist.\<close>
-
 subsection\<open>Beweise\<close>
 text\<open>Die besondere Fähigkeit im Beweisassistent Isabelle/HOL liegt darin,
 maschinengeprüfte Beweise zu machen.
@@ -37,6 +33,29 @@ lemma \<open>3 = 2+1\<close> by simp
 theorem \<open>3 = 2+1\<close> by simp
 beispiel \<open>3 = 2+1\<close> by simp
 
+
+subsection\<open>Typen\<close>
+text\<open>Typen werden per \<^verbatim>\<open>::\<close> annotiert.
+Beispielsweise sagt \<^theory_text>\<open>3::nat\<close>, dass \<^term>\<open>3::nat\<close> eine natürliche Zahl (Typ \<^typ>\<open>nat\<close>) ist.\<close>
+
+text\<open>Einige vordefinierte Typen in Isabelle/HOL:
+
+  \<^item> Natürliche Zahlen. Typ \<^typ>\<open>nat\<close>.
+    Beispielsweise  \<^term_type>\<open>0 :: nat\<close>, \<^term_type>\<open>1 :: nat\<close>,
+    \<^term_type>\<open>2 :: nat\<close>, \<^term_type>\<open>3 :: nat\<close>.
+    Auf natürlichen Zahlen ist die Nachfolgerfunktion \<^const>\<open>Suc\<close> definiert.
+    Beispielsweise ist @{lemma "Suc 2 = 3" by simp}.
+  \<^item> Ganze Zahlen. Typ \<^typ>\<open>int\<close>.
+    Beispielsweise  \<^term_type>\<open>0 :: int\<close>, \<^term_type>\<open>1 :: int\<close>,
+    \<^term_type>\<open>-1 :: int\<close>, \<^term_type>\<open>-42 :: int\<close>.
+  \<^item> Listen. Typ \<^typ>\<open>'\<alpha> list\<close>.
+    Beispielsweise  \<^term_type>\<open>[] :: nat list\<close>, \<^term_type>\<open>[] :: int list\<close>,
+    \<^term_type>\<open>[0, 1, 2, 3] :: nat list\<close>, \<^term_type>\<open>[0, 1, -1, -42] :: int list\<close>.
+  \<^item> Strings. Typ \<^typ>\<open>string\<close>.
+    Beispielsweise  \<^term_type>\<open>''Hello, World'' :: string\<close>.
+\<close>
+
+
 subsection\<open>Mehr Typen\<close>
 text\<open>Jeder Typ der mit einem einfachen Anführungszeichen anfängt ist ein polymorpher Typ.
 Beispiel: \<^typ>\<open>'a\<close> oder \<^typ>\<open>'\<alpha>\<close>.
@@ -55,7 +74,108 @@ Im Beweis obigen \<^theory_text>\<open>lemma\<open>3 = 2+1\<close>\<close> hat I
 \<close>
 
 subsection\<open>Noch mehr Typen\<close>
-text\<open>TODO @{command datatype} \<^datatype>\<open>list\<close>\<close>
+text\<open>Eigene Typen können unter Anderem mit dem Keyword @{command datatype} eingeführt werden.
+Im folgenden Beispiel führen wir einen @{command datatype} für Farben ein.\<close>
+
+datatype beispiel_farbe = Rot | Gruen | Blau
+
+text\<open>Eine variable \<^term_type>\<open>x :: beispiel_farbe\<close> kann entweder den Wert
+\<^const>\<open>Rot\<close>, \<^const>\<open>Gruen\<close>, oder \<^const>\<open>Blau\<close> haben.
+Dies lässt sich auch beweisen:\<close>
+
+beispiel\<open>x = Rot \<or> x = Gruen \<or> x = Blau\<close>
+  by(cases x, auto)
+
+text\<open>Wir können auch einen Schritt weitergehen und eine Liste von \<^typ>\<open>beispiel_farbe\<close>
+selbst implementieren.\<close>
+
+datatype beispiel_farbe_liste = FLLeer | FLKopf beispiel_farbe beispiel_farbe_liste
+
+text\<open>Eine \<^typ>\<open>beispiel_farbe_liste\<close> ist hier rekursiv definiert:
+
+  \<^item> Entweder ist die Liste \<^const>\<open>FLLeer\<close> und enthält keine Elemente.
+  \<^item> Oder es gibt bereits eine \<^typ>\<open>beispiel_farbe_liste\<close> und über den \<^const>\<open>FLKopf\<close>
+    Konstruktor hängen wir eine weitere \<^typ>\<open>beispiel_farbe\<close> an.
+    Die Abkürzung \<^const>\<open>FLKopf\<close> steht hier für Farben-Listen-Kopf.
+
+Beispielsweise können wir immer länger werdende
+\<^typ>\<open>beispiel_farbe_liste\<close>n welche nur \<^const>\<open>Rot\<close>e Elemente enthalten wie folgt konstruieren:
+
+  \<^item> \<^term>\<open>(FLLeer) :: beispiel_farbe_liste\<close> enthält 0 Elemente.
+  \<^item> \<^term>\<open>(FLKopf Rot FLLeer) :: beispiel_farbe_liste\<close> enthält ein \<^const>\<open>Rot\<close> Element.
+  \<^item> \<^term>\<open>(FLKopf Rot (FLKopf Rot FLLeer)) :: beispiel_farbe_liste\<close>
+     enthält zwei \<^const>\<open>Rot\<close> Elemente.
+  \<^item> \<^term>\<open>(FLKopf Rot (FLKopf Rot (FLKopf Rot FLLeer))) :: beispiel_farbe_liste\<close>
+     enthält drei \<^const>\<open>Rot\<close> Elemente.
+\<close>
+
+text\<open>Das Konzept Liste kann weiter verallgemeinert werden.
+Wir können eine generische Liste bauen, welche nicht nur \<^typ>\<open>beispiel_farbe\<close>n aufnehmen kann,
+sondern eine polymorphe Liste,
+welche beliebige Typen speichern kann.
+\<close>
+
+datatype '\<alpha> beispiel_liste = Leer | Kopf '\<alpha> \<open>'\<alpha> beispiel_liste\<close>
+
+text\<open>Der Typ \<^typ>\<open>'\<alpha>\<close> steht hierbei für einen Platzhalter für beliebige Typen.
+Beispielsweise können wir mit der generischen \<^typ>\<open>'\<alpha> beispiel_liste\<close> wieder unsere
+\<^typ>\<open>beispiel_farbe_liste\<close> simulieren:
+
+  \<^item> \<^term_type>\<open>(Leer) :: beispiel_farbe beispiel_liste\<close> enthält 0 Elemente.
+  \<^item> \<^term_type>\<open>(Kopf Rot Leer) :: beispiel_farbe beispiel_liste\<close>
+    enthält ein \<^const>\<open>Rot\<close> Element.
+  \<^item> \<^term_type>\<open>(Kopf Rot (Kopf Rot Leer)) :: beispiel_farbe beispiel_liste\<close>
+     enthält zwei \<^const>\<open>Rot\<close> Elemente.
+  \<^item> \<^term_type>\<open>(Kopf Rot (Kopf Rot (Kopf Rot Leer))) :: beispiel_farbe beispiel_liste\<close>
+     enthält drei \<^const>\<open>Rot\<close> Elemente.
+
+Die Liste kann jedoch auch andere Typen von Elementen speichern.
+
+  \<^item> \<^term_type>\<open>(Kopf 2 (Kopf 1 (Kopf 0 Leer))) :: nat beispiel_liste\<close>
+  \<^item> \<^term_type>\<open>(Kopf ''Erstes Element'' (Kopf ''Letzes Element'' Leer)) :: string beispiel_liste\<close>
+\<close>
+
+text\<open>Die Länge einer \<^typ>\<open>'\<alpha> beispiel_liste\<close> lässt sich über folgende rekursive Funktion
+wie folgt definieren:\<close>
+
+fun beispiel_liste_laenge :: "'\<alpha> beispiel_liste \<Rightarrow> nat" where
+  "beispiel_liste_laenge Leer = 0"
+| "beispiel_liste_laenge (Kopf _ ls) = Suc (beispiel_liste_laenge ls)"
+
+text\<open>Funktionen werden oft über Pattern-Matching implementiert,
+d.h., dass der gegebene Datentyp zerlegt wird und eine Fallunterscheidung getroffen wird.
+
+  \<^item> Für den Basisfall \<^const>\<open>Leer\<close> wird \<^term>\<open>0::nat\<close> zurückgegeben.
+  \<^item> Für den rekursiven Fall \<^term>\<open>Kopf\<close> in dem wir ein Kopfelement haben
+    welches wir ignorieren und einer Folgeliste \<^term>\<open>ls::'\<alpha> beispiel_liste\<close>
+    rufen wir \<^const>\<open>beispiel_liste_laenge\<close> rekursiv mit der Folgeliste auf und geben den
+    Nachfolger der so berechneten Zahl zurück.\<close>
+
+beispiel \<open>beispiel_liste_laenge Leer = 0\<close>
+  by eval
+beispiel \<open>beispiel_liste_laenge (Kopf Rot (Kopf Rot (Kopf Rot Leer))) = 3\<close>
+  by eval
+
+text\<open>Zusätzlich können den einzelnen Feldern in Datentypen spezielle Namen gegeben werden.
+Beispielsweise:\<close>
+
+datatype '\<alpha> beispiel_liste_mit_namen =
+    LeerMN | KopfMN (kopfelement: '\<alpha>) (schwanzliste: \<open>'\<alpha> beispiel_liste_mit_namen\<close>)
+
+text\<open>Der Fall \<^const>\<open>LeerMN\<close> bleibt unverändert.
+Um Verwechslung zu vermeiden haben wir den einzelnen Fällen das Suffix MN (Mit-Namen)
+gegeben, da die Konstruktoren \<^const>\<open>Leer\<close> und \<^const>\<open>Kopf\<close> bereits durch das vorherige Beispiel
+definiert sind.
+Im \<^const>\<open>KopfMN\<close>-Fall haben nun die einzelnen Felder Namen.\<close>
+
+beispiel\<open>kopfelement (KopfMN Rot LeerMN) = Rot\<close> by simp
+beispiel\<open>schwanzliste (KopfMN Rot LeerMN) = LeerMN\<close> by simp
+
+text\<open>Die von Isabelle mitgelieferte Standardimplementierung einer Liste
+sieht unserem Beispiel recht ähnlich,
+allerdings liefert Isabelle noch zusätzlichen Syntactic Sugar um Listen komfortabler darzustellen.
+Die Implementierung einer Liste in der Standardbibliothek ist: \<^datatype>\<open>list\<close>\<close>
+
 
 subsection\<open>Funktionen\<close>
 text\<open>Beispiel:
