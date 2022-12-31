@@ -44,7 +44,7 @@ text\<open>Einige vordefinierte Typen in Isabelle/HOL:
     Beispielsweise  \<^term_type>\<open>0 :: nat\<close>, \<^term_type>\<open>1 :: nat\<close>,
     \<^term_type>\<open>2 :: nat\<close>, \<^term_type>\<open>3 :: nat\<close>.
     Auf natürlichen Zahlen ist die Nachfolgerfunktion \<^const>\<open>Suc\<close> definiert.
-    Beispielsweise ist @{lemma "Suc 2 = 3" by simp}.
+    Beispielsweise ist @{lemma \<open>Suc 2 = 3\<close> by simp}.
   \<^item> Ganze Zahlen. Typ \<^typ>\<open>int\<close>.
     Beispielsweise  \<^term_type>\<open>0 :: int\<close>, \<^term_type>\<open>1 :: int\<close>,
     \<^term_type>\<open>-1 :: int\<close>, \<^term_type>\<open>-42 :: int\<close>.
@@ -84,12 +84,12 @@ text\<open>Eine variable \<^term_type>\<open>x :: beispiel_farbe\<close> kann en
 Dies lässt sich auch beweisen:\<close>
 
 beispiel\<open>x = Rot \<or> x = Gruen \<or> x = Blau\<close>
-  by(cases x, auto)
+  by(cases \<open>x\<close>, auto)
 
 text\<open>Wir können auch einen Schritt weitergehen und eine Liste von \<^typ>\<open>beispiel_farbe\<close>
 selbst implementieren.\<close>
 
-datatype beispiel_farbe_liste = FLLeer | FLKopf beispiel_farbe beispiel_farbe_liste
+datatype beispiel_farbe_liste = FLLeer | FLKopf \<open>beispiel_farbe\<close> \<open>beispiel_farbe_liste\<close>
 
 text\<open>Eine \<^typ>\<open>beispiel_farbe_liste\<close> ist hier rekursiv definiert:
 
@@ -115,7 +115,7 @@ sondern eine polymorphe Liste,
 welche beliebige Typen speichern kann.
 \<close>
 
-datatype '\<alpha> beispiel_liste = Leer | Kopf '\<alpha> \<open>'\<alpha> beispiel_liste\<close>
+datatype '\<alpha> beispiel_liste = Leer | Kopf \<open>'\<alpha>\<close> \<open>'\<alpha> beispiel_liste\<close>
 
 text\<open>Der Typ \<^typ>\<open>'\<alpha>\<close> steht hierbei für einen Platzhalter für beliebige Typen.
 Beispielsweise können wir mit der generischen \<^typ>\<open>'\<alpha> beispiel_liste\<close> wieder unsere
@@ -138,9 +138,9 @@ Die Liste kann jedoch auch andere Typen von Elementen speichern.
 text\<open>Die Länge einer \<^typ>\<open>'\<alpha> beispiel_liste\<close> lässt sich über folgende rekursive Funktion
 wie folgt definieren:\<close>
 
-fun beispiel_liste_laenge :: "'\<alpha> beispiel_liste \<Rightarrow> nat" where
-  "beispiel_liste_laenge Leer = 0"
-| "beispiel_liste_laenge (Kopf _ ls) = Suc (beispiel_liste_laenge ls)"
+fun beispiel_liste_laenge :: \<open>'\<alpha> beispiel_liste \<Rightarrow> nat\<close> where
+  \<open>beispiel_liste_laenge Leer = 0\<close>
+| \<open>beispiel_liste_laenge (Kopf _ ls) = Suc (beispiel_liste_laenge ls)\<close>
 
 text\<open>Funktionen werden oft über Pattern-Matching implementiert,
 d.h., dass der gegebene Datentyp zerlegt wird und eine Fallunterscheidung getroffen wird.
@@ -160,7 +160,7 @@ text\<open>Zusätzlich können den einzelnen Feldern in Datentypen spezielle Nam
 Beispielsweise:\<close>
 
 datatype '\<alpha> beispiel_liste_mit_namen =
-    LeerMN | KopfMN (kopfelement: '\<alpha>) (schwanzliste: \<open>'\<alpha> beispiel_liste_mit_namen\<close>)
+    LeerMN | KopfMN (kopfelement: \<open>'\<alpha>\<close>) (schwanzliste: \<open>'\<alpha> beispiel_liste_mit_namen\<close>)
 
 text\<open>Der Fall \<^const>\<open>LeerMN\<close> bleibt unverändert.
 Um Verwechslung zu vermeiden haben wir den einzelnen Fällen das Suffix MN (Mit-Namen)
