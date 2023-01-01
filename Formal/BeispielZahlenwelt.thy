@@ -153,16 +153,15 @@ lemma wohlgeformte_handlungsabsicht_erschaffen:
   apply(simp add: swap_def Fun.swap_def)
   done
 
-
 text\<open>Wenn wir das Opfer eindeutig auswählen, ist die Handlungsabsicht "Stehlen" wohlgeformt.
   Allerdings wird niemand bestohlen, wenn das Opfer nicht eindeutig ist.\<close>
-fun stehlen4 :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
-  \<open>stehlen4 beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
-        map_option Zahlenwelt (stehlen beute opfer_nach_besitz dieb besitz)\<close>
+fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+  \<open>stehlen beute opfer_nach_besitz dieb (Zahlenwelt besitz) =
+        map_option Zahlenwelt (Zahlenwelt.stehlen beute opfer_nach_besitz dieb besitz)\<close>
 
 (*<*)
-lemma wohlgeformte_handlungsabsicht_stehlen4:
-  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen4 n p))\<close>
+lemma wohlgeformte_handlungsabsicht_stehlen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
   apply(cases \<open>welt\<close>)
   apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen, where C=\<open>Zahlenwelt\<close>])
   by(auto)
@@ -215,7 +214,7 @@ fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwel
 text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
 definition \<open>handlungsabsichten \<equiv> [
   Handlungsabsicht (erschaffen 5),
-  Handlungsabsicht (stehlen4 5 10),
+  Handlungsabsicht (stehlen 5 10),
   Handlungsabsicht reset,
   Handlungsabsicht alles_kaputt_machen,
   Handlungsabsicht unmoeglich
@@ -225,7 +224,7 @@ lemma wfh_handlungsabsichten:
   \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
   apply(simp add: handlungsabsichten_def)
   apply(safe)
-      apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen4
+      apply(simp_all add: wohlgeformte_handlungsabsicht_stehlen
       wohlgeformte_handlungsabsicht_alles_kaputt_machen
       wohlgeformte_handlungsabsicht_erschaffen
       wohlgeformte_handlungsabsicht_reset)
@@ -244,8 +243,8 @@ definition maxime_zahlenfortschritt :: \<open>(person, zahlenwelt) maxime\<close
   \<open>maxime_zahlenfortschritt \<equiv> Maxime (\<lambda>ich. individueller_fortschritt ich)\<close>
 
 (*<*)
-lemma mhg_maxime_zahlenfortschritt_stehlen4:
-  \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 5 10)) p\<close>
+lemma mhg_maxime_zahlenfortschritt_stehlen:
+  \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 10)) p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
   apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
@@ -260,7 +259,7 @@ Das nicht-wohlgeformte \<^const>\<open>stehlen_nichtwf\<close> erfüllt sie alle
 lemma \<open>ha \<in> {
     Handlungsabsicht (erschaffen 5),
     Handlungsabsicht (stehlen_nichtwf 5 Bob),
-    Handlungsabsicht (stehlen4 5 10),
+    Handlungsabsicht (stehlen 5 10),
     Handlungsabsicht alles_kaputt_machen,
     Handlungsabsicht unmoeglich
   } \<Longrightarrow> maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt ha p\<close>
@@ -268,7 +267,7 @@ lemma \<open>ha \<in> {
   apply(safe)
       apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
      apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
-  subgoal using mhg_maxime_zahlenfortschritt_stehlen4 by simp
+  subgoal using mhg_maxime_zahlenfortschritt_stehlen by simp
   subgoal
     by(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, auto)
   apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def; fail)
@@ -287,12 +286,12 @@ den \<^const>\<open>kategorischer_imperativ\<close>,
 da \<^const>\<open>Alice\<close> nach der Maxime z.B. \<^const>\<open>Bob\<close> bestehlen dürfte.\<close>
 beispiel \<open>kategorischer_imperativ_gegenbeispiel
   zahlenwps initialwelt maxime_zahlenfortschritt
-  (Handlungsabsicht (stehlen4 1 10))
+  (Handlungsabsicht (stehlen 1 10))
   Alice
   Bob
   Alice\<close>
   apply(simp add: kategorischer_imperativ_gegenbeispiel_def
-      wohlgeformte_handlungsabsicht_stehlen4 mhg_maxime_zahlenfortschritt_stehlen4)
+      wohlgeformte_handlungsabsicht_stehlen mhg_maxime_zahlenfortschritt_stehlen)
   by(eval)
 
 (*<*)
@@ -305,7 +304,7 @@ lemma \<open>wpsm_kommutiert (maxime_zahlenfortschritt) zahlenwps welt\<close>
 text\<open>Folgendes Beispiel zeigt, dass die \<^const>\<open>maxime_zahlenfortschritt\<close> den
 kategorischen Imperativ auf unseren \<^const>\<open>handlungsabsichten\<close> nicht erfüllt
 (zu sehen an dem \<^const>\<open>False\<close> im \<^const>\<open>bsp_erfuellte_maxime\<close>.).
-Die Handlungsabsichten \<^const>\<open>stehlen4\<close> als auch \<^const>\<open>reset\<close> sind nicht mit der Maxime vereinbar.
+Die Handlungsabsichten \<^const>\<open>stehlen\<close> als auch \<^const>\<open>reset\<close> sind nicht mit der Maxime vereinbar.
 Für die übrigen Handlungsabsichten ist das Ergebnis aber intuitiv:
   \<^item> \<^const>\<open>erschaffen\<close> ist erlaubt.
   \<^item> da \<^const>\<open>unmoeglich\<close> im Nichtstuen endet, ist dies auch erlaubt.
@@ -323,7 +322,7 @@ beispiel \<open>erzeuge_beispiel
         Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [Handlungsabsicht alles_kaputt_machen],
      bsp_uneindeutige_handlungen = [
-        Handlungsabsicht (stehlen4 5 10),
+        Handlungsabsicht (stehlen 5 10),
         Handlungsabsicht reset]\<rparr>\<close>
   by beispiel_tac
 
@@ -341,7 +340,7 @@ lemma \<open>\<not> moralisch welt maxime_zahlenfortschritt (Handlungsabsicht (s
 text\<open>In unserer \<^const>\<open>initialwelt\<close> in der \<^const>\<open>Bob\<close> als Opfer anhand seines Besitzes
     als Opfer eines Diebstahls ausgewählt würde, ist stehlen dennoch nicht \<^const>\<open>moralisch\<close>,
     obwohl die Handlungsabsicht wohlgeformt ist:\<close>
-lemma \<open>\<not> moralisch initialwelt maxime_zahlenfortschritt (Handlungsabsicht (stehlen4 5 10))\<close>
+lemma \<open>\<not> moralisch initialwelt maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 10))\<close>
   by(eval)
 
 text\<open>Da Schenken und Stehlen in dieser Welt equivalent ist, ist Schenken auch unmoralisch:\<close>  
@@ -365,7 +364,7 @@ erfüllt; zu sehen an dem \<^const>\<open>True\<close> im \<^const>\<open>bsp_er
 
 Die Handlungsabsichten werden eingeordnet wie erwartet:
   \<^item> \<^const>\<open>erschaffen\<close> ist gut, \<^const>\<open>unmoeglich\<close> (bedeutet: Nichtstun) ist auch okay.
-  \<^item> \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist schlecht.
+  \<^item> \<^const>\<open>stehlen\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist schlecht.
   \<close>
 beispiel \<open>erzeuge_beispiel
     zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
@@ -378,7 +377,7 @@ beispiel \<open>erzeuge_beispiel
         Handlungsabsicht (erschaffen 5),
         Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [
-        Handlungsabsicht (stehlen4 5 10),
+        Handlungsabsicht (stehlen 5 10),
         Handlungsabsicht reset,
         Handlungsabsicht alles_kaputt_machen],
      bsp_uneindeutige_handlungen = []\<rparr>\<close>
@@ -398,9 +397,9 @@ lemma wpsm_kommutiert_altruistischer_fortschritt:
    apply (metis hlp2 hlp3 zahlenwps_sym)
   by (metis hlp2 hlp3 zahlenwps_id zahlenwps_sym)
 
-lemma mhg_maxime_altruistischer_fortschritt_stehlen4:
+lemma mhg_maxime_altruistischer_fortschritt_stehlen:
   \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt 
-      maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen4 5 10)) p\<close>
+      maxime_altruistischer_fortschritt (Handlungsabsicht (stehlen 5 10)) p\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
   apply(simp add: ausfuehrbar.simps)
   apply(case_tac \<open>welt\<close>, simp)
@@ -448,7 +447,7 @@ lemma maxime_altruistischer_fortschritt_mhg_handlungsabsichten:
   apply(simp add: handlungsabsichten_def)
   apply(safe)
       apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def; fail)
-     apply (simp add: mhg_maxime_altruistischer_fortschritt_stehlen4; fail)
+     apply (simp add: mhg_maxime_altruistischer_fortschritt_stehlen; fail)
     apply(simp add: maxime_altruistischer_fortschritt_reset; fail)
    apply(simp add: maxime_altruistischer_fortschritt_alles_kaputt_machen; fail)
   apply(case_tac \<open>welt\<close>, simp add: handeln_def nachher_handeln.simps maxime_und_handlungsabsicht_generalisieren_def maxime_altruistischer_fortschritt_def)
@@ -678,7 +677,7 @@ beispiel \<open>erzeuge_beispiel
         Handlungsabsicht unmoeglich],
      bsp_uneindeutige_handlungen = [
         Handlungsabsicht (erschaffen 5),
-        Handlungsabsicht (stehlen4 5 10),
+        Handlungsabsicht (stehlen 5 10),
         Handlungsabsicht reset]
     \<rparr>\<close>
   by beispiel_tac
@@ -737,7 +736,7 @@ text\<open>Folgendes Beispiel zeigt, dass die Maxime \<^const>\<open>globaler_st
 den kategorischen Imperativ erfüllen kann.
 Die Handlungsabsichten sind fast intuitiv in erlaubt und verboten eingeordnet.
   \<^item> \<^term>\<open>erschaffen 5\<close> ist erlaubt.
-  \<^item> \<^const>\<open>stehlen4\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
+  \<^item> \<^const>\<open>stehlen\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
     Allerdings ist auch \<^const>\<open>unmoeglich\<close> verboten, da die Maxime Untätigkeit verbietet.
     Dieser letzte Fall ist unschön.
 \<close>
@@ -750,7 +749,7 @@ beispiel \<open>erzeuge_beispiel
      bsp_erfuellte_maxime = True,
      bsp_erlaubte_handlungen = [Handlungsabsicht (erschaffen 5)],
      bsp_verbotene_handlungen = [
-      Handlungsabsicht (stehlen4 5 10),
+      Handlungsabsicht (stehlen 5 10),
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen,
       Handlungsabsicht unmoeglich],
@@ -780,7 +779,7 @@ beispiel \<open>moralisch initialwelt
           (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen_nichtwf 5 Bob))\<close>
   by(eval)
 beispiel \<open>moralisch initialwelt
-          (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen4 5 10))\<close>
+          (Maxime (\<lambda>ich. globaler_fortschritt)) (Handlungsabsicht (stehlen 5 10))\<close>
   by(eval)
 
 text\<open>Folgendes Beispiel zeigt, dass die Maxime \<^const>\<open>globaler_fortschritt\<close>
@@ -788,7 +787,7 @@ den kategorischen Imperativ erfüllen kann.
 Die Handlungsabsichten sind meiner Meinung nach intuitiv
 (basierend auf der globalen Betrachtung der Maxime) in erlaubt und verboten eingeordnet.
   \<^item> \<^term>\<open>erschaffen\<close> ist erlaubt.
-    Auch \<^const>\<open>stehlen4\<close> ist erlaubt, da dabei "doem Kollektiv" kein Besitz verloren geht.
+    Auch \<^const>\<open>stehlen\<close> ist erlaubt, da dabei "doem Kollektiv" kein Besitz verloren geht.
     Untätigkeit wird wieder über \<^const>\<open>unmoeglich\<close> erlaubt.
   \<^item> \<^const>\<open>reset\<close> und \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
 \<close>
@@ -801,7 +800,7 @@ beispiel \<open>erzeuge_beispiel
      bsp_erfuellte_maxime = True,
      bsp_erlaubte_handlungen = [
       Handlungsabsicht (erschaffen 5),
-      Handlungsabsicht (stehlen4 5 10),
+      Handlungsabsicht (stehlen 5 10),
       Handlungsabsicht unmoeglich],
      bsp_verbotene_handlungen = [
       Handlungsabsicht reset,
@@ -848,7 +847,7 @@ beispiel \<open>individueller_fortschritt Alice
 
 text\<open>Solch eine Maxime ist allerdings nicht wohlgeformt.\<close>
 beispiel \<open>\<not> wohlgeformte_maxime_auf
-    (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
+    (handeln Alice initialwelt (Handlungsabsicht (stehlen 5 10))) zahlenwps
     (Maxime (\<lambda>ich. individueller_fortschritt Alice))\<close>
   apply(simp add: wohlgeformte_maxime_auf_def)
   apply(rule_tac x=\<open>Alice\<close> in exI)
@@ -858,7 +857,7 @@ beispiel \<open>\<not> wohlgeformte_maxime_auf
 
 text\<open>Sobald wir aufhören \<^const>\<open>Alice\<close> hardzucoden, wird die Maxime wohlgeformt.\<close>
 beispiel \<open>wohlgeformte_maxime_auf
-    (handeln Alice initialwelt (Handlungsabsicht (stehlen4 5 10))) zahlenwps
+    (handeln Alice initialwelt (Handlungsabsicht (stehlen 5 10))) zahlenwps
     (Maxime (\<lambda>ich. individueller_fortschritt ich))\<close>
   apply(simp add: wohlgeformte_maxime_auf_def)
   apply(code_simp)

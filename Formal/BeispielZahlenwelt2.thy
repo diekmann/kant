@@ -453,11 +453,13 @@ beispiel \<open>erzeuge_beispiel
   \<rparr>\<close> by beispiel_tac
 
 
-(*TODO:
+(*
   1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
      (das sollte der neue function map typ providen).
      hat_konsens_existierende_abmachung_einloesen zeigt, dass dies zumindest fuer diese eine HA gilt.
   2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
+     TODO.
+     Ansonsten ist stehlen nicht zu unterscheiden von abmachung einloesen!!!
 *)
 definition maxime_hatte_konsens :: \<open>(person, zahlenwelt) maxime\<close> where
   \<open>maxime_hatte_konsens \<equiv> Maxime (\<lambda>ich h. hat_konsens h)\<close>
