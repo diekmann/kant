@@ -373,7 +373,43 @@ lemma hat_konsens_existierende_abmachung_einloesen:
 
 
 
+fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
+  \<open>stehlen beute opfer_nach_besitz dieb welt =
+        map_option (\<lambda>b. welt\<lparr>besitz := b\<rparr>) (Zahlenwelt.stehlen beute opfer_nach_besitz dieb (besitz welt))\<close>
 
+beispiel\<open>stehlen 3 10 Alice initialwelt =
+Some \<lparr>
+  besitz = \<^url>[Alice := 8, Bob := 7, Carol := -3],
+  konsens = (\<lambda>_. [])(
+    Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
+    Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]),
+  staatsbesitz = 9000,
+  umwelt = 600
+ \<rparr>\<close> by eval
+
+text\<open>\<^const>\<open>stehlen\<close> und \<^const>\<open>existierende_abmachung_einloesen\<close> können ununterscheidbar sein,
+was den \<^const>\<open>besitz\<close> betrifft.
+Der Hauptunterschied ist, ob \<^const>\<open>konsens\<close> eingelöst wurde oder nicht.\<close>
+beispiel
+ \<open>besitz (the (stehlen 3 10 Alice initialwelt)) =
+  besitz (the (existierende_abmachung_einloesen Bob initialwelt))\<close>
+ \<open>konsens (the (stehlen 3 10 Alice initialwelt)) \<noteq>
+  konsens (the (existierende_abmachung_einloesen Bob initialwelt))\<close>
+  by code_simp+
+
+(*<*)
+lemma wohlgeformte_handlungsabsicht_stehlen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
+  (*apply(simp)
+  apply(cases \<open>welt\<close>, simp)*)
+  apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
+            where C="(\<lambda>b. welt\<lparr>besitz := b\<rparr>)" and welt="besitz welt"])
+    apply(simp)
+  (*TODO*, das gilt leider nicht. Die wfh_generalize_worldI ist doof*)
+  oops
+(*>*)
+
+(*TODO: stehlen muss zu den Handlungsabsichten hinzu!*)
 
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
@@ -412,6 +448,7 @@ lemma alles_kaputt_machen_code[code]:
    Some (welt\<lparr> besitz := (\<lambda>_. min_list (map (besitz welt) enum_class.enum) -1)\<rparr>)\<close>
   apply(cases \<open>welt\<close>, simp add: alles_kaputt_machen_code_help)
   done
+
 
 
 
