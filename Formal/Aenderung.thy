@@ -226,70 +226,6 @@ lemma swap_aenderung_ausfuehren:
   done
 
 
-(*TODO: Achtung, das macht unfug wenn p1 und p2 unterschiedlich*)
-definition aenderung_merge_same_person
-  :: \<open>('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung \<Rightarrow> ('person, 'etwas) aenderung
-      \<Rightarrow> ('person, 'etwas) aenderung option\<close>
-where
-  \<open>aenderung_merge_same_person a1 a2 =
-   (if betroffen a1 \<noteq> betroffen a2
-    then undefined
-    else sum_delta_num (betroffen a1) (aenderung_val a1) (aenderung_val a2))\<close>
-(*TODO: test!*)
-
-
-lemma \<open>aenderung_merge_same_person (Verliert Alice (2::int)) (Gewinnt Alice 6) = Some (Gewinnt Alice 4)\<close>
-  by eval
-
-lemma aenderung_merge_same_person_commute:
-  fixes a::\<open>('person, 'a::ordered_ab_group_add) aenderung\<close>
-  shows \<open>betroffen a = betroffen b \<Longrightarrow> aenderung_merge_same_person a b = aenderung_merge_same_person b a\<close>
-  apply(cases \<open>a\<close>, case_tac [!] \<open>b\<close>)
-  by(simp_all add: aenderung_merge_same_person_def sum_delta_num_def Let_def add.commute)
-
-
-fun aenderung_list_to_to_abmachung
-  :: \<open>('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person \<rightharpoonup> ('person, 'etwas) aenderung)\<close>
-where
-  \<open>aenderung_list_to_to_abmachung [] = Map.empty\<close>
-| \<open>aenderung_list_to_to_abmachung (delta # deltas) = 
-   (case (aenderung_list_to_to_abmachung deltas) (betroffen delta)
-      of None \<Rightarrow> (aenderung_list_to_to_abmachung deltas)((betroffen delta) \<mapsto> delta)
-       | Some delta2 \<Rightarrow> (aenderung_list_to_to_abmachung deltas)((betroffen delta) := aenderung_merge_same_person delta2 delta)
-   )\<close>
-
-lemma \<open>aenderung_list_to_to_abmachung [Verliert Alice (2::int), Verliert Alice 6]
-  = [Alice \<mapsto> Verliert Alice 8]\<close>
-  by eval
-
-lemma \<open>aenderung_list_to_to_abmachung [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
-  = [Alice \<mapsto> Verliert Alice 2, Bob \<mapsto> Gewinnt Bob 3, Carol \<mapsto> Gewinnt Carol 2, Eve \<mapsto> Verliert Eve 1]\<close>
-  by eval
-
-
-lemma \<open>aenderung_list_to_to_abmachung [Verliert Alice (2::int), Gewinnt Alice 6]
-  = [Alice \<mapsto> Gewinnt Alice 4]\<close>
-  by eval
-
-
-text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> in eine \<^typ>\<open>('person, 'etwas) aenderung set\<close>
-zu übersetzen ist nicht trivial, da Die Liste mehrere Änderungen der gleichen Person
-enthalten kann, welche gemerged werden müssen.\<close>
-definition aenderung_list_to_set
-  :: \<open>('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) aenderung set\<close>
-  where
-\<open>aenderung_list_to_set as \<equiv> set (List.map_filter (aenderung_list_to_to_abmachung as) Enum.enum)\<close>
-
-lemma \<open>aenderung_list_to_set as = ran (aenderung_list_to_to_abmachung as)\<close>
-  apply(simp add: aenderung_list_to_set_def)
-  (*TODO!*)
-  oops
-lemma \<open>aenderung_list_to_set 
-  [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Eve 3, Gewinnt Alice 2, Gewinnt Carol 2, Verliert Eve 1]
-= {Gewinnt Bob 3, Gewinnt Carol 2, Gewinnt Eve 2}\<close>
-  by eval
-(*>*)
-
 subsection\<open>Abmachungen\<close>
 text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> wie
 z.B. \<^term>\<open>[Gewinnt Alice (3::int), Verliert Bob 3]\<close> ließe sich gut verwenden,
@@ -339,7 +275,7 @@ lemma to_abmachung_fold_induct_helper:
   by(simp add: fun_eq_iff)+
 lemma to_abmachung_fold:
   fixes as :: \<open>('person, 'etwas::ordered_ab_group_add) aenderung list\<close>
-shows \<open>to_abmachung as = fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as (\<lambda>_. 0)\<close>
+  shows \<open>to_abmachung as = fold (\<lambda>a acc. \<lbrakk>acc(betroffen a += aenderung_val a)\<rbrakk>) as (\<lambda>_. 0)\<close>
   apply(subst to_abmachung_fold_induct_helper[where abmachung=\<open>\<lambda>_. 0\<close>])
   by simp
 
