@@ -327,8 +327,8 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
     apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
     apply(simp add: the_single_elem)
     apply(safe)
-     apply (simp add: swap_def; fail)
-  by (simp add: fun_upd_twist swap_def)
+     apply (simp add: swap_def Fun.swap_def; fail)
+  by (simp add: fun_upd_twist swap_def Fun.swap_def)
 
 
 

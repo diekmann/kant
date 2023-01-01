@@ -1,5 +1,5 @@
 theory Swap
-imports Helper
+imports Helper "HOL-Combinatorics.Transposition" BeispielTac
 begin
 
 section\<open>Swap\<close>
@@ -14,34 +14,51 @@ die \<^term>\<open>besitz :: 'person \<Rightarrow> int\<close> Funktion zurückg
 allerdings mit dem Besitz von \<^term>\<open>p1::'person\<close> und \<^term>\<open>p2::'person\<close> vertauscht.
 \<close>
 
+(*
+Initially, I introduced my own swap implementation as `swap a b f = f(a:=f b, b:= f a)`.
+But then I found that Isabelle/HOL already provides this implementation.
+*)
+
 definition swap :: \<open>'a \<Rightarrow> 'a \<Rightarrow> ('a \<Rightarrow> 'b) \<Rightarrow> 'a \<Rightarrow> 'b\<close> where
-  \<open>swap a b f \<equiv> f(a:=f b, b:= f a)\<close>
+  \<open>swap a b f \<equiv> Fun.swap a b f\<close>
+
+beispiel "swap a b f = f(a:=f b, b:= f a)"
+  by (simp add: Fun.swap_def swap_def)
 
 lemma swap1[simp]: \<open>swap a b (swap a b f) = f\<close>
-  by(simp add: swap_def)
+  by (simp add: swap_def swap_nilpotent)
 lemma swap2[simp]: \<open>swap b a (swap a b f) = f\<close>
+  by (simp add: swap_def swap_nilpotent transpose_commute)
+
+beispiel \<open>(swap p1 p2 swap) p1 p2 x = x\<close> (*wow, types*)
   by(simp add: swap_def)
-lemma swap3: \<open>(swap p1 p2 swap) p1 p2 x = x\<close> (*wow, types*)
+beispiel \<open>(swap p2 p1 swap) p1 p2 x = x\<close> (*wow, types*)
   by(simp add: swap_def)
-lemma swap4: \<open>(swap p2 p1 swap) p1 p2 x = x\<close> (*wow, types*)
-  by(simp add: swap_def)
+
 lemma swap_id[simp]: \<open>swap a a f = f\<close>
   by(simp add: swap_def)
-lemma \<open>f_swapped = (swap a b f) \<Longrightarrow> f_swapped a = f b \<and> f_swapped b = f a\<close>
+
+beispiel \<open>f_swapped = (swap a b f) \<Longrightarrow> f_swapped a = f b \<and> f_swapped b = f a\<close>
   by(simp add: swap_def)
+
+(*TODO rename*)
 lemma swap_symmetric: \<open>swap a b = swap b a\<close>
-  by(simp add: fun_eq_iff swap_def)
+  unfolding swap_def
+  by (simp add: swap_commute)
 lemma map_swap_none: \<open>a \<notin> set P \<Longrightarrow> b \<notin> set P \<Longrightarrow> map (swap a b f) P = map f P\<close>
-  by(simp add: swap_def)
+  by (simp add: swap_def Fun.swap_def)
+
 lemma map_swap_one: \<open>a \<notin> set P \<Longrightarrow>  map (swap a b f) P = map (f(b:=f a)) P\<close>
-  by(simp add: swap_def)
+  by(simp add: swap_def Fun.swap_def)
+
 lemma swap_a: \<open>swap a b f a = f b\<close>
   by(simp add: swap_def)
 lemma swap_b: \<open>swap a b f b = f a\<close>
   by(simp add: swap_def)
+
 lemma sum_swap_none: \<open>a \<notin> P \<Longrightarrow> b \<notin> P \<Longrightarrow> sum (swap a b f) P = sum f P\<close>
   apply(rule sum.cong, simp)
-  apply(simp add: swap_def)
+  apply(simp add: swap_def Fun.swap_def)
   by fastforce
 lemma swap_nothing: \<open>a \<noteq> p1 \<Longrightarrow> a \<noteq> p2 \<Longrightarrow> swap p1 p2 f a = f a\<close>
   by(simp add: swap_def)
@@ -60,7 +77,8 @@ lemma swap_fun_map_comp_id:
   by (simp add: map_idI)
 
 lemma swap_forall: \<open>(\<forall>p. P (swap p1 p2 a p) (swap p1 p2 b p)) \<longleftrightarrow> (\<forall>p. P (a p) (b p))\<close>
-by (metis swap_a swap_b swap_nothing)
+  apply(simp add: swap_def)
+  by (metis transpose_involutory)
 
 (*
 whenever a prove can be solved by (metis swap_a swap_b swap_nothing)
@@ -161,17 +179,19 @@ lemma swap_fun_swap_id: \<open>swap p1 p2 konsens (swap p1 p2 id p) = konsens p\
   by(simp add: swap_nothing)
 
 
-(*TODO: baut swap eine Permutation und gibt es darauf lemmata?*)
+(*TODO: baut swap eine Permutation und gibt es darauf lemmata?
+TODO: HOL-Combinatorics.Permutations
+*)
 lemma \<open>distinct [p1,p2,p3,p4] \<Longrightarrow> swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)\<close>
-  by(auto simp add: swap_def)
+  by(auto simp add: swap_def Fun.swap_def)
 
 lemma swap_comm: \<open>p1 \<noteq> p3 \<Longrightarrow> p1 \<noteq> p4 \<Longrightarrow> p2 \<noteq> p3 \<Longrightarrow> p2 \<noteq> p4 \<Longrightarrow>
   swap p1 p2 (swap p3 p4 welt) = swap p3 p4 (swap p1 p2 welt)\<close>
-  by(auto simp add: swap_def)
+  by(auto simp add: swap_def Fun.swap_def)
 
 lemma swap_unrelated_im_kreis:
   \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
     swap p2 p (swap p1 p2 (swap p p1 (swap p1 p2 welt))) = welt\<close>
-  by(simp add: swap_def)
+  by(simp add: swap_def Fun.swap_def)
 
 end

@@ -381,7 +381,7 @@ fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Righta
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abbauen n))\<close>
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
-  apply(simp add: zahlenwps_def swap_def)
+  apply(simp add: zahlenwps_def swap_def Fun.swap_def)
   by (simp add: konsensswap_sym)
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps initialwelt (Handlungsabsicht (abbauen n))\<close>

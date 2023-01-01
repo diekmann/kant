@@ -150,7 +150,7 @@ fun erschaffen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rig
 lemma wohlgeformte_handlungsabsicht_erschaffen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (erschaffen n))\<close>
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
-  apply(simp add: swap_def)
+  apply(simp add: swap_def Fun.swap_def)
   done
 
 
@@ -413,7 +413,7 @@ lemma maxime_altruistischer_fortschritt_reset:
       maxime_altruistischer_fortschritt (Handlungsabsicht (reset)) p\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
-  apply(auto simp add: swap_def split: option.split option.split_asm)
+  apply(auto simp add: swap_def Fun.swap_def split: option.split option.split_asm)
   done
 
 lemma maxime_altruistischer_fortschritt_alles_kaputt_machen:
@@ -421,7 +421,7 @@ lemma maxime_altruistischer_fortschritt_alles_kaputt_machen:
       maxime_altruistischer_fortschritt (Handlungsabsicht (alles_kaputt_machen)) p\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
-  apply(auto simp add: swap_def split: option.split option.split_asm)
+  apply(auto simp add: swap_def Fun.swap_def split: option.split option.split_asm)
   done
 
 lemma wfm_maxime_altruistischer_fortschritt:
@@ -495,7 +495,7 @@ lemma
 beispiel \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   zahlenwps p2 p (zahlenwps p1 p2 (zahlenwps p1 p welt)) = zahlenwps p1 p2 welt\<close>
   apply(cases \<open>welt\<close>, simp add: swap_def)
-  by auto
+  by (metis swap_nilpotent swap_triple)
 
 lemma zahlenwps_unrelated_im_kreis:
   \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
@@ -508,8 +508,7 @@ lemma zahlenwps_unrelated_im_kreis_map_handlung_helper:
   = map_handlung (zahlenwps p2 p1) h\<close>
   apply(cases \<open>h\<close>, rename_tac vor nach, simp)
   apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
-  apply(simp add: swap_def)
-  by auto
+  by (metis swap1 swap_unrelated_im_kreis)
 
 (*WOW: ich bekomme ein (zahlenwps p1 p2 welt) innerhalb einer Handlung weg!*)
 lemma wfh_unrelated_pullout_wps:
@@ -570,16 +569,16 @@ lemma wohlgeformte_handlungsabsicht_zahlenwps_komm:
 
 lemma \<open>pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
   zahlenwps pX p1 (zahlenwps pX p2 (zahlenwps p1 pX (zahlenwps p1 p2 welt))) = welt\<close>
-  by(cases \<open>welt\<close>, simp add: swap_def)
+  by(cases \<open>welt\<close>, simp add: swap_def Fun.swap_def)
 
 lemma \<open>pX \<noteq> p1 \<Longrightarrow> pX \<noteq> p2 \<Longrightarrow> p1 \<noteq> p2 \<Longrightarrow>
   zahlenwps pX p2 (zahlenwps pX p1 (zahlenwps p2 pX (zahlenwps p1 p2 welt))) = welt\<close>
-  by(cases \<open>welt\<close>, simp add: swap_def)
+  by(cases \<open>welt\<close>, simp add: swap_def Fun.swap_def)
 
 lemma zahlenwps_funny_permutation: \<open>p \<noteq> p1 \<Longrightarrow> p \<noteq> p2 \<Longrightarrow>
   zahlenwps p2 p1 (zahlenwps p p2 (zahlenwps p1 p (zahlenwps p1 p2 welt)))
     = zahlenwps p p1 (zahlenwps p2 p welt)\<close>
-  apply(cases \<open>welt\<close>, simp add: swap_def)
+  apply(cases \<open>welt\<close>, simp add: swap_def Fun.swap_def)
   by auto
 
 lemma zahlenwps_funny_permutation_map_handlung_helper:
@@ -588,7 +587,7 @@ lemma zahlenwps_funny_permutation_map_handlung_helper:
     = map_handlung (zahlenwps p2 p) ( ( h))\<close>
   apply(cases \<open>h\<close>, rename_tac vor nach, simp)
   apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp)
-  apply(simp add: swap_def)
+  apply(simp add: swap_def Fun.swap_def)
   by auto
 
 lemma wfh_pullout_wps_helper_same:
@@ -891,7 +890,7 @@ fun collatzh:: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt o
 text\<open>Die Handlungsabsicht \<^const>\<open>collatzh\<close> ist tatsächlich immer wohlgeformt.\<close>
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht collatzh)\<close>
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
-  apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff)+
+  apply(case_tac \<open>welt\<close>, simp add: swap_def fun_eq_iff Fun.swap_def)+
   done
 
 

@@ -1,9 +1,15 @@
+(*The following Cache session only exists to pre-compile some theories in advance and cache them.
+This makes compiling and building the proof doc locally a bit faster,
+since we don't have to load those cached theories all the time.
+At the same time, the cache is minimal, so building the whole thing from scratch
+fits into a free GitHub action.*)
 session Cache in "Cache" = HOL +
   options [document = false]
-  sessions "HOL-Library"
+  sessions "HOL-Library" "HOL-Combinatorics"
   theories
     "HOL-Library.Extended_Real"
     "HOL-Library.Code_Target_Numeral"
+    "HOL-Combinatorics.Transposition"
 
 session Kant = Cache +
   (*pass document=pdf via iabelle build command line *)

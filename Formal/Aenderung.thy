@@ -218,11 +218,11 @@ lemma swap_aenderung_ausfuehren:
   subgoal
     apply(simp)
     apply(simp add: aenderung_swap_def, safe)
-      apply (simp_all add: fun_upd_twist swap_def)
+      apply (simp_all add: fun_upd_twist swap_def Fun.swap_def)
     done
   apply(simp)
     apply(simp add: aenderung_swap_def, safe)
-    apply (simp_all add: fun_upd_twist swap_def)
+    apply (simp_all add: fun_upd_twist swap_def Fun.swap_def)
   done
 
 
@@ -451,7 +451,7 @@ lemma abmachung_dom_swap:
   apply(simp add: abmachung_dom_def)
   apply(simp add: image_def)
   apply(rule Collect_cong)
-  apply(simp add: swap_def)
+  apply(simp add: swap_def Fun.swap_def)
   by fast
 
 lemma to_abmachung_abmachung_to_aenderung_list_induct_helper:
@@ -509,7 +509,7 @@ lemma
 lemma abmachung_ausfuehren_swap:
   \<open>abmachung_ausfuehren (swap p1 p2 a) (swap p1 p2 welt)
     = swap p2 p1 (abmachung_ausfuehren a welt)\<close>
-  by(auto simp add: abmachung_ausfuehren_def swap_def)
+  by(auto simp add: abmachung_ausfuehren_def swap_def Fun.swap_def)
 
 lemma aenderung_ausfuehren_abmachung_to_aenderung_induction_helper:
   fixes welt :: \<open>'person::enum \<Rightarrow> 'etwas::ordered_ab_group_add\<close>
@@ -630,7 +630,7 @@ lemma set_abmachungs_betroffene_swap:
   apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
   apply(simp add: image_def)
   apply(rule Collect_cong)
-  apply(simp add: swap_def)
+  apply(simp add: swap_def Fun.swap_def)
   by fast
 (*>*)
 
@@ -730,14 +730,14 @@ lemma konsens_entfernen_konsensswap:
    apply(simp add: swap_if_move_inner)
    apply(simp add: swap_id_in_set)
    apply(subst(2) remove1_swap2[of \<open>p1\<close> \<open>p2\<close>, symmetric])
-   apply(auto simp add: konsensswap_apply swap_def)[1] (*wants helper*)
+   apply(auto simp add: konsensswap_apply swap_def Fun.swap_def)[1] (*wants helper*)
 
   apply(simp add: set_abmachungs_betroffene_swap)
   apply(simp add: konsensswap_apply)
   apply(simp add: swap_if_move_inner)
   apply(simp add: swap_id_in_set)
   apply(simp add: konsensswap_apply swap_def comp_def)
-  by (simp add: list.map_ident_strong)
+  by (simp add: transpose_commute)
 
 
 
