@@ -398,11 +398,56 @@ beispiel
   by code_simp+
 
 (*<*)
+(*TODO: dedup mit wfh_generalize_worldI*)
+thm wfh_generalize_worldI
+lemma wfh_generalize_worldI:
+  fixes wps :: \<open>('person, 'w) wp_swap\<close>
+    and welt :: \<open>'w\<close>
+    and ha :: \<open>'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>
+    and sel :: \<open>'zw \<Rightarrow> 'w\<close>
+  shows
+\<open>wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha)) \<Longrightarrow>
+  sel zwelt = welt \<Longrightarrow>
+  (\<And>p1 p2 zw. wps p1 p2 (sel zw) = sel (zwps p1 p2 zw)) \<Longrightarrow>
+  (\<And>p zw. ha p (sel zw) = map_option sel (zha p zw)) \<Longrightarrow>
+wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht zha)\<close>
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(clarsimp)
+  apply(erule_tac x=\<open>p1\<close> in allE)
+  apply(erule_tac x=\<open>p2\<close> in allE)
+  apply(simp add: option.map_comp)
+  apply(subgoal_tac "wps p2 p1 \<circ> sel = sel \<circ> zwps p2 p1")
+   prefer 2
+   apply fastforce
+  apply(simp)
+  apply(thin_tac "wps p2 p1 \<circ> sel = _")
+  apply(simp add: map_option.comp[symmetric])
+(*vermutlich fehlt, dass alles ausserhalb von sel unangetastet bleibt*)
+  thm wohlgeformte_handlungsabsicht.simps[symmetric]
+
+
+  oops
+  thm map_option.comp
+  apply(simp add: comp_def)
+  done
+
+(*This is mostly a copy of wohlgeformte_handlungsabsicht_stehlen and this sucks.*)
+thm wohlgeformte_handlungsabsicht_stehlen
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
+  apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(simp add: zahlenwps_def)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: the_single_elem)
+  apply(safe)
+   apply (simp add: zahlenwps_def swap_def Fun.swap_def konsensswap_sym; fail)
+  apply (simp add: zahlenwps_def swap_def Fun.swap_def konsensswap_sym fun_upd_twist)
+  done
+
   (*apply(simp)
   apply(cases \<open>welt\<close>, simp)*)
-  apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
+  apply(rule wfh_generalize_worldI[OF ,
             where C="(\<lambda>b. welt\<lparr>besitz := b\<rparr>)" and welt="besitz welt"])
     apply(simp)
   (*TODO*, das gilt leider nicht. Die wfh_generalize_worldI ist doof*)
