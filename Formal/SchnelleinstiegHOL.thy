@@ -377,14 +377,85 @@ denn sonst ließe sich nichts beweisen.
 \<close>
 
 subsection\<open>Ist das KI?\<close>
-text\<open>TODO: nein!
+text\<open>Nein!
 
-KI oft synonym machine learning.
-Axiome.
+Dieser Abschnitt ist etwas opinionated und handwavy.
+Wenn aktuell von Künstlicher Intelligenz (KI) gesprochen wird,
+wird damit oft Machine Learning gemeint.
+Ich kürze Machine Learning absichtlich nicht mit ML ab,
+da die Verwechslung mit der Programmiersprache Standard Meta Language (ML)
+\<^url>\<open>https://de.wikipedia.org/wiki/Standard_ML\<close>
+zu groß ist.
+Isabelle ist in ML geschrieben und wenn im Umfeld von Isabelle von ML geredet wird,
+ist meistens nie Machine Learning gemeint.
+Genau genommen benutzt Isabelle die Poly/ML Implementierung,
+welche das tollste Logo aller Programmiersprachen hat.\<close>
 
-Isabelle/HOL
-
+text_raw\<open>
+  \begin{center}
+    \includegraphics[height=0.15\textwidth]{Poly_Parrot3.png}\\
+    Poly/ML Logo von polyml.org
+  \end{center}
 \<close>
+
+text\<open>
+Zurück zum Machine Learning.
+Eine der aktuell beliebtesten Implementierungen für maschinelles Lernen sind neuronale Netze.
+Dabei wird ein Algorithmus mit einer Unmenge an Trainingsdaten gefüttert,
+um ein sogenanntes neuronales Netzwerk zu trainieren.
+Ist so ein riesiges Netzwerk einmal trainiert ist es quasi unmöglich auf eine einzelne Zahl
+im trainierten Netzwerk zu zeigen und zu verstehen
+warum das Netz an genau dieser Stelle diese Zahl hat.
+Der Einsatz solcher Methoden um moralische Entscheidungen zu treffen ist meiner Meinung nach
+zurecht umstritten.
+Insbesondere da die Ausgaben eines neuronalen Netzes auf den Trainingsdaten beruhen.
+Wenn die Trainingsdaten bereits von versteckten Vorurteilen durchsetzt sind,
+werden diese natürlich auch in das Netz übernommen.
+
+
+Unser Ansatz der Modellierung in einem Theorembeweiser ist grundverschieden von
+Entscheidungsfindungsansätzen basierend auf Machine Learning.
+
+  \<^item> \<^emph>\<open>Axiomatische Grundlage\<close>.
+    Machine Learning basiert auf den Trainingsdaten.
+    Wenn ein neuronales Netzwerk auf mehreren Milliarden Trainingsdaten basiert,
+    ließe sich ketzerisch sagen,
+    dass das logische System auf mehreren Milliarden Axiomen beruht.
+    Diese Axiomatische Grundlage kann schnell inkonsistent werden
+    und es ist unmöglich diese riesige Menge an Axiomen zu hinterfragen.
+
+    Im Gegensatz dazu steht die Anzahl der Axiome in Isabelle/HOL.
+    Es handelt sich größtenteils um die gewöhnlichen Axiome der klassischen Mathematik,
+    über die sich klassische Mathematiker größtenteils seit über 100 Jahren einig sind
+    (\<^url>\<open>https://en.wikipedia.org/wiki/Axiom_of_choice\<close> sagt
+    "The axiom of choice was formulated in 1904 by Ernst Zermelo").
+    Auch ist die Anzahl der Axiome minimal.
+    Wenn wir die Isabelle Sources nach dem Kommando @{command axiomatization} durchsuchen,
+    finden wir außerhalb von Beispielen nur eine Hand voll Axiomen.
+    In diesem Artikel verwenden wir das Kommando @{command axiomatization} gar nicht.
+    Hinzu kommen noch axiomatische Konstruktionen,
+    wobei jede solche Konstruktion jedoch sehr genau auf ihre Korrektheit geprüft wurde.
+    In diesem Artikel führen wir keine neuen axiomatischen Konstruktionen ein
+    und verlassen uns komplett auf die Konstruktionen der Standardbibliothek,
+    wie z.B. @{command datatype} oder @{command fun}.
+  \<^item> \<^emph>\<open>Nachvollziehbarkeit der Ergebnisse\<close>.
+    Während es bei einem großen neuronalen Netz nahezu unmöglich ist zu verstehen warum ein
+    bestimmter Wert an einer bestimmten Stelle steht und was dies zu bedeuten hat,
+    lässt sich dieses Dokument immer wieder neu kompilieren und alle Beweise wiederholen.
+    Dabei ließe sich genau nachvollziehen wie ein Fakt es in den Isabelle Microkernel geschafft hat.
+    Zusätzlich stellt Isabelle diverse \<^verbatim>\<open>trace\<close> Kommandos bereit.
+    Es lässt sich also nachvollziehen, warum etwas gilt.
+  \<^item> \<^emph>\<open>Vertrauen in die Ergebnisse\<close>.
+    Wie bereits erwähnt basiert Isabelle auf einem mathematischen Microkernel,
+    wodurch ein extrem hohes Vertrauen in alle Ergebnisse erzielt wird.
+    
+
+Allerdings darf Machine Learning und natürlich beim Beweise- und Gegenbeispiel-Finden helfen;
+so angebunden wie automatisierte Beweiser wie Z3.
+Das bedeutet, Machine Learning hilft bei der Entwicklung,
+trifft jedoch selbst keine Entscheidungen.
+\<close>
+
 (*find ./Downloads/Isabelle2022/src/HOL -name "*.thy"  | xargs grep axiomatiz | wc -l*)
 
 subsection\<open>Shallow Embedding vs. Deep Embedding\<close>
