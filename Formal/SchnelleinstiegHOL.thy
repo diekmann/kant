@@ -374,4 +374,18 @@ Jedoch müssen wir diese Annahmen explizit treffen und aufschreiben,
 denn sonst ließe sich nichts beweisen.
 \<close>
 
+subsection\<open>Ist das KI?\<close>
+text\<open>TODO: nein!
+
+KI oft synonym machine learning.
+Axiome.
+
+Isabelle/HOL
+
+\<close>
+(*find ./Downloads/Isabelle2022/src/HOL -name "*.thy"  | xargs grep axiomatiz | wc -l*)
+
+subsection\<open>Shallow Embedding vs. Deep Embedding\<close>
+text\<open>TODO\<close>
+
 end

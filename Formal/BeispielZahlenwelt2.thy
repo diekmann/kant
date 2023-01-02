@@ -435,6 +435,17 @@ lemma datatype_split_map_option_equal:
 thm datatype_split_map_option_equal[of besitz,
       where makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"]
 
+lemma
+  assumes not_touches_other: "\<And>p welt. map_option sel_other (zha p welt) = Some (sel_other welt)"
+  (*wpsid*)
+  shows
+  "map_option sel_other (zha p1 zwelt) =
+             map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
+  apply(simp add: not_touches_other[of p1])
+  thm not_touches_other
+  oops
+ (*TODO hieran arbeite ich gerade*)
+
 thm wfh_generalize_worldI
 lemma wfh_generalize_worldI:
   fixes wps :: \<open>('person, 'w) wp_swap\<close>
@@ -501,14 +512,6 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
    apply (simp add: zahlenwps_def swap_def Fun.swap_def konsensswap_sym; fail)
   apply (simp add: zahlenwps_def swap_def Fun.swap_def konsensswap_sym fun_upd_twist)
   done
-
-  (*apply(simp)
-  apply(cases \<open>welt\<close>, simp)*)
-  apply(rule wfh_generalize_worldI[OF ,
-            where C="(\<lambda>b. welt\<lparr>besitz := b\<rparr>)" and welt="besitz welt"])
-    apply(simp)
-  (*TODO*, das gilt leider nicht. Die wfh_generalize_worldI ist doof*)
-  oops
 (*>*)
 
 (*TODO: stehlen muss zu den Handlungsabsichten hinzu!*)

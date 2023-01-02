@@ -58,18 +58,52 @@
 
 \begin{document}
 
-\title{Extensionale Interpretation des Kategorischen Imperativs}
+\title{Einführung in Isabelle/HOL am Beispiel Philosophie:\\
+Extensionale Interpretation des Kategorischen Imperativs}
 \author{Cornelius Diekmann}
 \maketitle
 
 \begin{abstract}
-Language warning: German ahead.
 
-Extensionale Interpretation des Kategorischen Imperativs.
-Persönliche Interpretation basierend auf Sekundärliteratur.
+Language: German.
 
-Beispiel referenz: \cite{russellphi}
+\medskip
+
+In diesem Artikel modellieren wir eine persönlich angehauchte
+Interpretation von Kants kategorischem Imperativ.
+Primär ist dieses Dokument eine Einführung in die Modellierung mit Isabelle/HOL
+am Beispiel Philosophie.
+Das bevorzugte Leseformat ist die Proof Document Outline,
+welche alle wichtigen Definitionen, Beispiele und Ergbnisse (Lemmata und Theoreme) beinhaltet,
+jedoch die eigentlichen Beweise auslässt.
+Dieses Dokument ist im Theorembeweiser Isabelle/HOL geschrieben,
+d.h.\ dass beim Bau des Dokuments alle Beweise vom Computer überprüft werden.
+Wir können uns daher sicher sein, dass die Beweise stimmen
+und sie guten Gewissens im finalen Dokument auslassen.
+Dies erlaubt es uns, uns ganz auf die Feinheiten der Definitionen
+und Bedeutung der Behauptungen zu fokussieren.
+
+
+Bei der "extensionalen Interpretation des Kategorischen Imperativs" handelt es sich
+um meine persönliche Auslegung von Kants kategorischem Imperativ,
+welche teilweise Kant widerspricht.
+Der Hautpunterschied ist die Extensionalität, wie später im Dokument erläutert wird.
+Dies erlaubt es uns, ein \emph{shallow embedding} morlaischer Definitionen in
+unsere mathematische Logik zu konstruieren.
+
+Meine primäre Inspiration ist die Sekundärliteratur von Bertrand Russell~\cite{russellphi}.
+Russel war sowohl klassischer Mathematiker, einer der Urherber der Principia Mathematica,
+als auch Philosoph.
+Ich behaupte, hätte Russel damals Zugang zu Isabelle/HOL gehabt, wären wir heute weiter
+und Higher-Order Logik (HOL) wäre Russels Logik der Wahl geworden.
 \end{abstract}
+
+% Lawrence Paulson @LawrPaulson Replying to @popitter_net and @analytichegel
+% "Yes — PM goes easily into higher-order logic"
+% where "PM" is Principia Mathematicafrom context.
+%
+%
+%https://twitter.com/LawrPaulson/status/1582788684050358272
 
 \tableofcontents
 
