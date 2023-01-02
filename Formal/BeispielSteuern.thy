@@ -193,7 +193,7 @@ beispiel \<open>\<not> moralisch (Steuerwelt \<^url>[Alice:=8, Bob:=3, Eve:= 5])
 
 text\<open>Denn jeder muss Steuer zahlen!
 Ich finde es super spannend, dass hier faktisch ein Gleichbehandlungsgrundsatz rausfällt,
-ohne dass wir soewtas jemals explizit gefordert haben.
+ohne dass wir so Etwas jemals explizit gefordert haben.
 \<close>
 
 subsection\<open>Beiepiel: Jeder zahle 1 Steuer\<close>
