@@ -391,14 +391,85 @@
 </span><span>›</span></span></span><span>
 
 </span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Ist das KI?</span><span>›</span></span></span><span>
-</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>TODO: nein!
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Nein!
 </span><span>
-</span><span>KI oft synonym machine learning.
-</span><span>Axiome.
-</span><span>
-</span><span>Isabelle/HOL</span><span>
+</span><span>Dieser Abschnitt ist etwas opinionated und handwavy.
+</span><span>Wenn aktuell von Künstlicher Intelligenz (KI) gesprochen wird,
+</span><span>wird damit oft Machine Learning gemeint.
+</span><span>Ich kürze Machine Learning absichtlich nicht mit ML ab,
+</span><span>da die Verwechslung mit der Programmiersprache Standard Meta Language (ML)
+</span><span class="antiquoted"><span class="operator"><span>🌐</span></span><a href="https://de.wikipedia.org/wiki/Standard_ML"><span>‹https://de.wikipedia.org/wiki/Standard_ML›</span></a></span><span>
+</span><span>zu groß ist.
+</span><span>Isabelle ist in ML geschrieben und wenn im Umfeld von Isabelle von ML geredet wird,
+</span><span>ist meistens nie Machine Learning gemeint.
+</span><span>Genau genommen benutzt Isabelle die Poly/ML Implementierung,
+</span><span>welche das tollste Logo aller Programmiersprachen hat.</span><span>›</span></span></span><span>
 
+</span><span class="keyword1"><span class="command"><span>text_raw</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>
+  </span><span>\begin{center}
+</span><span>    \includegraphics[height=0.15\textwidth]{Poly_Parrot3.png}\\
+</span><span>    Poly/ML Logo von polyml.org
+</span><span>  \end{center}</span><span>
 </span><span>›</span></span></span><span>
+
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>
+</span><span>Zurück zum Machine Learning.</span><span>
+</span><span>Eine der aktuell beliebtesten Implementierungen für maschinelles Lernen sind neuronale Netze.</span><span>
+</span><span>Dabei wird ein Algorithmus mit einer Unmenge an Trainingsdaten gefüttert,</span><span>
+</span><span>um ein sogenanntes neuronales Netzwerk zu trainieren.</span><span>
+</span><span>Ist so ein riesiges Netzwerk einmal trainiert ist es quasi unmöglich auf eine einzelne Zahl</span><span>
+</span><span>im trainierten Netzwerk zu zeigen und zu verstehen</span><span>
+</span><span>warum das Netz an genau dieser Stelle diese Zahl hat.</span><span>
+</span><span>Der Einsatz solcher Methoden um moralische Entscheidungen zu treffen ist meiner Meinung nach</span><span>
+</span><span>zurecht umstritten.</span><span>
+</span><span>Insbesondere da die Ausgaben eines neuronalen Netzes auf den Trainingsdaten beruhen.</span><span>
+</span><span>Wenn die Trainingsdaten bereits von versteckten Vorurteilen durchsetzt sind,</span><span>
+</span><span>werden diese natürlich auch in das Netz übernommen.</span><span>
+
+
+</span><span>Unser Ansatz der Modellierung in einem Theorembeweiser ist grundverschieden von</span><span>
+</span><span>Entscheidungsfindungsansätzen basierend auf Machine Learning.</span><span>
+
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span class="antiquoted"><span class="operator"><span>∗</span></span><span class="plain_text"><span>‹</span><span>Axiomatische Grundlage</span><span>›</span></span></span><span>.</span><span>
+    </span><span>Machine Learning basiert auf den Trainingsdaten.</span><span>
+    </span><span>Wenn ein neuronales Netzwerk auf mehreren Milliarden Trainingsdaten basiert,</span><span>
+    </span><span>ließe sich ketzerisch sagen,</span><span>
+    </span><span>dass das logische System auf mehreren Milliarden Axiomen beruht.</span><span>
+    </span><span>Diese Axiomatische Grundlage kann schnell inkonsistent werden</span><span>
+    </span><span>und es ist unmöglich diese riesige Menge an Axiomen zu hinterfragen.</span><span>
+
+    </span><span>Im Gegensatz dazu steht die Anzahl der Axiome in Isabelle/HOL.</span><span>
+    </span><span>Es handelt sich größtenteils um die gewöhnlichen Axiome der klassischen Mathematik,</span><span>
+    </span><span>über die sich klassische Mathematiker größtenteils seit über 100 Jahren einig sind</span><span>
+    </span><span>(</span><span class="antiquoted"><span class="operator"><span>🌐</span></span><a href="https://en.wikipedia.org/wiki/Axiom_of_choice"><span>‹https://en.wikipedia.org/wiki/Axiom_of_choice›</span></a></span><span> sagt</span><span>
+    </span><span>"The axiom of choice was formulated in 1904 by Ernst Zermelo").</span><span>
+    </span><span>Auch ist die Anzahl der Axiome minimal.</span><span>
+    </span><span>Wenn wir die Isabelle Sources nach dem Kommando </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>axiomatization</span><span class="antiquote"><span>}</span></span></span><span> durchsuchen,</span><span>
+    </span><span>finden wir außerhalb von Beispielen nur eine Hand voll Axiomen.</span><span>
+    </span><span>In diesem Artikel verwenden wir das Kommando </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>axiomatization</span><span class="antiquote"><span>}</span></span></span><span> gar nicht.</span><span>
+    </span><span>Hinzu kommen noch axiomatische Konstruktionen,</span><span>
+    </span><span>wobei jede solche Konstruktion jedoch sehr genau auf ihre Korrektheit geprüft wurde.</span><span>
+    </span><span>In diesem Artikel führen wir keine neuen axiomatischen Konstruktionen ein</span><span>
+    </span><span>und verlassen uns komplett auf die Konstruktionen der Standardbibliothek,</span><span>
+    </span><span>wie z.B. </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>datatype</span><span class="antiquote"><span>}</span></span></span><span> oder </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>fun</span><span class="antiquote"><span>}</span></span></span><span>.</span><span>
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span class="antiquoted"><span class="operator"><span>∗</span></span><span class="plain_text"><span>‹</span><span>Nachvollziehbarkeit der Ergebnisse</span><span>›</span></span></span><span>.</span><span>
+    </span><span>Während es bei einem großen neuronalen Netz nahezu unmöglich ist zu verstehen warum ein</span><span>
+    </span><span>bestimmter Wert an einer bestimmten Stelle steht und was dies zu bedeuten hat,</span><span>
+    </span><span>lässt sich dieses Dokument immer wieder neu kompilieren und alle Beweise wiederholen.</span><span>
+    </span><span>Dabei ließe sich genau nachvollziehen wie ein Fakt es in den Isabelle Microkernel geschafft hat.</span><span>
+    </span><span>Zusätzlich stellt Isabelle diverse </span><span class="antiquoted"><span class="operator"><span>▩</span></span><span class="raw_text"><span>‹trace›</span></span></span><span> Kommandos bereit.</span><span>
+    </span><span>Es lässt sich also nachvollziehen, warum etwas gilt.</span><span>
+</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span class="antiquoted"><span class="operator"><span>∗</span></span><span class="plain_text"><span>‹</span><span>Vertrauen in die Ergebnisse</span><span>›</span></span></span><span>.</span><span>
+    </span><span>Wie bereits erwähnt basiert Isabelle auf einem mathematischen Microkernel,</span><span>
+    </span><span>wodurch ein extrem hohes Vertrauen in alle Ergebnisse erzielt wird.</span><span>
+    
+
+</span><span>Allerdings darf Machine Learning und natürlich beim Beweise- und Gegenbeispiel-Finden helfen;</span><span>
+</span><span>so angebunden wie automatisierte Beweiser wie Z3.</span><span>
+</span><span>Das bedeutet, Machine Learning hilft bei der Entwicklung,</span><span>
+</span><span>trifft jedoch selbst keine Entscheidungen.</span><span>
+</span><span>›</span></span></span><span>
+
 </span><span class="comment1"><span>(</span><span>*</span><span>find ./Downloads/Isabelle2022/src/HOL -name "*.thy"  | xargs grep axiomatiz | wc -l</span><span>*</span><span>)</span></span><span>
 
 </span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Shallow Embedding vs. Deep Embedding</span><span>›</span></span></span><span>
