@@ -434,17 +434,79 @@ lemma datatype_split_map_option_equal:
 
 thm datatype_split_map_option_equal[of besitz,
       where makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"]
-
+(*
 lemma
+  (*This assumes a handlung never fails and this is nonsense!*)
   assumes not_touches_other: "\<And>p welt. map_option sel_other (zha p welt) = Some (sel_other welt)"
-  (*wpsid*)
+  and     make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
+  and     wpsid: "zwps p2 p1 (zwps p1 p2 zwelt) = zwelt"
   shows
   "map_option sel_other (zha p1 zwelt) =
              map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
-  apply(simp add: not_touches_other[of p1])
-  thm not_touches_other
-  oops
+proof -
+
+  let ?w="zha p2 (zwps p1 p2 zwelt)"
+  let ?ignoreMe="case ?w of Some w \<Rightarrow> sel w"
+
+  have ignoreMe: "?w \<noteq> None \<Longrightarrow> makeZ ?ignoreMe (sel_other (the ?w)) = the ?w"
+    apply (cases ?w)
+     apply(simp; fail)
+    apply(simp)
+    using make_whole by simp
+
+
+  have shuffle_sel:
+    "map_option (sel_other \<circ> zwps p2 p1) ?w =
+      map_option (sel_other \<circ> zwps p2 p1 \<circ> (\<lambda>other. makeZ ?ignoreMe other) \<circ> sel_other) ?w"
+    apply(cases "?w")
+     apply(simp; fail)
+    apply(simp)
+    using ignoreMe by simp
+
+  (*WTF*)
+  have ignoreMe2: "?w \<noteq> None \<Longrightarrow> makeZ ?ignoreMe (sel_other (zwps p1 p2 zwelt))
+          = the ?w"
+    apply (cases ?w)
+     apply(simp; fail)
+    apply(simp)
+    using make_whole
+    by (metis not_touches_other option.distinct(1) option.map_sel option.sel) 
+
+  (*
+  have "\<exists>ignoreMe. makeZ ignoreMe (sel_other w) = w" for w
+    using make_whole by auto
+  from this obtain ignoreMe where ignoreMe:
+    "makeZ ignoreMe (sel_other (zwps p1 p2 zwelt)) = zwps p1 p2 zwelt"
+    by blast
+
+  have shuffle_sel:
+    "sel_other \<circ> zwps p2 p1 = sel_other \<circ> zwps p2 p1 \<circ> (\<lambda>other. makeZ ignoreMe other) \<circ> sel_other"
+  apply(simp add: fun_eq_iff, clarsimp)
+  sorry
  (*TODO hieran arbeite ich gerade*)
+  *)
+
+  show ?thesis
+    apply(simp add: not_touches_other[of p1])
+    (*apply(cases "?w")
+     apply(simp)
+     apply (metis not_touches_other option.map_disc_iff option.simps(3)) (*wtf*)*)
+    apply(simp add: option.map_comp)
+    apply(subst shuffle_sel)
+    apply(simp add: option.map_comp[symmetric])
+    apply(simp add: not_touches_other)
+    apply(subgoal_tac "zha p2 (zwps p1 p2 zwelt) \<noteq> None")
+      prefer 2
+      using not_touches_other apply auto[1]
+    thm ignoreMe2 (*fail from here*)
+    apply(subst ignoreMe2, simp)
+    apply(simp)
+    apply(subst ignoreMe)
+    apply(simp add: ignoreMe)
+    apply(simp add: wpsid)
+    done
+qed
+*)
 
 thm wfh_generalize_worldI
 lemma wfh_generalize_worldI:
