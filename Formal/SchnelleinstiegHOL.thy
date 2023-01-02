@@ -33,6 +33,8 @@ lemma \<open>3 = 2+1\<close> by simp
 theorem \<open>3 = 2+1\<close> by simp
 beispiel \<open>3 = 2+1\<close> by simp
 
+text\<open>Freitext, so wie der aktuelle Satz, sind nicht (oder nur minimal) maschinell geprüft.\<close>
+
 
 subsection\<open>Typen\<close>
 text\<open>Typen werden per \<^verbatim>\<open>::\<close> annotiert.
