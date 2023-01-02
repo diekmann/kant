@@ -372,6 +372,8 @@ lemma hat_konsens_existierende_abmachung_einloesen:
   done
 
 
+(*TODO: upstream*)
+declare Zahlenwelt.stehlen.simps[simp del]
 
 fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>stehlen beute opfer_nach_besitz dieb welt =
@@ -398,19 +400,60 @@ beispiel
   by code_simp+
 
 (*<*)
+lemma besitz_sel_update: "map_option besitz (map_option (\<lambda>b. w\<lparr>besitz := b\<rparr>) b) = b"
+  apply(cases b)
+   apply(simp; fail)
+  apply(simp)
+  done
+
 (*TODO: dedup mit wfh_generalize_worldI*)
+
+typ "'a zahlenwelt_scheme"
+value \<open>x :: 'a zahlenwelt_scheme\<close>
+find_consts name:zahlenwelt
+term zahlenwelt.make
+term zahlenwelt.fields
+thm zahlenwelt.defs
+
+lemma "zahlenwelt.fields = zahlenwelt.make"
+  by(simp add: fun_eq_iff zahlenwelt.defs)
+
+value[simp]\<open>zahlenwelt.fields (besitz initialwelt) (konsens initialwelt) (staatsbesitz initialwelt) (umwelt initialwelt)\<close>
+value[simp]\<open>zahlenwelt.make (besitz initialwelt) (konsens initialwelt) (staatsbesitz initialwelt) (umwelt initialwelt)\<close>
+
+text\<open>Assume we have a compound datatype, consisting of the parts selected by \<^term>\<open>sel\<close>
+and the parts selected by \<^term>\<open>sel_other\<close>.
+Together, they build the complete datatype.
+But we can reason about \<^const>\<open>map_option\<close> equivalence in isolation.\<close>
+lemma datatype_split_map_option_equal:
+  \<open>map_option sel w1 = map_option sel w2 \<Longrightarrow>
+   (\<And> w. makeZ (sel w) (sel_other w) = w) \<Longrightarrow>
+   map_option sel_other w1 = map_option sel_other w2 \<Longrightarrow>
+  w1 = w2\<close>
+  by (metis (no_types, lifting) None_eq_map_option_iff option.exhaust_sel option.map_sel)
+
+thm datatype_split_map_option_equal[of besitz,
+      where makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"]
+
 thm wfh_generalize_worldI
 lemma wfh_generalize_worldI:
   fixes wps :: \<open>('person, 'w) wp_swap\<close>
     and welt :: \<open>'w\<close>
     and ha :: \<open>'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>
     and sel :: \<open>'zw \<Rightarrow> 'w\<close>
+  assumes wf_ha: "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha))"
+  and     sel_welt: "sel zwelt = welt"
+  and     sel_wps: "\<And>p1 p2 zw. wps p1 p2 (sel zw) = sel (zwps p1 p2 zw)"
+  and     sel_ha: "\<And>p zw. ha p (sel zw) = map_option sel (zha p zw)"
+  and     make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
+  and     unrelated: "\<And>p1 p2. map_option sel_other (zha p1 zwelt) =
+                                map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
   shows
-\<open>wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha)) \<Longrightarrow>
-  sel zwelt = welt \<Longrightarrow>
-  (\<And>p1 p2 zw. wps p1 p2 (sel zw) = sel (zwps p1 p2 zw)) \<Longrightarrow>
-  (\<And>p zw. ha p (sel zw) = map_option sel (zha p zw)) \<Longrightarrow>
-wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht zha)\<close>
+\<open>wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht zha)\<close>
+proof -
+  from wf_ha sel_welt sel_wps sel_ha have
+    \<open>map_option sel (zha p1 zwelt) = map_option sel (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))\<close>
+    for p1 p2
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
   apply(clarsimp)
   apply(erule_tac x=\<open>p1\<close> in allE)
@@ -420,22 +463,36 @@ wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht zha)\<close>
    prefer 2
    apply fastforce
   apply(simp)
-  apply(thin_tac "wps p2 p1 \<circ> sel = _")
-  apply(simp add: map_option.comp[symmetric])
-(*vermutlich fehlt, dass alles ausserhalb von sel unangetastet bleibt*)
-  thm wohlgeformte_handlungsabsicht.simps[symmetric]
-
-
-  oops
-  thm map_option.comp
-  apply(simp add: comp_def)
   done
+
+  from datatype_split_map_option_equal[OF this make_whole unrelated] make_whole have
+    \<open>(zha p1 zwelt) = (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))\<close>
+    for p1 p2
+    by simp
+  then show ?thesis
+  by(simp add: wohlgeformte_handlungsabsicht.simps )
+qed
+
 
 (*This is mostly a copy of wohlgeformte_handlungsabsicht_stehlen and this sucks.*)
 thm wohlgeformte_handlungsabsicht_stehlen
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
-  apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
+  (*apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
+        where sel=besitz
+        and makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"
+        and sel_other="\<lambda>w. (konsens w, staatsbesitz w, umwelt w)"
+        , of welt "besitz welt" _ n p])
+      apply(simp; fail)
+     apply(simp add: zahlenwps_def; fail)
+    apply(simp add: besitz_sel_update; fail)
+   apply(case_tac w, simp add: zahlenwelt.defs; fail)
+  apply(simp)
+  (*needs a simpler lemma which describes that stehlen does not touch sel_other. unrelated in lemma above needs to be simpler!*)
+*)
+    
+  
+  apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps Zahlenwelt.stehlen.simps)
   apply(simp add: zahlenwps_def)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
