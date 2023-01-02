@@ -436,14 +436,18 @@ thm datatype_split_map_option_equal[of besitz,
       where makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"]
 (*
 lemma
-  (*This assumes a handlung never fails and this is nonsense!*)
-  assumes not_touches_other: "\<And>p welt. map_option sel_other (zha p welt) = Some (sel_other welt)"
-  and     make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
-  and     wpsid: "zwps p2 p1 (zwps p1 p2 zwelt) = zwelt"
+  assumes not_touches_other:
+      "\<And>p welt welt'. zha p welt = Some welt' \<Longrightarrow> sel_other welt' = sel_other welt"
+  and make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
+  and wpsid: "zwps p2 p1 (zwps p1 p2 zwelt) = zwelt"
   shows
   "map_option sel_other (zha p1 zwelt) =
              map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
 proof -
+
+  have not_touches_other_simp:
+    "zha p welt \<noteq> None \<Longrightarrow> map_option sel_other (zha p welt) = Some (sel_other welt)" for p welt
+    using not_touches_other by blast
 
   let ?w="zha p2 (zwps p1 p2 zwelt)"
   let ?ignoreMe="case ?w of Some w \<Rightarrow> sel w"
@@ -487,6 +491,9 @@ proof -
   *)
 
   show ?thesis
+    apply(cases "zha p1 zwelt")
+     apply(simp)
+     defer (*I don't think this holds*)
     apply(simp add: not_touches_other[of p1])
     (*apply(cases "?w")
      apply(simp)
@@ -547,11 +554,9 @@ proof -
 qed
 
 
-(*This is mostly a copy of wohlgeformte_handlungsabsicht_stehlen and this sucks.*)
-thm wohlgeformte_handlungsabsicht_stehlen
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
-  (*apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
+  apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
         where sel=besitz
         and makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"
         and sel_other="\<lambda>w. (konsens w, staatsbesitz w, umwelt w)"
@@ -562,9 +567,11 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
    apply(case_tac w, simp add: zahlenwelt.defs; fail)
   apply(simp)
   (*needs a simpler lemma which describes that stehlen does not touch sel_other. unrelated in lemma above needs to be simpler!*)
-*)
-    
-  
+  apply(simp add: Zahlenwelt.stehlen.simps split: option.split)
+  by(auto simp add: konsensswap_sym zahlenwps_def opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall split: if_split_asm)
+
+(*
+(*This is mostly a copy of wohlgeformte_handlungsabsicht_stehlen and this sucks.*)
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps Zahlenwelt.stehlen.simps)
   apply(simp add: zahlenwps_def)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
@@ -574,6 +581,7 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
    apply (simp add: zahlenwps_def swap_def Fun.swap_def konsensswap_sym; fail)
   apply (simp add: zahlenwps_def swap_def Fun.swap_def konsensswap_sym fun_upd_twist)
   done
+*)
 (*>*)
 
 (*TODO: stehlen muss zu den Handlungsabsichten hinzu!*)
