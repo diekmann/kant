@@ -450,10 +450,11 @@ Entscheidungsfindungsansätzen basierend auf Machine Learning.
     wodurch ein extrem hohes Vertrauen in alle Ergebnisse erzielt wird.
     
 
-Allerdings darf Machine Learning und natürlich beim Beweise- und Gegenbeispiel-Finden helfen;
+Allerdings darf Machine Learning uns natürlich beim Beweise- und Gegenbeispiel-Finden helfen;
 so angebunden wie automatisierte Beweiser wie Z3.
 Das bedeutet, Machine Learning hilft bei der Entwicklung,
-trifft jedoch selbst keine Entscheidungen.
+trifft jedoch selbst keine Entscheidungen und alle Ergebnisse werden von
+Isabelles Kernel überprüft.
 \<close>
 
 (*find ./Downloads/Isabelle2022/src/HOL -name "*.thy"  | xargs grep axiomatiz | wc -l*)
