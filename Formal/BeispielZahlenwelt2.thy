@@ -553,6 +553,12 @@ proof -
   by(simp add: wohlgeformte_handlungsabsicht.simps )
 qed
 
+lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_None:
+  "opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 welt) enum_class.enum = None
+    \<longleftrightarrow>
+   opfer_eindeutig_nach_besitz_auswaehlen p welt enum_class.enum = None"
+  by(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+
 
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
@@ -568,7 +574,8 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
   apply(simp)
   (*needs a simpler lemma which describes that stehlen does not touch sel_other. unrelated in lemma above needs to be simpler!*)
   apply(simp add: Zahlenwelt.stehlen.simps split: option.split)
-  by(auto simp add: konsensswap_sym zahlenwps_def opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall split: if_split_asm)
+  apply(simp add: zahlenwps_def opfer_eindeutig_nach_besitz_auswaehlen_swap_None)
+  by(auto simp add: konsensswap_sym opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
 
 (*
 (*This is mostly a copy of wohlgeformte_handlungsabsicht_stehlen and this sucks.*)

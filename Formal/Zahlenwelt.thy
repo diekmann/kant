@@ -272,9 +272,9 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_alt:
   \<open>p1 \<in> set ps \<Longrightarrow>
    p2 \<in> set ps \<Longrightarrow>
    distinct ps \<Longrightarrow>
-opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps =
-  map_option (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
-    (opfer_eindeutig_nach_besitz_auswaehlen p besitz ps)\<close>
+   opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 besitz) ps =
+     map_option (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p)
+       (opfer_eindeutig_nach_besitz_auswaehlen p besitz ps)\<close>
   using opfer_eindeutig_nach_besitz_auswaehlen_swap[of \<open>p1\<close> \<open>ps\<close> \<open>p2\<close> \<open>p\<close> \<open>(swap p1 p2 besitz)\<close>, simplified swap1]
   by simp
 
@@ -285,6 +285,11 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
   apply(rule opfer_eindeutig_nach_besitz_auswaehlen_swap_alt)
   using enum_class.in_enum enum_class.enum_distinct by auto
 
+lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_None:
+  "opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 welt) enum_class.enum = None
+    \<longleftrightarrow>
+   opfer_eindeutig_nach_besitz_auswaehlen p welt enum_class.enum = None"
+  by(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
 
 lemma the_single_elem_None_swap:
   \<open>the_single_elem {p. x p = a} = None \<Longrightarrow>
