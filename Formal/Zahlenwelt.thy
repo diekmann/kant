@@ -32,12 +32,12 @@ text\<open>Beispiel mit fancy Syntax:\<close>
 beispiel \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] Bob = 3\<close> by eval
 
 text\<open>Das Beispiel liest sich wie folgt.
-Die Welt \<^term_type>\<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] :: person \<Rightarrow> int\<close> ist eine Funktion von
+Die Welt @{term_type [source=true] \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] :: person \<Rightarrow> int\<close>} ist eine Funktion von
 \<^typ>\<open>person\<close> nach \<^typ>\<open>int\<close>.
 Wir rufen diese Funktion mit den Parameter \<^const>\<open>Bob\<close> auf.
 Das Ergebnis ist \<^term>\<open>3::int\<close>.\<close>
 
-text\<open>Die Funktion \<^term>\<open>\<^url>[Alice := 4, Carol := 4]\<close> lässt sich auch mit Hilfe folgender
+text\<open>Die Funktion @{term [source=true] \<open>\<^url>[Alice := 4, Carol := 4]\<close>} lässt sich auch mit Hilfe folgender
 Hilfsfunktionen als eine Menge von Tupeln darstellen.\<close>
 beispiel \<open>show_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Bob, 0), (Carol, 4), (Eve, 0)]\<close> by eval
 beispiel \<open>show_num_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Carol, 4)]\<close> by eval
