@@ -31,8 +31,8 @@ lemma \<open>delta_num p1 i1 i2 = Some (Verliert p2 (i::int)) \<Longrightarrow> 
   by(auto simp add: delta_num_def split_ifs)
 
 
-lemma \<open>delta_num Alice (2::int) 6 = Some (Gewinnt Alice 4)\<close> by eval
-lemma \<open>delta_num Alice (-2::int) 6 = Some (Gewinnt Alice 8)\<close> by eval
+beispiel \<open>delta_num Alice (2::int) 6 = Some (Gewinnt Alice 4)\<close> by eval
+beispiel \<open>delta_num Alice (-2::int) 6 = Some (Gewinnt Alice 8)\<close> by eval
 
 
 lemma delta_num_same: \<open>delta_num p (a::'a::ordered_ab_group_add) a = None\<close>
@@ -50,8 +50,8 @@ definition sum_delta_num
       else None
   )\<close>
 
-lemma \<open>sum_delta_num Alice (2::int) 6 = Some (Gewinnt Alice 8)\<close> by eval
-lemma \<open>sum_delta_num Alice (-2::int) 6 = Some (Gewinnt Alice 4)\<close> by eval
+beispiel \<open>sum_delta_num Alice (2::int) 6 = Some (Gewinnt Alice 8)\<close> by eval
+beispiel \<open>sum_delta_num Alice (-2::int) 6 = Some (Gewinnt Alice 4)\<close> by eval
 
 lemma sum_delta_num_delta_num:
   fixes i1::\<open>'a::ordered_ab_group_add\<close>
@@ -90,11 +90,11 @@ lemma betroffene_case_aenderung:
 (*>*)
 
 
-lemma \<open>betroffene [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
+beispiel \<open>betroffene [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
   = [Alice, Bob, Carol, Eve]\<close> by eval
-lemma \<open>betroffene [Verliert Alice (5::nat), Gewinnt Bob 3, Verliert Eve 7]
+beispiel \<open>betroffene [Verliert Alice (5::nat), Gewinnt Bob 3, Verliert Eve 7]
   = [Alice, Bob, Eve]\<close> by eval
-lemma \<open>betroffene [Verliert Alice (5::nat), Gewinnt Alice 3]
+beispiel \<open>betroffene [Verliert Alice (5::nat), Gewinnt Alice 3]
   = [Alice, Alice]\<close> by eval
 
 (*<*)
@@ -102,8 +102,8 @@ definition aenderung_val :: \<open>('person, ('etwas::uminus)) aenderung \<Right
   where
 \<open>aenderung_val a \<equiv> case a of Verliert _ n \<Rightarrow> -n | Gewinnt _ n \<Rightarrow> n\<close>
 
-lemma \<open>aenderung_val (Verliert Alice (2::int)) = -2\<close> by eval
-lemma \<open>aenderung_val (Gewinnt Alice (2::int)) = 2\<close> by eval
+beispiel \<open>aenderung_val (Verliert Alice (2::int)) = -2\<close> by eval
+beispiel \<open>aenderung_val (Gewinnt Alice (2::int)) = 2\<close> by eval
 
 lemma betroffen_simps[simp]:
   \<open>betroffen (Gewinnt a ab) = a\<close>
@@ -123,7 +123,7 @@ fun delta_num_map
                of (a,b) \<Rightarrow> delta_num p a b)
         (Enum.enum::'person list)\<close>
 
-lemma\<open>delta_num_map
+beispiel\<open>delta_num_map
   (Handlung [Alice \<mapsto> 5::int, Bob \<mapsto> 10, Eve \<mapsto> 1]
             [Alice \<mapsto> 3, Bob \<mapsto> 13, Carol \<mapsto> 2])
   = [Verliert Alice 2, Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]\<close> by eval
@@ -134,7 +134,7 @@ fun delta_num_fun
   \<open>delta_num_fun (Handlung vor nach) =
       List.map_filter (\<lambda>p. delta_num p (vor p) (nach p)) Enum.enum\<close>
 
-lemma \<open>delta_num_fun
+beispiel \<open>delta_num_fun
     (Handlung
         ((\<lambda>p. 0::int)(Alice:=8, Bob:=12, Eve:=7))
         ((\<lambda>p. 0::int)(Alice:=3, Bob:=15, Eve:=0)))
@@ -152,9 +152,9 @@ definition aenderung_swap
 where
   \<open>aenderung_swap p1 p2 a \<equiv> map_aenderung (\<lambda>p. if p = p1 then p2 else if p = p2 then p1 else p) id a\<close>
 
-lemma\<open>aenderung_swap Alice Bob (Gewinnt Alice (3::nat)) = Gewinnt Bob 3\<close> by eval
-lemma\<open>aenderung_swap Alice Bob (Gewinnt Bob (3::nat)) = Gewinnt Alice 3\<close> by eval
-lemma\<open>aenderung_swap Alice Bob (Gewinnt Carol (3::nat)) = Gewinnt Carol 3\<close> by eval
+beispiel\<open>aenderung_swap Alice Bob (Gewinnt Alice (3::nat)) = Gewinnt Bob 3\<close> by eval
+beispiel\<open>aenderung_swap Alice Bob (Gewinnt Bob (3::nat)) = Gewinnt Alice 3\<close> by eval
+beispiel\<open>aenderung_swap Alice Bob (Gewinnt Carol (3::nat)) = Gewinnt Carol 3\<close> by eval
 
 
 lemma aenderung_swap_id: \<open>aenderung_swap p1 p2 (aenderung_swap p1 p2 a) = a\<close>
@@ -190,7 +190,7 @@ where
 | \<open>aenderung_ausfuehren (Verliert p n # deltas) bes = aenderung_ausfuehren deltas \<lbrakk>bes(p -= n)\<rbrakk>\<close>
 | \<open>aenderung_ausfuehren (Gewinnt p n # deltas) bes = aenderung_ausfuehren deltas \<lbrakk>bes(p += n)\<rbrakk>\<close>
 
-lemma
+beispiel
 \<open>aenderung_ausfuehren
   [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
   (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
@@ -198,7 +198,7 @@ lemma
   (\<^url>[Alice:=6, Bob:=6, Carol:=2, Eve:= 4])\<close>
   by eval
 
-lemma
+beispiel
 \<open>aenderung_ausfuehren
   [Verliert Alice (2::int), Verliert Alice 6]
   (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
@@ -224,7 +224,7 @@ lemma swap_aenderung_ausfuehren:
     apply(simp add: aenderung_swap_def, safe)
     apply (simp_all add: fun_upd_twist swap_def Fun.swap_def)
   done
-
+(*>*)
 
 subsection\<open>Abmachungen\<close>
 text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> wie
@@ -279,7 +279,6 @@ lemma to_abmachung_fold:
   apply(subst to_abmachung_fold_induct_helper[where abmachung=\<open>\<lambda>_. 0\<close>])
   by simp
 
-
 lemma to_abmachung_List_map_filter_simp_call:
   fixes f :: \<open>'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group_add) aenderung option\<close>
   assumes valid_f: \<open>\<And>p a. f p = Some a \<Longrightarrow> betroffen a = p\<close>
@@ -331,7 +330,7 @@ fixes f :: \<open>'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group
 
 
 
-lemma \<open>[to_abmachung [Gewinnt Alice (3::int)], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]
+beispiel \<open>[to_abmachung [Gewinnt Alice (3::int)], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]
         = [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
 
 (*<*)
@@ -350,15 +349,14 @@ definition abmachung_to_aenderung
 where
   \<open>abmachung_to_aenderung \<equiv> abmachung_to_aenderung_list Enum.enum\<close>
 
-lemma \<open>abmachung_to_aenderung ((\<lambda>p.0)(Alice := (3::int), Bob := -3)) = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
-
+beispiel \<open>abmachung_to_aenderung ((\<lambda>p.0)(Alice := (3::int), Bob := -3))
+            = [Gewinnt Alice 3, Verliert Bob 3]\<close> by eval
 
 
 definition aenderung_to_abmachung
   :: \<open>('person, 'etwas) aenderung list \<Rightarrow> ('person::enum, 'etwas::{ord,zero,plus,minus,uminus}) abmachung\<close>
 where
   \<open>aenderung_to_abmachung \<equiv> to_abmachung\<close>
-
 
 lemma fixes as :: \<open>('person::enum, int) aenderung list\<close>
   shows \<open>abmachung_to_aenderung (aenderung_to_abmachung as) = as\<close>
@@ -433,7 +431,7 @@ where
   \<open>abmachung_ausfuehren a besitz \<equiv> \<lambda>p. a p + (besitz p)\<close>
 
 text\<open>Beispiel:\<close>
-lemma
+beispiel
   \<open>abmachung_ausfuehren
     (to_abmachung [Gewinnt Alice 3, Verliert Bob 3])
     (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
@@ -541,7 +539,7 @@ definition abmachungs_betroffene :: \<open>('person::enum, 'etwas::zero) abmachu
 where
   \<open>abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]\<close>
 
-lemma \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
+beispiel \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
   = [Alice, Bob]\<close> by eval
 
 
@@ -605,7 +603,7 @@ definition konsens_entfernen
       fold (\<lambda>p k. k(p := remove1 abmachung (k p))) (abmachungs_betroffene abmachung) kons\<close>
 
 
-lemma
+beispiel
   \<open>konsens_entfernen
     (to_abmachung [Gewinnt Alice (3::int), Verliert Bob 3])
     ((\<lambda>_. [])(
@@ -674,8 +672,6 @@ lemma konsens_entfernen_konsensswap:
   apply(simp add: swap_id_in_set)
   apply(simp add: konsensswap_apply swap_def comp_def)
   by (simp add: transpose_commute)
-
-
 
 lemma to_abmachung_delta_num_fun_simp_call:
   (*stronger than the usual ordered_ab_group_add*)
