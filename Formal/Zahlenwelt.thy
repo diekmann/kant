@@ -6,12 +6,13 @@ section\<open>Zahlenwelt Helper\<close>
 text\<open>In diesem Abschnitt definieren wir Hilfsfunktionen für kommende "Zahlenwelt" Beispiele.\<close>
 
 text\<open>Wir werden Beispiele betrachten, in denen wir Welten modellieren, in denen jeder Person eine
-Zahl zugewiesen wird: \<^typ>\<open>person \<Rightarrow> int\<close>.
+Zahl zugewiesen wird, Typ \<^typ>\<open>person \<Rightarrow> int\<close>.
 Diese Zahl kann zum Beispiel der Besitz oder Wohlstand einer Person sein, oder das Einkommen.
-Wobei Gesamtbesitz und Einkommen über einen kurzen Zeitraum recht unterschiedliche Sachen
-modellieren.
+Dabei ist zu beachten,
+dass Gesamtbesitz und Einkommen (über einen kurzen Zeitraum) recht unterschiedliche Sachen
+modellieren, jedoch den gleichen Typen in unserem Modell haben werden.
 
-Hier sind einige Hilfsfunktionen um mit \<^typ>\<open>person \<Rightarrow> int\<close> allgemein zu arbeiten.\<close>
+Hier sind einige Hilfsfunktionen um mit dem Typ \<^typ>\<open>person \<Rightarrow> int\<close> allgemein zu arbeiten.\<close>
 
 text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0::int\<close>:\<close>
 definition DEFAULT :: \<open>person \<Rightarrow> int\<close> where
@@ -19,46 +20,46 @@ definition DEFAULT :: \<open>person \<Rightarrow> int\<close> where
 
 (*<*)
 syntax
-  "_ZahlenWelt"  :: \<open>updbinds \<Rightarrow> 'a\<close> ("(1\<^url>[_])")
+  "_ZahlenWelt" :: \<open>updbinds \<Rightarrow> 'a\<close> ("(1\<^url>[_])")
 
 translations
-  "_ZahlenWelt ms"                     \<rightleftharpoons> "_Update (CONST DEFAULT) ms"
-
+  "_ZahlenWelt ms" \<rightleftharpoons> "_Update (CONST DEFAULT) ms"
 (*>*)
 
-
-text\<open>Beispiel:\<close>
-lemma \<open>(DEFAULT(Alice:=8, Bob:=3, Eve:= 5)) Bob = 3\<close> by eval
+beispiel \<open>(DEFAULT(Alice:=8, Bob:=3, Eve:= 5)) Bob = 3\<close> by eval
 
 text\<open>Beispiel mit fancy Syntax:\<close>
-lemma \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] Bob = 3\<close> by eval
+beispiel \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] Bob = 3\<close> by eval
 
-lemma \<open>show_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Bob, 0), (Carol, 4), (Eve, 0)]\<close> by eval
-lemma \<open>show_num_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Carol, 4)]\<close> by eval
+text\<open>Das Beispiel liest sich wie folgt.
+Die Welt \<^term_type>\<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] :: person \<Rightarrow> int\<close> ist eine Funktion von
+\<^typ>\<open>person\<close> nach \<^typ>\<open>int\<close>.
+Wir rufen diese Funktion mit den Parameter \<^const>\<open>Bob\<close> auf.
+Das Ergebnis ist \<^term>\<open>3::int\<close>.\<close>
 
+text\<open>Die Funktion \<^term>\<open>\<^url>[Alice := 4, Carol := 4]\<close> lässt sich auch mit Hilfe folgender
+Hilfsfunktionen als eine Menge von Tupeln darstellen.\<close>
+beispiel \<open>show_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Bob, 0), (Carol, 4), (Eve, 0)]\<close> by eval
+beispiel \<open>show_num_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Carol, 4)]\<close> by eval
 
-(*from joint_probability
-abbreviation joint_probability ("\<P>'(_ ; _') _") where
-"\<P>(X ; Y) x \<equiv> \<P>(\<lambda>x. (X x, Y x)) x
-*)
-
-(*TODO: this can produce ambiguous parse trees.
-So I added those \<lbrakk>\<rbrakk>
-*)
+text\<open>Folgende Syntaxabkürzungen erlauben es uns eine einfachere Notation einzuführen,
+um den Besitz einer Person zu erhöhen oder zu verringern.\<close>
+(* this can produce ambiguous parse trees. So I added those \<lbrakk>\<rbrakk> *)
 abbreviation num_fun_add_syntax ("\<lbrakk>_ '(_ += _')\<rbrakk>") where
   \<open>\<lbrakk>f(p += n)\<rbrakk> \<equiv> (f(p := (f p) + n))\<close>
 
 abbreviation num_fun_minus_syntax ("\<lbrakk>_ '(_ -= _')\<rbrakk>") where
   \<open>\<lbrakk>f(p -= n)\<rbrakk> \<equiv> (f(p := (f p) - n))\<close>
 
-lemma \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob += 4)\<rbrakk> Bob = 7\<close> by eval
-lemma \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob -= 4)\<rbrakk> Bob = -1\<close> by eval
+beispiel \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob += 4)\<rbrakk> Bob = 7\<close> by eval
+beispiel \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob -= 4)\<rbrakk> Bob = -1\<close> by eval
+
+text\<open>Erhöhen und verringern heben sich auf.\<close>
+beispiel fixes n:: \<open>int\<close> shows \<open>\<lbrakk>\<lbrakk>f(p += n)\<rbrakk>(p -= n)\<rbrakk> = f\<close> by(simp)
 
 
-lemma fixes n:: \<open>int\<close> shows \<open>\<lbrakk>\<lbrakk>f(p += n)\<rbrakk>(p -= n)\<rbrakk> = f\<close> by(simp)
-
-
-text\<open>Diskriminierungsfrei eine \<^typ>\<open>'person\<close> eindeutig anhand Ihres Besitzes auswählen:\<close>
+text\<open>Folgende Funktion wählt diskriminierungsfrei
+eine \<^typ>\<open>'person\<close> eindeutig anhand Ihres Besitzes aus.\<close>
 definition opfer_eindeutig_nach_besitz_auswaehlen
   :: \<open>int \<Rightarrow> ('person \<Rightarrow> int) \<Rightarrow> 'person list \<Rightarrow> 'person option\<close> where
   \<open>opfer_eindeutig_nach_besitz_auswaehlen b besitz ps = 
@@ -113,15 +114,24 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_injective:
   by (metis (mono_tags) empty_filter_conv)
 (*>*)
 
+text\<open>Folgende Hilfsdefinition definiert eindeutig das Element in einer Einelementigen Menge,
+wenn dieses existiert.\<close>
 definition the_single_elem :: \<open>'a set \<Rightarrow> 'a option\<close> where
   \<open>the_single_elem s \<equiv> if card s = 1 then Some (Set.the_elem s) else None\<close>
 
-(*<*)
+beispiel \<open>the_single_elem {a} = Some a\<close> by(simp add: the_single_elem_def)
+beispiel \<open>the_single_elem {1::nat,2} = None\<close> by(simp add: the_single_elem_def)
+beispiel \<open>the_single_elem {} = None\<close> by(simp add: the_single_elem_def)
+
+text\<open>Hier sehen wir unser Shallow Embedding:
+Unsere Definition \<^const>\<open>the_single_elem\<close> lässt sich komplett auf bereits existierende Konzepte
+in HOL reduzieren.\<close>
 lemma the_single_elem:
   \<open>the_single_elem s = (if is_singleton s then Some (Set.the_elem s) else None)\<close>
   apply(simp add: is_singleton_the_elem the_single_elem_def card_1_singleton_iff)
   by auto
 
+(*<*)
 lemma \<open>the_single_elem {a} = Some a\<close>
   by(simp add: the_single_elem_def)
 lemma \<open>a \<noteq> b \<Longrightarrow> the_single_elem {a,b} = None\<close>
@@ -134,6 +144,7 @@ lemma the_single_elem_exhaust:
 apply(cases \<open>the_single_elem S\<close>)
 by(auto)
 (*>*)
+
 
 lemma opfer_nach_besitz_induct_step_set_simp: \<open>besitz a \<noteq> opfer_nach_besitz \<Longrightarrow>
   {p. (p = a \<or> p \<in> set ps) \<and> besitz p = opfer_nach_besitz} =
