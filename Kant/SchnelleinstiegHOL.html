@@ -472,8 +472,57 @@
 
 </span><span class="comment1"><span>(</span><span>*</span><span>find ./Downloads/Isabelle2022/src/HOL -name "*.thy"  | xargs grep axiomatiz | wc -l</span><span>*</span><span>)</span></span><span>
 
-</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Shallow Embedding vs. Deep Embedding</span><span>›</span></span></span><span>
-</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>TODO</span><span>›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>subsection</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Deep Embedding vs. Shallow Embedding</span><span>›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>Im Bereich der mathematischen Modellierung wird oft
+</span><span>zwischen Deep Embedding und Shallow Embedding unterschieden.
+</span><span>
+</span><span>Deep Embedding bedeutet, dass unsere domänenspezifische Logik komplett in der Meta-Logik
+</span><span>neu implementiert wird.
+</span><span>Die Meta-Logik wird von der domänenspezifischen Logik wegabstrahiert.
+</span><span>In Isabelle/HOL ist die Meta-Logik HOL.
+</span><span>Die domänenspezifische Logik ist unsere Logik mit der wir moralische Schlussfolgerungen
+</span><span>treffen wollen.
+</span><span>Wenn wir unsere "moralische Logik" komplett in HOL deep embedden wollen,
+</span><span>bedeutet dass, dass wir alle Konzepte unserer Logik komplett neu implementieren.
+</span><span>So könnten wir beispielsweise definieren:
+</span><span class="antiquoted"><span class="operator"><span>⬚</span></span><span class="raw_text"><span>‹</span><span class="keyword1"><span class="command"><span>datatype</span></span></span><span> moralisch </span><span class="main"><span>=</span></span><span> Moralisch </span><span class="main"><span>|</span></span><span> NichtMoralisch›</span></span></span><span>.
+</span><span>Ein Deep Embedding hat den Vorteil, dass wir die Semantik unserer Logik komplett
+</span><span>selbst definieren können.
+</span><span>Wenn sich also HOL und unsere Logik verschieden verhalten sollen, ist ein Deep Embedding
+</span><span>unerlässlich.
+</span><span>Der Nachteil ist allerdings, dass wir alles was wir brauchen selbst definieren müssen
+</span><span>und die wir z.B. nicht von der enormen Menge an Lemmata der Isabelle Standardbibliothek
+</span><span>profitieren.
+</span><span>
+</span><span>Im Gegensatz dazu steht ein Shallow Embedding.
+</span><span>Dabei wird die domänenspezifische Logik direkt in der Meta-Logik definiert.
+</span><span>Alle Konzepte der Meta-Logik werden übernommen.
+</span><span>Dies funktioniert nur, wenn sich die Meta-Logik so wie unsere domänenspezifische Logik verhält.
+</span><span>Die Abstraktionsebene die unsere domänenspezifische Logik über die Meta-Logik spannt
+</span><span>wird so dünn wie möglich gehalten und so viele Konzepte wie möglich der Meta-Logik
+</span><span>werden Eins-zu-Eins in der domänenspezifischen Logik übernommen.
+</span><span>Beispielsweise könnten wir uns entscheiden keinen neuen Datentyp </span><span class="antiquoted"><span class="operator"><span>⬚</span></span><span class="raw_text"><span>‹</span><span class="keyword1"><span class="command"><span>datatype</span></span></span><span> moralisch›</span></span></span><span> einzuführen.
+</span><span>Wir könnten einen bestehenden HOL Datentyp weiterverwenden,
+</span><span>beispielsweise </span><span class="antiquoted"><span class="operator"><span>⬚</span></span><span class="raw_text"><span>‹</span><span class="keyword1"><span class="command"><span>type_synonym</span></span></span><span> moralisch </span><span class="main"><span>=</span></span><span> bool›</span></span></span><span>.
+</span><span>Dies funktioniert nur, wenn sich der HOL-Typ </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><a class="entity_ref" href="../../HOL/HOL/HOL.html#HOL.bool|type"><span>bool</span></a><span>›</span></span></span><span> tatsächlich so verhält,
+</span><span>wie wir es gerne für unseren domänenspezifischen "moralisch" Typen hätten.
+</span><span>Ein riesiger Vorteil ist, dass wir bei einem Shallow Embedding die gesamte
+</span><span>Isabelle/HOL Standardbibliothek an bestehenden Theories und Lemmata weiterverwenden können.
+</span><span>Beispielsweise sind alle Lemmata über </span><span class="antiquoted"><span class="operator"><span><span class="hidden">\&lt;^</span><span class="control">typ</span><span class="hidden">&gt;</span></span></span><span class="quoted"><span>‹</span><a class="entity_ref" href="../../HOL/HOL/HOL.html#HOL.bool|type"><span>bool</span></a><span>›</span></span></span><span> automatisch für uns verfügbar
+</span><span>und bestehende Beweistaktiken funktionieren automatisch auf bestehenden HOL Typen.
+</span><span>
+</span><span>Das Beispiel über </span><span class="antiquoted"><span class="operator"><span>⬚</span></span><span class="raw_text"><span>‹</span><span class="keyword1"><span class="command"><span>datatype</span></span></span><span> moralisch›</span></span></span><span> ist etwas übertrieben
+</span><span>und keine neuen Datentypen einzuführen und nur z.B. </span><span class="antiquoted"><span class="operator"><span>⬚</span></span><span class="raw_text"><span>‹</span><span class="keyword1"><span class="command"><span>type_synonym</span></span></span><span> moralisch </span><span class="main"><span>=</span></span><span> bool›</span></span></span><span>
+</span><span>zu verwenden ist natürlich etwas radikal.
+</span><span>Einem Shallow Embedding ist es nicht verboten neue Datentypen einzuführen
+</span><span>und eine eigene Semantik auf diesen Datentypen zu definieren.
+</span><span>Dennoch gilt der allgemeine Grundsatz für ein Shallow Embedding:
+</span><span>Die Meta-Logik wird so weit weiterverwendet wie möglich.
+</span><span>
+</span><span>Wir versuchen in diesem Artikel wann immer möglich ein Shallow Embedding zu machen
+</span><span>und so viel von HOL und Isabelles Standardbibliothek weiterzuverwenden wie möglich.</span><span>
+</span><span>›</span></span></span><span>
+
 
 </span><span class="keyword2"><span class="keyword"><span>end</span></span></span></pre>
 </body>
