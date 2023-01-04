@@ -371,10 +371,6 @@ lemma hat_konsens_existierende_abmachung_einloesen:
   apply(simp add: abmachung_einloesen_reverse_engineer)
   done
 
-
-(*TODO: upstream*)
-declare Zahlenwelt.stehlen.simps[simp del]
-
 fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>stehlen beute opfer_nach_besitz dieb welt =
         map_option (\<lambda>b. welt\<lparr>besitz := b\<rparr>) (Zahlenwelt.stehlen beute opfer_nach_besitz dieb (besitz welt))\<close>
@@ -414,10 +410,8 @@ find_consts name:zahlenwelt
 term zahlenwelt.make
 term zahlenwelt.fields
 thm zahlenwelt.defs
-
 lemma "zahlenwelt.fields = zahlenwelt.make"
   by(simp add: fun_eq_iff zahlenwelt.defs)
-
 value[simp]\<open>zahlenwelt.fields (besitz initialwelt) (konsens initialwelt) (staatsbesitz initialwelt) (umwelt initialwelt)\<close>
 value[simp]\<open>zahlenwelt.make (besitz initialwelt) (konsens initialwelt) (staatsbesitz initialwelt) (umwelt initialwelt)\<close>
 
@@ -585,8 +579,6 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
 *)
 (*>*)
 
-(*TODO: stehlen muss zu den Handlungsabsichten hinzu!*)
-
 text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>abbauen i p welt = Some (welt\<lparr> besitz := \<lbrakk>(besitz welt)(p += int i)\<rbrakk>, umwelt := (umwelt welt) - int i \<rparr>)\<close>
@@ -598,9 +590,6 @@ lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abb
 
 lemma \<open>wohlgeformte_handlungsabsicht zahlenwps initialwelt (Handlungsabsicht (abbauen n))\<close>
   by(code_simp)
-
-
-
 
 
 
@@ -647,6 +636,7 @@ definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxi
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht (stehlen 3 10),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen,
@@ -659,6 +649,7 @@ beispiel \<open>erzeuge_beispiel
       Handlungsabsicht (abbauen 5),
       Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [
+      Handlungsabsicht (stehlen 3 10),
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = [
@@ -702,6 +693,7 @@ beispiel \<open>erzeuge_beispiel
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht (stehlen 3 10),
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen,
    Handlungsabsicht unmoeglich]
@@ -713,6 +705,7 @@ beispiel \<open>erzeuge_beispiel
       Handlungsabsicht (abbauen 5),
       Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [
+      Handlungsabsicht (stehlen 3 10),
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen],
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
@@ -728,6 +721,7 @@ oder nur in dieser einen Welt.
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht (stehlen 3 10),
    Handlungsabsicht existierende_abmachung_einloesen,
    Handlungsabsicht reset,
    Handlungsabsicht alles_kaputt_machen,
@@ -735,7 +729,7 @@ beispiel \<open>erzeuge_beispiel
   (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
 = Some
   \<lparr>
-   bsp_erfuellte_maxime = True,
+   bsp_erfuellte_maxime = False,
    bsp_erlaubte_handlungen = [
       Handlungsabsicht (abbauen 5),
       Handlungsabsicht existierende_abmachung_einloesen,
@@ -743,8 +737,14 @@ beispiel \<open>erzeuge_beispiel
    bsp_verbotene_handlungen = [
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen],
-   bsp_uneindeutige_handlungen = []\<rparr>\<close>
+   bsp_uneindeutige_handlungen = [
+      Handlungsabsicht (stehlen 3 10)
+  ]\<rparr>\<close>
   by beispiel_tac
+text\<open>TODO: Seit dem ich die Handlungsabsicht \<^const>\<open>stehlen\<close> eingeführt habe,
+ist \<^const>\<open>bsp_erfuellte_maxime\<close> False und \<^const>\<open>stehlen\<close> ist eine uneindeutige Handlung.
+Ich vermute, das liegt daran, dass die \<^const>\<open>maxime_hatte_konsens\<close> auch testen muss,
+dass der Konsens eingelöst wurde!\<close>
 
   
 
@@ -814,4 +814,7 @@ theorem
   using mhg_katimp_maxime_altruistischer_fortschritt apply simp
   using mhg_katimp_maxime_hatte_konsens apply simp
   done
+
+(*TODO: MaximeConj IrgendwasMitUmwelt, und dann sollte abbauen ploetzlich verboten sein,
+waehrend alles andere unveraendert bleibt.*)
 end
