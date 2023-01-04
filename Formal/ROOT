@@ -9,6 +9,7 @@ session Cache in "Cache" = HOL +
   theories
     "HOL-Library.Extended_Real"
     "HOL-Library.Code_Target_Numeral"
+    "HOL-Library.Multiset"
     "HOL-Combinatorics.Transposition"
 
 session Kant = Cache +

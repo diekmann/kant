@@ -117,6 +117,7 @@ where
   \<open>hat_konsens h \<equiv>
     let abmachung = reverse_engineer_abmachung (map_handlung besitz h)
     in enthaelt_konsens abmachung (vorher h)\<close>
+(*TODO: hier will konsens_wurde_entfernt dazu? Neuer name. Einvernehmlich?*)
 
 
 (*<*)

@@ -1,5 +1,5 @@
 theory Aenderung
-imports Main ExecutableHelper BeispielPerson Handlung Zahlenwelt
+imports Main ExecutableHelper BeispielPerson Handlung Zahlenwelt "HOL-Library.Multiset"
 begin
 
 section\<open>Änderungen in Welten\<close>
@@ -724,6 +724,39 @@ lemma to_abmachung_delta_num_fun_simp_call:
   subgoal by(auto simp add: delta_num_def split: if_split_asm)
   by(simp add: delta_num_def)
 (*>*)
+
+text\<open>Folgendes Prädikat prüft ob eine Abmachung korrekt aus dem Konsens entfernt wurde.
+Dies sollte normalerweise direkt nachdem eine Abmachung eingelöst wurde geschehen.\<close>
+definition konsens_wurde_entfernt
+  :: \<open>('person::enum, 'etwas::zero) abmachung \<Rightarrow>
+      ('person, 'etwas) globaler_konsens \<Rightarrow> ('person, 'etwas) globaler_konsens \<Rightarrow> bool\<close>
+where
+  \<open>konsens_wurde_entfernt abmachung konsens_vor konsens_nach \<equiv>
+    \<forall>betroffene_person \<in> set (abmachungs_betroffene abmachung).
+       mset (konsens_vor betroffene_person) = mset (abmachung#(konsens_nach betroffene_person))\<close>
+
+text\<open>Wir müssen hier Multisets (\<^const>\<open>mset\<close>) verwenden,
+da eine Abmachung sowohl mehrfach vorkommen kann aber nur einmal eingelöst wird
+und die Reihenfolge in welcher die Abmachungen angeordnet sind egal ist.\<close>
+(*TODO: will ich multiset von Anfang an verwenden?*)
+
+
+text\<open>Folgendes gilt nicht \<^term>\<open>konsens_wurde_entfernt a konsens (konsens_entfernen a konsens)\<close>,
+da \<^const>\<open>konsens_entfernen\<close> nur einen existierenden Konsens entfernt.
+Sollte der gegebene Konsens nicht existieren passiert nichts!
+\<close>
+beispiel
+\<open>konsens = (\<lambda>_. []) \<Longrightarrow> a = to_abmachung [Gewinnt Alice (3::int), Verliert Bob 3]
+  \<Longrightarrow> \<not> konsens_wurde_entfernt a konsens (konsens_entfernen a konsens)\<close>
+  by(simp, eval)
+
+text\<open>Wenn wir allerdings Konsens haben, dann verhalten sich \<^const>\<open>konsens_wurde_entfernt\<close> und
+\<^const>\<open>konsens_entfernen\<close> doch wie erwartet.\<close>
+lemma konsens_wurde_entfernt_konsens_entfernen:
+  \<open>enthaelt_konsens a konsens \<Longrightarrow> konsens_wurde_entfernt a konsens (konsens_entfernen a konsens)\<close>
+  apply(simp add: konsens_wurde_entfernt_def)
+  apply(simp add: konsens_entfernen_simp)
+  by (simp add: enthaelt_konsens_def)
 
 
 text\<open>Gegeben eine Handlung berechnet folgende Funktion die Abmachung,
