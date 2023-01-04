@@ -245,9 +245,11 @@ definition maxime_zahlenfortschritt :: \<open>(person, zahlenwelt) maxime\<close
 (*<*)
 lemma mhg_maxime_zahlenfortschritt_stehlen:
   \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_zahlenfortschritt (Handlungsabsicht (stehlen 5 10)) p\<close>
-  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def, intro allI impI)
+  apply(simp add: maxime_und_handlungsabsicht_generalisieren_def
+                  maxime_zahlenfortschritt_def, intro allI impI)
   apply(case_tac \<open>welt\<close>, simp)
-  apply(simp add: handeln_def nachher_handeln.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: Zahlenwelt.stehlen.simps handeln_def nachher_handeln.simps
+                  opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(auto intro: the_single_elem_exhaust)
   done
 (*>*)
@@ -403,7 +405,7 @@ lemma mhg_maxime_altruistischer_fortschritt_stehlen:
   apply(simp add: maxime_altruistischer_fortschritt_def maxime_und_handlungsabsicht_generalisieren_def maxime_zahlenfortschritt_def handeln_def nachher_handeln.simps, intro allI impI)
   apply(simp add: ausfuehrbar.simps)
   apply(case_tac \<open>welt\<close>, simp)
-  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
+  apply(simp add: Zahlenwelt.stehlen.simps opfer_eindeutig_nach_besitz_auswaehlen_the_single_elem_enumall)
   apply(simp add: ist_noop_def split: option.split option.split_asm)
   by fastforce
 

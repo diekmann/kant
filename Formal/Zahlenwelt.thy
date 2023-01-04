@@ -338,7 +338,9 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
      apply (simp add: swap_def Fun.swap_def; fail)
   by (simp add: fun_upd_twist swap_def Fun.swap_def)
 
-
+(*<*)
+declare Zahlenwelt.stehlen.simps[simp del]
+(*>*)
 
 
 definition aufsummieren :: \<open>('person::enum \<Rightarrow> int) \<Rightarrow> int\<close> where

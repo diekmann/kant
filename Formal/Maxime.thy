@@ -154,7 +154,7 @@ Wenn eine Handlung für eine Person okay ist, dann muss sie auch Okay sein,
 wenn jemand anderes diese Handlung ausführt.
 
 Formal:
-\<^term>\<open>m ich (handeln ich welt handlungsabsicht) \<Longrightarrow> \<forall>p2. m ich (handeln p2 welt handlungsabsicht)\<close>
+\<^term>\<open>okay m ich (handeln ich welt handlungsabsicht) \<Longrightarrow> \<forall>p2. okay m ich (handeln p2 welt handlungsabsicht)\<close>
 
 Genau dies können wir aus unserer Definition von \<^const>\<open>moralisch\<close> ableiten:\<close>
 
