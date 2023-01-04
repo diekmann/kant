@@ -756,9 +756,10 @@ lemma mhg_katimp_maxime_hatte_konsens:
     kategorischer_imperativ_auf ha welt maxime_hatte_konsens\<close>
   apply(simp add: maxime_hatte_konsens_def)
   apply(erule globale_maxime_katimp)
-      apply (simp add: handeln_def einvernehmlich_noop ist_noop_def; fail)
-    subgoal by(simp add: wpsm_kommutiert_handlung_raw einvernehmlich_swap_nachher_handeln)  using zahlenwps_sym apply fastforce
-   apply (simp add: zahlenwps_id)
+      subgoal by(simp add: handeln_def einvernehmlich_noop ist_noop_def)
+     subgoal by(simp add: wpsm_kommutiert_handlung_raw einvernehmlich_swap_nachher_handeln) 
+    subgoal using zahlenwps_sym by fastforce
+   subgoal by(simp add: zahlenwps_id)
   by simp
 
 
@@ -782,12 +783,11 @@ lemma mhg_katimp_maxime_altruistischer_fortschritt:
     kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def)
   apply(erule globale_maxime_katimp)
-      apply (simp add: handeln_def einvernehmlich_noop ist_noop_def; fail)
-     using wpsm_kommutiert_altruistischer_fortschritt
-     apply (simp add: maxime_altruistischer_fortschritt_def) 
-    using zahlenwps_sym apply fastforce
-   apply (simp add: zahlenwps_id)
-    by simp
+      subgoal by(simp add: handeln_def einvernehmlich_noop ist_noop_def)
+     subgoal using wpsm_kommutiert_altruistischer_fortschritt by(simp add: maxime_altruistischer_fortschritt_def) 
+    subgoal using zahlenwps_sym by fastforce
+   subgoal by(simp add: zahlenwps_id)
+  by simp
 
 text\<open>Folgendes Theorem zeigt, dass das \<^const>\<open>MaximeDisj\<close> Konstrukt in jeder Welt funktioniert.\<close>
 theorem
@@ -803,7 +803,7 @@ theorem
       (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)\<close>
   apply(rule kategorischer_imperativ_auf_MaximeDisjI2)
   apply(elim disjE)
-  using mhg_katimp_maxime_altruistischer_fortschritt apply simp
+   using mhg_katimp_maxime_altruistischer_fortschritt apply simp
   using mhg_katimp_maxime_hatte_konsens apply simp
   done
 
