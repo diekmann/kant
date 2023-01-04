@@ -112,9 +112,9 @@ text\<open>Wenn \<^const>\<open>reverse_engineer_abmachung\<close> hier nicht ge
 berechnet wie später eingelöst, dann wird das ganze exploitable.
 Da eine \<^typ>\<open>('person, 'etwas) abmachung\<close> aber eine eindeutige Darstellung sein sollte,
 müsst das so funktionieren.\<close>
-definition hat_konsens :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close>
+definition einvernehmlich :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close>
 where
-  \<open>hat_konsens h \<equiv>
+  \<open>einvernehmlich h \<equiv>
     let abmachung = reverse_engineer_abmachung (map_handlung besitz h)
     in enthaelt_konsens abmachung (vorher h)
         \<and> konsens_wurde_entfernt abmachung (konsens (vorher h)) (konsens (nachher h))\<close>
@@ -122,50 +122,50 @@ where
 
 
 (*<*)
-lemma hat_konsens_swap:
-  \<open>hat_konsens (map_handlung (zahlenwps p1 p2) h) = hat_konsens h\<close>
+lemma einvernehmlich_swap:
+  \<open>einvernehmlich (map_handlung (zahlenwps p1 p2) h) = einvernehmlich h\<close>
   apply(cases \<open>h\<close>, rename_tac vor nach, simp)
-  apply(simp add: hat_konsens_def)
+  apply(simp add: einvernehmlich_def)
   apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp add: zahlenwps_def)
   apply(simp add: reverse_engineer_abmachung_swap)
   apply(simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
   apply(simp add: konsens_wurde_entfernt_swap)
   by metis (*wtf?*)
 
-lemma hat_konsens_swap_nachher_handeln:
-  \<open>hat_konsens (Handlung (zahlenwps p1 p2 welt) (nachher_handeln p1 (zahlenwps p1 p2 welt) ha)) =
-    hat_konsens (Handlung welt (zahlenwps p1 p2 (nachher_handeln p1 (zahlenwps p2 p1 welt) ha)))\<close>
-  apply (metis (no_types, opaque_lifting) handlung.map hat_konsens_swap zahlenwps_id zahlenwps_sym)
+lemma einvernehmlich_swap_nachher_handeln:
+  \<open>einvernehmlich (Handlung (zahlenwps p1 p2 welt) (nachher_handeln p1 (zahlenwps p1 p2 welt) ha)) =
+    einvernehmlich (Handlung welt (zahlenwps p1 p2 (nachher_handeln p1 (zahlenwps p2 p1 welt) ha)))\<close>
+  apply (metis (no_types, opaque_lifting) handlung.map einvernehmlich_swap zahlenwps_id zahlenwps_sym)
   done
 
-lemma hat_konsens_noop: \<open>hat_konsens (Handlung welt welt)\<close>
-  apply(simp add: hat_konsens_def reverse_engineer_abmachung_same)
+lemma einvernehmlich_noop: \<open>einvernehmlich (Handlung welt welt)\<close>
+  apply(simp add: einvernehmlich_def reverse_engineer_abmachung_same)
   by(code_simp)
 
-lemma nicht_ausfuehrbar_hat_konsens:
-  \<open>\<not> ausfuehrbar p welt ha \<Longrightarrow> hat_konsens (handeln p welt ha)\<close>
-  apply(simp add: handeln_def nicht_ausfuehrbar_nachher_handeln hat_konsens_noop)
+lemma nicht_ausfuehrbar_einvernehmlich:
+  \<open>\<not> ausfuehrbar p welt ha \<Longrightarrow> einvernehmlich (handeln p welt ha)\<close>
+  apply(simp add: handeln_def nicht_ausfuehrbar_nachher_handeln einvernehmlich_noop)
   done
 (*>*)
 
 
 text\<open>Eine Handlung die keine Änderung bewirkt hat keine Betroffenen und damit immer Konsens.\<close>
-lemma \<open>hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w)))\<close>
-  apply(simp add: hat_konsens_def Let_def)
+lemma \<open>einvernehmlich (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w)))\<close>
+  apply(simp add: einvernehmlich_def Let_def)
   apply(simp add: handeln_def nachher_handeln.simps reverse_engineer_abmachung_same)
   apply(code_simp)
   done
   
 beispiel
-  \<open>hat_konsens (handeln Alice initialwelt
+  \<open>einvernehmlich (handeln Alice initialwelt
     (Handlungsabsicht (\<lambda>p w. Some
        (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk>,
            konsens := konsens_entfernen (to_abmachung [Gewinnt Alice (3::int), Verliert Bob 3]) (konsens w) \<rparr>))))\<close>
   by eval
-beispiel \<open>\<not> hat_konsens (handeln Alice initialwelt
+beispiel \<open>\<not> einvernehmlich (handeln Alice initialwelt
           (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk> \<rparr>))))\<close>
   by eval
-beispiel \<open>\<not> hat_konsens (handeln Alice initialwelt
+beispiel \<open>\<not> einvernehmlich (handeln Alice initialwelt
           (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 4)\<rbrakk>(Bob -= 4)\<rbrakk> \<rparr>))))\<close>
   by eval
 
@@ -366,14 +366,14 @@ beispiel \<open>nachher_handeln Alice
   by eval
 
 
-text\<open>Für\<^const>\<open>existierende_abmachung_einloesen\<close> gilt immer \<^const>\<open>hat_konsens\<close>.
+text\<open>Für\<^const>\<open>existierende_abmachung_einloesen\<close> gilt immer \<^const>\<open>einvernehmlich\<close>.
 Das \<^const>\<open>reverse_engineer_abmachung\<close> macht also das Richtige.\<close>
-lemma hat_konsens_existierende_abmachung_einloesen:
-  \<open>hat_konsens (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))\<close>
-  apply(simp add: hat_konsens_def handeln_def nachher_handeln.simps)
+lemma einvernehmlich_existierende_abmachung_einloesen:
+  \<open>einvernehmlich (handeln p welt (Handlungsabsicht existierende_abmachung_einloesen))\<close>
+  apply(simp add: einvernehmlich_def handeln_def nachher_handeln.simps)
   apply(cases \<open>existierende_abmachung_einloesen p welt\<close>)
   apply(simp)
-  using hat_konsens_def hat_konsens_noop apply fastforce
+  using einvernehmlich_def einvernehmlich_noop apply fastforce
   apply(simp)
   apply(rename_tac welt')
   apply(simp add: existierende_abmachung_einloesen_def split:list.split_asm)
@@ -668,16 +668,8 @@ beispiel \<open>erzeuge_beispiel
   \<rparr>\<close> by beispiel_tac
 
 
-(*
-  1) das reverse-engineered delta muss genau dem delta in der welt entsprechen
-     (das sollte der neue function map typ providen).
-     hat_konsens_existierende_abmachung_einloesen zeigt, dass dies zumindest fuer diese eine HA gilt.
-  2) es muss getestet werden, dass die Abmachung auch eingeloest wurde, also aus dem konsens entfernt wurde
-     TODO.
-     Ansonsten ist stehlen nicht zu unterscheiden von abmachung einloesen!!!
-*)
 definition maxime_hatte_konsens :: \<open>(person, zahlenwelt) maxime\<close> where
-  \<open>maxime_hatte_konsens \<equiv> Maxime (\<lambda>ich h. hat_konsens h)\<close>
+  \<open>maxime_hatte_konsens \<equiv> Maxime (\<lambda>ich h. einvernehmlich h)\<close>
 
 
 beispiel \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Handlungsabsicht existierende_abmachung_einloesen)).
@@ -687,7 +679,7 @@ beispiel \<open>\<forall>h \<in> set (alle_moeglichen_handlungen initialwelt (Ha
 
 lemma \<open>wohlgeformte_maxime zahlenwps maxime_hatte_konsens\<close>
   by(simp add: wohlgeformte_maxime_def wohlgeformte_maxime_auf_def
-               maxime_hatte_konsens_def hat_konsens_swap)
+               maxime_hatte_konsens_def einvernehmlich_swap)
 
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
@@ -755,7 +747,7 @@ lemma \<open>maxime_und_handlungsabsicht_generalisieren zahlenwps welt
      maxime_hatte_konsens (Handlungsabsicht existierende_abmachung_einloesen) p\<close>
   apply(simp add: maxime_und_handlungsabsicht_generalisieren_def maxime_hatte_konsens_def)
   apply(clarsimp)
-  apply(simp add: hat_konsens_existierende_abmachung_einloesen)
+  apply(simp add: einvernehmlich_existierende_abmachung_einloesen)
   done
   
 lemma mhg_katimp_maxime_hatte_konsens:
@@ -764,8 +756,8 @@ lemma mhg_katimp_maxime_hatte_konsens:
     kategorischer_imperativ_auf ha welt maxime_hatte_konsens\<close>
   apply(simp add: maxime_hatte_konsens_def)
   apply(erule globale_maxime_katimp)
-      apply (simp add: handeln_def hat_konsens_noop ist_noop_def; fail)
-    subgoal by(simp add: wpsm_kommutiert_handlung_raw hat_konsens_swap_nachher_handeln)  using zahlenwps_sym apply fastforce
+      apply (simp add: handeln_def einvernehmlich_noop ist_noop_def; fail)
+    subgoal by(simp add: wpsm_kommutiert_handlung_raw einvernehmlich_swap_nachher_handeln)  using zahlenwps_sym apply fastforce
    apply (simp add: zahlenwps_id)
   by simp
 
@@ -790,7 +782,7 @@ lemma mhg_katimp_maxime_altruistischer_fortschritt:
     kategorischer_imperativ_auf ha welt maxime_altruistischer_fortschritt\<close>
   apply(simp add: maxime_altruistischer_fortschritt_def)
   apply(erule globale_maxime_katimp)
-      apply (simp add: handeln_def hat_konsens_noop ist_noop_def; fail)
+      apply (simp add: handeln_def einvernehmlich_noop ist_noop_def; fail)
      using wpsm_kommutiert_altruistischer_fortschritt
      apply (simp add: maxime_altruistischer_fortschritt_def) 
     using zahlenwps_sym apply fastforce
