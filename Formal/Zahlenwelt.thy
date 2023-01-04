@@ -15,32 +15,24 @@ modellieren, jedoch den gleichen Typen in unserem Modell haben werden.
 Hier sind einige Hilfsfunktionen um mit dem Typ \<^typ>\<open>person \<Rightarrow> int\<close> allgemein zu arbeiten.\<close>
 
 text\<open>Default: Standardmäßig hat jede Person \<^term>\<open>0::int\<close>:\<close>
-definition DEFAULT :: \<open>person \<Rightarrow> int\<close> where
+definition DEFAULT :: \<open>person \<Rightarrow> int\<close> ("\<euro>") where
   \<open>DEFAULT \<equiv> \<lambda>p. 0\<close>
-
-(*<*)
-syntax
-  "_ZahlenWelt" :: \<open>updbinds \<Rightarrow> 'a\<close> ("(1\<^url>[_])")
-
-translations
-  "_ZahlenWelt ms" \<rightleftharpoons> "_Update (CONST DEFAULT) ms"
-(*>*)
 
 beispiel \<open>(DEFAULT(Alice:=8, Bob:=3, Eve:= 5)) Bob = 3\<close> by eval
 
 text\<open>Beispiel mit fancy Syntax:\<close>
-beispiel \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] Bob = 3\<close> by eval
+beispiel \<open>(\<euro>(Alice:=8, Bob:=3, Eve:= 5)) Bob = 3\<close> by eval
 
 text\<open>Das Beispiel liest sich wie folgt.
-Die Welt @{term_type [source=true] \<open>\<^url>[Alice:=8, Bob:=3, Eve:= 5] :: person \<Rightarrow> int\<close>} ist eine Funktion von
+Die Welt @{term_type [source=true] \<open>(\<euro>(Alice:=8, Bob:=3, Eve:= 5)) :: person \<Rightarrow> int\<close>} ist eine Funktion von
 \<^typ>\<open>person\<close> nach \<^typ>\<open>int\<close>.
 Wir rufen diese Funktion mit den Parameter \<^const>\<open>Bob\<close> auf.
 Das Ergebnis ist \<^term>\<open>3::int\<close>.\<close>
 
-text\<open>Die Funktion @{term [source=true] \<open>\<^url>[Alice := 4, Carol := 4]\<close>} lässt sich auch mit Hilfe folgender
+text\<open>Die Funktion @{term [source=true] \<open>(\<euro>(Alice := 4, Carol := 4))\<close>} lässt sich auch mit Hilfe folgender
 Hilfsfunktionen als eine Menge von Tupeln darstellen.\<close>
-beispiel \<open>show_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Bob, 0), (Carol, 4), (Eve, 0)]\<close> by eval
-beispiel \<open>show_num_fun \<^url>[Alice := 4, Carol := 4] = [(Alice, 4), (Carol, 4)]\<close> by eval
+beispiel \<open>show_fun (\<euro>(Alice := 4, Carol := 4)) = [(Alice, 4), (Bob, 0), (Carol, 4), (Eve, 0)]\<close> by eval
+beispiel \<open>show_num_fun (\<euro>(Alice := 4, Carol := 4)) = [(Alice, 4), (Carol, 4)]\<close> by eval
 
 text\<open>Folgende Syntaxabkürzungen erlauben es uns eine einfachere Notation einzuführen,
 um den Besitz einer Person zu erhöhen oder zu verringern.\<close>
@@ -51,8 +43,8 @@ abbreviation num_fun_add_syntax ("\<lbrakk>_ '(_ += _')\<rbrakk>") where
 abbreviation num_fun_minus_syntax ("\<lbrakk>_ '(_ -= _')\<rbrakk>") where
   \<open>\<lbrakk>f(p -= n)\<rbrakk> \<equiv> (f(p := (f p) - n))\<close>
 
-beispiel \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob += 4)\<rbrakk> Bob = 7\<close> by eval
-beispiel \<open>\<lbrakk>\<^url>[Alice:=8, Bob:=3, Eve:= 5](Bob -= 4)\<rbrakk> Bob = -1\<close> by eval
+beispiel \<open>\<lbrakk>\<euro>(Alice:=8, Bob:=3, Eve:= 5)(Bob += 4)\<rbrakk> Bob = 7\<close> by eval
+beispiel \<open>\<lbrakk>\<euro>(Alice:=8, Bob:=3, Eve:= 5)(Bob -= 4)\<rbrakk> Bob = -1\<close> by eval
 
 text\<open>Erhöhen und verringern heben sich auf.\<close>
 beispiel fixes n:: \<open>int\<close> shows \<open>\<lbrakk>\<lbrakk>f(p += n)\<rbrakk>(p -= n)\<rbrakk> = f\<close> by(simp)
@@ -355,8 +347,8 @@ definition aufsummieren :: \<open>('person::enum \<Rightarrow> int) \<Rightarrow
 lemma \<open>aufsummieren (besitz :: person\<Rightarrow>int) = (\<Sum>p\<leftarrow>[Alice,Bob,Carol,Eve]. besitz p)\<close>
   by(simp add: aufsummieren_def enum_person_def)
 
-lemma \<open>aufsummieren \<^url>[Alice := 4, Carol := 8] = 12\<close> by eval
-lemma \<open>aufsummieren \<^url>[Alice := 4, Carol := 4] = 8\<close> by eval
+lemma \<open>aufsummieren (\<euro>(Alice := 4, Carol := 8)) = 12\<close> by eval
+lemma \<open>aufsummieren (\<euro>(Alice := 4, Carol := 4)) = 8\<close> by eval
 
 lemma aufsummieren_swap:
   \<open>aufsummieren (swap p1 p2 welt) = aufsummieren welt\<close>

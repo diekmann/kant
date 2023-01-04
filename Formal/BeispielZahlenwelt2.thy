@@ -31,7 +31,7 @@ record zahlenwelt =
 definition initialwelt :: \<open>zahlenwelt\<close>
   where
 \<open>initialwelt \<equiv> \<lparr>
-  besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+  besitz = (\<euro>(Alice := 5, Bob := 10, Carol := -3)),
   konsens = (\<lambda>_. [])(
     Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
     Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]),
@@ -56,7 +56,7 @@ definition zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenw
 
 beispiel \<open>zahlenwps Alice Bob initialwelt
 = \<lparr>
-  besitz = \<^url>[Alice := 10, Bob := 5, Carol := -3],
+  besitz = (\<euro>(Alice := 10, Bob := 5, Carol := -3)),
   konsens = (\<lambda>_. [])(
     Alice := [to_abmachung [Gewinnt Bob 3, Verliert Alice 3]],
     Bob := [to_abmachung [Gewinnt Bob 3], to_abmachung [Gewinnt Bob 3, Verliert Alice 3]]),
@@ -67,7 +67,7 @@ beispiel \<open>zahlenwps Alice Bob initialwelt
 
 beispiel \<open>zahlenwps Alice Carol initialwelt
 = \<lparr>
-  besitz = \<^url>[Alice := -3, Bob := 10, Carol := 5],
+  besitz = (\<euro>(Alice := -3, Bob := 10, Carol := 5)),
   konsens = (\<lambda>_. [])(
     Bob := [to_abmachung [Gewinnt Carol 3, Verliert Bob 3]],
     Carol := [to_abmachung [Gewinnt Carol 3], to_abmachung [Gewinnt Carol 3, Verliert Bob 3]]),
@@ -185,7 +185,7 @@ definition abmachung_einloesen :: \<open>(person, int) abmachung \<Rightarrow> z
 beispiel \<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob 3]) initialwelt
  = Some
   \<lparr>
-    besitz = \<^url>[Alice := 8, Bob := 7, Carol := -3],
+    besitz = (\<euro>(Alice := 8, Bob := 7, Carol := -3)),
     konsens = (\<lambda>_. [])(
       Alice := [to_abmachung [Gewinnt Alice 3]],
       Bob := []),
@@ -197,7 +197,7 @@ beispiel \<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3, Verliert Bob
 beispiel \<open>abmachung_einloesen (to_abmachung [Gewinnt Alice 3]) initialwelt
  = Some
   \<lparr>
-    besitz = \<^url>[Alice := 8, Bob := 10, Carol := -3],
+    besitz = (\<euro>(Alice := 8, Bob := 10, Carol := -3)),
     konsens = (\<lambda>_. [])(
       Alice := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
       Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]),
@@ -308,7 +308,7 @@ Es is beispielsweise nicht möglich, dass \<^const>\<open>Alice\<close> eine Han
 ausführt, die \<^const>\<open>Carol\<close> betrifft, ohne deren Zustimmung.\<close>
 beispiel \<open>\<not> ausfuehrbar Alice
   \<lparr>
-    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+    besitz = (\<euro>(Alice := 5, Bob := 10, Carol := -3)),
     konsens = (\<lambda>_. [])(
       Alice := [to_abmachung [Verliert Carol 3]]
       ),
@@ -320,7 +320,7 @@ beispiel \<open>\<not> ausfuehrbar Alice
 text\<open>Nur wenn \<^const>\<open>Carol\<close> zustimmt wird die Handlung möglich.\<close>
 beispiel \<open>ausfuehrbar Alice
   \<lparr>
-    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+    besitz = (\<euro>(Alice := 5, Bob := 10, Carol := -3)),
     konsens = (\<lambda>_. [])(
       Alice := [to_abmachung [Verliert Carol 3]],
       Carol := [to_abmachung [Verliert Carol 3]]
@@ -335,7 +335,7 @@ beispiel \<open>ausfuehrbar Alice
 text\<open>Da \<^const>\<open>Alice\<close> nicht betroffen is, bleibt \<^term>\<open>[Verliert Carol 3]\<close> bei \<^const>\<open>Alice\<close> übrig.\<close>
 beispiel \<open>nachher_handeln Alice
   \<lparr>
-    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -3],
+    besitz = (\<euro>(Alice := 5, Bob := 10, Carol := -3)),
     konsens = (\<lambda>_. [])(
       Alice := [to_abmachung [Verliert Carol 3]],
       Carol := [to_abmachung [Verliert Carol 3]]
@@ -345,7 +345,7 @@ beispiel \<open>nachher_handeln Alice
   \<rparr>
   (Handlungsabsicht existierende_abmachung_einloesen)
 = \<lparr>
-    besitz = \<^url>[Alice := 5, Bob := 10, Carol := -6],
+    besitz = (\<euro>(Alice := 5, Bob := 10, Carol := -6)),
     konsens = (\<lambda>_. [])(
       Alice := [to_abmachung [Verliert Carol 3]],
       Carol := []
@@ -381,7 +381,7 @@ fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> z
 
 beispiel\<open>stehlen 3 10 Alice initialwelt =
 Some \<lparr>
-  besitz = \<^url>[Alice := 8, Bob := 7, Carol := -3],
+  besitz = (\<euro>(Alice := 8, Bob := 7, Carol := -3)),
   konsens = (\<lambda>_. [])(
     Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
     Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]),

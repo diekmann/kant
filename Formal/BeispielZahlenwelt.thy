@@ -20,15 +20,15 @@ fun gesamtbesitz :: \<open>zahlenwelt \<Rightarrow> int\<close> where
   \<open>gesamtbesitz (Zahlenwelt besitz) = aufsummieren besitz\<close>
 
 text\<open>Beispiel:\<close>
-beispiel \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 8]) = 12\<close> by eval
-beispiel \<open>gesamtbesitz (Zahlenwelt \<^url>[Alice := 4, Carol := 4]) = 8\<close> by eval
+beispiel \<open>gesamtbesitz (Zahlenwelt (\<euro>(Alice := 4, Carol := 8))) = 12\<close> by eval
+beispiel \<open>gesamtbesitz (Zahlenwelt (\<euro>(Alice := 4, Carol := 4))) = 8\<close> by eval
 
 text\<open>Mein persönlicher Besitz:\<close>
 fun meins :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> int\<close> where
   \<open>meins p (Zahlenwelt besitz) = besitz p\<close>
 
 text\<open>Beispiel:\<close>
-beispiel \<open>meins Carol (Zahlenwelt \<^url>[Alice := 8, Carol := 4]) = 4\<close> by eval
+beispiel \<open>meins Carol (Zahlenwelt (\<euro>(Alice := 8, Carol := 4))) = 4\<close> by eval
 
 
 text\<open>Um den \<^file>\<open>SchleierNichtwissen.thy\<close> zu implementieren:\<close>
@@ -36,8 +36,8 @@ fun zahlenwps :: \<open>person \<Rightarrow> person \<Rightarrow> zahlenwelt \<R
   \<open>zahlenwps p1 p2 (Zahlenwelt besitz) = Zahlenwelt (swap p1 p2 besitz)\<close>
 
 text\<open>Beispiel:\<close>
-beispiel \<open>zahlenwps Alice Carol (Zahlenwelt \<^url>[Alice := 4, Bob := 6, Carol := 8])
-    = (Zahlenwelt \<^url>[Alice := 8, Bob := 6, Carol := 4])\<close>
+beispiel \<open>zahlenwps Alice Carol (Zahlenwelt (\<euro>(Alice := 4, Bob := 6, Carol := 8)))
+    = (Zahlenwelt (\<euro>(Alice := 8, Bob := 6, Carol := 4)))\<close>
   by eval
 
 (*<*)
@@ -70,7 +70,7 @@ lemma hlp3: \<open>p1 \<noteq> p2 \<Longrightarrow> p \<noteq> p1 \<Longrightarr
 
 
 text\<open>\<^const>\<open>Alice\<close> hat Besitz, \<^const>\<open>Bob\<close> ist reicher, \<^const>\<open>Carol\<close> hat Schulden.\<close>
-definition \<open>initialwelt \<equiv> Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3]\<close>
+definition \<open>initialwelt \<equiv> Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3))\<close>
 
 
 
@@ -79,7 +79,7 @@ text\<open>Sobald ich eine konkrete Person in einer Handlungsabsicht hardcode,
   ist diese nicht mehr wohlgeformt.\<close>
 
 beispiel \<open>\<not>wohlgeformte_handlungsabsicht
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     (Handlungsabsicht (\<lambda>ich w. if ich = Alice then Some w else Some (Zahlenwelt (\<lambda>_. 0))))\<close>
   apply(simp add: wohlgeformte_handlungsabsicht.simps swap_def)
   apply(eval)
@@ -114,17 +114,17 @@ text\<open>Leider ist diese Funktion auch diskriminierend:
   Wenn es mehrere potenzielle Opfer mit dem gleichen Besitz gibt,
   dann bestimmt die Reihenfolge in \<^term>\<open>Enum.enum\<close> wer bestohlen wird.
   Diese Reihenfolge ist wieder eine Eigenschaft von \<^typ>\<open>person\<close> und nicht \<^typ>\<open>zahlenwelt\<close>.\<close>
-beispiel\<open>handeln Alice (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+beispiel\<open>handeln Alice (Zahlenwelt (\<euro>(Alice := 10, Bob := 10, Carol := -3)))
                 (Handlungsabsicht (stehlen_nichtwf2 5 10))
-  = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
-               (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])\<close> by eval
-beispiel\<open>handeln Bob (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3])
+  = Handlung (Zahlenwelt (\<euro>(Alice := 10, Bob := 10, Carol := - 3)))
+               (Zahlenwelt (\<euro>(Alice := 10, Bob := 10, Carol := - 3)))\<close> by eval
+beispiel\<open>handeln Bob (Zahlenwelt (\<euro>(Alice := 10, Bob := 10, Carol := -3)))
               (Handlungsabsicht (stehlen_nichtwf2 5 10))
-  = Handlung (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := - 3])
-             (Zahlenwelt \<^url>[Alice := 5, Bob := 15, Carol := - 3])\<close> by eval
+  = Handlung (Zahlenwelt (\<euro>(Alice := 10, Bob := 10, Carol := - 3)))
+             (Zahlenwelt (\<euro>(Alice := 5, Bob := 15, Carol := - 3)))\<close> by eval
 beispiel \<open>wohlgeformte_handlungsabsicht_gegenbeispiel
       zahlenwps
-      (Zahlenwelt \<^url>[Alice := 10, Bob := 10, Carol := -3]) (Handlungsabsicht (stehlen_nichtwf2 5 10))
+      (Zahlenwelt (\<euro>(Alice := 10, Bob := 10, Carol := -3))) (Handlungsabsicht (stehlen_nichtwf2 5 10))
       Alice Bob\<close>
   by eval
 
@@ -197,8 +197,8 @@ lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
   by (simp add: swap_def)
 (*>*)
 
-beispiel \<open>alles_kaputt_machen Alice (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
-  = Some (Zahlenwelt \<^url>[Alice := -4, Bob := -4, Carol := -4, Eve := -4])\<close>
+beispiel \<open>alles_kaputt_machen Alice (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
+  = Some (Zahlenwelt (\<euro>(Alice := -4, Bob := -4, Carol := -4, Eve := -4)))\<close>
   by(code_simp)
 
 (*TODO: Handlung alles_besser_machen.*)
@@ -276,7 +276,7 @@ lemma \<open>ha \<in> {
 text\<open>Nicht alle Handlungen generalisieren, z.B. \<^const>\<open>reset\<close> nicht:\<close>
 beispiel
   \<open>\<not> maxime_und_handlungsabsicht_generalisieren
-         zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+         zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
          maxime_zahlenfortschritt (Handlungsabsicht reset) Alice\<close>
   by eval
 
@@ -311,7 +311,7 @@ Für die übrigen Handlungsabsichten ist das Ergebnis aber intuitiv:
   \<^item> \<^const>\<open>alles_kaputt_machen\<close> ist verboten.
 \<close>
 beispiel \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     handlungsabsichten
     maxime_zahlenfortschritt =
   Some
@@ -367,7 +367,7 @@ Die Handlungsabsichten werden eingeordnet wie erwartet:
   \<^item> \<^const>\<open>stehlen\<close>, \<^const>\<open>reset\<close>, \<^const>\<open>alles_kaputt_machen\<close> ist schlecht.
   \<close>
 beispiel \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     handlungsabsichten
     maxime_altruistischer_fortschritt =
   Some
@@ -665,7 +665,7 @@ die Maxime \<^const>\<open>individueller_strikter_fortschritt\<close> erfüllt n
 Entweder erlaubt die Maxime keine Assuage über eine Handlungsabsicht,
 oder die Handlungsabsicht ist verboten.\<close>
 beispiel \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     handlungsabsichten
     (Maxime individueller_strikter_fortschritt) =
   Some
@@ -741,7 +741,7 @@ Die Handlungsabsichten sind fast intuitiv in erlaubt und verboten eingeordnet.
     Dieser letzte Fall ist unschön.
 \<close>
 beispiel \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     handlungsabsichten
     (Maxime (\<lambda>ich. globaler_strikter_fortschritt)) =
   Some
@@ -792,7 +792,7 @@ Die Handlungsabsichten sind meiner Meinung nach intuitiv
   \<^item> \<^const>\<open>reset\<close> und \<^const>\<open>alles_kaputt_machen\<close> sind verboten.
 \<close>
 beispiel \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     handlungsabsichten
     (Maxime (\<lambda>ich. globaler_fortschritt)) =
   Some
@@ -899,7 +899,7 @@ Dies ist keine große Überraschung, da \<^const>\<open>reset\<close> auch nicht
 hat und wir die Maxime auch für ungeeignet befunden haben.\<close>
 beispiel
   \<open>\<not> maxime_und_handlungsabsicht_generalisieren
-       zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
+       zahlenwps (Zahlenwelt (\<euro>(Alice := 2, Bob := 3)))
        maxime_zahlenfortschritt (Handlungsabsicht collatzh) Alice\<close>
   by eval
 
@@ -913,7 +913,7 @@ Dies wirft die Frage auf:
 Die Antwort liefert \<^const>\<open>collatzh\<close>.\<close>
 beispiel
   \<open>\<not> maxime_und_handlungsabsicht_generalisieren
-       zahlenwps (Zahlenwelt \<^url>[Alice := 2, Bob := 3])
+       zahlenwps (Zahlenwelt (\<euro>(Alice := 2, Bob := 3)))
        maxime_altruistischer_fortschritt (Handlungsabsicht collatzh) Alice\<close>
   by eval
 
@@ -1013,7 +1013,7 @@ definition partiell_schlechter_charakter:: \<open>person \<Rightarrow> zahlenwel
                    else None)\<close>
 
 beispiel \<open>erzeuge_beispiel
-    zahlenwps (Zahlenwelt \<^url>[Alice := 5, Bob := 10, Carol := -3])
+    zahlenwps (Zahlenwelt (\<euro>(Alice := 5, Bob := 10, Carol := -3)))
     [Handlungsabsicht partiell_guter_charakter, Handlungsabsicht partiell_schlechter_charakter]
     maxime_altruistischer_fortschritt
 = Some

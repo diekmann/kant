@@ -193,17 +193,17 @@ where
 beispiel
 \<open>aenderung_ausfuehren
   [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
-  (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
+  (\<euro>(Alice:=8, Bob:=3, Eve:= 5))
   =
-  (\<^url>[Alice:=6, Bob:=6, Carol:=2, Eve:= 4])\<close>
+  (\<euro>(Alice:=6, Bob:=6, Carol:=2, Eve:= 4))\<close>
   by eval
 
 beispiel
 \<open>aenderung_ausfuehren
   [Verliert Alice (2::int), Verliert Alice 6]
-  (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
+  (\<euro>(Alice:=8, Bob:=3, Eve:= 5))
   =
-  (\<^url>[Bob:=3, Eve:= 5])\<close>
+  (\<euro>(Bob:=3, Eve:= 5))\<close>
   by eval
 
 (*<*)
@@ -434,8 +434,8 @@ text\<open>Beispiel:\<close>
 beispiel
   \<open>abmachung_ausfuehren
     (to_abmachung [Gewinnt Alice 3, Verliert Bob 3])
-    (\<^url>[Alice:=8, Bob:=3, Eve:= 5])
-  = (\<^url>[Alice:=11, Bob:=0, Eve:= 5])\<close>
+    (\<euro>(Alice:=8, Bob:=3, Eve:= 5))
+  = (\<euro>(Alice:=11, Bob:=0, Eve:= 5))\<close>
   by(code_simp)
 
 
