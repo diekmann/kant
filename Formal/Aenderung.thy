@@ -604,10 +604,14 @@ lemma konsensswap_apply:
   apply(simp add: konsensswap_def comp_def)
   by(rule swap_cases, simp_all add: swap_a swap_b swap_nothing)
 
-
 lemma konsensswap_same[simp]:
   \<open>konsensswap p p konsens = konsens\<close>
   by(simp add: konsensswap_def swap_id_comp)
+
+lemma konsensswap_swap_id:
+  "konsensswap p1 p2 konsens (swap p1 p2 id p) = map (swap p1 p2) (konsens p)"
+  apply(simp add: konsensswap_apply)
+  by (simp add: swap_fun_swap_id)
 (*>*)
 
 
@@ -758,6 +762,25 @@ lemma konsens_wurde_entfernt_konsens_entfernen:
   apply(simp add: konsens_entfernen_simp)
   by (simp add: enthaelt_konsens_def)
 
+(*<*)
+
+(*makes the simplifier loop*)
+lemma
+  "add_mset (swap p1 p2 a) (image_mset (swap p1 p2) M) =
+     image_mset (swap p1 p2) (add_mset a M)"
+  by simp
+
+lemma konsens_wurde_entfernt_swap:
+  \<open>konsens_wurde_entfernt (swap p1 p2 a) (konsensswap p1 p2 konsens_vor) (konsensswap p1 p2 konsens_nach)
+    = konsens_wurde_entfernt a konsens_vor konsens_nach\<close> 
+  apply(simp add: konsens_wurde_entfernt_def abmachungs_betroffene_is_dom)
+  apply(simp add: abmachung_dom_swap)
+  apply(rule ball_cong)
+   apply(simp; fail)
+  apply(simp add: konsensswap_swap_id)
+  (*TODO: wow, ugly*)
+  by (metis (no_types, opaque_lifting) comp_apply image_mset_add_mset multiset.map_comp multiset.map_ident_strong swap1)
+(*>*)
 
 text\<open>Gegeben eine Handlung berechnet folgende Funktion die Abmachung,
 aus der diese Handlung resultiert haben könnte.\<close>

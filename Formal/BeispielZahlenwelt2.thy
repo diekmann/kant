@@ -116,8 +116,9 @@ definition hat_konsens :: \<open>zahlenwelt handlung \<Rightarrow> bool\<close>
 where
   \<open>hat_konsens h \<equiv>
     let abmachung = reverse_engineer_abmachung (map_handlung besitz h)
-    in enthaelt_konsens abmachung (vorher h)\<close>
-(*TODO: hier will konsens_wurde_entfernt dazu? Neuer name. Einvernehmlich?*)
+    in enthaelt_konsens abmachung (vorher h)
+        \<and> konsens_wurde_entfernt abmachung (konsens (vorher h)) (konsens (nachher h))\<close>
+(*TODO: hier will konsens_wurde_entfernt dazu? Neuer name! Einvernehmlich?*)
 
 
 (*<*)
@@ -127,7 +128,9 @@ lemma hat_konsens_swap:
   apply(simp add: hat_konsens_def)
   apply(case_tac \<open>vor\<close>, case_tac \<open>nach\<close>, simp add: zahlenwps_def)
   apply(simp add: reverse_engineer_abmachung_swap)
-  by (simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
+  apply(simp add: Aenderung.enthaelt_konsens_swap BeispielZahlenwelt2.enthaelt_konsens_def)
+  apply(simp add: konsens_wurde_entfernt_swap)
+  by metis (*wtf?*)
 
 lemma hat_konsens_swap_nachher_handeln:
   \<open>hat_konsens (Handlung (zahlenwps p1 p2 welt) (nachher_handeln p1 (zahlenwps p1 p2 welt) ha)) =
@@ -153,8 +156,14 @@ lemma \<open>hat_konsens (handeln p welt (Handlungsabsicht (\<lambda>p w. Some w
   apply(code_simp)
   done
   
-beispiel \<open>hat_konsens (handeln Alice initialwelt
-        (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk> \<rparr>))))\<close>
+beispiel
+  \<open>hat_konsens (handeln Alice initialwelt
+    (Handlungsabsicht (\<lambda>p w. Some
+       (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk>,
+           konsens := konsens_entfernen (to_abmachung [Gewinnt Alice (3::int), Verliert Bob 3]) (konsens w) \<rparr>))))\<close>
+  by eval
+beispiel \<open>\<not> hat_konsens (handeln Alice initialwelt
+          (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 3)\<rbrakk>(Bob -= 3)\<rbrakk> \<rparr>))))\<close>
   by eval
 beispiel \<open>\<not> hat_konsens (handeln Alice initialwelt
           (Handlungsabsicht (\<lambda>p w. Some (w\<lparr> besitz := \<lbrakk>\<lbrakk>(besitz w)(Alice += 4)\<rbrakk>(Bob -= 4)\<rbrakk> \<rparr>))))\<close>
@@ -370,7 +379,8 @@ lemma hat_konsens_existierende_abmachung_einloesen:
   apply(simp add: existierende_abmachung_einloesen_def split:list.split_asm)
   apply(frule abmachung_einloesen_some_entahelt_konsens)
   apply(simp add: abmachung_einloesen_reverse_engineer)
-  done
+  using BeispielZahlenwelt2.enthaelt_konsens_def abmachung_einloesen_def
+    konsens_wurde_entfernt_konsens_entfernen by fastforce
 
 fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>stehlen beute opfer_nach_besitz dieb welt =
@@ -712,13 +722,7 @@ beispiel \<open>erzeuge_beispiel
    bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel_tac
 
-(*TODO: MaximeDisj beweisen.
 
-Irgendwie will ich, dass die ausgewaehlte maxime dann fuer eine Handlung gefixed ist.
-
-Ich frage mich ja, ob MaximeDisj hier wirklich funktioniert
-oder nur in dieser einen Welt.
-*)
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
   [Handlungsabsicht (abbauen 5),
@@ -730,22 +734,17 @@ beispiel \<open>erzeuge_beispiel
   (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
 = Some
   \<lparr>
-   bsp_erfuellte_maxime = False,
+   bsp_erfuellte_maxime = True,
    bsp_erlaubte_handlungen = [
       Handlungsabsicht (abbauen 5),
       Handlungsabsicht existierende_abmachung_einloesen,
       Handlungsabsicht unmoeglich],
    bsp_verbotene_handlungen = [
+      Handlungsabsicht (stehlen 3 10),
       Handlungsabsicht reset,
       Handlungsabsicht alles_kaputt_machen],
-   bsp_uneindeutige_handlungen = [
-      Handlungsabsicht (stehlen 3 10)
-  ]\<rparr>\<close>
+   bsp_uneindeutige_handlungen = []\<rparr>\<close>
   by beispiel_tac
-text\<open>TODO: Seit dem ich die Handlungsabsicht \<^const>\<open>stehlen\<close> eingeführt habe,
-ist \<^const>\<open>bsp_erfuellte_maxime\<close> False und \<^const>\<open>stehlen\<close> ist eine uneindeutige Handlung.
-Ich vermute, das liegt daran, dass die \<^const>\<open>maxime_hatte_konsens\<close> auch testen muss,
-dass der Konsens eingelöst wurde!\<close>
 
   
 
@@ -798,7 +797,7 @@ lemma mhg_katimp_maxime_altruistischer_fortschritt:
    apply (simp add: zahlenwps_id)
     by simp
 
-
+text\<open>Folgendes Theorem zeigt, dass das \<^const>\<open>MaximeDisj\<close> Konstrukt in jeder Welt funktioniert.\<close>
 theorem
   \<open>ex_erfuellbare_instanz maxime_altruistischer_fortschritt welt ha \<and>
     (\<forall>p. maxime_und_handlungsabsicht_generalisieren
