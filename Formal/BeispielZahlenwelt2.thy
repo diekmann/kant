@@ -19,7 +19,6 @@ Allerdings führen wir einige Erweiterungen ein:
     gleichzeitig eine wohlgeformte Handlungsabsicht zu haben.
     TODO: machen
   \<^item> Als weitere spezielle Entität wird die Umwelt eingeführt.
-    TODO: auch ein Beispiel damit.
 \<close>
 
 record zahlenwelt =
@@ -304,7 +303,8 @@ lemma existierende_abmachung_einloesen_zahlenwps_pullout:
 (*>*)
 
 text\<open>In jeder Welt ist damit die Handlungsabsicht wohlgeformt.\<close>
-lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt
+lemma wohlgeformte_handlungsabsicht_existierende_abmachung_einloesen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt
          (Handlungsabsicht existierende_abmachung_einloesen)\<close>
   apply(simp add: wohlgeformte_handlungsabsicht.simps)
   apply(cases \<open>welt\<close>, simp)
@@ -594,27 +594,27 @@ text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>abbauen i p welt = Some (welt\<lparr> besitz := \<lbrakk>(besitz welt)(p += int i)\<rbrakk>, umwelt := (umwelt welt) - int i \<rparr>)\<close>
 
-lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abbauen n))\<close>
+(*<*)
+lemma wohlgeformte_handlungsabsicht_abbauen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (abbauen n))\<close>
   apply(case_tac \<open>welt\<close>, simp add: wohlgeformte_handlungsabsicht.simps)
   apply(simp add: zahlenwps_def swap_def Fun.swap_def)
   by (simp add: konsensswap_sym)
-
-lemma \<open>wohlgeformte_handlungsabsicht zahlenwps initialwelt (Handlungsabsicht (abbauen n))\<close>
-  by(code_simp)
-
+(*>*)
 
 
 
 fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>reset ich welt = Some (welt\<lparr> besitz := \<lambda> _. 0\<rparr>)\<close>
 
-
-lemma \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
+(*<*)
+lemma wohlgeformte_handlungsabsicht_reset:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht reset)\<close>
   apply(simp add: wohlgeformte_handlungsabsicht.simps handeln_def nachher_handeln.simps)
   apply(simp add: zahlenwps_def konsensswap_sym)
   apply(simp add: swap_def fun_eq_iff)
   done
-  
+(*>*)
 
 fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>alles_kaputt_machen ich welt = Some (welt\<lparr> besitz := \<lambda> _. Min ((besitz welt) ` UNIV) - 1 \<rparr>)\<close>
@@ -626,12 +626,47 @@ lemma alles_kaputt_machen_code[code]:
   done
 
 
+(*<*)
+declare alles_kaputt_machen.simps[simp del]
+
+lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
+  \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht alles_kaputt_machen)\<close>
+  apply(simp add: wohlgeformte_handlungsabsicht.simps)
+  apply(simp add: alles_kaputt_machen_code)
+  apply(simp add: zahlenwps_def konsensswap_sym)
+  apply(case_tac \<open>welt\<close>, simp add: fun_eq_iff)
+  apply(simp add: min_list_swap_int_enum)
+  by (simp add: swap_def)
+(*>*)
+
 
 
 
 fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>unmoeglich _ _ = None\<close>
 
+
+
+text\<open>Die Beispielhandlungsabsichten, die wir betrachten wollen.\<close>
+definition \<open>handlungsabsichten \<equiv> [
+  Handlungsabsicht (abbauen 5),
+  Handlungsabsicht (stehlen 3 10),
+  Handlungsabsicht existierende_abmachung_einloesen,
+  Handlungsabsicht reset,
+  Handlungsabsicht alles_kaputt_machen,
+  Handlungsabsicht unmoeglich
+]\<close>
+
+lemma wfh_handlungsabsichten:
+  \<open>ha \<in> set handlungsabsichten \<Longrightarrow> wohlgeformte_handlungsabsicht zahlenwps welt ha\<close>
+  apply(simp add: handlungsabsichten_def)
+  apply(safe)
+       apply(simp add: wohlgeformte_handlungsabsicht_abbauen; fail)
+      apply(simp add: wohlgeformte_handlungsabsicht_stehlen; fail)
+     apply(simp add: wohlgeformte_handlungsabsicht_existierende_abmachung_einloesen; fail)
+    apply(simp add: wohlgeformte_handlungsabsicht_reset; fail)
+  apply(simp add: wohlgeformte_handlungsabsicht_alles_kaputt_machen; fail)
+  by (simp add: wohlgeformte_handlungsabsicht.simps)
 
 
 
@@ -646,12 +681,7 @@ definition maxime_altruistischer_fortschritt :: \<open>(person, zahlenwelt) maxi
 (*existierende_abmachung_einloesen macht, dass die Maxime nicht erfuellt.*)
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
-  [Handlungsabsicht (abbauen 5),
-   Handlungsabsicht (stehlen 3 10),
-   Handlungsabsicht existierende_abmachung_einloesen,
-   Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen,
-   Handlungsabsicht unmoeglich]
+  handlungsabsichten
   maxime_altruistischer_fortschritt
 = Some
   \<lparr>
@@ -717,12 +747,7 @@ beispiel \<open>erzeuge_beispiel
 
 beispiel \<open>erzeuge_beispiel
   zahlenwps initialwelt
-  [Handlungsabsicht (abbauen 5),
-   Handlungsabsicht (stehlen 3 10),
-   Handlungsabsicht existierende_abmachung_einloesen,
-   Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen,
-   Handlungsabsicht unmoeglich]
+  handlungsabsichten
   (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
 = Some
   \<lparr>
@@ -817,12 +842,7 @@ text\<open>Folgendes Beispiel ist wie die vorherigen Beispiel.
 Zusätzlich fügen wir jedoch noch \<^const>\<open>maxime_keine_umweltzerstoerung\<close> via \<^const>\<open>MaximeConj\<close> hinzu.\<close>
 beispiel\<open>erzeuge_beispiel
   zahlenwps initialwelt
-  [Handlungsabsicht (abbauen 5),
-   Handlungsabsicht (stehlen 3 10),
-   Handlungsabsicht existierende_abmachung_einloesen,
-   Handlungsabsicht reset,
-   Handlungsabsicht alles_kaputt_machen,
-   Handlungsabsicht unmoeglich]
+  handlungsabsichten
   (MaximeConj (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
               maxime_keine_umweltzerstoerung)
 = Some
@@ -841,4 +861,5 @@ beispiel\<open>erzeuge_beispiel
 text\<open>Das Ergebnis ist fast wie in vorherigen Beispielen.
 Allerdings ist \<^const>\<open>abbauen\<close> nun Teil der verbotenen Handlungsabsichten,
 da dabei Umwelt abgebaut wird.\<close>
+
 end
