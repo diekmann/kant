@@ -6,9 +6,35 @@ section\<open>Änderungen in Welten\<close>
 text\<open>In diesem Abschnitt werden wir Änderungen in Welten,
 und darauf basierend, Abmachungen modellieren.\<close>
 
+text\<open>Bei einer Änderung keine eine Person entweder etwas verlieren oder gewinnen.
+Dieses einfache Modell ist natürlich auf unsere Zahlenwelten angepasst,
+in der normalerweise Typ \<^typ>\<open>'etwas\<close> ein \<^typ>\<open>int\<close> ist.\<close>
 datatype ('person, 'etwas) aenderung = Verliert \<open>'person\<close> \<open>'etwas\<close> | Gewinnt \<open>'person\<close> \<open>'etwas\<close>
 
 text\<open>Beispiel: \<^term>\<open>[Gewinnt Alice 3, Verliert Bob 3]::(person, int) aenderung list\<close>.\<close>
+
+text\<open>Von einer \<^typ>\<open>('person, 'etwas) aenderung\<close> betroffene Person bzw. Personen.\<close>
+definition betroffen :: \<open>('person, 'etwas) aenderung \<Rightarrow> 'person\<close>
+  where
+\<open>betroffen a \<equiv> case a of Verliert p _ \<Rightarrow> p | Gewinnt p _ \<Rightarrow> p\<close>
+
+definition betroffene :: \<open>('person, 'etwas) aenderung list \<Rightarrow> 'person list\<close>
+  where
+\<open>betroffene as \<equiv> map betroffen as\<close>
+
+(*<*)
+lemma betroffene_case_aenderung:
+  \<open>betroffene = map (case_aenderung (\<lambda>p _. p) (\<lambda>p _. p))\<close>
+  by(simp add: fun_eq_iff betroffene_def betroffen_def)
+(*>*)
+
+
+beispiel \<open>betroffene [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
+  = [Alice, Bob, Carol, Eve]\<close> by eval
+beispiel \<open>betroffene [Verliert Alice (5::nat), Gewinnt Bob 3, Verliert Eve 7]
+  = [Alice, Bob, Eve]\<close> by eval
+beispiel \<open>betroffene [Verliert Alice (5::nat), Gewinnt Alice 3]
+  = [Alice, Alice]\<close> by eval
 
 (*<*)
 text\<open>Das Delta um von \<^term>\<open>i2\<close> nach \<^term>\<open>i2\<close> zu kommen.\<close>
@@ -66,36 +92,17 @@ lemma  delta_num_sum_delta_num:
 (*>*)
 
 subsection\<open>Deltas\<close>
-text\<open>Deltas, d.h. Unterschiede zwischen Welten.\<close>
+text\<open>Deltas, d.h. Unterschiede zwischen Welten.
+Ein Delta ist eine Liste von Änderungen.
+Wir definieren das @{theory_text \<open>type_synonym\<close>} delta als die Funktion,
+welche solch eine Liste berechnet,
+gegeben die Handlung welche die Veränderung hervorruft.\<close>
 (*Man könnte eine class Delta world einführen, mit einer delta-Funtion
   :: welt -> welt -> [Aenderung person etwas]
 Diese Klasse würde dann Welten mit Personen und Etwas in Relation setzen.
 Dafür bräuchte es MultiParamTypeClasses. Eine simple Funktion ist da einfacher.*)
 type_synonym ('welt, 'person, 'etwas) delta =
     \<open>'welt handlung \<Rightarrow> (('person, 'etwas) aenderung) list\<close>
-
-text\<open>Von einer \<^typ>\<open>('person, 'etwas) aenderung\<close> betroffene.\<close>
-definition betroffen :: \<open>('person, 'etwas) aenderung \<Rightarrow> 'person\<close>
-  where
-\<open>betroffen a \<equiv> case a of Verliert p _ \<Rightarrow> p | Gewinnt p _ \<Rightarrow> p\<close>
-
-definition betroffene :: \<open>('person, 'etwas) aenderung list \<Rightarrow> 'person list\<close>
-  where
-\<open>betroffene as \<equiv> map betroffen as\<close>
-
-(*<*)
-lemma betroffene_case_aenderung:
-  \<open>betroffene = map (case_aenderung (\<lambda>p _. p) (\<lambda>p _. p))\<close>
-  by(simp add: fun_eq_iff betroffene_def betroffen_def)
-(*>*)
-
-
-beispiel \<open>betroffene [Verliert Alice (2::int), Gewinnt Bob 3, Gewinnt Carol 2, Verliert Eve 1]
-  = [Alice, Bob, Carol, Eve]\<close> by eval
-beispiel \<open>betroffene [Verliert Alice (5::nat), Gewinnt Bob 3, Verliert Eve 7]
-  = [Alice, Bob, Eve]\<close> by eval
-beispiel \<open>betroffene [Verliert Alice (5::nat), Gewinnt Alice 3]
-  = [Alice, Alice]\<close> by eval
 
 (*<*)
 definition aenderung_val :: \<open>('person, ('etwas::uminus)) aenderung \<Rightarrow> 'etwas\<close>
@@ -182,13 +189,17 @@ lemma swap_map_map_aenderung_swap:
 (*>*)
 
 
-
+text\<open>Eine Liste von Änderungen lässt sich ausführen.\<close>
 fun aenderung_ausfuehren
   :: \<open>('person, 'etwas::{plus,minus}) aenderung list \<Rightarrow> ('person \<Rightarrow> 'etwas) \<Rightarrow> ('person \<Rightarrow> 'etwas)\<close>
 where
   \<open>aenderung_ausfuehren [] bes = bes\<close>
 | \<open>aenderung_ausfuehren (Verliert p n # deltas) bes = aenderung_ausfuehren deltas \<lbrakk>bes(p -= n)\<rbrakk>\<close>
 | \<open>aenderung_ausfuehren (Gewinnt p n # deltas) bes = aenderung_ausfuehren deltas \<lbrakk>bes(p += n)\<rbrakk>\<close>
+
+text\<open>Die lokale Variable \<^term_type>\<open>bes :: ('person \<Rightarrow> 'etwas)\<close> stellt dabei den
+aktuellen Besitz dar.
+Die Ausgabe der Funktion ist der modifizierte Besitz, nachdem die Änderung ausgeführt wurde.\<close>
 
 beispiel
 \<open>aenderung_ausfuehren
@@ -205,6 +216,8 @@ beispiel
   =
   (\<euro>(Bob:=3, Eve:= 5))\<close>
   by eval
+text\<open>Im vorherigen Beispiel verliert \<^const>\<open>Alice\<close> alles.
+Da sie nun den \<^const>\<open>DEFAULT\<close>-Wert von \<^term>\<open>0::int\<close> besitzt, wird ihre Besitz nicht angezeigt.\<close>
 
 (*<*)
 (*TODO: upstream und vereinfachen!*)
@@ -231,33 +244,46 @@ text\<open>Eine \<^typ>\<open>('person, 'etwas) aenderung list\<close> wie
 z.B. \<^term>\<open>[Gewinnt Alice (3::int), Verliert Bob 3]\<close> ließe sich gut verwenden,
 um eine Abmachung zwischen \<^const>\<open>Alice\<close> und \<^const>\<open>Bob\<close> zu modellieren.
 Allerdings ist diese Darstellung unpraktisch zu benutzen.
-Beispielsweise sind 
-\<^term>\<open>[Gewinnt Alice (3::int), Verliert Bob 3]\<close>, \<^term>\<open>[Verliert Bob 3, Gewinnt Alice (3::int)]\<close>,
-\<^term>\<open>[Gewinnt Alice (1::int), Gewinnt Alice 1, Gewinnt Alice 1, Verliert Bob 3, Verliert Carol 0]\<close>,
+Beispielsweise sind
+
+  \<^item> \<^term>\<open>[Gewinnt Alice (3::int), Verliert Bob 3]\<close>
+  \<^item> \<^term>\<open>[Verliert Bob 3, Gewinnt Alice (3::int)]\<close>
+  \<^item> \<^term>\<open>[Gewinnt Alice (1::int), Gewinnt Alice 1, Gewinnt Alice 1, Verliert Bob 3, Verliert Carol 0]\<close>
+
 extensional betrachtet alle equivalent.
-Es ist praktischer, eine Darstellung zu wählen, in der syntaktische und semantische Äquivalenz
-zusammenfallen.
+Es ist praktischer, eine Darstellung zu wählen,
+in der syntaktische und semantische Äquivalenz zusammenfallen.
 Das bedeutet, eine Abmachung muss eindeutig dargestellt werden.
-Ein Kandidat dafür wäre eine Map \<^typ>\<open>'person \<rightharpoonup> 'etwas\<close>, da diese eindeutig einer
+Ein Kandidat dafür wäre eine Map vom Typ \<^typ>\<open>'person \<rightharpoonup> 'etwas\<close>, da diese eindeutig einer
 \<^typ>\<open>'person\<close> ein \<^typ>\<open>'etwas\<close> zuordnet.
-Dies funktioniert allerdings nur, wenn \<^typ>\<open>'etwas::{uminus,plus}\<close> mit Plus und Minus
+Dies funktioniert allerdings nur, wenn @{typ [source=true] \<open>'etwas::{uminus,plus}\<close>} mit Plus und Minus
 dargestellt werden kann, um \<^const>\<open>Gewinnt\<close> und \<^const>\<open>Verliert\<close> darzustellen.
 Allerdings ist auch diese Darstellung nicht eindeutig,
 da z.B. \<^term>\<open>[Alice \<mapsto> 0] = Map.empty\<close> semantisch gilt,
 solange \<^term>\<open>0\<close> ein neutrales Element ist.
 Deshalb stellen wir eine Abmachung als eine
-totale Funktion \<^typ>\<open>'person \<Rightarrow> ('etwas::{uminus, plus, zero})\<close> dar.
-\<^term>\<open>(\<lambda>_. 0)(Alice := 3, Bob := -3)\<close> bedeutet \<^const>\<open>Alice\<close> bekommt 3, \<^const>\<open>Bob\<close> verliert 3.
+totale Funktion vom Typ @{typ [source=true] \<open>'person \<Rightarrow> ('etwas::{uminus, plus, zero})\<close>} dar.
+Der Term \<^term>\<open>(\<lambda>_. 0)(Alice := 3, Bob := -3)\<close> bedeutet \<^const>\<open>Alice\<close> bekommt 3, \<^const>\<open>Bob\<close> verliert 3.
 \<close>
 type_synonym  ('person, 'etwas) abmachung = \<open>'person \<Rightarrow> 'etwas\<close>
 
-(*TODO: dedup mit aenderung_list_to_to_abmachung*)
+
+text\<open>Folgende Funktion konvertiert eine Liste von Änderungen in ein Abmachung.
+Persönlich finde ich es schöner eine Liste von Änderungen aufzuschreiben,
+mathematisch ist eine Abmachung allerdings überlegen.
+Folgende Funktion sorgt dafür, dass wir Abmachungen dennoch als
+Liste von Änderungen aufschreiben können, dann allerdings mit der Abmachung weiterrechnen.\<close>
 fun to_abmachung
   :: \<open>('person, 'etwas::{ord,zero,plus,minus,uminus}) aenderung list \<Rightarrow> ('person, 'etwas) abmachung\<close>
 where
   \<open>to_abmachung [] = (\<lambda>p. 0)\<close>
 | \<open>to_abmachung (delta # deltas) = 
    \<lbrakk>(to_abmachung deltas)(betroffen delta += aenderung_val delta)\<rbrakk>\<close>
+
+
+beispiel \<open>[to_abmachung [Gewinnt Alice (3::int)], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]
+        = [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
+
 
 (*<*)
 lemma to_abmachung_simp_call:
@@ -326,14 +352,7 @@ fixes f :: \<open>'person::enum \<Rightarrow> ('person, 'etwas::ordered_ab_group
    apply(simp add: enum_class.enum_UNIV)
   apply(simp add: enum_class.enum_distinct)
   done
-(*>*)
 
-
-
-beispiel \<open>[to_abmachung [Gewinnt Alice (3::int)], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]
-        = [(\<lambda>p.0)(Alice := 3), (\<lambda>p.0)(Alice := 3, Bob := -3)]\<close> by eval
-
-(*<*)
 fun abmachung_to_aenderung_list
   :: \<open>'person list \<Rightarrow> ('person, 'etwas::{ord,zero,plus,minus,uminus}) abmachung \<Rightarrow> ('person, 'etwas) aenderung list\<close>
 where
@@ -425,12 +444,47 @@ lemma aenderung_to_abmachung_abmachung_to_aenderung:
 
 
 
+text\<open>Personen, welche von einer Abmachung betroffen sind.\<close>
+definition abmachungs_betroffene :: \<open>('person::enum, 'etwas::zero) abmachung \<Rightarrow> 'person list\<close>
+where
+  \<open>abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]\<close>
+
+beispiel \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
+  = [Alice, Bob]\<close> by eval
+
+
+(*<*)
+lemma abmachungs_betroffene_simp: \<open>abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum\<close>
+proof -
+  have \<open>concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as\<close> for as
+    by(induction \<open>as\<close>) auto
+  thus \<open>?thesis\<close>
+    by(simp add: abmachungs_betroffene_def)
+qed
+
+lemma abmachungs_betroffene_distinct: \<open>distinct (abmachungs_betroffene a)\<close>
+  apply(simp add: abmachungs_betroffene_simp)
+  using enum_class.enum_distinct distinct_filter by blast
+
+lemma abmachungs_betroffene_is_dom: \<open>set (abmachungs_betroffene a) = abmachung_dom a\<close>
+  by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
+
+lemma set_abmachungs_betroffene_swap:
+  \<open>set (abmachungs_betroffene (swap p1 p2 a)) = (swap p1 p2 id) ` set (abmachungs_betroffene a)\<close>
+  apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
+  apply(simp add: image_def)
+  apply(rule Collect_cong)
+  apply(simp add: swap_def Fun.swap_def)
+  by fast
+(*>*)
+
+text\<open>Eine Abmachung lässt sich ausführen.
+Dabei wird effektiv die gegebene \<^term>\<open>besitz::('person \<Rightarrow> 'etwas)\<close> Funktion upgedated.\<close>
 definition abmachung_ausfuehren
   :: \<open>('person, 'etwas::{plus,minus}) abmachung \<Rightarrow> ('person \<Rightarrow> 'etwas) \<Rightarrow> ('person \<Rightarrow> 'etwas)\<close>
 where
   \<open>abmachung_ausfuehren a besitz \<equiv> \<lambda>p. a p + (besitz p)\<close>
 
-text\<open>Beispiel:\<close>
 beispiel
   \<open>abmachung_ausfuehren
     (to_abmachung [Gewinnt Alice 3, Verliert Bob 3])
@@ -483,29 +537,52 @@ lemma aenderung_ausfuehren_abmachung_to_aenderung:
   apply(simp add: enum_class.enum_distinct)
   done
 
+(*>*)
+
+
+text\<open>Es ist equivalent eine Abmachung oder die entsprechende Änderungsliste auszuführen.\<close>
 (*TODO: does this make a good [code] rule? I cannot measure performance changes.*)
 lemma abmachung_ausfuehren_aenderung:
   fixes abmachung :: \<open>('person::enum, 'etwas::ordered_ab_group_add) abmachung\<close>
   shows \<open>abmachung_ausfuehren abmachung = aenderung_ausfuehren (abmachung_to_aenderung abmachung)\<close>
   by(simp add: abmachung_ausfuehren_def fun_eq_iff aenderung_ausfuehren_abmachung_to_aenderung)
-(*>*)
 
 
+subsection\<open>Konsens\<close>
 text\<open>Laut \<^url>\<open>https://de.wikipedia.org/wiki/Konsens#Konsens_im_Rechtssystem\<close> lässt sich Konsens
-wie folg definieren:
+wie folgt definieren:
 "die Übereinstimmung der Willenserklärungen beider Vertragspartner über die Punkte des Vertrages".
 Wir können also \<^term>\<open>to_abmachung [Gewinnt Alice 3, Verliert Bob 3]\<close> verwenden,
 um Konsens zu modellieren.
 Dabei müssen alle Betroffenen die gleiche Vorstellung der Abmachung haben.
 Beispielsweise lässt sich der gesamte Konsens in einer Welt darstellen als
-\<^typ>\<open>'person \<Rightarrow> ('person, 'etwas) abmachung list\<close>, wobei jeder person genau die Abmachungen
+\<^typ>\<open>'person \<Rightarrow> ('person, 'etwas) abmachung list\<close>, wobei jeder Person genau die Abmachungen
 zugeordnet werden, deren sie zustimmt.
 Die Abmachungen sind in einer Liste und keiner Menge, da eine Person eventuell bereit ist,
 Abmachungen mehrfach auszuführen.
 \<close>
 
-
 type_synonym ('person, 'etwas) globaler_konsens = \<open>'person \<Rightarrow> ('person, 'etwas) abmachung list\<close>
+
+text\<open>
+Folgendes Beispiel liest sich wie folgt:
+
+\<^term>\<open>(\<lambda>_. [])(
+    Alice := [to_abmachung [Gewinnt Alice 3], to_abmachung [Gewinnt Alice 3, Verliert Bob 3]],
+    Bob := [to_abmachung [Gewinnt Alice 3, Verliert Bob 3]]) :: (person, int) globaler_konsens\<close>
+
+\<^const>\<open>Alice\<close> stimmt folgendem zu:
+  \<^item> \<^const>\<open>Alice\<close> bekommt 3.
+  \<^item> \<^const>\<open>Alice\<close> bekommt 3 und \<^const>\<open>Bob\<close> muss 3 abgeben.
+
+\<^const>\<open>Bob\<close> stimmt folgendem zu:
+  \<^item> \<^const>\<open>Alice\<close> bekommt 3 und \<^const>\<open>Bob\<close> muss 3 abgeben.
+
+Wir könnten also sagen, dass Konsens zwischen \<^const>\<open>Alice\<close> und \<^const>\<open>Bob\<close> herrscht,
+dass 3 Besitz von \<^const>\<open>Bob\<close> auf \<^const>\<open>Alice\<close> übergehen.
+Zusätzlich wäre es in diesem Beispiel auch okay für \<^const>\<open>Alice\<close>,
+wenn sie 3 Besitz erhalten würde, ohne dass \<^const>\<open>Bob\<close> 3 Besitz verliert.
+\<close>
 
 (*<*)
 definition konsensswap
@@ -534,42 +611,7 @@ lemma konsensswap_same[simp]:
 (*>*)
 
 
-
-definition abmachungs_betroffene :: \<open>('person::enum, 'etwas::zero) abmachung \<Rightarrow> 'person list\<close>
-where
-  \<open>abmachungs_betroffene a \<equiv> [p. p \<leftarrow> Enum.enum, a p \<noteq> 0]\<close>
-
-beispiel \<open>abmachungs_betroffene (to_abmachung [Gewinnt Bob (3::int), Verliert Alice 3])
-  = [Alice, Bob]\<close> by eval
-
-
-(*<*)
-lemma abmachungs_betroffene_simp: \<open>abmachungs_betroffene a = filter (\<lambda>p. a p \<noteq> 0) Enum.enum\<close>
-proof -
-  have \<open>concat (map (\<lambda>p. if a p \<noteq> 0 then [p] else []) as) = filter (\<lambda>p. a p \<noteq> 0) as\<close> for as
-    by(induction \<open>as\<close>) auto
-  thus \<open>?thesis\<close>
-    by(simp add: abmachungs_betroffene_def)
-qed
-
-lemma abmachungs_betroffene_distinct: \<open>distinct (abmachungs_betroffene a)\<close>
-  apply(simp add: abmachungs_betroffene_simp)
-  using enum_class.enum_distinct distinct_filter by blast
-
-lemma abmachungs_betroffene_is_dom: \<open>set (abmachungs_betroffene a) = abmachung_dom a\<close>
-  by(simp add: abmachung_dom_def abmachungs_betroffene_simp enum_class.enum_UNIV)
-
-lemma set_abmachungs_betroffene_swap:
-  \<open>set (abmachungs_betroffene (swap p1 p2 a)) = (swap p1 p2 id) ` set (abmachungs_betroffene a)\<close>
-  apply(simp add: abmachungs_betroffene_simp enum_class.enum_UNIV)
-  apply(simp add: image_def)
-  apply(rule Collect_cong)
-  apply(simp add: swap_def Fun.swap_def)
-  by fast
-(*>*)
-
-
-
+text\<open>Folgendes Prädikat prüft, ob für eine gegebene Abmachung Konsens herrscht.\<close>
 definition enthaelt_konsens
   :: \<open>('person::enum, 'etwas::zero) abmachung \<Rightarrow> ('person, 'etwas) globaler_konsens \<Rightarrow> bool\<close>
 where
@@ -684,14 +726,15 @@ lemma to_abmachung_delta_num_fun_simp_call:
 (*>*)
 
 
-
+text\<open>Gegeben eine Handlung berechnet folgende Funktion die Abmachung,
+aus der diese Handlung resultiert haben könnte.\<close>
 definition reverse_engineer_abmachung
   :: \<open>('person::enum \<Rightarrow> 'etwas::linordered_ab_group_add) handlung \<Rightarrow> ('person, 'etwas) abmachung\<close>
 where
   \<open>reverse_engineer_abmachung h \<equiv>
     fold (\<lambda>p acc. acc(p := (nachher h p) - (vorher h p))) Enum.enum (\<lambda>_. 0)\<close>
 
-
+text\<open>Sollte die Abmachung vom Typ \<^typ>\<open>(person, int) abmachung\<close> sein, ist dies eindeutig.\<close>
 lemma reverse_engineer_abmachung_delta_num_fun:
   \<open>reverse_engineer_abmachung h = to_abmachung (delta_num_fun h)\<close>
   apply(simp add: fun_eq_iff reverse_engineer_abmachung_def)
