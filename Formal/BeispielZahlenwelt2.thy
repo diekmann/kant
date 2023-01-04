@@ -807,6 +807,38 @@ theorem
   using mhg_katimp_maxime_hatte_konsens apply simp
   done
 
-(*TODO: MaximeConj IrgendwasMitUmwelt, und dann sollte abbauen ploetzlich verboten sein,
-waehrend alles andere unveraendert bleibt.*)
+text\<open>Wir könnten zusätzlich noch eine Maxime einführen,
+welche besagt, dass die Umwelt nicht zerstört werden darf.\<close>
+definition maxime_keine_umweltzerstoerung :: \<open>(person, zahlenwelt) maxime\<close> where
+  \<open>maxime_keine_umweltzerstoerung \<equiv>
+      Maxime (\<lambda>_ h. umwelt (vorher h) \<le> umwelt (nachher h))\<close>
+
+text\<open>Folgendes Beispiel ist wie die vorherigen Beispiel.
+Zusätzlich fügen wir jedoch noch \<^const>\<open>maxime_keine_umweltzerstoerung\<close> via \<^const>\<open>MaximeConj\<close> hinzu.\<close>
+beispiel\<open>erzeuge_beispiel
+  zahlenwps initialwelt
+  [Handlungsabsicht (abbauen 5),
+   Handlungsabsicht (stehlen 3 10),
+   Handlungsabsicht existierende_abmachung_einloesen,
+   Handlungsabsicht reset,
+   Handlungsabsicht alles_kaputt_machen,
+   Handlungsabsicht unmoeglich]
+  (MaximeConj (MaximeDisj maxime_altruistischer_fortschritt maxime_hatte_konsens)
+              maxime_keine_umweltzerstoerung)
+= Some
+  \<lparr>
+   bsp_erfuellte_maxime = True,
+   bsp_erlaubte_handlungen = [
+      Handlungsabsicht existierende_abmachung_einloesen,
+      Handlungsabsicht unmoeglich],
+   bsp_verbotene_handlungen = [
+      Handlungsabsicht (abbauen 5),
+      Handlungsabsicht (stehlen 3 10),
+      Handlungsabsicht reset,
+      Handlungsabsicht alles_kaputt_machen],
+   bsp_uneindeutige_handlungen = []\<rparr>\<close>
+  by beispiel_tac
+text\<open>Das Ergebnis ist fast wie in vorherigen Beispielen.
+Allerdings ist \<^const>\<open>abbauen\<close> nun Teil der verbotenen Handlungsabsichten,
+da dabei Umwelt abgebaut wird.\<close>
 end
