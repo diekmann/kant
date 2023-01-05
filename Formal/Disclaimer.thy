@@ -28,6 +28,7 @@ Ich habe
     Dieses Experiment ist allerdings fehlgeschlagen und ist auch nicht im kompilierten pdf Dokument
     enthalten.
 
+
 Dieses Dokument ist ein instabiler Development Snapshot,
 entwickelt auf \<^url>\<open>https://github.com/diekmann/kant\<close>.
 Er enthält sinnvolles und weniger sinnvolle Experimente!
@@ -60,6 +61,7 @@ Dabei sind die Wörter wie folgt zu verstehen
   \<^item> \<^emph>\<open>Kategorischer Imperativ\<close> bezieht sich auf Kants Kategorischer Imperativ.
     Ziel dieser Theorie ist es, moralische Entscheidungen basierend auf Kants Idee zu machen.
 
+Wann immer möglich sind Quellen als klickbare URL direkt ins Dokument integriert.
 
 Der Titel in einfacher Sprache:
 Der kategorische Imperativ, aber wohl nicht so wie Kant ihn gedacht hat,
