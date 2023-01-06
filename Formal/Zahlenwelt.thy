@@ -338,8 +338,17 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
      apply (simp add: swap_def Fun.swap_def; fail)
   by (simp add: fun_upd_twist swap_def Fun.swap_def)
 
+
 (*<*)
-declare Zahlenwelt.stehlen.simps[simp del]
+lemma stehlen_swap_None:
+  "stehlen n opf p2 (swap p1 p2 welt) = None
+    \<longleftrightarrow>
+   stehlen n opf p1 welt = None"
+  apply(simp split: option.split)
+  apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_None)
+  by(auto simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+
+declare stehlen.simps[simp del]
 (*>*)
 
 

@@ -85,14 +85,15 @@ lemma zahlenwps_sym: \<open>zahlenwps p1 p2 = zahlenwps p2 p1\<close>
 lemma zahlenwps_same: \<open>zahlenwps p p w = w\<close>
   by(cases \<open>w\<close>, simp add: zahlenwps_def)
 
-lemma besitz_zahlenwps: \<open>besitz (zahlenwps p1 p2 welt) p2 = besitz welt p1\<close>
-  apply(cases \<open>welt\<close>, simp add: zahlenwps_def)
+lemma besitz_zahlenwps[simp]: "besitz (zahlenwps p1 p2 welt) = swap p1 p2 (besitz welt)"
+  by(simp add: zahlenwps_def)
+
+lemma besitz_zahlenwps_apply: \<open>besitz (zahlenwps p1 p2 welt) p2 = besitz welt p1\<close>
   by (simp add: swap_b)
 
 lemma besitz_zahlenwps_nothing: \<open>pX \<noteq> p1 \<Longrightarrow>
        pX \<noteq> p2 \<Longrightarrow>
        besitz (zahlenwps p1 p2 welt) pX = besitz welt pX\<close>
-  apply(cases \<open>welt\<close>, simp add: zahlenwps_def)
   by (simp add: swap_nothing)
 (*>*)
 
@@ -439,10 +440,12 @@ lemma datatype_split_map_option_equal:
 
 thm datatype_split_map_option_equal[of besitz,
       where makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"]
+
 (*
 lemma
   assumes not_touches_other:
       "\<And>p welt welt'. zha p welt = Some welt' \<Longrightarrow> sel_other welt' = sel_other welt"
+  (*and iff_None: "\<And>p p1 p2 welt. zha p welt = None \<longleftrightarrow> zha p (swap p1 p2 welt) = None"*)
   and make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
   and wpsid: "zwps p2 p1 (zwps p1 p2 zwelt) = zwelt"
   shows
@@ -520,6 +523,7 @@ proof -
 qed
 *)
 
+
 thm wfh_generalize_worldI
 lemma wfh_generalize_worldI:
   fixes wps :: \<open>('person, 'w) wp_swap\<close>
@@ -558,7 +562,6 @@ proof -
   by(simp add: wohlgeformte_handlungsabsicht.simps )
 qed
 
-
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
   apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
@@ -571,10 +574,13 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
     apply(simp add: besitz_sel_update; fail)
    apply(case_tac w, simp add: zahlenwelt.defs; fail)
   apply(simp)
-  (*needs a simpler lemma which describes that stehlen does not touch sel_other. unrelated in lemma above needs to be simpler!*)
-  apply(simp add: Zahlenwelt.stehlen.simps split: option.split)
-  apply(simp add: zahlenwps_def opfer_eindeutig_nach_besitz_auswaehlen_swap_None konsensswap_sym)
-  by(auto simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
+  apply(case_tac "Zahlenwelt.stehlen n p p1 (besitz welt)")
+   apply(simp add: stehlen_swap_None; fail)
+  apply(simp)
+  apply(case_tac "Zahlenwelt.stehlen n p p2 (swap p1 p2 (besitz welt))")
+   apply(simp add: stehlen_swap_None; fail)
+  apply(simp)
+  by (simp add: konsensswap_sym zahlenwps_def)
 
 (*
 (*This is mostly a copy of wohlgeformte_handlungsabsicht_stehlen and this sucks.*)
@@ -590,7 +596,8 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
 *)
 (*>*)
 
-text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.\<close>
+text\<open>Ressourcen können nicht aus dem Nichts erschaffen werden.
+Diese Handlungsabsicht entnimmt der Natur und weist einer Person zu.\<close>
 fun abbauen :: \<open>nat \<Rightarrow> person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>abbauen i p welt = Some (welt\<lparr> besitz := \<lbrakk>(besitz welt)(p += int i)\<rbrakk>, umwelt := (umwelt welt) - int i \<rparr>)\<close>
 
@@ -603,7 +610,9 @@ lemma wohlgeformte_handlungsabsicht_abbauen:
 (*>*)
 
 
-
+text\<open>Diese Handlungsabsicht weist allen Personen ein Besitz von 0 zu.
+Dies vernichtet allen Besitz.
+Personen mit Schulden (negativem Besitz) könnten jedoch profitieren.\<close>
 fun reset :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>reset ich welt = Some (welt\<lparr> besitz := \<lambda> _. 0\<rparr>)\<close>
 
@@ -616,6 +625,10 @@ lemma wohlgeformte_handlungsabsicht_reset:
   done
 (*>*)
 
+text\<open>Die Handlungsabsicht die alles kaputt macht.
+Die Handlungsabsicht sucht sich den minimalen Besitz aller Personen und
+weist allen Personen Eins weniger zu.
+Damit haben alle Personen definitiv weniger als zuvor.\<close>
 fun alles_kaputt_machen :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>alles_kaputt_machen ich welt = Some (welt\<lparr> besitz := \<lambda> _. Min ((besitz welt) ` UNIV) - 1 \<rparr>)\<close>
 
@@ -641,7 +654,7 @@ lemma wohlgeformte_handlungsabsicht_alles_kaputt_machen:
 
 
 
-
+text\<open>Die unmögliche Handlungsabsicht, welche immer scheitert.\<close>
 fun unmoeglich :: \<open>person \<Rightarrow> zahlenwelt \<Rightarrow> zahlenwelt option\<close> where
   \<open>unmoeglich _ _ = None\<close>
 
@@ -794,13 +807,13 @@ lemma wpsm_kommutiert_altruistischer_fortschritt:
   apply(safe)
    apply(case_tac \<open>pX = p1\<close>)
     apply(erule_tac x=\<open>p2\<close> in allE)
-    apply (metis besitz_zahlenwps zahlenwps_sym)
+    apply (simp add: swap_a swap_b zahlenwps_sym; fail)
    apply(case_tac \<open>pX = p2\<close>)
     apply(erule_tac x=\<open>p1\<close> in allE)
-    apply (metis besitz_zahlenwps zahlenwps_sym)
+    apply (simp add: swap_a swap_b zahlenwps_sym; fail)
    apply(erule_tac x=\<open>pX\<close> in allE)
-   apply(simp add: besitz_zahlenwps_nothing zahlenwps_sym)
-  by (metis besitz_zahlenwps besitz_zahlenwps_nothing zahlenwps_sym)
+   apply(simp add: besitz_zahlenwps_nothing zahlenwps_sym swap_nothing; fail)
+  by (metis swap_a swap_b swap_nothing zahlenwps_sym)
 
 lemma mhg_katimp_maxime_altruistischer_fortschritt:
   \<open>\<forall>p. maxime_und_handlungsabsicht_generalisieren zahlenwps welt maxime_altruistischer_fortschritt ha p \<Longrightarrow>
