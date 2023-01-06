@@ -445,7 +445,7 @@ thm datatype_split_map_option_equal[of besitz,
 lemma
   assumes not_touches_other:
       "\<And>p welt welt'. zha p welt = Some welt' \<Longrightarrow> sel_other welt' = sel_other welt"
-  (*and iff_None: "\<And>p p1 p2 welt. zha p welt = None \<longleftrightarrow> zha p (swap p1 p2 welt) = None"*)
+  and iff_None: "\<And>p1 p2 welt. zha p1 welt = None \<longleftrightarrow> zha p2 (zwps p1 p2 welt) = None"
   and make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
   and wpsid: "zwps p2 p1 (zwps p1 p2 zwelt) = zwelt"
   shows
@@ -498,23 +498,34 @@ proof -
  (*TODO hieran arbeite ich gerade*)
   *)
 
+  have XXX:  "zha p2 (zwps p1 p2 zwelt) = Some welt' \<Longrightarrow> sel_other welt' = sel_other (zwps p1 p2 zwelt)"
+    for welt'
+    using not_touches_other[of _ "zwps p1 p2 zwelt"] by simp
+
   show ?thesis
     apply(cases "zha p1 zwelt")
      apply(simp)
-     defer (*I don't think this holds*)
+     using iff_None apply blast
     apply(simp add: not_touches_other[of p1])
+    apply(case_tac "zha p2 (zwps p1 p2 zwelt)")
+     apply(simp)
+     using iff_None apply force
+     apply(simp)
+
+    (*we fail here, since we don't propagate the zwps to the aa*)
+
+     using XXX 
     (*apply(cases "?w")
      apply(simp)
      apply (metis not_touches_other option.map_disc_iff option.simps(3)) (*wtf*)*)
     apply(simp add: option.map_comp)
     apply(subst shuffle_sel)
     apply(simp add: option.map_comp[symmetric])
+    apply(simp)
+    thm not_touches_other
     apply(simp add: not_touches_other)
-    apply(subgoal_tac "zha p2 (zwps p1 p2 zwelt) \<noteq> None")
-      prefer 2
-      using not_touches_other apply auto[1]
     thm ignoreMe2 (*fail from here*)
-    apply(subst ignoreMe2, simp)
+    apply(subst ignoreMe2)
     apply(simp)
     apply(subst ignoreMe)
     apply(simp add: ignoreMe)
@@ -539,7 +550,7 @@ lemma wfh_generalize_worldI:
                                 map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
   shows
 \<open>wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht zha)\<close>
-proof -
+proof -         
   from wf_ha sel_welt sel_wps sel_ha have
     \<open>map_option sel (zha p1 zwelt) = map_option sel (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))\<close>
     for p1 p2
