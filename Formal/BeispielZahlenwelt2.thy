@@ -534,13 +534,13 @@ proof -
 qed
 *)
 
-thm wfh_generalize_worldI
+thm wfh_generalize_worldI (*This needs to be derived from the below super complicated version!*)
 lemma wfh_generalize_worldI:
   fixes wps :: \<open>('person, 'w) wp_swap\<close>
     and welt :: \<open>'w\<close>
     and ha :: \<open>'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>
     and sel :: \<open>'zw \<Rightarrow> 'w\<close>
-  assumes wf_ha: "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht (ha))"
+  assumes wf_ha: "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht ha)"
   and     sel_welt: "sel zwelt = welt"
   and     sel_wps: "\<And>p1 p2 zw. wps p1 p2 (sel zw) = sel (zwps p1 p2 zw)"
   and     sel_ha: "\<And>p zw. ha p (sel zw) = map_option sel (zha p zw)"
@@ -574,31 +574,20 @@ proof -
 
   from wf_ha sel_welt sel_wps sel_ha have wohlgeformt_sel_on_wps_zwelt:
     "map_option sel (zha p2 (zwps p1 p2 zwelt)) =
-  map_option sel (map_option (zwps p1 p2) (zha p1 (zwps p2 p1 (zwps p1 p2 zwelt))))"
+      map_option sel (map_option (zwps p1 p2) (zha p1 (zwps p2 p1 (zwps p1 p2 zwelt))))"
     for p2 p1
-    apply(simp add: wohlgeformte_handlungsabsicht.simps)
-    apply(clarsimp)
-    apply(erule_tac x=\<open>p1\<close> in allE)
-    apply(erule_tac x=\<open>p2\<close> in allE)
-    apply(simp add: option.map_comp)
-    apply(subgoal_tac "wps p2 p1 \<circ> sel = sel \<circ> zwps p2 p1")
-     prefer 2
-     apply fastforce
-    apply(simp)
-    by (smt (verit, best) None_eq_map_option_iff option.exhaust_sel option.map_comp option.map_sel wpsid)
-    (*This whole `have` needs to be redone. The apply style above is blind cargo cult*)
+    by (smt (verit, best) None_eq_map_option_iff option.exhaust_sel option.map_sel wohlgeformt_sel wpsid)
+    (*This whole `have` needs to be redone.*)
 
   have not_touches_other_simp:
     "zha p welt \<noteq> None \<Longrightarrow> map_option sel_other (zha p welt) = Some (sel_other welt)" for p welt
     using not_touches_other by blast
-
 
   from wps_sym have not_touches_other_wps:
     "zha p2 (zwps p1 p2 welt) = Some welt'
                           \<Longrightarrow> sel_other welt' = sel_other (zwps p2 p1 welt)"
     for p1 p2 welt welt'
     using not_touches_other[of p2 "(zwps p1 p2 welt)"] by simp
-
 
   have wpsid': "zwps p2 p1 (zwps p2 p1 w) = w" for w p1 p2
     using wps_sym wpsid by simp
