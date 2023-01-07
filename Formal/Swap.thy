@@ -22,7 +22,7 @@ But then I found that Isabelle/HOL already provides this implementation.
 definition swap :: \<open>'a \<Rightarrow> 'a \<Rightarrow> ('a \<Rightarrow> 'b) \<Rightarrow> 'a \<Rightarrow> 'b\<close> where
   \<open>swap a b f \<equiv> Fun.swap a b f\<close>
 
-beispiel "swap a b f = f(a:=f b, b:= f a)"
+beispiel \<open>swap a b f = f(a:=f b, b:= f a)\<close>
   by (simp add: Fun.swap_def swap_def)
 
 lemma swap1[simp]: \<open>swap a b (swap a b f) = f\<close>

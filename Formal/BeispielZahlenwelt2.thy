@@ -85,7 +85,7 @@ lemma zahlenwps_sym: \<open>zahlenwps p1 p2 = zahlenwps p2 p1\<close>
 lemma zahlenwps_same: \<open>zahlenwps p p w = w\<close>
   by(cases \<open>w\<close>, simp add: zahlenwps_def)
 
-lemma besitz_zahlenwps[simp]: "besitz (zahlenwps p1 p2 welt) = swap p1 p2 (besitz welt)"
+lemma besitz_zahlenwps[simp]: \<open>besitz (zahlenwps p1 p2 welt) = swap p1 p2 (besitz welt)\<close>
   by(simp add: zahlenwps_def)
 
 lemma besitz_zahlenwps_apply: \<open>besitz (zahlenwps p1 p2 welt) p2 = besitz welt p1\<close>
@@ -408,8 +408,8 @@ beispiel
   by code_simp+
 
 (*<*)
-lemma besitz_sel_update: "map_option besitz (map_option (\<lambda>b. w\<lparr>besitz := b\<rparr>) b) = b"
-  apply(cases b)
+lemma besitz_sel_update: \<open>map_option besitz (map_option (\<lambda>b. w\<lparr>besitz := b\<rparr>) b) = b\<close>
+  apply(cases \<open>b\<close>)
    apply(simp; fail)
   apply(simp)
   done
@@ -417,14 +417,14 @@ lemma besitz_sel_update: "map_option besitz (map_option (\<lambda>b. w\<lparr>be
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
   apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen,
-        where sel=besitz
-        and makeZ="\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u"
-        and sel_other="\<lambda>w. (konsens w, staatsbesitz w, umwelt w)"
-        , of welt "besitz welt" _ n p])
+        where sel=\<open>besitz\<close>
+        and makeZ=\<open>\<lambda>b other. case other of (k, s, u) \<Rightarrow> zahlenwelt.make b k s u\<close>
+        and sel_other=\<open>\<lambda>w. (konsens w, staatsbesitz w, umwelt w)\<close>
+        , of \<open>welt\<close> \<open>besitz welt\<close> _ \<open>n\<close> \<open>p\<close>])
           apply(simp; fail)
          apply(simp add: zahlenwps_def; fail)
         apply(simp add: besitz_sel_update; fail)
-       apply(case_tac w, simp add: zahlenwelt.defs; fail)
+       apply(case_tac \<open>w\<close>, simp add: zahlenwelt.defs; fail)
       apply(simp, force)
      apply(simp add: stehlen_swap_None; fail)
     apply(simp add: zahlenwelt.defs zahlenwps_def; fail)

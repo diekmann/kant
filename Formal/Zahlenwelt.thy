@@ -289,9 +289,9 @@ lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall:
   using enum_class.in_enum enum_class.enum_distinct by auto
 
 lemma opfer_eindeutig_nach_besitz_auswaehlen_swap_None:
-  "opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 welt) enum_class.enum = None
+  \<open>opfer_eindeutig_nach_besitz_auswaehlen p (swap p1 p2 welt) enum_class.enum = None
     \<longleftrightarrow>
-   opfer_eindeutig_nach_besitz_auswaehlen p welt enum_class.enum = None"
+   opfer_eindeutig_nach_besitz_auswaehlen p welt enum_class.enum = None\<close>
   by(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)
 
 lemma the_single_elem_None_swap:
@@ -341,9 +341,9 @@ lemma wohlgeformte_handlungsabsicht_stehlen:
 
 (*<*)
 lemma stehlen_swap_None:
-  "stehlen n opf p2 (swap p1 p2 welt) = None
+  \<open>stehlen n opf p2 (swap p1 p2 welt) = None
     \<longleftrightarrow>
-   stehlen n opf p1 welt = None"
+   stehlen n opf p1 welt = None\<close>
   apply(simp split: option.split)
   apply(simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_None)
   by(auto simp add: opfer_eindeutig_nach_besitz_auswaehlen_swap_enumall)

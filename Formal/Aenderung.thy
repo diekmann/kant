@@ -94,7 +94,7 @@ lemma  delta_num_sum_delta_num:
 subsection\<open>Deltas\<close>
 text\<open>Deltas, d.h. Unterschiede zwischen Welten.
 Ein Delta ist eine Liste von Änderungen.
-Wir definieren das @{theory_text \<open>type_synonym\<close>} delta als die Funktion,
+Wir definieren das \<^theory_text>\<open>type_synonym\<close> delta als die Funktion,
 welche solch eine Liste berechnet,
 gegeben die Handlung welche die Veränderung hervorruft.\<close>
 (*Man könnte eine class Delta world einführen, mit einer delta-Funtion
@@ -609,7 +609,7 @@ lemma konsensswap_same[simp]:
   by(simp add: konsensswap_def swap_id_comp)
 
 lemma konsensswap_swap_id:
-  "konsensswap p1 p2 konsens (swap p1 p2 id p) = map (swap p1 p2) (konsens p)"
+  \<open>konsensswap p1 p2 konsens (swap p1 p2 id p) = map (swap p1 p2) (konsens p)\<close>
   apply(simp add: konsensswap_apply)
   by (simp add: swap_fun_swap_id)
 (*>*)
@@ -766,8 +766,8 @@ lemma konsens_wurde_entfernt_konsens_entfernen:
 
 (*makes the simplifier loop*)
 lemma
-  "add_mset (swap p1 p2 a) (image_mset (swap p1 p2) M) =
-     image_mset (swap p1 p2) (add_mset a M)"
+  \<open>add_mset (swap p1 p2 a) (image_mset (swap p1 p2) M) =
+     image_mset (swap p1 p2) (add_mset a M)\<close>
   by simp
 
 lemma konsens_wurde_entfernt_swap:
