@@ -447,7 +447,8 @@ lemma
       "\<And>p welt welt'. zha p welt = Some welt' \<Longrightarrow> sel_other welt' = sel_other welt"
   and iff_None: "\<And>p1 p2 welt. zha p1 welt = None \<longleftrightarrow> zha p2 (zwps p1 p2 welt) = None"
   and make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
-  and wpsid: "zwps p2 p1 (zwps p1 p2 zwelt) = zwelt"
+  and wpsid: "\<And> welt. zwps p2 p1 (zwps p1 p2 welt) = welt"
+  and wps_sym: \<open>\<And>welt p1 p2. zwps p1 p2 welt = zwps p2 p1 welt\<close>
   shows
   "map_option sel_other (zha p1 zwelt) =
              map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
@@ -484,19 +485,34 @@ proof -
     using make_whole
     by (metis not_touches_other option.distinct(1) option.map_sel option.sel) 
 
-  (*
-  have "\<exists>ignoreMe. makeZ ignoreMe (sel_other w) = w" for w
-    using make_whole by auto
-  from this obtain ignoreMe where ignoreMe:
-    "makeZ ignoreMe (sel_other (zwps p1 p2 zwelt)) = zwps p1 p2 zwelt"
-    by blast
+  from wps_sym have not_touches_other_wps:
+    "zha p2 (zwps p1 p2 welt) = Some welt'
+                          \<Longrightarrow> sel_other welt' = sel_other (zwps p2 p1 welt)"
+    for p1 p2 welt welt'
+    using not_touches_other[of p2 "(zwps p1 p2 welt)"] by simp
 
-  have shuffle_sel:
-    "sel_other \<circ> zwps p2 p1 = sel_other \<circ> zwps p2 p1 \<circ> (\<lambda>other. makeZ ignoreMe other) \<circ> sel_other"
-  apply(simp add: fun_eq_iff, clarsimp)
-  sorry
- (*TODO hieran arbeite ich gerade*)
-  *)
+  have other_proof:
+    \<open>map_option sel (zha p1 welt) = map_option sel (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 welt)))\<close>
+    for p1 p2 welt
+    sorry
+  from this[of p2 "zwps p1 p2 zwelt" p1] have sel_wps_propagate:
+    "zha p2 (zwps p1 p2 zwelt) = Some welt'
+      \<Longrightarrow> sel welt' = sel (the (map_option (zwps p2 p1) (zha p1 zwelt)))"
+    for welt'
+    apply(simp add: wpsid)
+    apply(case_tac "zha p1 zwelt")
+     apply(simp; fail)
+    apply(simp)
+    using wps_sym by presburger
+
+  have makeZ_pullout:
+    "makeZ (sel (f a)) (sel_other (f b)) = f (makeZ (sel a) (sel_other b))"
+    for a b f
+    sorry
+
+  have wpsid': "zwps p2 p1 (zwps p2 p1 w) = w" for w
+    using wps_sym wpsid by simp
+
 
   have XXX:  "zha p2 (zwps p1 p2 zwelt) = Some welt' \<Longrightarrow> sel_other welt' = sel_other (zwps p1 p2 zwelt)"
     for welt'
@@ -507,30 +523,17 @@ proof -
      apply(simp)
      using iff_None apply blast
     apply(simp add: not_touches_other[of p1])
+    apply(simp add: option.map_comp)
+    apply(subst shuffle_sel)
     apply(case_tac "zha p2 (zwps p1 p2 zwelt)")
      apply(simp)
      using iff_None apply force
-     apply(simp)
-
-    (*we fail here, since we don't propagate the zwps to the aa*)
-
-     using XXX 
-    (*apply(cases "?w")
-     apply(simp)
-     apply (metis not_touches_other option.map_disc_iff option.simps(3)) (*wtf*)*)
-    apply(simp add: option.map_comp)
-    apply(subst shuffle_sel)
-    apply(simp add: option.map_comp[symmetric])
     apply(simp)
-    thm not_touches_other
-    apply(simp add: not_touches_other)
-    thm ignoreMe2 (*fail from here*)
-    apply(subst ignoreMe2)
-    apply(simp)
-    apply(subst ignoreMe)
-    apply(simp add: ignoreMe)
-    apply(simp add: wpsid)
-    done
+    apply(frule not_touches_other_wps, simp)
+    apply(simp add: sel_wps_propagate)
+    apply(simp add: makeZ_pullout)
+    apply(simp add: wpsid')
+    by (metis make_whole not_touches_other)
 qed
 *)
 
