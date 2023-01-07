@@ -219,10 +219,169 @@ lemma
 
 
 (*<*)
+text\<open>Assume we have a compound datatype, consisting of the parts selected by \<^term>\<open>sel\<close>
+and the parts selected by \<^term>\<open>sel_other\<close>.
+Together, they build the complete datatype.
+But we can reason about \<^const>\<open>map_option\<close> equivalence in isolation.\<close>
+lemma datatype_split_map_option_equal:
+  \<open>map_option sel w1 = map_option sel w2 \<Longrightarrow>
+   (\<And> w. makeZ (sel w) (sel_other w) = w) \<Longrightarrow>
+   map_option sel_other w1 = map_option sel_other w2 \<Longrightarrow>
+  w1 = w2\<close>
+  by (metis (no_types, lifting) None_eq_map_option_iff option.exhaust_sel option.map_sel)
+
+text\<open>Assume we have a compound complex world \<^typ>\<open>'zw\<close>.
+Assume we have a simpler sub-world \<^typ>\<open>'w\<close>.
+Assume we have a Handlungsabsicht in this simpler sub-world \<^term_type>\<open>ha :: 'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>
+which only modifies the sub-world.
+Then we can lift \<^const>\<open>wohlgeformte_handlungsabsicht\<close> from the sub-world to the compound world.
+
+\<^term>\<open>makeZ\<close> is basically the constructor which combines the simpler sub-world with other stuff
+to the complicated compound world.
+
+The \<^term_type>\<open>sel :: 'zw \<Rightarrow> 'w\<close> selects the parts of the compound world which are modified.
+The \<^term_type>\<open>sel_other :: 'zw \<Rightarrow> 'a\<close> selects the parts of the compound world which are not modified.\<close>
+  lemma wfh_generalize_worldI:
+  fixes wps :: \<open>('person, 'w) wp_swap\<close> \<comment>\<open>swap in the simple world\<close>
+    and zwps :: \<open>('person, 'zw) wp_swap\<close> \<comment>\<open>swap in the compound world\<close>
+    and welt :: \<open>'w\<close> \<comment>\<open>the simple world\<close>
+    and zwelt :: \<open>'zw\<close> \<comment>\<open>the compound world\<close>
+    and ha :: \<open>'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>
+    and sel :: \<open>'zw \<Rightarrow> 'w\<close> \<comment>\<open>selects the parts from the compound wold which are modified.\<close>
+    and makeZ :: \<open>'w \<Rightarrow> 'other \<Rightarrow> 'zw\<close> \<comment>\<open>builds the compound world from the simple world and other stuff\<close>
+  assumes wf_ha: "wohlgeformte_handlungsabsicht wps welt (Handlungsabsicht ha)"
+  and     sel_welt: "sel zwelt = welt"
+  and     sel_wps: "\<And>p1 p2 zw. wps p1 p2 (sel zw) = sel (zwps p1 p2 zw)"
+  and     sel_ha: "\<And>p zw. ha p (sel zw) = map_option sel (zha p zw)"
+  and     make_whole: "\<And> w. makeZ (sel w) (sel_other w) = w"
+
+  and not_touches_other:
+      "\<And>p welt welt'. zha p welt = Some welt' \<Longrightarrow> sel_other welt' = sel_other welt"
+  and iff_None: "\<And>p1 p2 welt. zha p1 welt = None \<longleftrightarrow> zha p2 (zwps p1 p2 welt) = None"
+  and makeZ_pullout:
+    "\<And>p1 p2 a b. makeZ (sel (zwps p2 p1 a)) (sel_other (zwps p2 p1 b)) = zwps p2 p1 (makeZ (sel a) (sel_other b))"
+  and wpsid: "\<And> welt p1 p2. zwps p2 p1 (zwps p1 p2 welt) = welt"
+  and wps_sym: \<open>\<And>welt p1 p2. zwps p1 p2 welt = zwps p2 p1 welt\<close>
+
+  shows
+    \<open>wohlgeformte_handlungsabsicht zwps zwelt (Handlungsabsicht zha)\<close>
+proof -         
+  from wf_ha sel_welt sel_wps sel_ha have wohlgeformt_sel:
+    \<open>map_option sel (zha p1 zwelt) = map_option sel (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))\<close>
+    for p1 p2
+    apply(simp add: wohlgeformte_handlungsabsicht.simps)
+    apply(clarsimp)
+    apply(erule_tac x=\<open>p1\<close> in allE)
+    apply(erule_tac x=\<open>p2\<close> in allE)
+    apply(simp add: option.map_comp)
+    apply(subgoal_tac "wps p2 p1 \<circ> sel = sel \<circ> zwps p2 p1")
+     prefer 2
+     apply fastforce
+    apply(simp)
+    done
+
+  have wohlgeformt_sel_on_wps_zwelt:
+    "map_option sel (zha p2 (zwps p1 p2 zwelt)) =
+      map_option sel (map_option (zwps p1 p2) (zha p1 (zwps p2 p1 (zwps p1 p2 zwelt))))"
+    for p2 p1
+    using wohlgeformt_sel[of p1 p2]
+    apply(simp add: wpsid)
+    apply(cases "zha p1 zwelt")
+     apply(simp; fail)
+    apply(cases "zha p2 (zwps p1 p2 zwelt)")
+     apply(simp; fail)
+    apply(simp)
+    by (metis wpsid sel_wps)
+
+  from wps_sym have not_touches_other_wps:
+    "zha p2 (zwps p1 p2 welt) = Some welt'
+                          \<Longrightarrow> sel_other welt' = sel_other (zwps p2 p1 welt)"
+    for p1 p2 welt welt'
+    using not_touches_other[of p2 "(zwps p1 p2 welt)"] by simp
+
+  have wpsid': "zwps p2 p1 (zwps p2 p1 w) = w" for w p1 p2
+    using wps_sym wpsid by simp
+
+  have sel_wps_propagate:
+    "zha p2 (zwps p1 p2 zwelt) = Some welt'
+      \<Longrightarrow> sel welt' = sel (the (map_option (zwps p2 p1) (zha p1 zwelt)))"
+    for welt' p1  p2
+    using wohlgeformt_sel_on_wps_zwelt[of p2 p1]
+    apply(simp add: wpsid)
+    apply(case_tac "zha p1 zwelt")
+     apply(simp; fail)
+    apply(simp)
+    using wps_sym by presburger
+
+  have sel_other_makeZ:
+    "zha p1 zwelt = Some welt' \<Longrightarrow>
+       sel_other zwelt = sel_other (makeZ (sel welt') (sel_other zwelt))"
+    for welt' p1
+    apply -
+    apply(drule not_touches_other[symmetric])
+    using make_whole[of welt'] by simp
+
+  have wohlgeformt_sel_other:
+    "map_option sel_other (zha p1 zwelt) =
+                 map_option sel_other (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))"
+    for p1 p2
+  proof -
+    let ?w="zha p2 (zwps p1 p2 zwelt)"
+    let ?ignoreMe="case ?w of Some w \<Rightarrow> sel w"
+  
+    have ignoreMe: "?w \<noteq> None \<Longrightarrow> makeZ ?ignoreMe (sel_other (the ?w)) = the ?w"
+      apply (cases ?w)
+       apply(simp; fail)
+      apply(simp)
+      using make_whole by simp
+  
+    have shuffle_sel:
+      "map_option (sel_other \<circ> zwps p2 p1) ?w =
+        map_option (sel_other \<circ> zwps p2 p1 \<circ> (\<lambda>other. makeZ ?ignoreMe other) \<circ> sel_other) ?w"
+      for p1 p2
+      apply(cases "?w")
+       apply(simp; fail)
+      apply(simp)
+      using ignoreMe by simp
+
+    show ?thesis
+    apply(cases "zha p1 zwelt")
+     apply(simp)
+     using iff_None apply blast
+    apply(simp add: not_touches_other[of p1])
+     apply(simp add: option.map_comp)
+    apply(subst shuffle_sel)
+    apply(case_tac "zha p2 (zwps p1 p2 zwelt)")
+     apply(simp)
+     using iff_None apply force
+    apply(simp)
+    apply(frule not_touches_other_wps, simp)
+    apply(simp add: sel_wps_propagate)
+    apply(simp add: makeZ_pullout)
+    apply(simp add: wpsid')
+     using sel_other_makeZ by simp
+ qed
+
+  from datatype_split_map_option_equal[OF wohlgeformt_sel make_whole wohlgeformt_sel_other] make_whole have
+    \<open>(zha p1 zwelt) = (map_option (zwps p2 p1) (zha p2 (zwps p1 p2 zwelt)))\<close>
+    for p1 p2
+    by simp
+  then show ?thesis
+  by(simp add: wohlgeformte_handlungsabsicht.simps )
+qed
+
+(*TODO: can we derive wfh_generalize_world_ConstrI from wfh_generalize_worldI?*)
+thm wfh_generalize_worldI[where makeZ="\<lambda>w other. C w" and sel="\<lambda>zw. (inv C) zw"
+                                and zha=zha and zwelt="C welt" and zwps=zwps]
+lemma "inj C \<Longrightarrow> inv C (C welt) = welt" by(simp)
+
 text\<open>Wenn sich eine einfache Welt \<^typ>\<open>'w\<close> in eine komplexere Welt \<^typ>\<open>'zw\<close> übersetzen lässt,
 (wobei die Übersetzung hier \<^term>\<open>C::'w \<Rightarrow> 'zw\<close> ist),
-dann kann auch \<^const>\<open>wohlgeformte_handlungsabsicht\<close> mit übersetzt werden.\<close>
-lemma wfh_generalize_worldI:
+dann kann auch \<^const>\<open>wohlgeformte_handlungsabsicht\<close> mit übersetzt werden.
+
+This is basically @{thm wfh_generalize_worldI}, but instead of \<^term>\<open>sel\<close>,
+we have the opposite: Constructor \<^term>\<open>C\<close>.\<close>
+lemma wfh_generalize_world_ConstrI:
   fixes wps :: \<open>('person, 'w) wp_swap\<close>
     and welt :: \<open>'w\<close>
     and ha :: \<open>'person \<Rightarrow> 'w \<Rightarrow> 'w option\<close>

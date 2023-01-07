@@ -163,7 +163,7 @@ fun stehlen :: \<open>int \<Rightarrow> int \<Rightarrow> person \<Rightarrow> z
 lemma wohlgeformte_handlungsabsicht_stehlen:
   \<open>wohlgeformte_handlungsabsicht zahlenwps welt (Handlungsabsicht (stehlen n p))\<close>
   apply(cases \<open>welt\<close>)
-  apply(rule wfh_generalize_worldI[OF wohlgeformte_handlungsabsicht_stehlen, where C=\<open>Zahlenwelt\<close>])
+  apply(rule wfh_generalize_world_ConstrI[OF wohlgeformte_handlungsabsicht_stehlen, where C=\<open>Zahlenwelt\<close>])
   by(auto)
 (*>*)
 
