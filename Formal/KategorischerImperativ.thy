@@ -252,6 +252,42 @@ dann ist diese Handlung moralisch..
 \<close>
 
 
+definition xor :: "bool \<Rightarrow> bool \<Rightarrow> bool" (infixr "\<oplus>" 25) where
+  "a \<oplus> b \<equiv> \<not> (a \<longleftrightarrow> b)"
+
+lemma "a \<oplus> b = (\<not> (a \<longleftrightarrow> b))" by(auto simp add: xor_def)
+lemma "a \<oplus> b = (a \<noteq> b)" by(auto simp add: xor_def)
+lemma "a \<oplus> b = ((a \<and> \<not>b) \<or> (\<not>a \<and> b))" by(auto simp add: xor_def)
+lemma "a \<oplus> b = (a = (\<not>b))" by(auto simp add: xor_def)
+(*TODO: strik nicht moralisch, i.e. schlecht*)
+
+
+thm kategorischer_imperativ_auf2
+(*wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>*)
+
+lemma \<open>
+  kategorischer_imperativ_auf ha welt m
+  \<longleftrightarrow>
+  (moralisch welt m ha \<oplus> (\<forall>p1 p2. \<not> okay m p2 (handeln p1 welt ha)))\<close>
+  (*TODO: \<not> okay m p1 !*)
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2[symmetric])
+  apply(rule iffI)
+  subgoal
+    apply(elim disjE)
+    subgoal
+      apply(simp)
+      apply (simp add: moralisch_simp)
+      done
+    apply (simp add: moralisch_simp)
+    apply(rule iffI)
+     apply(case_tac "\<exists>p. ausfuehrbar p welt ha")
+      apply(simp; fail)
+     apply(simp; fail)
+    nitpick
+    oops
+   
+
 
 subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
 

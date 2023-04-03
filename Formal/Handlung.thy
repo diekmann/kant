@@ -160,6 +160,16 @@ where
   \<open>ausfuehrbar p welt (Handlungsabsicht h) = (h p welt \<noteq> None)\<close>
 
 (*<*)
+lemma do_not_get_lazy_and_just_assume_everything_is_ausfuehrbar:
+  "(\<forall> ha. ausfuehrbar p welt ha) \<Longrightarrow> False"
+proof -
+  assume a: \<open>\<forall> ha. ausfuehrbar p welt ha\<close>
+  hence \<open>\<forall> h. ausfuehrbar p welt (Handlungsabsicht h)\<close> by blast
+  thus ?thesis
+    apply(simp)
+    by fastforce
+qed
+
 declare ausfuehrbar.simps[simp del]
 (*>*)
 
