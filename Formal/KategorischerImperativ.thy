@@ -252,6 +252,8 @@ dann ist diese Handlung moralisch..
 \<close>
 
 
+
+
 definition xor :: "bool \<Rightarrow> bool \<Rightarrow> bool" (infixr "\<oplus>" 25) where
   "a \<oplus> b \<equiv> \<not> (a \<longleftrightarrow> b)"
 
@@ -264,6 +266,9 @@ lemma "a \<oplus> b = (a = (\<not>b))" by(auto simp add: xor_def)
 
 thm kategorischer_imperativ_auf2
 (*wohlgeformte_handlungsabsicht wps welt ha \<Longrightarrow>*)
+
+lemma "\<not> okay m p2 (handeln p1 welt ha) \<Longrightarrow> ausfuehrbar p1 welt ha"
+  oops
 
 lemma \<open>
   kategorischer_imperativ_auf ha welt m
@@ -304,6 +309,14 @@ lemma blinde_maxime_katimp:
   \<open>kategorischer_imperativ wps welt (Maxime (\<lambda>ich h. m))\<close>
   apply(rule kategorischer_imperativI)
   by(simp)
+
+
+text\<open>Sollte eine Handlungsabsicht nicht ausführbar,
+ sein erfüllt sie immer den kategorischen Imperativ.\<close>
+lemma nicht_ausfuehrbar_katimp:
+  \<open>\<forall>p. \<not> ausfuehrbar p welt ha \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
+  apply(rule kategorischer_imperativ_aufI)
+  by simp
 
 
 text\<open>Eine Maxime welche das \<^term>\<open>ich::'person\<close> ignoriert,
