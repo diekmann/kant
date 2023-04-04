@@ -180,12 +180,12 @@ lemma kategorischer_imperativ_aufI:
 
 
 text\<open>Um den \<^const>\<open>kategorischer_imperativ_auf\<close> einer Handlungsabsicht zu zeigen muss
-entweder die Handlungsabsicht moralisch sein,
+die Handlungsabsicht moralisch sein,
 oder es darf keine Person geben, die diese Handlung auch tatsächlich
 unter gegebener Maxime ausführen würde:\<close>
 lemma kategorischer_imperativ_auf2:
-  \<open>moralisch welt m ha \<or> \<not>(\<exists> p. ausfuehrbar p welt ha \<and> okay m p (handeln p welt ha))
-      \<longleftrightarrow> kategorischer_imperativ_auf ha welt m\<close>
+  \<open>kategorischer_imperativ_auf ha welt m \<longleftrightarrow>
+    moralisch welt m ha \<or> \<not>(\<exists> p. ausfuehrbar p welt ha \<and> okay m p (handeln p welt ha))\<close>
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
 
@@ -292,14 +292,16 @@ dann ist diese Handlung moralisch..
 definition xor :: "bool \<Rightarrow> bool \<Rightarrow> bool" (infixr "\<oplus>" 25) where
   "a \<oplus> b \<equiv> \<not> (a \<longleftrightarrow> b)"
 
-lemma "a \<oplus> b = (\<not> (a \<longleftrightarrow> b))" by(auto simp add: xor_def)
-lemma "a \<oplus> b = (a \<noteq> b)" by(auto simp add: xor_def)
-lemma "a \<oplus> b = ((a \<and> \<not>b) \<or> (\<not>a \<and> b))" by(auto simp add: xor_def)
-lemma "a \<oplus> b = (a = (\<not>b))" by(auto simp add: xor_def)
+lemma "(a \<oplus> b) = (\<not> (a \<longleftrightarrow> b))" by(auto simp add: xor_def)
+lemma "(a \<oplus> b) = (a \<noteq> b)" by(auto simp add: xor_def)
+lemma xor2: "(a \<oplus> b) = ((a \<and> \<not>b) \<or> (\<not>a \<and> b))" by(auto simp add: xor_def)
+lemma "(a \<oplus> b) = (a = (\<not>b))" by(auto simp add: xor_def)
 (*TODO: strikt nicht moralisch, i.e. schlecht*)
 
-
-
+lemma "moralisch welt m ha \<oplus> (\<exists>p1 p2. \<not> okay m p2 (handeln p1 welt ha))"
+  apply (simp add: moralisch_simp)
+  apply(simp add: xor_def)
+  by auto
 
 
 thm kategorischer_imperativ_auf2
@@ -311,14 +313,45 @@ lemma todo_cont_here_for_gleichstellungslemma:
   kategorischer_imperativ_auf ha welt m
   \<longleftrightarrow>
   (moralisch welt m ha \<oplus> (\<forall>p. ausfuehrbar p welt ha \<longrightarrow> \<not> okay m p (handeln p welt ha)))\<close>
-  (*TODO: \<not> okay m p1 !*)
   apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2[symmetric])
+  apply(simp add: kategorischer_imperativ_auf2)
   apply(case_tac "moralisch welt m ha")
    apply(simp)
-   prefer 2
-   apply(simp; fail)
-  apply (simp add: moralisch_simp)
+   apply (simp add: moralisch_simp; fail)
+  apply(simp; fail)
+  done
+
+lemma
+  \<open>\<forall>p. ausfuehrbar p welt ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt m 
+  \<longleftrightarrow>
+   (moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))\<close>
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2)
+  apply(case_tac "moralisch welt m ha")
+   apply(simp add: moralisch_simp)
+  apply(simp)
+  done
+
+lemma
+  \<open>\<forall>p. ausfuehrbar p welt ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt m 
+  \<longleftrightarrow>
+   (moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))\<close>
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2)
+  apply(case_tac "moralisch welt m ha")
+   apply(simp add: moralisch_simp)
+  apply(simp)
+  done
+
+lemma
+  \<open>(moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))
+    \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2)
+  apply(case_tac "moralisch welt m ha")
+   apply(simp)+
   done
 
 lemma \<open>
@@ -327,7 +360,7 @@ lemma \<open>
   (moralisch welt m ha \<oplus> (\<forall>p1 p2. \<not> okay m p2 (handeln p1 welt ha)))\<close>
   (*TODO: \<not> okay m p1 !*)
   apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2[symmetric])
+  apply(simp add: kategorischer_imperativ_auf2)
   apply(case_tac "moralisch welt m ha")
    apply(simp)
    apply (simp add: moralisch_simp; fail)
