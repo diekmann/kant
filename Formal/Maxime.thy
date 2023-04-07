@@ -1,5 +1,5 @@
 theory Maxime
-imports Handlung BeispielPerson ExecutableHelper
+imports Handlung BeispielPerson ExecutableHelper Xor
 begin
 
 section\<open>Maxime\<close>
@@ -178,6 +178,12 @@ corollary
 text\<open>Die umgekehrte Richtung gilt nicht, weil diese Formulierung nur die Handlungen betrachtet,
 die okay sind.\<close>
 
+
+text\<open>Entweder ist etwas moralisch,
+oder es gibt zwei Personen, für die eine Handlungsabsicht nicht \<^const>\<open>okay\<close> ist.\<close>
+lemma moralisch_oder_nicht_okay:
+  "moralisch welt m ha \<oplus> (\<exists>p1 p2. \<not> okay m p2 (handeln p1 welt ha))"
+  by (auto simp add: xor2 moralisch_simp)
 
 (*<*)
 text\<open>Versuch eine executable version zu bauen.

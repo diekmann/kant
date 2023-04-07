@@ -20,6 +20,7 @@ session Kant = Cache +
     BeispielTac
     ExecutableHelper
     Percentage
+    Xor
     Swap
     Helper
   theories [show_question_marks = false]

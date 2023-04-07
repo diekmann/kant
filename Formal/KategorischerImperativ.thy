@@ -188,6 +188,52 @@ lemma kategorischer_imperativ_auf2:
     moralisch welt m ha \<or> \<not>(\<exists> p. ausfuehrbar p welt ha \<and> okay m p (handeln p welt ha))\<close>
   by(auto simp add: kategorischer_imperativ_auf_def moralisch_simp)
 
+corollary
+  \<open>kategorischer_imperativ_auf ha welt m \<longleftrightarrow>
+    moralisch welt m ha \<or> (\<forall> p. ausfuehrbar p welt ha \<longrightarrow> \<not> okay m p (handeln p welt ha))\<close>
+  by (simp add: kategorischer_imperativ_auf2)
+
+text\<open>Man könnte auch sagen,
+damit eine Handlungsabsicht den kategorischen Imperativ erfüllt,
+muss die Handlungsabsicht entweder für alle moralisch sein,
+oder die Handlungsabsicht (soweit ausführbar) ist für alle nicht okay.\<close>
+lemma katimp_eq_entweder_moralisch_oder_nicht_okay:
+  assumes \<open>\<exists>p. ausfuehrbar p welt ha\<close>
+  shows
+  \<open>kategorischer_imperativ_auf ha welt m \<longleftrightarrow>
+    (moralisch welt m ha \<oplus> (\<forall>p. ausfuehrbar p welt ha \<longrightarrow> \<not> okay m p (handeln p welt ha)))\<close>
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2)
+  apply(case_tac "moralisch welt m ha")
+   apply(simp)
+   apply (simp add: assms moralisch_simp; fail)
+  apply(simp; fail)
+  done
+
+text\<open>Also entweder ist die Absicht \<^emph>\<open>für alle\<close> okay, oder sie ist \<^emph>\<open>für alle\<close> nicht okay.\<close>
+
+(*<*)
+lemma
+  \<open>\<forall>p. ausfuehrbar p welt ha \<Longrightarrow>
+  kategorischer_imperativ_auf ha welt m 
+  \<longleftrightarrow>
+   (moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))\<close>
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2)
+  apply(case_tac "moralisch welt m ha")
+   apply(simp add: moralisch_simp)
+  apply(simp)
+  done
+
+lemma
+  \<open>(moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))
+    \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
+  apply(simp add: xor_def)
+  apply(simp add: kategorischer_imperativ_auf2)
+  apply(case_tac "moralisch welt m ha")
+   apply(simp)+
+  done
+(*>*)
 
 text\<open>Für Beispiele wird es einfacher zu zeigen, dass eine Maxime nicht den
 kategorischen Imperativ erfüllt, wenn wir direkt ein Beispiel angeben.\<close>
@@ -246,12 +292,11 @@ sein muss, wobei beliebige Personen (nicht nur ich) Täter und Opfer sein könne
 \<close>
 
 (*<*)
-(*TODO: namen?*)
 lemma
   \<open>kategorischer_imperativ_auf ha welt m \<Longrightarrow>
     (\<forall> p ich.
       ausfuehrbar ich welt ha \<and> okay m ich (handeln ich welt ha)
-      \<longrightarrow> okay m p (handeln ich welt ha))\<close>
+       \<longrightarrow> okay m p (handeln ich welt ha))\<close>
   apply(simp add: kategorischer_imperativ_auf_simp)
   by blast
 
@@ -261,7 +306,7 @@ lemma
   \<open>kategorischer_imperativ_auf ha welt m \<Longrightarrow>
     (\<forall> p ich.
        okay m ich (handeln ich welt ha)
-      \<longrightarrow> okay m p (handeln ich welt ha))\<close>
+        \<longrightarrow> okay m p (handeln ich welt ha))\<close>
   apply(simp add: kategorischer_imperativ_auf_simp)
   apply(clarsimp)
   apply (metis ausgangszustand_ist_gut handeln_def nicht_ausfuehrbar_nachher_handeln)
@@ -281,98 +326,6 @@ Wenn eine Maxime den kategorischen Imperativ erfüllt
 und es für eine beliebige (wohlgeformte) Handlung auszuführen für mich okay ist diese auszuführen,
 dann ist diese Handlung moralisch..
 \<close>
-
-
-
-
-
-
-
-
-definition xor :: "bool \<Rightarrow> bool \<Rightarrow> bool" (infixr "\<oplus>" 25) where
-  "a \<oplus> b \<equiv> \<not> (a \<longleftrightarrow> b)"
-
-lemma "(a \<oplus> b) = (\<not> (a \<longleftrightarrow> b))" by(auto simp add: xor_def)
-lemma "(a \<oplus> b) = (a \<noteq> b)" by(auto simp add: xor_def)
-lemma xor2: "(a \<oplus> b) = ((a \<and> \<not>b) \<or> (\<not>a \<and> b))" by(auto simp add: xor_def)
-lemma "(a \<oplus> b) = (a = (\<not>b))" by(auto simp add: xor_def)
-(*TODO: strikt nicht moralisch, i.e. schlecht*)
-
-lemma "moralisch welt m ha \<oplus> (\<exists>p1 p2. \<not> okay m p2 (handeln p1 welt ha))"
-  apply (simp add: moralisch_simp)
-  apply(simp add: xor_def)
-  by auto
-
-
-thm kategorischer_imperativ_auf2
-lemma "\<not> okay m p2 (handeln p1 welt ha) \<Longrightarrow> ausfuehrbar p1 welt ha"
-  oops
-
-lemma todo_cont_here_for_gleichstellungslemma:
-  \<open>\<exists>p. ausfuehrbar p welt ha \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt m
-  \<longleftrightarrow>
-  (moralisch welt m ha \<oplus> (\<forall>p. ausfuehrbar p welt ha \<longrightarrow> \<not> okay m p (handeln p welt ha)))\<close>
-  apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2)
-  apply(case_tac "moralisch welt m ha")
-   apply(simp)
-   apply (simp add: moralisch_simp; fail)
-  apply(simp; fail)
-  done
-
-lemma
-  \<open>\<forall>p. ausfuehrbar p welt ha \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt m 
-  \<longleftrightarrow>
-   (moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))\<close>
-  apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2)
-  apply(case_tac "moralisch welt m ha")
-   apply(simp add: moralisch_simp)
-  apply(simp)
-  done
-
-lemma
-  \<open>\<forall>p. ausfuehrbar p welt ha \<Longrightarrow>
-  kategorischer_imperativ_auf ha welt m 
-  \<longleftrightarrow>
-   (moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))\<close>
-  apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2)
-  apply(case_tac "moralisch welt m ha")
-   apply(simp add: moralisch_simp)
-  apply(simp)
-  done
-
-lemma
-  \<open>(moralisch welt m ha \<oplus> (\<forall>p. \<not> okay m p (handeln p welt ha)))
-    \<Longrightarrow> kategorischer_imperativ_auf ha welt m\<close>
-  apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2)
-  apply(case_tac "moralisch welt m ha")
-   apply(simp)+
-  done
-
-lemma \<open>
-  kategorischer_imperativ_auf ha welt m
-  \<longleftrightarrow>
-  (moralisch welt m ha \<oplus> (\<forall>p1 p2. \<not> okay m p2 (handeln p1 welt ha)))\<close>
-  (*TODO: \<not> okay m p1 !*)
-  apply(simp add: xor_def)
-  apply(simp add: kategorischer_imperativ_auf2)
-  apply(case_tac "moralisch welt m ha")
-   apply(simp)
-   apply (simp add: moralisch_simp; fail)
-  apply(simp)
-  apply (simp add: moralisch_simp)
-  apply(elim exE)
-    (*nitpick*)
-    oops
-
-
-
-
 
 
 subsection\<open>Maximen die den Kategorischen Imperativ immer Erfüllen\<close>
