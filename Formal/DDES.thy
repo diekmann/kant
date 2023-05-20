@@ -58,6 +58,12 @@ datatype ('world, 'event) discrete_event_simulator =
 definition duration :: "'event timed_event \<Rightarrow> time" where
   "duration _ \<equiv> 0"
 
+text\<open>The next time step. Usually, this is \<^term>\<open>at e\<close>.
+But time moves forward monotonically, so if \<^term>\<open>now::time\<close> is already after \<^term>\<open>at e\<close>,
+we stay at \<^term>\<open>now::time\<close> (instead of moving back in time).\<close>
+definition next_time :: "time \<Rightarrow> 'event timed_event \<Rightarrow> time" where
+  "next_time now e \<equiv> max now (at e)"
+
 fun process_one ::
   "('world, 'event) executor \<Rightarrow>
    ('world, 'event) discrete_event_simulator \<Rightarrow> ('world, 'event) discrete_event_simulator"
@@ -67,12 +73,11 @@ where
      of [] \<Rightarrow> DiscreteEventSimulator now hist current []
       | e#events \<Rightarrow>
          DiscreteEventSimulator
-            ((max now (at e)) + (duration e))
-            ((max now (at e), event e)#hist)
+            ((next_time now e) + (duration e))
+            ((next_time now e, event e)#hist)
             (f current hist (event e))
             (events @ next_events e)
       )"
-(*TODO: max now (at e) wants an abbreviation*)
 
 beispiel \<open>process_one (\<lambda>w hist e. if e = ''add42'' then w+42 else w)
   (DiscreteEventSimulator 0 [] (0::int)
@@ -86,7 +91,7 @@ beispiel \<open>process_one (\<lambda>w hist e. if e = ''add42'' then w+42 else 
       RepeatingEvent 4 0 ''nothing'',
       RepeatingEvent 8 0 ''nothing'',
       RepeatingEvent 42 0 ''nothing''])\<close>
-  by(simp add: duration_def)
+  by(simp add: duration_def next_time_def)
 
 text\<open>Execute 5 events:
 time 0
@@ -112,7 +117,7 @@ lemma time_only_moves_forward:
   apply(simp)
   apply(cases "sort_key at fel")
    apply(simp; fail)
-  apply(simp add: duration_def)
+  apply(simp add: duration_def next_time_def)
   apply(rename_tac e, case_tac e)
   apply(simp)
   apply fastforce
