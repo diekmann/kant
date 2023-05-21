@@ -147,8 +147,22 @@ fun exec :: "(int, event) executor" where
   "exec _   world hist (Lohn n) = world + n"
 | "exec now world hist (Einkommenssteuer) = world - ((sum_einkommen (events_since (now - 12) hist)) div 2)"
 
-value \<open>((process_one exec)^^13)
+
+beispiel \<open>((process_one exec)^^13)
+  (DiscreteEventSimulator 0 [] (0::int)
+    [RepeatingEvent 0 1 (Lohn 100), RepeatingEvent 12 12 Einkommenssteuer])
+= DiscreteEventSimulator 12
+  [(12, Einkommenssteuer), (11, Lohn 100), (10, Lohn 100), (9, Lohn 100), (8, Lohn 100), (7, Lohn 100),
+   (6, Lohn 100), (5, Lohn 100), (4, Lohn 100), (3, Lohn 100), (2, Lohn 100), (1, Lohn 100), (0, Lohn 100)]
+  600 [RepeatingEvent 12 1 (Lohn 100), RepeatingEvent 24 12 Einkommenssteuer]\<close> by eval
+
+
+value \<open>((process_one exec)^^26)
   (DiscreteEventSimulator 0 [] (0::int)
     [RepeatingEvent 0 1 (Lohn 100), RepeatingEvent 12 12 Einkommenssteuer])\<close>
+
+(*BUG: welt ist 1150, sollte 1200 sein. Off by one.*)
+
+(*Weil lohn und einkommenssteuer gleichzeitig passieren brauche ich vmtl sort_stable*)
 
 end
