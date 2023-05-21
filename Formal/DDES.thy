@@ -126,11 +126,12 @@ lemma time_only_moves_forward:
 
 hide_const at
 
-(*TODO: assumes time is sorted*)
 fun events_since :: "time \<Rightarrow> 'event past_events \<Rightarrow> 'event past_events" where
   "events_since since [] = []"
 | "events_since since ((t, ev)#hist) =
       (if t \<ge> since then (t,ev)#events_since since hist else events_since since hist)"
+
+(*speed improvement: assumes time is sorted and use take_while*)
 
 beispiel \<open>events_since 4 [(11, ''X''), (5, ''X''), (4, ''X''), (3, ''Y''), (2, ''Y''), (4, ''X'')] =
   [(11, ''X''), (5, ''X''), (4, ''X''), (4, ''X'')]\<close> by eval
