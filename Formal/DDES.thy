@@ -76,7 +76,7 @@ where
          DiscreteEventSimulator
             ((next_time now e) + (duration e))
             ((next_time now e, event e)#hist)
-            (f now world hist (event e))
+            (f (next_time now e) world hist (event e))
             (events @ next_events e)
       )"
 
@@ -160,8 +160,6 @@ beispiel \<open>((process_one exec)^^13)
 value \<open>((process_one exec)^^26)
   (DiscreteEventSimulator 0 [] (0::int)
     [RepeatingEvent 0 1 (Lohn 100), RepeatingEvent 12 12 Einkommenssteuer])\<close>
-
-(*BUG: welt ist 1150, sollte 1200 sein. Off by one.*)
 
 (*Weil lohn und einkommenssteuer gleichzeitig passieren brauche ich vmtl sort_stable*)
 
