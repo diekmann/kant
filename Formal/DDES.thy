@@ -16,7 +16,8 @@ type_synonym 'event past_events = \<open>(time \<times> 'event) list\<close>
 text\<open>We events as datatype (instead of a function) to reason about them.
 An executor must describe how an event is actually executed,
 by describing how it modifies the world.\<close>
-type_synonym ('world, 'event) executor = \<open>'world \<Rightarrow> 'event past_events \<Rightarrow> 'event \<Rightarrow> 'world\<close>
+type_synonym ('world, 'event) executor = \<open>time \<Rightarrow> 'world \<Rightarrow> 'event past_events \<Rightarrow> 'event \<Rightarrow> 'world\<close>
+                                        (* now \<Rightarrow> world  \<Rightarrow>  history           \<Rightarrow> event  \<Rightarrow> world *)
 
 
 text\<open>Events for the Simulator.\<close>
@@ -68,18 +69,18 @@ fun process_one ::
   "('world, 'event) executor \<Rightarrow>
    ('world, 'event) discrete_event_simulator \<Rightarrow> ('world, 'event) discrete_event_simulator"
 where
-  "process_one f (DiscreteEventSimulator now hist current fel) = 
+  "process_one f (DiscreteEventSimulator now hist world fel) = 
     (case sort_key at fel
-     of [] \<Rightarrow> DiscreteEventSimulator now hist current []
+     of [] \<Rightarrow> DiscreteEventSimulator now hist world []
       | e#events \<Rightarrow>
          DiscreteEventSimulator
             ((next_time now e) + (duration e))
             ((next_time now e, event e)#hist)
-            (f current hist (event e))
+            (f now world hist (event e))
             (events @ next_events e)
       )"
 
-beispiel \<open>process_one (\<lambda>w hist e. if e = ''add42'' then w+42 else w)
+beispiel \<open>process_one (\<lambda>now w hist e. if e = ''add42'' then w+42 else w)
   (DiscreteEventSimulator 0 [] (0::int)
     [RepeatingEvent 8 0 ''nothing'',
      RepeatingEvent 4 0 ''nothing'',
@@ -99,7 +100,7 @@ time 0
 time 3
 time 6
 time 8\<close>
-beispiel \<open>((process_one (\<lambda>w _ _. w+1))^^5)
+beispiel \<open>((process_one (\<lambda>_ w _ _. w+1))^^5)
   (DiscreteEventSimulator 0 [] (0::int)
     [RepeatingEvent 0 3 ''X'', RepeatingEvent 0 8 ''X''])
 =
@@ -124,5 +125,30 @@ lemma time_only_moves_forward:
   by force
 
 hide_const at
+
+(*TODO: assumes time is sorted*)
+fun events_since :: "time \<Rightarrow> 'event past_events \<Rightarrow> 'event past_events" where
+  "events_since since [] = []"
+| "events_since since ((t, ev)#hist) =
+      (if t \<ge> since then (t,ev)#events_since since hist else events_since since hist)"
+
+beispiel \<open>events_since 4 [(11, ''X''), (5, ''X''), (4, ''X''), (3, ''Y''), (2, ''Y''), (4, ''X'')] =
+  [(11, ''X''), (5, ''X''), (4, ''X''), (4, ''X'')]\<close> by eval
+
+subsection\<open>Steuerbeispiel\<close>
+
+datatype event = Lohn int | (*Kapitalertraege int |*) Einkommenssteuer
+
+fun sum_einkommen :: "event past_events \<Rightarrow> int" where
+  "sum_einkommen evs = fold (\<lambda>ev acc. acc + (case ev of (_, Lohn n) \<Rightarrow> n | _ \<Rightarrow> 0)) evs 0"
+
+(*Assumes 50% tax*)
+fun exec :: "(int, event) executor" where
+  "exec _   world hist (Lohn n) = world + n"
+| "exec now world hist (Einkommenssteuer) = world - ((sum_einkommen (events_since (now - 12) hist)) div 2)"
+
+value \<open>((process_one exec)^^13)
+  (DiscreteEventSimulator 0 [] (0::int)
+    [RepeatingEvent 0 1 (Lohn 100), RepeatingEvent 12 12 Einkommenssteuer])\<close>
 
 end
