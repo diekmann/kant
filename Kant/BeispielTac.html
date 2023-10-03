@@ -14,22 +14,22 @@
 
 <pre class="source"><span class="keyword1"><span class="command"><span>theory</span></span></span><span> </span><a href="BeispielTac.html"><span>BeispielTac</span></a><span>
   </span><span class="keyword2"><span class="keyword"><span>imports</span></span></span><span> </span><a href="../../HOL/HOL/Main.html"><span>Main</span></a><span>
-  </span><span class="keyword2"><span class="keyword"><span>keywords</span></span></span><span> </span><span class="quoted"><span>"</span><span>beispiel</span><span>"</span></span><span> </span><span class="main"><span>::</span></span><span> thy_goal_stmt
+  </span><span class="keyword2"><span class="keyword"><span>keywords</span></span></span><span> </span><span class="quoted"><span>"beispiel"</span></span><span> </span><span class="main"><span>::</span></span><span> thy_goal_stmt
 </span><span class="keyword2"><span class="keyword"><span>begin</span></span></span><span>
 
-</span><span class="keyword1"><span class="command"><span>section</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>The beispiel Isar Keyword</span><span>›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>section</span></span></span><span class="quoted"><span class="plain_text"><span>‹The beispiel Isar Keyword›</span></span></span><span>
 
-</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹</span><span>The following is a copy of the </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>lemma</span><span class="antiquote"><span>}</span></span></span><span> Isar keyword.</span><span>
-</span><span>The name "beispiel" is German for "example".</span><span>
+</span><span class="keyword1"><span class="command"><span>text</span></span></span><span class="quoted"><span class="plain_text"><span>‹The following is a copy of the </span><span class="antiquoted"><span class="antiquote"><span>@{</span></span><span class="operator"><span>command</span></span><span> </span><span>lemma</span><span class="antiquote"><span>}</span></span></span><span> Isar keyword.
+The name "beispiel" is German for "example".
 
-</span><span>I learned that there are two kinds of people:</span><span>
-</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span>People who use unnamed lemmas as examples and who emphasize examples.</span><span>
-</span><span>  </span><span class="antiquoted"><span>▪</span></span><span> </span><span>People who simply delete unnamed lemmas.</span><span>
+I learned that there are two kinds of people:
+  </span><span class="antiquoted"><span>▪</span></span><span> People who use unnamed lemmas as examples and who emphasize examples.
+  </span><span class="antiquoted"><span>▪</span></span><span> People who simply delete unnamed lemmas.
 
-</span><span>To clearly indicate that many unnamed lemmas are meant as examples and are crucial part</span><span>
-</span><span>of the compiled proof document, I decided to explicitly create a new command for examples.</span><span>
-</span><span>›</span></span></span><span>
-</span><span class="keyword1"><span class="command"><span>ML</span></span></span><span> </span><span class="quoted"><span>‹</span><span>
+To clearly indicate that many unnamed lemmas are meant as examples and are crucial part
+of the compiled proof document, I decided to explicitly create a new command for examples.
+›</span></span></span><span>
+</span><span class="keyword1"><span class="command"><span>ML</span></span></span><span> </span><span class="quoted"><span>‹
 </span><span class="keyword2"><span class="keyword"><span>local</span></span></span><span>
 
 </span><span class="keyword1"><span class="keyword"><span>val</span></span></span><span> </span><span class="entity"><span>long_keyword</span></span><span> </span><span class="main"><span>=</span></span><span>
